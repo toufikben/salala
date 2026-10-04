@@ -31,7 +31,7 @@ class AnimalCard extends ConsumerWidget {
     // after a separator and left it dangling at the end of the row.
     final subtitle = <String>[
       if (headline.isNotEmpty) headline,
-      if (birth != null) birth,
+      ?birth,
     ].join('\n');
     final initial = animal.name.isEmpty
         ? '?'
