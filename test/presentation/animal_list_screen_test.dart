@@ -105,7 +105,13 @@ void main() {
   testWidgets('Arabic renders right-to-left', (tester) async {
     await pumpSalala(tester, locale: const Locale('ar'));
 
-    expect(find.text('الحيوانات'), findsOneWidget);
+    expect(
+      find.descendant(
+        of: find.byType(AppBar),
+        matching: find.text('الحيوانات'),
+      ),
+      findsOneWidget,
+    ); // the nav bar repeats the label, so scope the check to the title
     final context = tester.element(find.byType(AppBar).first);
     expect(Directionality.of(context), TextDirection.rtl);
   });

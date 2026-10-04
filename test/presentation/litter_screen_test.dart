@@ -108,6 +108,11 @@ void main() {
       find.byType(DropdownButtonFormField<String>),
       'Nala',
     );
+    await _pickFrom(
+      tester,
+      find.byType(DropdownButtonFormField<String?>),
+      'Atlas',
+    );
     await _pickFrom(tester, find.byType(DropdownButtonFormField<int>), '3');
 
     final save = find.widgetWithText(FilledButton, 'Save');
