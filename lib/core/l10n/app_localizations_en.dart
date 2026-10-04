@@ -320,6 +320,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get animalDeathDate => 'Died';
 
   @override
+  String get animalDam => 'Dam';
+
+  @override
+  String get animalSire => 'Sire';
+
+  @override
   String get valueUnknown => 'Not recorded';
 
   @override

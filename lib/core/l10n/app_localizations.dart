@@ -658,6 +658,18 @@ abstract class AppLocalizations {
   /// **'Died'**
   String get animalDeathDate;
 
+  /// No description provided for @animalDam.
+  ///
+  /// In en, this message translates to:
+  /// **'Dam'**
+  String get animalDam;
+
+  /// No description provided for @animalSire.
+  ///
+  /// In en, this message translates to:
+  /// **'Sire'**
+  String get animalSire;
+
   /// No description provided for @valueUnknown.
   ///
   /// In en, this message translates to:

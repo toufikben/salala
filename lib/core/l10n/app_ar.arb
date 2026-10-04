@@ -124,6 +124,8 @@
 
   "animalGone": "تم حذف هذا الحيوان.",
   "animalDeathDate": "تاريخ النفوق",
+  "animalDam": "الأم",
+  "animalSire": "الأب",
   "valueUnknown": "غير مسجّل",
   "recordDeleteTitle": "حذف هذا السجل؟",
 

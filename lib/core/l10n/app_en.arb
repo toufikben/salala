@@ -141,6 +141,8 @@
 
   "animalGone": "This animal was deleted.",
   "animalDeathDate": "Died",
+  "animalDam": "Dam",
+  "animalSire": "Sire",
   "valueUnknown": "Not recorded",
   "recordDeleteTitle": "Delete this record?",
 

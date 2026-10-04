@@ -151,12 +151,14 @@ class _IdentityCard extends StatelessWidget {
         (l10n.animalRegistrationNo, animal.registrationNo!),
       if (animal.registry != null && animal.registry!.isNotEmpty)
         (l10n.animalRegistry, animal.registry!),
+      // Plain "Dam"/"Sire" rather than the form's "Dam (mother)": on a card the
+      // label sits in a column of labels and the parenthetical is noise.
       (
-        l10n.litterDam,
+        l10n.animalDam,
         animalById(animals, animal.damId)?.name ?? l10n.valueUnknown,
       ),
       (
-        l10n.litterSire,
+        l10n.animalSire,
         animalById(animals, animal.sireId)?.name ?? l10n.valueUnknown,
       ),
       if (animal.deathDate != null)

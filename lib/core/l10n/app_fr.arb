@@ -124,6 +124,8 @@
 
   "animalGone": "Cet animal a été supprimé.",
   "animalDeathDate": "Mort le",
+  "animalDam": "Mère",
+  "animalSire": "Père",
   "valueUnknown": "Non enregistré",
   "recordDeleteTitle": "Supprimer cet enregistrement ?",
 

@@ -325,6 +325,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get animalDeathDate => 'تاريخ النفوق';
 
   @override
+  String get animalDam => 'الأم';
+
+  @override
+  String get animalSire => 'الأب';
+
+  @override
   String get valueUnknown => 'غير مسجّل';
 
   @override
