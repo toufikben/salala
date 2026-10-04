@@ -164,6 +164,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get actionRetry => 'Réessayer';
 
   @override
+  String get actionClear => 'Effacer';
+
+  @override
   String get lockTitle => 'Salala est verrouillé';
 
   @override
@@ -213,6 +216,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get settingsAbout => 'À propos';
 
   @override
+  String get settingsBuildTag => 'Version';
+
+  @override
   String get settingsOfflineNote =>
       'Tout est stocké sur cet appareil. Sans compte, sans serveur, sans suivi.';
 
@@ -221,4 +227,89 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get settingsExportSoon => 'L\'export PDF et JSON arrive en phase 2.';
+
+  @override
+  String get litterAdd => 'Nouvelle portée';
+
+  @override
+  String get litterAddTitle => 'Enregistrer une portée';
+
+  @override
+  String get litterEmptyTitle => 'Aucune portée pour l\'instant';
+
+  @override
+  String get litterEmptyBody =>
+      'Enregistrez un accouplement pour suivre la gestation et déclarer les chiots en une étape.';
+
+  @override
+  String get litterName => 'Nom de la portée';
+
+  @override
+  String get litterNameRequired => 'Le nom de la portée est obligatoire';
+
+  @override
+  String get litterDam => 'Mère';
+
+  @override
+  String get litterDamRequired => 'Choisissez la mère';
+
+  @override
+  String get litterDamMissing => 'Mère supprimée';
+
+  @override
+  String get litterSire => 'Père';
+
+  @override
+  String get litterSireUnknown => 'Père inconnu';
+
+  @override
+  String get litterNoDams => 'Marquez d\'abord une femelle comme reproductrice';
+
+  @override
+  String get litterMatingDate => 'Date de l\'accouplement';
+
+  @override
+  String get litterWhelpingDate => 'Date de la mise bas';
+
+  @override
+  String get litterWeaningDate => 'Date du sevrage';
+
+  @override
+  String litterExpected(String date) {
+    return 'Mise bas prévue : $date';
+  }
+
+  @override
+  String litterPuppyCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count chiots',
+      one: '1 chiot',
+      zero: 'Aucun chiot déclaré',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get litterPuppiesToRegister => 'Chiots nés';
+
+  @override
+  String get litterPuppiesHint =>
+      'Chaque chiot est ajouté à vos animaux, nommé d\'après la portée';
+
+  @override
+  String get litterNoPuppies => 'Aucun chiot déclaré pour cette portée.';
+
+  @override
+  String get litterGone => 'Cette portée a été supprimée.';
+
+  @override
+  String litterDeleteTitle(String name) {
+    return 'Supprimer $name ?';
+  }
+
+  @override
+  String get litterDeleteBody =>
+      'Les chiots restent dans vos animaux ; seul l\'accouplement est supprimé. Cette action est irréversible.';
 }

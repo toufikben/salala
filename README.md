@@ -15,15 +15,18 @@ network permission in Phase 0–2.
 | [`ARCHITECTURE.md`](ARCHITECTURE.md) | layers, schema decisions, state, security model |
 | [`DECISIONS.md`](DECISIONS.md) | every costly choice, why, and which two are still open |
 
-## Status (Stage 0)
+## Status
 
-- `flutter analyze` (whole project including tests): **No issues found**
-- `flutter test`: **35 passed, 0 failed** — schema 8, animal DAO 8, record DAOs 7,
-  app-lock 7, widget 5
+- CI run **37230817629** (`Analyze and test`, commit `3ae999e`): **No issues
+  found!** and **35 tests passed** — schema 8, animal DAO 8, record DAOs 7,
+  app-lock 7, widget 5. That is the authoritative verdict; the same commands run
+  on the laptop are a convenience, not a gate (see `ROADMAP.md`).
 - Built: database layer with foreign keys and migrations, animal list/form,
-  settings, app-lock PIN gate, English/Arabic/French with RTL
-- Not yet done: CI has never run (no git remote exists — that is an owner
-  decision), litter and record screens, PDF/JSON export
+  settings, app-lock PIN gate, English/Arabic/French with RTL.
+- In flight (Stage 1a, awaiting CI): litter list/form/detail — a whelping
+  registers its puppies as animals in one transaction — plus the three-tab nav
+  bar and a build tag on Settings → About for device-side proof.
+- Not yet done: record screens, PDF/JSON export, reminders.
 
 ## Toolchain
 
@@ -36,10 +39,15 @@ claims are verified on the physical device, not by compilation.
 ```sh
 C:/src/flutter/bin/flutter pub get
 C:/src/flutter/bin/flutter gen-l10n   # regenerate AppLocalizations
-C:/src/flutter/bin/dart analyze
-C:/src/flutter/bin/flutter test -j 1
 C:/src/flutter/bin/dart format lib test
-C:/src/flutter/bin/flutter run        # debug on a connected phone
+```
+
+The debug APK is published to a rolling `debug-apk` prerelease rather than an
+Actions artifact (the account's artifact quota is shared and full — see
+`DECISIONS.md` D13):
+
+```sh
+gh release download debug-apk -p "*.apk" -D build/apk
 ```
 
 Tests open a real SQLite database through `sqflite_common_ffi`, one temp file

@@ -382,6 +382,12 @@ abstract class AppLocalizations {
   /// **'Try again'**
   String get actionRetry;
 
+  /// No description provided for @actionClear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get actionClear;
+
   /// No description provided for @lockTitle.
   ///
   /// In en, this message translates to:
@@ -478,6 +484,12 @@ abstract class AppLocalizations {
   /// **'About'**
   String get settingsAbout;
 
+  /// No description provided for @settingsBuildTag.
+  ///
+  /// In en, this message translates to:
+  /// **'Build'**
+  String get settingsBuildTag;
+
   /// No description provided for @settingsOfflineNote.
   ///
   /// In en, this message translates to:
@@ -495,6 +507,144 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'PDF and JSON export arrive in Phase 2.'**
   String get settingsExportSoon;
+
+  /// No description provided for @litterAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'New litter'**
+  String get litterAdd;
+
+  /// No description provided for @litterAddTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Register a litter'**
+  String get litterAddTitle;
+
+  /// No description provided for @litterEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No litters yet'**
+  String get litterEmptyTitle;
+
+  /// No description provided for @litterEmptyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Record a mating to follow the pregnancy and register the puppies in one step.'**
+  String get litterEmptyBody;
+
+  /// No description provided for @litterName.
+  ///
+  /// In en, this message translates to:
+  /// **'Litter name'**
+  String get litterName;
+
+  /// No description provided for @litterNameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'A litter name is required'**
+  String get litterNameRequired;
+
+  /// No description provided for @litterDam.
+  ///
+  /// In en, this message translates to:
+  /// **'Dam (mother)'**
+  String get litterDam;
+
+  /// No description provided for @litterDamRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose the dam'**
+  String get litterDamRequired;
+
+  /// No description provided for @litterDamMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'Dam removed'**
+  String get litterDamMissing;
+
+  /// No description provided for @litterSire.
+  ///
+  /// In en, this message translates to:
+  /// **'Sire (father)'**
+  String get litterSire;
+
+  /// No description provided for @litterSireUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown sire'**
+  String get litterSireUnknown;
+
+  /// No description provided for @litterNoDams.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark a female as breeding stock first'**
+  String get litterNoDams;
+
+  /// No description provided for @litterMatingDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Mating date'**
+  String get litterMatingDate;
+
+  /// No description provided for @litterWhelpingDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Whelping date'**
+  String get litterWhelpingDate;
+
+  /// No description provided for @litterWeaningDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Weaning date'**
+  String get litterWeaningDate;
+
+  /// No description provided for @litterExpected.
+  ///
+  /// In en, this message translates to:
+  /// **'Expected whelping: {date}'**
+  String litterExpected(String date);
+
+  /// No description provided for @litterPuppyCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No puppies registered} =1{1 puppy} other{{count} puppies}}'**
+  String litterPuppyCount(int count);
+
+  /// No description provided for @litterPuppiesToRegister.
+  ///
+  /// In en, this message translates to:
+  /// **'Puppies born'**
+  String get litterPuppiesToRegister;
+
+  /// No description provided for @litterPuppiesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Each puppy is added to your animals, named after the litter'**
+  String get litterPuppiesHint;
+
+  /// No description provided for @litterNoPuppies.
+  ///
+  /// In en, this message translates to:
+  /// **'No puppies registered for this litter yet.'**
+  String get litterNoPuppies;
+
+  /// No description provided for @litterGone.
+  ///
+  /// In en, this message translates to:
+  /// **'This litter was deleted.'**
+  String get litterGone;
+
+  /// No description provided for @litterDeleteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete {name}?'**
+  String litterDeleteTitle(String name);
+
+  /// No description provided for @litterDeleteBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The puppies stay in your animals; only the mating record is removed. This cannot be undone.'**
+  String get litterDeleteBody;
 }
 
 class _AppLocalizationsDelegate

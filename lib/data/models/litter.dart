@@ -8,7 +8,7 @@ class Litter extends Equatable {
     required this.createdAt,
     required this.updatedAt,
     this.sireId,
-    this.matings,
+    this.matingDate,
     this.whelpingDate,
     this.weaningDate,
     this.notes,
@@ -19,9 +19,10 @@ class Litter extends Equatable {
   final String damId;
   final String? sireId;
 
-  /// Day of the mating(s); kept as a free text/number slot because breeders
-  /// record re-matings differently across registries.
-  final int? matings;
+  /// Unix milliseconds of the mating the whelping date is counted from. The
+  /// column is still named `matings` from schema v1; a re-mating overwrites it,
+  /// which is what a breeder wants the expected date to follow.
+  final int? matingDate;
   final int? whelpingDate;
   final int? weaningDate;
   final String? notes;
@@ -32,7 +33,7 @@ class Litter extends Equatable {
     String? name,
     String? damId,
     String? sireId,
-    int? matings,
+    int? matingDate,
     int? whelpingDate,
     bool clearWhelpingDate = false,
     int? weaningDate,
@@ -44,7 +45,7 @@ class Litter extends Equatable {
       name: name ?? this.name,
       damId: damId ?? this.damId,
       sireId: sireId ?? this.sireId,
-      matings: matings ?? this.matings,
+      matingDate: matingDate ?? this.matingDate,
       whelpingDate: clearWhelpingDate
           ? null
           : (whelpingDate ?? this.whelpingDate),
@@ -61,7 +62,7 @@ class Litter extends Equatable {
       name: map['name']! as String,
       damId: map['dam_id']! as String,
       sireId: map['sire_id'] as String?,
-      matings: map['matings'] as int?,
+      matingDate: map['matings'] as int?,
       whelpingDate: map['whelping_date'] as int?,
       weaningDate: map['weaning_date'] as int?,
       notes: map['notes'] as String?,
@@ -76,7 +77,7 @@ class Litter extends Equatable {
       'name': name,
       'dam_id': damId,
       'sire_id': sireId,
-      'matings': matings,
+      'matings': matingDate,
       'whelping_date': whelpingDate,
       'weaning_date': weaningDate,
       'notes': notes,
@@ -91,7 +92,7 @@ class Litter extends Equatable {
     name,
     damId,
     sireId,
-    matings,
+    matingDate,
     whelpingDate,
     weaningDate,
     notes,

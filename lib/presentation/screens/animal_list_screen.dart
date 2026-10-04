@@ -7,6 +7,7 @@ import '../../core/router/app_router.dart';
 import '../../data/models/animal.dart';
 import '../providers/app_providers.dart';
 import '../widgets/animal_card.dart';
+import '../widgets/salala_nav_bar.dart';
 
 class AnimalListScreen extends ConsumerWidget {
   const AnimalListScreen({super.key});
@@ -17,16 +18,8 @@ class AnimalListScreen extends ConsumerWidget {
     final animals = ref.watch(animalsProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.navAnimals),
-        actions: <Widget>[
-          IconButton(
-            tooltip: l10n.navSettings,
-            icon: const Icon(Icons.settings_outlined),
-            onPressed: () => context.push(AppPaths.settings),
-          ),
-        ],
-      ),
+      appBar: AppBar(title: Text(l10n.navAnimals)),
+      bottomNavigationBar: const SalalaNavBar(index: 0),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => context.push(AppPaths.newAnimal),
         icon: const Icon(Icons.add),

@@ -124,3 +124,39 @@ view instead of the button, and the only assertion was `find.text('Nala')` —
 which matched the form's own text field. Assertions now also prove the route
 popped (`find.byType(AnimalFormScreen), findsNothing`), so "it saved" is
 falsifiable rather than assumed.
+
+## D13 — The debug APK ships as a release asset, not an Actions artifact
+**Forced by the account, 2026-10-04.**
+CI's first run built everything green and then failed on `Upload debug APK`:
+*"Artifact storage quota has been hit"*. The cap (~500 MB on this plan) is
+account-wide, and stale builds from other repositories already fill it — nothing
+`salala` does can fix that. The workflow now publishes the APK to one rolling
+`debug-apk` prerelease with `--clobber`, which uses a separate storage budget and
+keeps exactly one debug build per channel instead of growing with every push.
+Fetch it with `gh release download debug-apk -p "*.apk"`.
+
+## D14 — A whelping and its puppies are written in one transaction
+**Decided by the agent, 2026-10-04.**
+`LitterDao.createWithPuppies` inserts the litter and its animals inside
+`db.transaction`, and stamps `litter_id`, `dam_id` and `sire_id` itself rather
+than trusting the caller. Two reasons: a half-written whelping (litter with no
+puppies, or puppies pointing at a litter that was never saved) is precisely the
+record a paper ledger cannot produce, and the lineage columns are the one thing
+every later feature — pedigree, transfer pack, health inheritance — reads. The
+rollback is tested by making the second puppy collide with an existing primary
+key and asserting the litter row is gone.
+
+## D15 — Three screens, three plain nav bars, no shell route
+**Decided by the agent, 2026-10-04.**
+`SalalaNavBar` is carried by each top-level screen and navigates with
+`context.go`. A `StatefulShellRoute` would preserve a navigation stack per tab,
+which nothing needs at three lists, and it makes every screen harder to pump in
+isolation — the widget tests drive the real app, so the simpler frame is also
+the more testable one.
+
+## D16 — Expected whelping dates are shown only for species we can name
+**Decided by the agent, 2026-10-04.**
+`gestation.dart` knows dog (63 days) and cat (65). An unlisted species returns
+null and the UI shows no estimate. Guessing 63 days for a rabbit or a breeder's
+unusual species would put a wrong date in the place of an honest absence, and a
+wrong due date is the kind of thing that costs a litter.

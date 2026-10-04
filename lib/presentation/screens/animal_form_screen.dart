@@ -7,6 +7,7 @@ import '../../core/l10n/enum_labels.dart';
 import '../../core/utils/date_utils.dart';
 import '../../data/models/animal.dart';
 import '../providers/app_providers.dart';
+import '../widgets/date_tile.dart';
 
 enum AnimalFormMode { create, edit }
 
@@ -215,7 +216,7 @@ class _AnimalFormScreenState extends ConsumerState<AnimalFormScreen> {
                     setState(() => _status = value ?? _status),
               ),
               const SizedBox(height: 12),
-              _BirthDateTile(
+              DateTile(
                 value: _birthDate == null
                     ? null
                     : formatDay(context, _birthDate),
@@ -290,34 +291,6 @@ class _AnimalFormScreenState extends ConsumerState<AnimalFormScreen> {
           ),
         ),
       ),
-    );
-  }
-}
-
-class _BirthDateTile extends StatelessWidget {
-  const _BirthDateTile({
-    required this.label,
-    required this.value,
-    required this.onPick,
-    this.onClear,
-  });
-
-  final String label;
-  final String? value;
-  final VoidCallback onPick;
-  final VoidCallback? onClear;
-
-  @override
-  Widget build(BuildContext context) {
-    return InputDecorator(
-      decoration: InputDecoration(
-        labelText: label,
-        suffixIcon: onClear == null
-            ? const Icon(Icons.calendar_today_outlined)
-            : IconButton(icon: const Icon(Icons.clear), onPressed: onClear),
-      ),
-      isEmpty: value == null,
-      child: InkWell(onTap: onPick, child: Text(value ?? '')),
     );
   }
 }

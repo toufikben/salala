@@ -12,10 +12,11 @@ lib/
   main.dart              bootstrap: open DB, read settings, seed providers, runApp
   app.dart               MaterialApp.router + locale + themes
   core/                  things with no domain knowledge
+    build_info.dart      the CI-stamped build tag, shown on Settings → About
     l10n/                .arb sources + generated AppLocalizations + enum labels
     router/              go_router config, route paths, PIN-gate redirect
     theme/               Material 3 seed, light/dark, 48px touch targets
-    utils/               date formatting through intl
+    utils/               date formatting through intl, gestation arithmetic
   data/
     models/              plain Dart value objects (Equatable), fromMap/toMap
     db/                  schema, open/migrate, DAOs

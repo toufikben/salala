@@ -1,7 +1,8 @@
 name: Flutter CI
 
-# No codegen step: Riverpod providers and l10n are hand-written, and
-# `flutter test`/`flutter build` run `flutter gen-l10n` as part of the build.
+# No build_runner: Riverpod providers are hand-written. The l10n Dart files are
+# committed for the IDE, and `flutter gen-l10n` below regenerates them from the
+# .arb sources so a stale commit can never mask a missing translation.
 
 on:
   push:
@@ -45,6 +46,8 @@ jobs:
     name: Build debug APK
     needs: analyze-and-test
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -60,14 +63,22 @@ jobs:
         run: flutter pub get
 
       - name: Build debug APK
-        # The commit SHA is stamped into the build tag so a phone screenshot
-        # proves which commit an installed APK came from.
+        # The commit SHA is stamped into the build tag and shown on Settings →
+        # About, so a phone screenshot proves which commit the installed APK is.
         run: flutter build apk --debug --dart-define=SALALA_BUILD_TAG=${GITHUB_SHA::7}
 
-      - name: Upload debug APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: salala-debug-apk
-          path: build/app/outputs/flutter-apk/app-debug.apk
-          if-no-files-found: error
-          retention-days: 7
+      - name: Publish the APK on the rolling debug release
+        # This account's Actions artifact storage is capped (~500 MB) and shared
+        # by every repository, so an upload-artifact step here fails on other
+        # projects' stale builds. A release asset is the same file with a
+        # separate budget, and --clobber keeps exactly one debug APK around
+        # instead of growing the total with every push.
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create debug-apk \
+            --prerelease \
+            --title "Debug builds" \
+            --notes "Rolling debug APK — every green CI run replaces this file." \
+            || true
+          gh release upload debug-apk build/app/outputs/flutter-apk/app-debug.apk --clobber

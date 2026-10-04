@@ -70,6 +70,7 @@
   "actionAdd": "Add",
   "actionClose": "Close",
   "actionRetry": "Try again",
+  "actionClear": "Clear",
 
   "lockTitle": "Salala is locked",
   "lockEnterPin": "Enter your PIN",
@@ -88,7 +89,53 @@
   "settingsLanguage": "Language",
   "settingsLanguageSystem": "System default",
   "settingsAbout": "About",
+  "settingsBuildTag": "Build",
   "settingsOfflineNote": "Everything is stored on this device. No account, no server, no tracking.",
   "settingsExport": "Export records",
-  "settingsExportSoon": "PDF and JSON export arrive in Phase 2."
+  "settingsExportSoon": "PDF and JSON export arrive in Phase 2.",
+
+  "litterAdd": "New litter",
+  "litterAddTitle": "Register a litter",
+  "litterEmptyTitle": "No litters yet",
+  "litterEmptyBody": "Record a mating to follow the pregnancy and register the puppies in one step.",
+  "litterName": "Litter name",
+  "litterNameRequired": "A litter name is required",
+  "litterDam": "Dam (mother)",
+  "litterDamRequired": "Choose the dam",
+  "litterDamMissing": "Dam removed",
+  "litterSire": "Sire (father)",
+  "litterSireUnknown": "Unknown sire",
+  "litterNoDams": "Mark a female as breeding stock first",
+  "litterMatingDate": "Mating date",
+  "litterWhelpingDate": "Whelping date",
+  "litterWeaningDate": "Weaning date",
+  "litterExpected": "Expected whelping: {date}",
+  "@litterExpected": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "litterPuppyCount": "{count, plural, =0{No puppies registered} =1{1 puppy} other{{count} puppies}}",
+  "@litterPuppyCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "litterPuppiesToRegister": "Puppies born",
+  "litterPuppiesHint": "Each puppy is added to your animals, named after the litter",
+  "litterNoPuppies": "No puppies registered for this litter yet.",
+  "litterGone": "This litter was deleted.",
+  "litterDeleteTitle": "Delete {name}?",
+  "@litterDeleteTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "litterDeleteBody": "The puppies stay in your animals; only the mating record is removed. This cannot be undone."
 }

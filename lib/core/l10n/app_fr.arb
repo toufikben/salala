@@ -53,6 +53,7 @@
   "actionAdd": "Ajouter",
   "actionClose": "Fermer",
   "actionRetry": "Réessayer",
+  "actionClear": "Effacer",
 
   "lockTitle": "Salala est verrouillé",
   "lockEnterPin": "Saisissez votre code",
@@ -71,7 +72,53 @@
   "settingsLanguage": "Langue",
   "settingsLanguageSystem": "Langue du système",
   "settingsAbout": "À propos",
+  "settingsBuildTag": "Version",
   "settingsOfflineNote": "Tout est stocké sur cet appareil. Sans compte, sans serveur, sans suivi.",
   "settingsExport": "Exporter les dossiers",
-  "settingsExportSoon": "L'export PDF et JSON arrive en phase 2."
+  "settingsExportSoon": "L'export PDF et JSON arrive en phase 2.",
+
+  "litterAdd": "Nouvelle portée",
+  "litterAddTitle": "Enregistrer une portée",
+  "litterEmptyTitle": "Aucune portée pour l'instant",
+  "litterEmptyBody": "Enregistrez un accouplement pour suivre la gestation et déclarer les chiots en une étape.",
+  "litterName": "Nom de la portée",
+  "litterNameRequired": "Le nom de la portée est obligatoire",
+  "litterDam": "Mère",
+  "litterDamRequired": "Choisissez la mère",
+  "litterDamMissing": "Mère supprimée",
+  "litterSire": "Père",
+  "litterSireUnknown": "Père inconnu",
+  "litterNoDams": "Marquez d'abord une femelle comme reproductrice",
+  "litterMatingDate": "Date de l'accouplement",
+  "litterWhelpingDate": "Date de la mise bas",
+  "litterWeaningDate": "Date du sevrage",
+  "litterExpected": "Mise bas prévue : {date}",
+  "@litterExpected": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "litterPuppyCount": "{count, plural, =0{Aucun chiot déclaré} =1{1 chiot} other{{count} chiots}}",
+  "@litterPuppyCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "litterPuppiesToRegister": "Chiots nés",
+  "litterPuppiesHint": "Chaque chiot est ajouté à vos animaux, nommé d'après la portée",
+  "litterNoPuppies": "Aucun chiot déclaré pour cette portée.",
+  "litterGone": "Cette portée a été supprimée.",
+  "litterDeleteTitle": "Supprimer {name} ?",
+  "@litterDeleteTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "litterDeleteBody": "Les chiots restent dans vos animaux ; seul l'accouplement est supprimé. Cette action est irréversible."
 }

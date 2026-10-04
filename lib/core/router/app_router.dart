@@ -14,9 +14,13 @@ class AppPaths {
   static const String lock = '/lock';
   static const String animals = '/animals';
   static const String newAnimal = '/animals/new';
+  static const String litters = '/litters';
+  static const String newLitter = '/litters/new';
   static const String settings = '/settings';
 
   static String editAnimal(String id) => '/animals/$id/edit';
+
+  static String litter(String id) => '/litters/$id';
 }
 
 /// go_router only re-runs `redirect` when this fires.
@@ -72,6 +76,22 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((ref) {
               mode: AnimalFormMode.edit,
               animalId: state.pathParameters['id']!,
             ),
+          ),
+        ],
+      ),
+      GoRoute(
+        path: AppPaths.litters,
+        builder: (context, state) => const LitterListScreen(),
+        routes: <RouteBase>[
+          // Declared before ':id' so a new litter is never read as an id.
+          GoRoute(
+            path: 'new',
+            builder: (context, state) => const LitterFormScreen(),
+          ),
+          GoRoute(
+            path: ':id',
+            builder: (context, state) =>
+                LitterDetailScreen(litterId: state.pathParameters['id']!),
           ),
         ],
       ),

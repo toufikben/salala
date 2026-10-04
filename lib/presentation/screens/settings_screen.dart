@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
+import '../../core/build_info.dart';
 import '../../core/l10n/app_localizations.dart';
-import '../../core/router/app_router.dart';
 import '../providers/app_providers.dart';
 import '../widgets/pin_dialogs.dart';
+import '../widgets/salala_nav_bar.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -15,14 +15,8 @@ class SettingsScreen extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.navSettings),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () =>
-              context.canPop() ? context.pop() : context.go(AppPaths.animals),
-        ),
-      ),
+      appBar: AppBar(title: Text(l10n.navSettings)),
+      bottomNavigationBar: const SalalaNavBar(index: 2),
       body: ListView(
         padding: const EdgeInsets.symmetric(vertical: 8),
         children: <Widget>[
@@ -39,6 +33,14 @@ class SettingsScreen extends ConsumerWidget {
             title: Text(l10n.settingsAbout),
             subtitle: Text(l10n.settingsOfflineNote),
           ),
+          // Only a CI build carries a tag, so this row is the device-side proof
+          // that the APK on the phone is the one just verified.
+          if (buildTag.isNotEmpty)
+            ListTile(
+              leading: const Icon(Icons.tag),
+              title: Text(l10n.settingsBuildTag),
+              subtitle: Text(buildTag),
+            ),
         ],
       ),
     );

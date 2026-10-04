@@ -5,6 +5,7 @@ import 'package:sqflite/sqflite.dart';
 import '../../data/db/daos.dart';
 import '../../data/db/settings_dao.dart';
 import '../../data/models/animal.dart';
+import '../../data/models/litter.dart';
 import '../../services/app_lock_service.dart';
 
 /// The opened database. `main()` overrides this after `ensureInitialized`, and
@@ -97,4 +98,42 @@ class AnimalsController extends AsyncNotifier<List<Animal>> {
 
 final animalsProvider = AsyncNotifierProvider<AnimalsController, List<Animal>>(
   AnimalsController.new,
+);
+
+class LittersController extends AsyncNotifier<List<Litter>> {
+  @override
+  Future<List<Litter>> build() => ref.read(daosProvider).litters.recent();
+
+  /// Writes a whelping and its puppies, then refreshes both lists: puppies are
+  /// animals, so the home list is stale the moment a litter is registered.
+  Future<Litter> register(Litter litter, List<Animal> puppies) async {
+    final daos = ref.read(daosProvider);
+    final created = await daos.litters.createWithPuppies(litter, puppies);
+    await ref.read(animalsProvider.notifier).refresh();
+    await refresh();
+    return created;
+  }
+
+  Future<void> edit(Litter litter) async {
+    await ref.read(daosProvider).litters.update(litter);
+    await refresh();
+  }
+
+  /// Deleting a litter unlinks its animals (`litter_id ON DELETE SET NULL`), so
+  /// the puppies survive as animals and the home list has to be re-read.
+  Future<void> delete(String id) async {
+    final daos = ref.read(daosProvider);
+    await daos.litters.delete(id);
+    await ref.read(animalsProvider.notifier).refresh();
+    await refresh();
+  }
+
+  Future<void> refresh() async {
+    ref.invalidateSelf();
+    await future;
+  }
+}
+
+final littersProvider = AsyncNotifierProvider<LittersController, List<Litter>>(
+  LittersController.new,
 );

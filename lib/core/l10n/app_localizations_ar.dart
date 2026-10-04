@@ -167,6 +167,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get actionRetry => 'إعادة المحاولة';
 
   @override
+  String get actionClear => 'مسح';
+
+  @override
   String get lockTitle => 'سلالة مقفل';
 
   @override
@@ -216,6 +219,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settingsAbout => 'حول التطبيق';
 
   @override
+  String get settingsBuildTag => 'رقم البناء';
+
+  @override
   String get settingsOfflineNote =>
       'كل شيء محفوظ على جهازك. بلا حساب، بلا خادم، بلا تتبع.';
 
@@ -224,4 +230,91 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settingsExportSoon => 'تصدير PDF و JSON يأتي في المرحلة الثانية.';
+
+  @override
+  String get litterAdd => 'ولادة جديدة';
+
+  @override
+  String get litterAddTitle => 'تسجيل ولادة';
+
+  @override
+  String get litterEmptyTitle => 'لا توجد ولادات بعد';
+
+  @override
+  String get litterEmptyBody =>
+      'سجّل التزاوج لمتابعة الحمل وتسجيل الجراء في خطوة واحدة.';
+
+  @override
+  String get litterName => 'اسم الولادة';
+
+  @override
+  String get litterNameRequired => 'اسم الولادة مطلوب';
+
+  @override
+  String get litterDam => 'الأم';
+
+  @override
+  String get litterDamRequired => 'اختر الأم';
+
+  @override
+  String get litterDamMissing => 'أُمّ محذوفة';
+
+  @override
+  String get litterSire => 'الأب';
+
+  @override
+  String get litterSireUnknown => 'أب غير معروف';
+
+  @override
+  String get litterNoDams => 'صنّف أنثى كحيوان تربية أولًا';
+
+  @override
+  String get litterMatingDate => 'تاريخ التزاوج';
+
+  @override
+  String get litterWhelpingDate => 'تاريخ الولادة';
+
+  @override
+  String get litterWeaningDate => 'تاريخ الفطام';
+
+  @override
+  String litterExpected(String date) {
+    return 'الولادة المتوقعة: $date';
+  }
+
+  @override
+  String litterPuppyCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count جرو',
+      many: '$count جروًا',
+      few: '$count جراء',
+      two: 'جروان',
+      one: 'جرو واحد',
+      zero: 'لا توجد جراء مسجلة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get litterPuppiesToRegister => 'عدد الجراء المولودة';
+
+  @override
+  String get litterPuppiesHint => 'يُضاف كل جرو إلى حيواناتك باسم الولادة';
+
+  @override
+  String get litterNoPuppies => 'لم تُسجَّل جراء لهذه الولادة بعد.';
+
+  @override
+  String get litterGone => 'تم حذف هذه الولادة.';
+
+  @override
+  String litterDeleteTitle(String name) {
+    return 'حذف $name؟';
+  }
+
+  @override
+  String get litterDeleteBody =>
+      'تبقى الجراء ضمن حيواناتك، ويُحذف سجل التزاوج فقط. لا يمكن التراجع عن هذه الخطوة.';
 }

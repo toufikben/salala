@@ -24,7 +24,7 @@ the only verifier of compiled Android output.
 | App-lock PIN service (salted SHA-256 in secure storage) | done |
 | en/ar/fr localisation + RTL | done |
 | Animal list, animal form, settings, PIN screens | done |
-| `.github/workflows/flutter-ci.yml` (analyze → test → debug APK) | written, **not yet run** |
+| `.github/workflows/flutter-ci.yml` (analyze → test → APK) | **run 37230817629**: `Analyze and test` success — `No issues found! (ran in 10.3s)`, `35 tests passed.` |
 | Backup/extraction rules closed on Android | done |
 | `dart analyze` (whole project incl. tests) | **No issues found** |
 | `flutter test` | **35 passed, 0 failed, exit 0, 44 s** — schema 8, animal DAO 8, record DAOs 7, app-lock 7, widgets 5 |
@@ -38,18 +38,28 @@ box had scrolled away. It is a `SingleChildScrollView` + `Column` now
 No production key exists, so the release build types stay debug-signed and the
 CI publishes debug artifacts only.
 
+The `dart analyze` and `flutter test` lines above were run on the development
+machine **before** the push. The user has since ruled that verification happens
+on GitHub and on the phone only ("لا تفحص او تبني محليا"), so from here on CI is
+the first verdict a change gets and the device is the second.
+
 ## Stage 1 — The breeder's ledger  *(the wedge the app is judged on)*
 
-- Litter screen: create a litter from a dam + optional sire, due-date math,
-  puppies auto-registered into `animals`.
-- Per-animal record screens: vaccinations (with due/overdue badges), health
-  tests (with expiry badges — the breed-specific screen panel is the
-  differentiator), weight curve, vet visits.
-- Reminder scheduler: 30-day due window, local notifications, no server. Needs
-  a notification plugin decision (`flutter_local_notifications` vs
-  `timezone`-paired scheduling) — decided by a spike, not by argument.
-- `es` and `de` `.arb` files once the copy has stabilised, to avoid translating
-  a moving target.
+### 1a — Litters *(code complete, awaiting CI and the phone)*
+
+- `LitterDao.createWithPuppies` — litter + puppies in one transaction, lineage
+  stamped by the dao (D14).
+- Litter list, litter form, litter detail; a three-tab nav bar (D15).
+- Expected whelping date from the mating date, dog and cat only (D16).
+- en/ar/fr copy for every new string.
+- Tests: 4 litter-DAO cases (linking, rollback, both delete paths), 5 gestation
+  cases, 3 widget cases (empty state, refused save, a whelping that registers
+  three puppies and shows them under Animals).
+
+Still open in Stage 1: per-animal record screens (vaccinations, health tests,
+weights, vet visits), the 30-day reminder scheduler — which needs a
+`flutter_local_notifications` spike, not an argument — and `es`/`de` `.arb`
+files once the copy settles.
 
 Gate: every record type creatable, editable, deletable on the device; reminders
 fire on the phone inside the window; screenshots before/after each function.

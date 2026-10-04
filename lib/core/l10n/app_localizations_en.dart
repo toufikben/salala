@@ -164,6 +164,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get actionRetry => 'Try again';
 
   @override
+  String get actionClear => 'Clear';
+
+  @override
   String get lockTitle => 'Salala is locked';
 
   @override
@@ -213,6 +216,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsAbout => 'About';
 
   @override
+  String get settingsBuildTag => 'Build';
+
+  @override
   String get settingsOfflineNote =>
       'Everything is stored on this device. No account, no server, no tracking.';
 
@@ -221,4 +227,89 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsExportSoon => 'PDF and JSON export arrive in Phase 2.';
+
+  @override
+  String get litterAdd => 'New litter';
+
+  @override
+  String get litterAddTitle => 'Register a litter';
+
+  @override
+  String get litterEmptyTitle => 'No litters yet';
+
+  @override
+  String get litterEmptyBody =>
+      'Record a mating to follow the pregnancy and register the puppies in one step.';
+
+  @override
+  String get litterName => 'Litter name';
+
+  @override
+  String get litterNameRequired => 'A litter name is required';
+
+  @override
+  String get litterDam => 'Dam (mother)';
+
+  @override
+  String get litterDamRequired => 'Choose the dam';
+
+  @override
+  String get litterDamMissing => 'Dam removed';
+
+  @override
+  String get litterSire => 'Sire (father)';
+
+  @override
+  String get litterSireUnknown => 'Unknown sire';
+
+  @override
+  String get litterNoDams => 'Mark a female as breeding stock first';
+
+  @override
+  String get litterMatingDate => 'Mating date';
+
+  @override
+  String get litterWhelpingDate => 'Whelping date';
+
+  @override
+  String get litterWeaningDate => 'Weaning date';
+
+  @override
+  String litterExpected(String date) {
+    return 'Expected whelping: $date';
+  }
+
+  @override
+  String litterPuppyCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count puppies',
+      one: '1 puppy',
+      zero: 'No puppies registered',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get litterPuppiesToRegister => 'Puppies born';
+
+  @override
+  String get litterPuppiesHint =>
+      'Each puppy is added to your animals, named after the litter';
+
+  @override
+  String get litterNoPuppies => 'No puppies registered for this litter yet.';
+
+  @override
+  String get litterGone => 'This litter was deleted.';
+
+  @override
+  String litterDeleteTitle(String name) {
+    return 'Delete $name?';
+  }
+
+  @override
+  String get litterDeleteBody =>
+      'The puppies stay in your animals; only the mating record is removed. This cannot be undone.';
 }

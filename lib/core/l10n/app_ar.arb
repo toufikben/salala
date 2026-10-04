@@ -53,6 +53,7 @@
   "actionAdd": "إضافة",
   "actionClose": "إغلاق",
   "actionRetry": "إعادة المحاولة",
+  "actionClear": "مسح",
 
   "lockTitle": "سلالة مقفل",
   "lockEnterPin": "أدخل الرمز السري",
@@ -71,7 +72,53 @@
   "settingsLanguage": "اللغة",
   "settingsLanguageSystem": "لغة النظام",
   "settingsAbout": "حول التطبيق",
+  "settingsBuildTag": "رقم البناء",
   "settingsOfflineNote": "كل شيء محفوظ على جهازك. بلا حساب، بلا خادم، بلا تتبع.",
   "settingsExport": "تصدير السجلات",
-  "settingsExportSoon": "تصدير PDF و JSON يأتي في المرحلة الثانية."
+  "settingsExportSoon": "تصدير PDF و JSON يأتي في المرحلة الثانية.",
+
+  "litterAdd": "ولادة جديدة",
+  "litterAddTitle": "تسجيل ولادة",
+  "litterEmptyTitle": "لا توجد ولادات بعد",
+  "litterEmptyBody": "سجّل التزاوج لمتابعة الحمل وتسجيل الجراء في خطوة واحدة.",
+  "litterName": "اسم الولادة",
+  "litterNameRequired": "اسم الولادة مطلوب",
+  "litterDam": "الأم",
+  "litterDamRequired": "اختر الأم",
+  "litterDamMissing": "أُمّ محذوفة",
+  "litterSire": "الأب",
+  "litterSireUnknown": "أب غير معروف",
+  "litterNoDams": "صنّف أنثى كحيوان تربية أولًا",
+  "litterMatingDate": "تاريخ التزاوج",
+  "litterWhelpingDate": "تاريخ الولادة",
+  "litterWeaningDate": "تاريخ الفطام",
+  "litterExpected": "الولادة المتوقعة: {date}",
+  "@litterExpected": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "litterPuppyCount": "{count, plural, =0{لا توجد جراء مسجلة} =1{جرو واحد} =2{جروان} few{{count} جراء} many{{count} جروًا} other{{count} جرو}}",
+  "@litterPuppyCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "litterPuppiesToRegister": "عدد الجراء المولودة",
+  "litterPuppiesHint": "يُضاف كل جرو إلى حيواناتك باسم الولادة",
+  "litterNoPuppies": "لم تُسجَّل جراء لهذه الولادة بعد.",
+  "litterGone": "تم حذف هذه الولادة.",
+  "litterDeleteTitle": "حذف {name}؟",
+  "@litterDeleteTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "litterDeleteBody": "تبقى الجراء ضمن حيواناتك، ويُحذف سجل التزاوج فقط. لا يمكن التراجع عن هذه الخطوة."
 }

@@ -12,6 +12,20 @@ AnimalStatus statusFromName(String? value) => AnimalStatus.values.firstWhere(
   orElse: () => AnimalStatus.active,
 );
 
+/// The litter's puppies, in name order — the order a breeder reads them off the
+/// whelping box.
+List<Animal> puppiesOf(List<Animal> animals, String litterId) =>
+    animals.where((a) => a.litterId == litterId).toList(growable: false)
+      ..sort((a, b) => a.name.compareTo(b.name));
+
+Animal? animalById(List<Animal> animals, String? id) {
+  if (id == null) return null;
+  for (final animal in animals) {
+    if (animal.id == id) return animal;
+  }
+  return null;
+}
+
 class Animal extends Equatable {
   const Animal({
     required this.id,
