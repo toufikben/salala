@@ -390,9 +390,9 @@ class _SparklinePainter extends CustomPainter {
         ),
     ];
 
-    final line = Path()
-      ..moveTo(points.first.dx, points.first.dy)
-      ..addPoints(points.sublist(1));
+    // `close: false` is what makes a polygon a polyline: the stroke runs through
+    // the points without drawing back from the last weigh-in to the first.
+    final line = Path()..addPolygon(points, false);
     canvas.drawPath(
       line,
       Paint()
