@@ -392,7 +392,7 @@ class _SparklinePainter extends CustomPainter {
 
     final line = Path()
       ..moveTo(points.first.dx, points.first.dy)
-      ..addPolyline(points.sublist(1));
+      ..addPoints(points.sublist(1));
     canvas.drawPath(
       line,
       Paint()
