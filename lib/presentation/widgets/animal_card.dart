@@ -18,13 +18,21 @@ class AnimalCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
-    final subtitle = <String>[
+    final headline = <String>[
       if (animal.breed != null && animal.breed!.isNotEmpty) animal.breed!,
       sexLabel(l10n, animal.sex),
-      if (animal.birthDate != null) formatDay(context, animal.birthDate),
       if (animal.status != AnimalStatus.active)
         statusLabel(l10n, animal.status),
     ].join(' · ');
+    final birth = animal.birthDate == null
+        ? null
+        : formatDay(context, animal.birthDate);
+    // The date gets its own line. On a phone the single-line version wrapped
+    // after a separator and left it dangling at the end of the row.
+    final subtitle = <String>[
+      if (headline.isNotEmpty) headline,
+      if (birth != null) birth,
+    ].join('\n');
     final initial = animal.name.isEmpty
         ? '?'
         : animal.name.substring(0, 1).toUpperCase();

@@ -25,10 +25,10 @@ void main() {
     await pumpSalala(tester);
 
     expect(find.text('No animals yet'), findsOneWidget);
-    expect(
-      find.text('Add animal'),
-      findsNWidgets(2),
-    ); // FAB + empty-state button
+    // Exactly one way in: the device check found a FAB stacked on top of the
+    // empty state's own button, and the two competed for the same thumb.
+    expect(find.text('Add animal'), findsOneWidget);
+    expect(find.byType(FloatingActionButton), findsNothing);
   });
 
   testWidgets('animals are grouped, breeding stock first', (tester) async {
@@ -43,6 +43,9 @@ void main() {
     expect(find.text('Breeding stock'), findsOneWidget);
     expect(find.text('Zeus'), findsOneWidget);
     expect(find.text('All animals'), findsOneWidget);
+
+    // With a herd to work on, the corner button is back.
+    expect(find.byType(FloatingActionButton), findsOneWidget);
 
     final breedingIndex = tester.getTopLeft(find.text('Breeding stock')).dy;
     final allIndex = tester.getTopLeft(find.text('All animals')).dy;
@@ -61,7 +64,9 @@ void main() {
 
     await pumpSalala(tester);
 
-    await tester.tap(find.widgetWithText(FloatingActionButton, 'Add animal'));
+    // The herd is empty here, so the only affordance is the empty state's own
+    // button — the FAB is deliberately absent until there is something to add to.
+    await tester.tap(find.widgetWithText(FilledButton, 'Add animal'));
     await tester.pumpAndSettle();
 
     final save = find.widgetWithText(FilledButton, 'Save');

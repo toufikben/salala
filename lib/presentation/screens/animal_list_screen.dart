@@ -20,11 +20,16 @@ class AnimalListScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(title: Text(l10n.navAnimals)),
       bottomNavigationBar: const SalalaNavBar(index: 0),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.push(AppPaths.newAnimal),
-        icon: const Icon(Icons.add),
-        label: Text(l10n.homeAddAnimal),
-      ),
+      // The empty herd carries its own "Add animal" button in the middle of the
+      // screen; a second affordance for the same action at the thumb corner only
+      // competes with it.
+      floatingActionButton: (animals.value?.isNotEmpty ?? false)
+          ? FloatingActionButton.extended(
+              onPressed: () => context.push(AppPaths.newAnimal),
+              icon: const Icon(Icons.add),
+              label: Text(l10n.homeAddAnimal),
+            )
+          : null,
       body: animals.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, stack) => _ErrorBody(

@@ -115,15 +115,22 @@ the first verdict a change gets and the device is the second.
 - App lock: toggling it opens the create-PIN dialog. It was cancelled without
   entering a PIN and the switch reverted to off — no device secret is ever
   typed in from this workflow.
-- Findings to fix, in priority order:
-  1. `animal_form_screen.dart:183` — the species helper text `'dog · cat'` is a
-     hardcoded English string inside a localized form; it stays English in the
-     Arabic and French UI. Needs l10n keys.
-  2. Herd card subtitle leaves a trailing "·" when it wraps to a second line.
-  3. Empty herd offers two "Add animal" affordances at once (filled button + FAB).
-  4. The weight unit renders as "kg" in every locale.
-- Not covered by this check: health tests and vet visits (1c, unbuilt), reminder
-  scheduling (unbuilt), and anything requiring a second device.
+- Findings, and what became of them:
+  1. `animal_form_screen.dart` — the species helper text `'dog · cat'` was a
+     hardcoded English string inside a localized form; it stayed English in the
+     Arabic and French UI. Fixed in 1c through `animalSpeciesHelper`; the
+     screening-result helper got the same treatment.
+  2. Herd card subtitle left a trailing "·" when it wrapped to a second line.
+     Fixed: the birth date now takes its own line.
+  3. Empty herd offered two "Add animal" affordances at once (filled button +
+     FAB). Fixed: the FAB appears only once there is a herd to add to. A test
+     had been asserting the duplication (`findsNWidgets(2)`), so the bug was
+     written down as expected behaviour — that assertion is now the guard.
+  4. The weight unit renders as "kg" in every locale. Open: it needs a decision
+     about Arabic unit wording (كغ vs keeping kg), not just a key.
+- Not covered by this check: health tests and vet visits (built in 1c, never run
+  on a device yet), reminder scheduling (unbuilt), and anything needing a second
+  device.
 
 ### 1c — Screenings and consultations on the same ledger *(built, awaiting CI)*
 
