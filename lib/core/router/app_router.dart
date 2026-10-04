@@ -6,11 +6,13 @@ import '../../presentation/providers/app_providers.dart';
 import '../../presentation/screens/animal_detail_screen.dart';
 import '../../presentation/screens/animal_form_screen.dart';
 import '../../presentation/screens/animal_list_screen.dart';
+import '../../presentation/screens/health_test_form_screen.dart';
 import '../../presentation/screens/litter_form_screen.dart';
 import '../../presentation/screens/litter_list_screen.dart';
 import '../../presentation/screens/lock_screen.dart';
 import '../../presentation/screens/settings_screen.dart';
 import '../../presentation/screens/vaccination_form_screen.dart';
+import '../../presentation/screens/vet_visit_form_screen.dart';
 import '../../presentation/screens/weight_form_screen.dart';
 
 class AppPaths {
@@ -34,6 +36,17 @@ class AppPaths {
       '/animals/$animalId/vaccinations/$id';
 
   static String newWeight(String animalId) => '/animals/$animalId/weights/new';
+
+  static String newHealthTest(String animalId) =>
+      '/animals/$animalId/health-tests/new';
+
+  static String healthTest(String animalId, String id) =>
+      '/animals/$animalId/health-tests/$id';
+
+  static String newVisit(String animalId) => '/animals/$animalId/visits/new';
+
+  static String visit(String animalId, String id) =>
+      '/animals/$animalId/visits/$id';
 
   static String litter(String id) => '/litters/$id';
 }
@@ -116,6 +129,30 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((ref) {
                 path: 'weights/new',
                 builder: (context, state) =>
                     WeightFormScreen(animalId: state.pathParameters['id']!),
+              ),
+              GoRoute(
+                path: 'health-tests/new',
+                builder: (context, state) =>
+                    HealthTestFormScreen(animalId: state.pathParameters['id']!),
+              ),
+              GoRoute(
+                path: 'health-tests/:recordId',
+                builder: (context, state) => HealthTestFormScreen(
+                  animalId: state.pathParameters['id']!,
+                  testId: state.pathParameters['recordId'],
+                ),
+              ),
+              GoRoute(
+                path: 'visits/new',
+                builder: (context, state) =>
+                    VetVisitFormScreen(animalId: state.pathParameters['id']!),
+              ),
+              GoRoute(
+                path: 'visits/:recordId',
+                builder: (context, state) => VetVisitFormScreen(
+                  animalId: state.pathParameters['id']!,
+                  visitId: state.pathParameters['recordId'],
+                ),
               ),
             ],
           ),

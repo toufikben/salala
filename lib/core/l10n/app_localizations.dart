@@ -813,6 +813,162 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The weigh-in is removed. This cannot be undone.'**
   String get weightDeleteBody;
+
+  /// No description provided for @animalSpeciesHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'dog · cat'**
+  String get animalSpeciesHelper;
+
+  /// No description provided for @healthTestAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add test'**
+  String get healthTestAdd;
+
+  /// No description provided for @healthTestAddTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Log a health test'**
+  String get healthTestAddTitle;
+
+  /// No description provided for @healthTestEditTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit health test'**
+  String get healthTestEditTitle;
+
+  /// A genetic or orthopaedic screening, not a vet check-up.
+  ///
+  /// In en, this message translates to:
+  /// **'Screening'**
+  String get healthTestType;
+
+  /// No description provided for @healthTestTypeRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Name the screening'**
+  String get healthTestTypeRequired;
+
+  /// No description provided for @healthTestResult.
+  ///
+  /// In en, this message translates to:
+  /// **'Result'**
+  String get healthTestResult;
+
+  /// No description provided for @healthTestResultRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the result'**
+  String get healthTestResultRequired;
+
+  /// Registry grade words (OFA, PENNFID) kept in English in every locale.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear · 0 · Affected'**
+  String get healthTestResultHelper;
+
+  /// No description provided for @healthTestDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Tested on'**
+  String get healthTestDate;
+
+  /// No description provided for @healthTestValidUntil.
+  ///
+  /// In en, this message translates to:
+  /// **'Valid until'**
+  String get healthTestValidUntil;
+
+  /// The organisation that issued the certificate, e.g. OFA.
+  ///
+  /// In en, this message translates to:
+  /// **'Testing body'**
+  String get healthTestBody;
+
+  /// No description provided for @healthTestVerifiedBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Verified by'**
+  String get healthTestVerifiedBy;
+
+  /// No description provided for @healthTestExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'Expired'**
+  String get healthTestExpired;
+
+  /// No description provided for @healthTestDeleteBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The screening is removed from this animal\'s history. This cannot be undone.'**
+  String get healthTestDeleteBody;
+
+  /// No description provided for @visitAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add visit'**
+  String get visitAdd;
+
+  /// No description provided for @visitAddTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Log a vet visit'**
+  String get visitAddTitle;
+
+  /// No description provided for @visitEditTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit vet visit'**
+  String get visitEditTitle;
+
+  /// No description provided for @visitDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Visit date'**
+  String get visitDate;
+
+  /// No description provided for @visitReason.
+  ///
+  /// In en, this message translates to:
+  /// **'Reason'**
+  String get visitReason;
+
+  /// No description provided for @visitNoReason.
+  ///
+  /// In en, this message translates to:
+  /// **'Consultation'**
+  String get visitNoReason;
+
+  /// No description provided for @visitOutcome.
+  ///
+  /// In en, this message translates to:
+  /// **'Outcome'**
+  String get visitOutcome;
+
+  /// No description provided for @visitCost.
+  ///
+  /// In en, this message translates to:
+  /// **'Cost'**
+  String get visitCost;
+
+  /// No description provided for @visitCostInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter an amount like 250'**
+  String get visitCostInvalid;
+
+  /// No description provided for @visitCurrency.
+  ///
+  /// In en, this message translates to:
+  /// **'Currency'**
+  String get visitCurrency;
+
+  /// No description provided for @visitDeleteBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The visit is removed from this animal\'s history. This cannot be undone.'**
+  String get visitDeleteBody;
 }
 
 class _AppLocalizationsDelegate

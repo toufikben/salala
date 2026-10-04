@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:salala/data/models/animal.dart';
+import 'package:salala/data/models/health_test.dart';
 import 'package:salala/data/models/vaccination.dart';
+import 'package:salala/data/models/vet_visit.dart';
 import 'package:salala/data/models/weight_entry.dart';
 import 'package:salala/presentation/screens/animal_detail_screen.dart';
 
@@ -94,6 +96,13 @@ Future<void> _save(WidgetTester tester) async {
 int _daysAgo(int days) =>
     DateTime.now().subtract(Duration(days: days)).millisecondsSinceEpoch;
 
+/// What a labelled field actually holds, which is the only way to prove a form
+/// reopened prefilled rather than merely reopened.
+String _fieldText(WidgetTester tester, String label) => tester
+    .widget<TextFormField>(find.widgetWithText(TextFormField, label))
+    .controller!
+    .text;
+
 int _daysAhead(int days) =>
     DateTime.now().add(Duration(days: days)).millisecondsSinceEpoch;
 
@@ -109,10 +118,19 @@ void main() {
     expect(find.text('Breed: Border collie'), findsOneWidget);
     expect(find.text('Dam: Not recorded'), findsOneWidget);
 
-    // Both record sections are there, and both are honestly empty.
-    expect(find.text('Vaccinations'), findsOneWidget);
-    expect(find.text('Weights'), findsOneWidget);
-    expect(find.text('Nothing recorded yet.'), findsNWidgets(2));
+    // All four record sections are there, and each one is honestly empty. The
+    // ledger is a lazy list, so a section is scrolled into view before it is
+    // asserted rather than counted from the top of the screen.
+    for (final title in const <String>[
+      'Vaccinations',
+      'Health tests',
+      'Vet visits',
+      'Weights',
+    ]) {
+      await _scrollTo(tester, find.text(title));
+      expect(find.text(title), findsOneWidget);
+      expect(find.text('Nothing recorded yet.'), findsWidgets);
+    }
   });
 
   testWidgets('logging a vaccination writes the dose and shows it', (
@@ -246,4 +264,226 @@ void main() {
     expect(find.text('4.20 kg'), findsNothing);
     expect(find.text('300 g'), findsOneWidget);
   });
+
+  testWidgets('a screening whose certificate lapsed is badged expired', (
+    tester,
+  ) async {
+    _usePhoneViewport(tester);
+    await pumpSalala(
+      tester,
+      seed: <Animal>[_nala()],
+      seedHealthTests: <HealthTest>[
+        _screening('BAER', result: 'Clear', tested: 400, validUntil: 10),
+        _screening('OFA hips', result: 'Good', tested: 200, validUntil: -60),
+      ],
+    );
+    await _openNala(tester);
+    await _scrollTo(tester, find.text('OFA hips'));
+
+    expect(find.text('OFA hips'), findsOneWidget);
+    // Only the lapsed one is flagged; a permanent OFA grade is not a claim
+    // running out.
+    expect(find.text('Expired'), findsOneWidget);
+    await _scrollTo(tester, find.text('BAER'));
+    expect(find.text('BAER'), findsOneWidget);
+    expect(find.text('Expired'), findsOneWidget);
+  });
+
+  testWidgets('logging a screening writes the row', (tester) async {
+    _usePhoneViewport(tester);
+    await pumpSalala(tester, seed: <Animal>[_nala()]);
+    await _openNala(tester);
+    await _scrollTo(tester, find.text('Health tests'));
+
+    await _tap(tester, find.widgetWithText(TextButton, 'Add test'));
+    expect(find.text('Log a health test'), findsOneWidget);
+
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Screening'),
+      'Echocardiography',
+    );
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Result'),
+      'Normal',
+    );
+    await _save(tester);
+
+    expect(find.text('Echocardiography'), findsOneWidget);
+    expect(find.textContaining('Normal'), findsWidgets);
+  });
+
+  testWidgets('a screening without a result is refused', (tester) async {
+    _usePhoneViewport(tester);
+    await pumpSalala(tester, seed: <Animal>[_nala()]);
+    await _openNala(tester);
+    await _scrollTo(tester, find.text('Health tests'));
+
+    await _tap(tester, find.widgetWithText(TextButton, 'Add test'));
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Screening'),
+      'BAER',
+    );
+    await _save(tester);
+
+    expect(find.text('Enter the result'), findsOneWidget);
+    expect(find.text('BAER'), findsNothing);
+  });
+
+  testWidgets('a screening is correctable from its own row', (tester) async {
+    _usePhoneViewport(tester);
+    await pumpSalala(
+      tester,
+      seed: <Animal>[_nala()],
+      seedHealthTests: <HealthTest>[
+        _screening('OFA hips', result: 'Good', tested: 30),
+      ],
+    );
+    await _openNala(tester);
+    await _scrollTo(tester, find.text('OFA hips'));
+
+    await _tap(tester, find.text('OFA hips'));
+    expect(find.text('Edit health test'), findsOneWidget);
+
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Result'),
+      'Excellent',
+    );
+    await _save(tester);
+
+    expect(find.textContaining('Excellent'), findsWidgets);
+  });
+
+  testWidgets('a screening deleted from its edit screen leaves the ledger', (
+    tester,
+  ) async {
+    _usePhoneViewport(tester);
+    await pumpSalala(
+      tester,
+      seed: <Animal>[_nala()],
+      seedHealthTests: <HealthTest>[
+        _screening('BAER', result: 'Clear', tested: 30),
+        _screening('OFA hips', result: 'Good', tested: 40),
+      ],
+    );
+    await _openNala(tester);
+    await _scrollTo(tester, find.text('BAER'));
+
+    await _tap(tester, find.text('BAER'));
+    await _tap(tester, find.byIcon(Icons.delete_outline));
+    expect(find.text('Delete this record?'), findsOneWidget);
+    await tester.tap(find.widgetWithText(FilledButton, 'Delete'));
+    await settleRealIo(tester);
+    await settleRealIo(tester);
+
+    expect(find.text('BAER'), findsNothing);
+    expect(find.text('OFA hips'), findsOneWidget);
+  });
+
+  testWidgets('a vet visit logs the reason and keeps the cost as typed', (
+    tester,
+  ) async {
+    _usePhoneViewport(tester);
+    await pumpSalala(tester, seed: <Animal>[_nala()]);
+    await _openNala(tester);
+    await _scrollTo(tester, find.text('Vet visits'));
+
+    await _tap(tester, find.widgetWithText(TextButton, 'Add visit'));
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Reason'),
+      'Limping on the left fore',
+    );
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Cost'),
+      '250.50',
+    );
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Currency'),
+      'mad',
+    );
+    await _save(tester);
+
+    expect(find.text('Limping on the left fore'), findsOneWidget);
+
+    // Reopening it proves the amount survived the round trip through SQLite and
+    // that the currency was normalised to a code, not left as typed.
+    await _tap(tester, find.text('Limping on the left fore'));
+    expect(find.text('Edit vet visit'), findsOneWidget);
+    expect(_fieldText(tester, 'Cost'), '250.5');
+    expect(_fieldText(tester, 'Currency'), 'MAD');
+  });
+
+  testWidgets('a visit with no reason is titled by the clinic that saw it', (
+    tester,
+  ) async {
+    _usePhoneViewport(tester);
+    await pumpSalala(
+      tester,
+      seed: <Animal>[_nala()],
+      seedVisits: <VetVisit>[
+        VetVisit(
+          id: '',
+          animalId: _nalaId,
+          visitDate: _daysAgo(5),
+          clinicName: 'Atlas Veterinary',
+          createdAt: 0,
+          updatedAt: 0,
+        ),
+      ],
+    );
+    await _openNala(tester);
+    await _scrollTo(tester, find.text('Atlas Veterinary'));
+
+    expect(find.text('Atlas Veterinary'), findsOneWidget);
+  });
+
+  testWidgets('the ledger keeps its section order in Arabic', (tester) async {
+    _usePhoneViewport(tester);
+    await pumpSalala(
+      tester,
+      locale: const Locale('ar'),
+      seed: <Animal>[_nala()],
+      seedHealthTests: <HealthTest>[
+        _screening('OFA hips', result: 'Good', tested: 30),
+      ],
+      seedVisits: <VetVisit>[
+        VetVisit(
+          id: '',
+          animalId: _nalaId,
+          visitDate: _daysAgo(5),
+          reason: 'عرج',
+          createdAt: 0,
+          updatedAt: 0,
+        ),
+      ],
+    );
+    await _openNala(tester);
+
+    // Each finder is scrolled to before it is asserted: the ledger is lazy, and
+    // a row above the fold has already been dropped by the time the next one is
+    // reached.
+    await _scrollTo(tester, find.text('فحوصات الصحة'));
+    expect(find.text('فحوصات الصحة'), findsOneWidget);
+    await _scrollTo(tester, find.text('OFA hips'));
+    expect(find.text('OFA hips'), findsOneWidget);
+    await _scrollTo(tester, find.text('عرج'));
+    expect(find.text('عرج'), findsOneWidget);
+  });
 }
+
+/// A screening dated `tested` days ago, optionally expiring `validUntil` days
+/// from now (negative means it lapsed that many days ago).
+HealthTest _screening(
+  String type, {
+  required String result,
+  required int tested,
+  int? validUntil,
+}) => HealthTest(
+  id: '',
+  animalId: _nalaId,
+  testType: type,
+  result: result,
+  testDate: _daysAgo(tested),
+  validUntil: validUntil == null ? null : _daysAhead(validUntil),
+  createdAt: 0,
+  updatedAt: 0,
+);

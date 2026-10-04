@@ -398,4 +398,84 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get weightDeleteBody => 'La pesée est supprimée. Action irréversible.';
+
+  @override
+  String get animalSpeciesHelper => 'chien · chat';
+
+  @override
+  String get healthTestAdd => 'Ajouter un test';
+
+  @override
+  String get healthTestAddTitle => 'Enregistrer un test de santé';
+
+  @override
+  String get healthTestEditTitle => 'Modifier le test';
+
+  @override
+  String get healthTestType => 'Dépistage';
+
+  @override
+  String get healthTestTypeRequired => 'Nommez le dépistage';
+
+  @override
+  String get healthTestResult => 'Résultat';
+
+  @override
+  String get healthTestResultRequired => 'Saisissez le résultat';
+
+  @override
+  String get healthTestResultHelper => 'Clear · 0 · Affected';
+
+  @override
+  String get healthTestDate => 'Testé le';
+
+  @override
+  String get healthTestValidUntil => 'Valable jusqu\'au';
+
+  @override
+  String get healthTestBody => 'Organisme certificateur';
+
+  @override
+  String get healthTestVerifiedBy => 'Vérifié par';
+
+  @override
+  String get healthTestExpired => 'Expiré';
+
+  @override
+  String get healthTestDeleteBody =>
+      'Le test est retiré de l\'historique de cet animal. Action irréversible.';
+
+  @override
+  String get visitAdd => 'Ajouter une visite';
+
+  @override
+  String get visitAddTitle => 'Enregistrer une visite';
+
+  @override
+  String get visitEditTitle => 'Modifier la visite';
+
+  @override
+  String get visitDate => 'Date de la visite';
+
+  @override
+  String get visitReason => 'Motif';
+
+  @override
+  String get visitNoReason => 'Consultation';
+
+  @override
+  String get visitOutcome => 'Conclusion';
+
+  @override
+  String get visitCost => 'Coût';
+
+  @override
+  String get visitCostInvalid => 'Saisissez un montant comme 250';
+
+  @override
+  String get visitCurrency => 'Devise';
+
+  @override
+  String get visitDeleteBody =>
+      'La visite est retirée de l\'historique de cet animal. Action irréversible.';
 }

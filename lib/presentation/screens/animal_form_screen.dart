@@ -180,7 +180,7 @@ class _AnimalFormScreenState extends ConsumerState<AnimalFormScreen> {
                 controller: _species,
                 decoration: InputDecoration(
                   labelText: l10n.animalSpecies,
-                  helperText: 'dog · cat',
+                  helperText: l10n.animalSpeciesHelper,
                 ),
                 validator: (value) => (value == null || value.trim().isEmpty)
                     ? l10n.animalSpeciesRequired

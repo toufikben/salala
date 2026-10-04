@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../data/models/health_test.dart';
 import '../../data/models/vaccination.dart';
+import '../../data/models/vet_visit.dart';
 import '../../data/models/weight_entry.dart';
 import 'app_providers.dart';
 
@@ -45,4 +47,46 @@ Future<void> saveWeight(WidgetRef ref, WeightEntry entry) async {
 Future<void> deleteWeight(WidgetRef ref, WeightEntry entry) async {
   await ref.read(daosProvider).weights.delete(entry.id);
   ref.invalidate(weightsForAnimalProvider(entry.animalId));
+}
+
+/// Screening results, newest test first.
+final healthTestsForAnimalProvider = FutureProvider.autoDispose
+    .family<List<HealthTest>, String>(
+      (ref, animalId) => ref.read(daosProvider).healthTests.forAnimal(animalId),
+    );
+
+/// Consultations, newest first.
+final visitsForAnimalProvider = FutureProvider.autoDispose
+    .family<List<VetVisit>, String>(
+      (ref, animalId) => ref.read(daosProvider).vetVisits.forAnimal(animalId),
+    );
+
+Future<void> saveHealthTest(WidgetRef ref, HealthTest test) async {
+  final daos = ref.read(daosProvider);
+  if (test.id.isEmpty) {
+    await daos.healthTests.create(test);
+  } else {
+    await daos.healthTests.update(test);
+  }
+  ref.invalidate(healthTestsForAnimalProvider(test.animalId));
+}
+
+Future<void> deleteHealthTest(WidgetRef ref, HealthTest test) async {
+  await ref.read(daosProvider).healthTests.delete(test.id);
+  ref.invalidate(healthTestsForAnimalProvider(test.animalId));
+}
+
+Future<void> saveVisit(WidgetRef ref, VetVisit visit) async {
+  final daos = ref.read(daosProvider);
+  if (visit.id.isEmpty) {
+    await daos.vetVisits.create(visit);
+  } else {
+    await daos.vetVisits.update(visit);
+  }
+  ref.invalidate(visitsForAnimalProvider(visit.animalId));
+}
+
+Future<void> deleteVisit(WidgetRef ref, VetVisit visit) async {
+  await ref.read(daosProvider).vetVisits.delete(visit.id);
+  ref.invalidate(visitsForAnimalProvider(visit.animalId));
 }

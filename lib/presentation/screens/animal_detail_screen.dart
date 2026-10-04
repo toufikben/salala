@@ -8,7 +8,9 @@ import '../../core/router/app_router.dart';
 import '../../core/utils/date_utils.dart';
 import '../../core/utils/weight.dart';
 import '../../data/models/animal.dart';
+import '../../data/models/health_test.dart';
 import '../../data/models/vaccination.dart';
+import '../../data/models/vet_visit.dart';
 import '../../data/models/weight_entry.dart';
 import '../providers/app_providers.dart';
 import '../providers/record_providers.dart';
@@ -80,6 +82,58 @@ class AnimalDetailScreen extends ConsumerWidget {
                                         .toUtc()
                                         .millisecondsSinceEpoch,
                                   ),
+                              ],
+                            ),
+                    ),
+              ),
+              _RecordSection(
+                title: l10n.recordsHealthTests,
+                addLabel: l10n.healthTestAdd,
+                onAdd: () => context.push(AppPaths.newHealthTest(animal.id)),
+                body: ref
+                    .watch(healthTestsForAnimalProvider(animal.id))
+                    .when(
+                      loading: () => const _SectionLoading(),
+                      error: (error, stack) => _SectionError(
+                        onRetry: () => ref.invalidate(
+                          healthTestsForAnimalProvider(animal.id),
+                        ),
+                      ),
+                      data: (tests) => tests.isEmpty
+                          ? _SectionEmpty(text: l10n.recordsEmpty)
+                          : Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                for (final test in tests)
+                                  _HealthTestTile(
+                                    test: test,
+                                    nowMs: DateTime.now()
+                                        .toUtc()
+                                        .millisecondsSinceEpoch,
+                                  ),
+                              ],
+                            ),
+                    ),
+              ),
+              _RecordSection(
+                title: l10n.recordsVisits,
+                addLabel: l10n.visitAdd,
+                onAdd: () => context.push(AppPaths.newVisit(animal.id)),
+                body: ref
+                    .watch(visitsForAnimalProvider(animal.id))
+                    .when(
+                      loading: () => const _SectionLoading(),
+                      error: (error, stack) => _SectionError(
+                        onRetry: () =>
+                            ref.invalidate(visitsForAnimalProvider(animal.id)),
+                      ),
+                      data: (visits) => visits.isEmpty
+                          ? _SectionEmpty(text: l10n.recordsEmpty)
+                          : Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                for (final visit in visits)
+                                  _VisitTile(visit: visit),
                               ],
                             ),
                     ),
@@ -264,14 +318,80 @@ class _VaccinationTile extends StatelessWidget {
         ].join(' · '),
       ),
       trailing: overdue
-          ? _OverdueBadge(label: l10n.vaccinationOverdue)
+          ? _FlagBadge(label: l10n.vaccinationOverdue)
           : const Icon(Icons.chevron_right),
     );
   }
 }
 
-class _OverdueBadge extends StatelessWidget {
-  const _OverdueBadge({required this.label});
+/// A screening result. The certificate number is the whole point of the row, so
+/// it leads; the expiry flag is what stops a lapsed claim reading as a fact.
+class _HealthTestTile extends StatelessWidget {
+  const _HealthTestTile({required this.test, required this.nowMs});
+
+  final HealthTest test;
+  final int nowMs;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return ListTile(
+      onTap: () => context.push(AppPaths.healthTest(test.animalId, test.id)),
+      title: Text(test.testType),
+      subtitle: Text(
+        <String>[
+          test.result,
+          formatDay(context, test.testDate),
+          if (test.certificateNo != null && test.certificateNo!.isNotEmpty)
+            test.certificateNo!,
+        ].join(' · '),
+      ),
+      trailing: test.isExpired(nowMs)
+          ? _FlagBadge(label: l10n.healthTestExpired)
+          : const Icon(Icons.chevron_right),
+    );
+  }
+}
+
+/// A consultation. The reason is the title because that is what a breeder
+/// scans for; a visit with no reason still shows the clinic or the vet.
+class _VisitTile extends StatelessWidget {
+  const _VisitTile({required this.visit});
+
+  final VetVisit visit;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final who = <String?>[
+      visit.clinicName,
+      visit.vetName,
+    ].where((s) => s != null && s.isNotEmpty).join(' · ');
+    final hasReason = visit.reason != null && visit.reason!.isNotEmpty;
+    // When there is no reason the clinic/vet already carries the title, so the
+    // subtitle must not repeat it.
+    final title = hasReason
+        ? visit.reason!
+        : (who.isEmpty ? l10n.visitNoReason : who);
+
+    return ListTile(
+      onTap: () => context.push(AppPaths.visit(visit.animalId, visit.id)),
+      title: Text(title),
+      subtitle: Text(
+        <String>[
+          formatDay(context, visit.visitDate),
+          if (visit.outcome != null && visit.outcome!.isNotEmpty)
+            visit.outcome!,
+          if (hasReason && who.isNotEmpty) who,
+        ].join(' · '),
+      ),
+      trailing: const Icon(Icons.chevron_right),
+    );
+  }
+}
+
+class _FlagBadge extends StatelessWidget {
+  const _FlagBadge({required this.label});
 
   final String label;
 

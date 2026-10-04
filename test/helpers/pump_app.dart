@@ -4,7 +4,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:salala/app.dart';
 import 'package:salala/data/db/daos.dart';
 import 'package:salala/data/models/animal.dart';
+import 'package:salala/data/models/health_test.dart';
 import 'package:salala/data/models/vaccination.dart';
+import 'package:salala/data/models/vet_visit.dart';
 import 'package:salala/data/models/weight_entry.dart';
 import 'package:salala/presentation/providers/app_providers.dart';
 import 'package:salala/services/app_lock_service.dart';
@@ -63,6 +65,8 @@ Future<FakeSecureStorage> pumpSalala(
   List<Animal> seed = const <Animal>[],
   List<Vaccination> seedVaccinations = const <Vaccination>[],
   List<WeightEntry> seedWeights = const <WeightEntry>[],
+  List<HealthTest> seedHealthTests = const <HealthTest>[],
+  List<VetVisit> seedVisits = const <VetVisit>[],
 }) async {
   final storage = FakeSecureStorage();
   late Database database;
@@ -81,6 +85,12 @@ Future<FakeSecureStorage> pumpSalala(
     }
     for (final entry in seedWeights) {
       await daos.weights.create(entry, nowMs: nowMs++);
+    }
+    for (final record in seedHealthTests) {
+      await daos.healthTests.create(record, nowMs: nowMs++);
+    }
+    for (final visit in seedVisits) {
+      await daos.vetVisits.create(visit, nowMs: nowMs++);
     }
   });
 

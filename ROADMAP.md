@@ -65,7 +65,7 @@ the first verdict a change gets and the device is the second.
   Arabic title check the new nav bar duplicated), then `46 passed, 1 failed`
   (a tab tap attempted from a pushed route that has no nav bar).
 
-### 1b — The animal ledger *(CI green, install pending device check)*
+### 1b — The animal ledger *(CI green, device check passed)*
 
 - Tapping an animal now opens its card (`/animals/:id`) instead of its form;
   editing stays in the card's menu.
@@ -89,8 +89,62 @@ the first verdict a change gets and the device is the second.
   against the engine source before the third push), then the ledger's parentage
   row printed the litter form's "Dam (mother)" wording.
 
-Still open in Stage 1: health-test and vet-visit sections on the same ledger,
-the 30-day reminder scheduler — which needs a
+### Device check — Stages 0/1a/1b on a Realme RMX3910 *(passed)*
+
+- Evidence: numbered screenshots in the session's `device-check/` folder
+  (00-foreground … 73-herd-empty-arabic), APK from the rolling `debug-apk` release.
+- Host boundary, named: `mobile-use inventory` returned `surfaceCount: 0` — no
+  live Canvas surface exists for this project — so the check drove the phone
+  over host `adb` (720×1604, screenshot pixels 1:1 with device pixels). Taps are
+  coordinate taps: `uiautomator dump` returns only an opaque Flutter view, so
+  there are no semantics nodes to select by.
+- Build identity confirmed on screen: Settings → "Build d2c33cf", matching HEAD.
+- Happy path verified end to end on hardware: empty herd → add-animal form (every
+  validator firing, species/sex/status dropdowns, date picker, the breeding
+  switch) → save → herd card → ledger identity card → log a DHPP dose → correct
+  it (edit form reopens prefilled) → log an 18.50 kg weigh-in → both rows
+  persisted and rendered → Settings (Export disabled with its Phase-2 copy, the
+  About privacy line).
+- Language switching verified live: English → French → Arabic. Arabic is fully
+  RTL — mirrored nav bar, mirrored FAB and switch, disclosure chevrons pointing
+  left, dialog buttons swapped, Arabic-Indic numerals in dates, and both record
+  sections showing their own empty state.
+- Deletion paths verified in Arabic: weigh-in deleted, dose deleted with a
+  "تم حذف التطعيم" confirmation, and the animal deleted behind a destructive
+  confirm dialog; the herd returned to its empty state, so the device is clean.
+- App lock: toggling it opens the create-PIN dialog. It was cancelled without
+  entering a PIN and the switch reverted to off — no device secret is ever
+  typed in from this workflow.
+- Findings to fix, in priority order:
+  1. `animal_form_screen.dart:183` — the species helper text `'dog · cat'` is a
+     hardcoded English string inside a localized form; it stays English in the
+     Arabic and French UI. Needs l10n keys.
+  2. Herd card subtitle leaves a trailing "·" when it wraps to a second line.
+  3. Empty herd offers two "Add animal" affordances at once (filled button + FAB).
+  4. The weight unit renders as "kg" in every locale.
+- Not covered by this check: health tests and vet visits (1c, unbuilt), reminder
+  scheduling (unbuilt), and anything requiring a second device.
+
+### 1c — Screenings and consultations on the same ledger *(built, awaiting CI)*
+
+- Health tests: the screening a buyer is shown — type, result, testing body,
+  certificate number, who verified it, and a `validUntil` that turns a row from
+  a fact into a claim with an expiry. A lapsed certificate gets an "Expired"
+  flag on its row; a permanent grade gets none.
+- Vet visits: reason, outcome, clinic, vet, and a cost kept exactly as typed
+  with its currency code normalised. No conversion — a placement pack has to
+  show what was spent, not what a fluctuating rate says it is worth today.
+- Both are creatable, correctable from their own row, and deletable behind the
+  same confirm dialog every record uses.
+- Device finding 1 is fixed here: the species helper text and the screening
+  result helper were hardcoded English inside a localized form; both now go
+  through `.arb` (the OFA/PENNFID grade words stay English on purpose).
+- Tests: 7 DAO cases (certificate round trip, expiry clearing, newest-first
+  ordering, decimal fee round trip, a null fee that must not read as zero) and
+  8 widget cases, including an Arabic ledger that asserts each row by scrolling
+  to it rather than trusting the list to be built.
+
+Still open in Stage 1: the 30-day reminder scheduler — which needs a
 `flutter_local_notifications` spike, not an argument — and `es`/`de` `.arb`
 files once the copy settles.
 

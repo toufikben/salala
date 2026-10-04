@@ -151,5 +151,34 @@
   "weightInvalid": "Saisissez un poids comme 4,2",
   "weightMeasuredOn": "Mesuré le",
   "weightNote": "Note",
-  "weightDeleteBody": "La pesée est supprimée. Action irréversible."
+  "weightDeleteBody": "La pesée est supprimée. Action irréversible.",
+
+  "animalSpeciesHelper": "chien · chat",
+
+  "healthTestAdd": "Ajouter un test",
+  "healthTestAddTitle": "Enregistrer un test de santé",
+  "healthTestEditTitle": "Modifier le test",
+  "healthTestType": "Dépistage",
+  "healthTestTypeRequired": "Nommez le dépistage",
+  "healthTestResult": "Résultat",
+  "healthTestResultRequired": "Saisissez le résultat",
+  "healthTestResultHelper": "Clear · 0 · Affected",
+  "healthTestDate": "Testé le",
+  "healthTestValidUntil": "Valable jusqu'au",
+  "healthTestBody": "Organisme certificateur",
+  "healthTestVerifiedBy": "Vérifié par",
+  "healthTestExpired": "Expiré",
+  "healthTestDeleteBody": "Le test est retiré de l'historique de cet animal. Action irréversible.",
+
+  "visitAdd": "Ajouter une visite",
+  "visitAddTitle": "Enregistrer une visite",
+  "visitEditTitle": "Modifier la visite",
+  "visitDate": "Date de la visite",
+  "visitReason": "Motif",
+  "visitNoReason": "Consultation",
+  "visitOutcome": "Conclusion",
+  "visitCost": "Coût",
+  "visitCostInvalid": "Saisissez un montant comme 250",
+  "visitCurrency": "Devise",
+  "visitDeleteBody": "La visite est retirée de l'historique de cet animal. Action irréversible."
 }

@@ -151,5 +151,34 @@
   "weightInvalid": "أدخل وزناً مثل 4.2",
   "weightMeasuredOn": "تاريخ الوزن",
   "weightNote": "ملاحظة",
-  "weightDeleteBody": "يُحذف هذا الوزن. لا يمكن التراجع عن ذلك."
+  "weightDeleteBody": "يُحذف هذا الوزن. لا يمكن التراجع عن ذلك.",
+
+  "animalSpeciesHelper": "كلب · قط",
+
+  "healthTestAdd": "فحص جديد",
+  "healthTestAddTitle": "تسجيل فحص صحي",
+  "healthTestEditTitle": "تعديل الفحص الصحي",
+  "healthTestType": "نوع الفحص",
+  "healthTestTypeRequired": "اسم الفحص مطلوب",
+  "healthTestResult": "النتيجة",
+  "healthTestResultRequired": "النتيجة مطلوبة",
+  "healthTestResultHelper": "Clear · 0 · Affected",
+  "healthTestDate": "تاريخ الفحص",
+  "healthTestValidUntil": "صالح حتى",
+  "healthTestBody": "الجهة المانحة",
+  "healthTestVerifiedBy": "التحقق بواسطة",
+  "healthTestExpired": "منتهي الصلاحية",
+  "healthTestDeleteBody": "يُحذف هذا الفحص من سجل الحيوان. لا يمكن التراجع عن ذلك.",
+
+  "visitAdd": "زيارة جديدة",
+  "visitAddTitle": "تسجيل زيارة بيطرية",
+  "visitEditTitle": "تعديل الزيارة البيطرية",
+  "visitDate": "تاريخ الزيارة",
+  "visitReason": "السبب",
+  "visitNoReason": "استشارة",
+  "visitOutcome": "النتيجة",
+  "visitCost": "التكلفة",
+  "visitCostInvalid": "أدخل مبلغاً مثل 250",
+  "visitCurrency": "العملة",
+  "visitDeleteBody": "تُحذف هذه الزيارة من سجل الحيوان. لا يمكن التراجع عن ذلك."
 }

@@ -403,4 +403,84 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get weightDeleteBody => 'يُحذف هذا الوزن. لا يمكن التراجع عن ذلك.';
+
+  @override
+  String get animalSpeciesHelper => 'كلب · قط';
+
+  @override
+  String get healthTestAdd => 'فحص جديد';
+
+  @override
+  String get healthTestAddTitle => 'تسجيل فحص صحي';
+
+  @override
+  String get healthTestEditTitle => 'تعديل الفحص الصحي';
+
+  @override
+  String get healthTestType => 'نوع الفحص';
+
+  @override
+  String get healthTestTypeRequired => 'اسم الفحص مطلوب';
+
+  @override
+  String get healthTestResult => 'النتيجة';
+
+  @override
+  String get healthTestResultRequired => 'النتيجة مطلوبة';
+
+  @override
+  String get healthTestResultHelper => 'Clear · 0 · Affected';
+
+  @override
+  String get healthTestDate => 'تاريخ الفحص';
+
+  @override
+  String get healthTestValidUntil => 'صالح حتى';
+
+  @override
+  String get healthTestBody => 'الجهة المانحة';
+
+  @override
+  String get healthTestVerifiedBy => 'التحقق بواسطة';
+
+  @override
+  String get healthTestExpired => 'منتهي الصلاحية';
+
+  @override
+  String get healthTestDeleteBody =>
+      'يُحذف هذا الفحص من سجل الحيوان. لا يمكن التراجع عن ذلك.';
+
+  @override
+  String get visitAdd => 'زيارة جديدة';
+
+  @override
+  String get visitAddTitle => 'تسجيل زيارة بيطرية';
+
+  @override
+  String get visitEditTitle => 'تعديل الزيارة البيطرية';
+
+  @override
+  String get visitDate => 'تاريخ الزيارة';
+
+  @override
+  String get visitReason => 'السبب';
+
+  @override
+  String get visitNoReason => 'استشارة';
+
+  @override
+  String get visitOutcome => 'النتيجة';
+
+  @override
+  String get visitCost => 'التكلفة';
+
+  @override
+  String get visitCostInvalid => 'أدخل مبلغاً مثل 250';
+
+  @override
+  String get visitCurrency => 'العملة';
+
+  @override
+  String get visitDeleteBody =>
+      'تُحذف هذه الزيارة من سجل الحيوان. لا يمكن التراجع عن ذلك.';
 }

@@ -399,4 +399,84 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get weightDeleteBody =>
       'The weigh-in is removed. This cannot be undone.';
+
+  @override
+  String get animalSpeciesHelper => 'dog · cat';
+
+  @override
+  String get healthTestAdd => 'Add test';
+
+  @override
+  String get healthTestAddTitle => 'Log a health test';
+
+  @override
+  String get healthTestEditTitle => 'Edit health test';
+
+  @override
+  String get healthTestType => 'Screening';
+
+  @override
+  String get healthTestTypeRequired => 'Name the screening';
+
+  @override
+  String get healthTestResult => 'Result';
+
+  @override
+  String get healthTestResultRequired => 'Enter the result';
+
+  @override
+  String get healthTestResultHelper => 'Clear · 0 · Affected';
+
+  @override
+  String get healthTestDate => 'Tested on';
+
+  @override
+  String get healthTestValidUntil => 'Valid until';
+
+  @override
+  String get healthTestBody => 'Testing body';
+
+  @override
+  String get healthTestVerifiedBy => 'Verified by';
+
+  @override
+  String get healthTestExpired => 'Expired';
+
+  @override
+  String get healthTestDeleteBody =>
+      'The screening is removed from this animal\'s history. This cannot be undone.';
+
+  @override
+  String get visitAdd => 'Add visit';
+
+  @override
+  String get visitAddTitle => 'Log a vet visit';
+
+  @override
+  String get visitEditTitle => 'Edit vet visit';
+
+  @override
+  String get visitDate => 'Visit date';
+
+  @override
+  String get visitReason => 'Reason';
+
+  @override
+  String get visitNoReason => 'Consultation';
+
+  @override
+  String get visitOutcome => 'Outcome';
+
+  @override
+  String get visitCost => 'Cost';
+
+  @override
+  String get visitCostInvalid => 'Enter an amount like 250';
+
+  @override
+  String get visitCurrency => 'Currency';
+
+  @override
+  String get visitDeleteBody =>
+      'The visit is removed from this animal\'s history. This cannot be undone.';
 }
