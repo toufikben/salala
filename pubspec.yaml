@@ -1,0 +1,46 @@
+name: salala
+description: "Salala — an offline-first health and lineage record for small-scale dog and cat breeders, with a transferable PDF pack for puppy buyers."
+publish_to: 'none'
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.13.4
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+
+  # State + routing (Riverpod 3, hand-written Notifiers: no codegen)
+  flutter_riverpod: ^3.0.0
+  go_router: ^14.8.1
+
+  # Storage: plain sqflite in Phase 0-2 (app PIN lock instead of SQLCipher)
+  sqflite: ^2.4.0
+  path: ^1.9.0
+  path_provider: ^2.1.6
+  flutter_secure_storage: ^11.0.0
+
+  # Models
+  equatable: ^2.0.7
+  uuid: ^4.5.1
+  meta: ^1.16.0
+
+  # App-lock PIN hashing (device-encrypted storage holds the salt+hash only)
+  crypto: ^3.0.3
+
+  # Localization
+  intl: any
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  sqflite_common_ffi: ^2.3.0
+
+flutter:
+  uses-material-design: true
+  generate: true

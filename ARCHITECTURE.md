@@ -1,0 +1,167 @@
+# Salala — architecture
+
+Salala (سلالة, "lineage") is an offline-first Android app that keeps health,
+lineage and placement records for small-scale dog and cat breeders, and exports
+a transferable document pack for puppy buyers. No account, no server, no
+network permission in Phase 0–2.
+
+## Layers
+
+```
+lib/
+  main.dart              bootstrap: open DB, read settings, seed providers, runApp
+  app.dart               MaterialApp.router + locale + themes
+  core/                  things with no domain knowledge
+    l10n/                .arb sources + generated AppLocalizations + enum labels
+    router/              go_router config, route paths, PIN-gate redirect
+    theme/               Material 3 seed, light/dark, 48px touch targets
+    utils/               date formatting through intl
+  data/
+    models/              plain Dart value objects (Equatable), fromMap/toMap
+    db/                  schema, open/migrate, DAOs
+  services/              non-DIO platform services (app-lock PIN)
+  presentation/
+    providers/           Riverpod providers + Notifiers (the only state layer)
+    screens/             one file per route
+    widgets/             reusable pieces used by screens
+```
+
+Dependency direction is one-way: `presentation → data/services → core`. Nothing
+in `data/` imports Flutter widget code; nothing in `core/` imports `data/`.
+
+### Why three layers and not the spec's clean architecture
+
+The original brief asked for `domain/ usecases/ repositories/ data/` folders.
+For a single-developer, single-device SQLite app that split would add a
+pass-through class per table with no second implementation to justify it. The
+DAO *is* the repository; the model *is* the entity. If a sync or second storage
+backend ever appears, the DAO boundary is already the seam to abstract over.
+
+`ai/` is intentionally absent: the agreed AI scope is rule-based triage plus a
+small intent classifier, and rule-based triage lives in `data/models` (a
+`Vaccination.isOverdue(nowMs)` style predicate) until there is a real model to
+wrap. No placeholder files.
+
+## Data
+
+One SQLite database (`salala.db`) opened by `AppDatabase.openAt`. Nine tables,
+schema version 1, declared once in `data/db/schema.dart`:
+
+`animals` `litters` `vaccinations` `health_tests` `weight_entries`
+`vet_visits` `buyers` `placements` `user_settings`
+
+Decisions encoded in the schema:
+
+- **No `owners` table.** The breeder *is* the app user; `buyers` is the only
+  external-person table, and it exists because the transfer pack has to name
+  the new owner. Modelling owners generically would be speculative structure.
+- `litters.sire_id` is `ON DELETE SET NULL`, `litters.dam_id` and every
+  animal→record foreign key is `ON DELETE CASCADE`. A sire can be unknown or
+  removed without destroying the litter; a dead animal's records go with it.
+- Timestamps are Unix milliseconds in INTEGER columns. There is no timezone
+  stored anywhere — the app is single-device, local-time by definition.
+- `animals.species` is free text, not an enum. Breeders mix dogs, cats, and
+  later rabbits or birds; an enum would need a migration for each new species.
+- `weight_entries.weight_grams` is an integer. Floats accumulate drift and a
+  gram is finer than anyone measures.
+- `user_settings` is a key/value table, not columns, so settings never need a
+  migration.
+
+### Migrations
+
+`AppDatabase.runMigrations(db, from, to)` steps one version at a time and throws
+`StateError` if a version in the gap has no registered step. A silent schema
+skip would corrupt a breeder's ledger, so the failure is loud by design. Steps
+register in `_migrations` keyed by target version; `registerMigration` is
+`@visibleForTesting` today and becomes the real registry when version 2 lands.
+
+### DAOs
+
+`RecordDao<T>` is the shared base: `create` (assigns a UUID and stamps
+`created_at`/`updated_at` when the columns exist), `update`, `delete`,
+`findById`, `all`, `byColumn`. It stamps at the **map** level, not the model
+level, so the DAO can set an id without rebuilding an Equatable value object.
+
+Subclasses add only real queries: `AnimalDao.findAll(species:, status:)`,
+`findBreedingStock()`, `findOffspring(litterId)`; `VaccinationDao.dueBefore(cutoffMs)`;
+`WeightDao.forAnimal` (ascending, for charts) and `latestFor`;
+`LitterDao.forDam`/`recent`; `PlacementDao.forAnimal`/`forBuyer`.
+
+## State
+
+Riverpod 3 with hand-written notifiers — no codegen, so `build_runner` is not in
+the dependency graph and CI has no generation step.
+
+- `databaseProvider` is the injection point: `main()` overrides it with the real
+  file database, tests override it with a temp-file database. Everything else
+  derives from it (`daosProvider`, `settingsDaoProvider`).
+- `AnimalsController extends AsyncNotifier<List<Animal>>` is the only list
+  controller so far. Mutating methods re-read via `refresh()`
+  (`invalidateSelf()` then `await future`) so the UI never shows a stale herd.
+  Its update method is named `edit`, because `AsyncNotifier` already owns
+  `update()`.
+- `LockGate` and `HasPin` are synchronous `Notifier<bool>`s. The router redirect
+  must decide synchronously on every navigation, so the async PIN digest check
+  happens in `main()`/the gate screen and only its *result* is stored here.
+- `LocaleController` writes the choice to `user_settings` and publishes a
+  `Locale?`; `initialLocaleProvider` is seeded at startup so a restart does not
+  flash the wrong language.
+
+## Routing and the PIN gate
+
+`app_router.dart` holds a `refreshListenable` that subscribes to
+`lockGateProvider` through `ref.listen`, so a redirect re-runs when the lock
+state changes. The redirect is two rules and nothing else:
+
+1. PIN exists and gate is closed and not already on `/lock` → `/lock`.
+2. Gate is satisfied (or no PIN exists) and on `/lock` → `/animals`.
+
+There is no "back to lock" edge case because there is no second route to guard
+yet; when more tab routes arrive the same two rules extend as a prefix check.
+
+## Security model (Phase 0–2)
+
+- The database is **not** encrypted at rest (SQLCipher deliberately deferred:
+  it costs a licence decision and a build complexity spike, and the threat it
+  answers — a stolen, unlocked phone with the app opened — is already answered
+  by the Android screen lock plus the app PIN).
+- The PIN is stored as a **salted SHA-256 digest** (16 random bytes from
+  `Random.secure()`, per-device salt) inside `flutter_secure_storage`, never as
+  plaintext, never in SQLite. Comparison is constant-time over the hex digest.
+- `enable()` rejects a PIN shorter than 4 digits *before* writing anything, so a
+  rejected attempt leaves no partial state.
+- Backup surfaces are closed: `android:allowBackup="false"` plus
+  `data_extraction_rules.xml` excluding `salala.db` and the two
+  `flutter_secure_storage` preference files from both `cloud-backup` and
+  `device-transfer`. Verified against Android's own docs: `allowBackup=false`
+  does not reliably block manufacturer device-to-device transfer, which is why
+  the extraction rules are not redundant.
+
+## Tests
+
+Tests open a **real** SQLite database through `sqflite_common_ffi` in a temp
+file, one per test, deleted in `addTearDown`. That was chosen over an in-memory
+fake because the point of these tests is the SQL: foreign keys, cascade rules,
+index creation, and ordering. `:memory:` with a per-test suffix does not work —
+SQLite on Windows only treats the exact string `:memory:` as in-memory, so
+distinct in-memory names fail with error 14.
+
+- `test/data/db/` — schema (tables, indexes, `user_version`, cascade, SET NULL,
+  orphan rejection, migration gap throws) and per-DAO behaviour.
+- `test/services/` — PIN hashing/gate against an in-memory fake secure storage
+  whose `read/write/delete` signatures match the plugin exactly.
+- `test/presentation/` — list states, grouping, form validation and save, the
+  lock redirect, and Arabic RTL measured off the rendered `Directionality`.
+
+Widget tests keep the real database but cannot simply `await` it: sqflite answers
+from a background isolate, and `testWidgets`' fake-async zone never advances it.
+`test/helpers/pump_app.dart` therefore exposes `settleRealIo(tester)`, which
+alternates a fake-clock pump with a short `tester.runAsync` real wait, then
+finishes with bounded pumps instead of `pumpAndSettle` (which hangs while any
+infinite animation, such as the loading spinner, is on screen). Missed taps are
+fatal in this suite, and the save test asserts that the form route actually
+popped — an earlier version passed green while saving nothing.
+
+Two UI rules follow from that: forms scroll with `SingleChildScrollView` +
+`Column` and never a lazy `ListView` (`Form.validate()` skips unmounted
+fields), and no widget test awaits database work outside `runAsync`.

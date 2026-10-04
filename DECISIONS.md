@@ -1,0 +1,126 @@
+# Salala — decisions
+
+Each entry is a choice that costs real money or real rework to undo, plus the
+reason it was made. Re-open an entry only with new evidence.
+
+## D1 — Wedge: small-scale breeders, not pet owners
+**Decided 2026-10-04 by the project owner.**
+General "pet health record" apps are a crowded, low-retention category with no
+paid conversion. Breeders have a hard deadline (a litter), a document they must
+hand over (the transfer pack), a legal-ish record set (health screenings,
+vaccination dates, pedigree), and money in the transaction. The lineage and
+placement tables exist only because of this choice.
+
+## D2 — AI scope: rule-based triage + small intent classifier, not an LLM
+**Decided 2026-10-04 by the project owner.**
+The original brief claimed on-device generative AI. That was corrected during
+the feasibility study: measured `.litertlm` model sizes on this hardware class
+(586 MB for Qwen3-0.6B) plus a 2-core/4GB build machine make an LLM feature
+unbuildable and unsellable here. Deterministic rules over the *stored record*
+answer "is this urgent" with auditable reasoning, which is also what a breeder
+trusts and what a regulator would not object to. A small intent classifier for
+free text is allowed later, gated on a measured benchmark (Stage 3).
+
+## D3 — Monetization: one-time purchase via Google Play Billing
+**Decided 2026-10-04 by the project owner. CONTRADICTED BY D8 — needs re-confirmation.**
+Chosen over subscriptions (breeder interest ends when the puppies go home) and
+over free+ads (destroys trust in a health record).
+
+## D4 — App-lock PIN without SQLCipher in Phase 0–2
+**Decided 2026-10-04 by the project owner.**
+SQLCipher means a licence/compliance decision, a heavier native build on a
+machine that cannot build natively, and a migration risk, to defend against a
+stolen unlocked phone — which the OS screen lock plus the app PIN already
+covers. The PIN is stored only as a per-device salted SHA-256 digest in
+`flutter_secure_storage`; comparison is constant-time.
+
+## D5 — Three layers instead of the brief's clean architecture
+**Decided by the agent, 2026-10-04.**
+`domain/usecases/repositories` over a single-device SQLite app is one
+pass-through class per table with no second implementation to justify it. The
+DAO is the repository; the model is the entity. The DAO boundary is the seam to
+abstract later if sync ever appears.
+
+## D6 — Real SQLite in tests (temp files), not in-memory fakes
+**Decided by the agent, 2026-10-04.**
+The value of these tests is exercising the actual SQL — FKs, cascades, indexes,
+ordering. A fake DAO would test the mock. Constraint discovered the hard way:
+SQLite on Windows honours only the exact string `:memory:`, so per-test
+in-memory names fail with error 14; each test gets its own temp file, deleted
+in `addTearDown`.
+
+Second constraint, same family: sqflite answers from a background isolate, which
+`testWidgets`' fake-async zone cannot advance. A widget test that awaits a real
+query hangs forever **without tripping its own timeout**, so the harness drives
+such work through `tester.runAsync` (`settleRealIo` in
+`test/helpers/pump_app.dart`) and asserts on outcomes rather than on elapsed
+frames.
+
+## D7 — No codegen (hand-written Riverpod 3 notifiers, `flutter gen-l10n`)
+**Decided by the agent, 2026-10-04.**
+Removes `build_runner` from the dependency graph and from CI, which on a
+metered, 2-core connection is worth real time. Cost: provider wiring is manual.
+
+## D8 — Payments from Morocco: an unresolved blocker on D3
+**Open. Owner decision required before Stage 4.**
+Google Play does not offer a payments merchant profile to individual developers
+resident in Morocco, so "one-time purchase via Play Billing" as decided in D3
+cannot be executed from this account as-is. Ranked responses, from the
+feasibility study:
+
+1. **Foreign company (LLC/Ltd) + Play Billing.** Highest revenue ceiling, and
+   the only version where D3 works literally. Cost: formation + annual filing
+   + a director abroad or an agent service; weeks of paperwork; the payment
+   profile becomes permanent.
+2. **B2B2C — sell the pack/records workflow to breeding clubs, transfer
+   agencies and clinics** (per-seat annual price, invoice or a global
+   processor). Fewest install-monetisation requirements, and the smallest
+   audience needed for a meaningful amount of money. Best odds for a solo
+   beginner.
+3. **Sell the travel/transfer document pack off-store** (one-time price paid
+   out-of-app; the APK distributed as a direct download) or iOS IAP, which has
+   no Morocco payout problem.
+4. **Defer money.** Make the KPI 100 real installs plus 100 expressed-interest
+   emails, then let the demand decide which of 1–3 to buy.
+
+Until this is settled the app stays network-free and payment-free — nothing in
+the codebase depends on D3, so no rework is risked by deciding late.
+
+## D9 — `applicationId` is not finalised
+**Open. Owner decision required before the first Play upload.**
+The scaffold generated `com.salala.salala`. A package name is a one-way door on
+Google Play (it is permanently tied to the developer account and cannot be
+changed after upload), and it also blocks option 3 in D8 if the app is ever
+distributed under a different vendor. So it is deliberately left unchanged
+rather than "fixed" quietly. The candidate is a neutral id that does not encode
+the current product name.
+
+## D10 — Backup and device transfer are disabled
+**Decided by the agent, 2026-10-04.**
+An offline-first health ledger whose PIN digest silently restored onto a new
+phone would be a privacy defect. `allowBackup="false"` plus
+`data_extraction_rules.xml` excluding `salala.db` and both
+`flutter_secure_storage` preference files from `cloud-backup` and
+`device-transfer`. Android's documentation confirms `allowBackup="false"` alone
+does not reliably block manufacturer device-to-device transfer, so the rules
+file is load-bearing, not decorative. Export/import (Stage 2) is the deliberate,
+user-initiated replacement.
+
+## D11 — Forms use `SingleChildScrollView` + `Column`, never a lazy `ListView`
+**Found by a test, 2026-10-04.**
+`Form.validate()` only visits *mounted* `FormField`s. Inside a `ListView`, a
+field outside the cache extent is not in the tree, so validation silently
+skipped it: the animal form would have saved a nameless animal whenever the user
+had scrolled down to the Save button. The form is short and fixed-size, so
+laziness bought nothing and cost correctness. Rule for every future form screen
+(health tests, vaccinations, placements): scroll the content, do not virtualise
+it.
+
+## D12 — A missed tap must fail the test
+**Decided by the agent, 2026-10-04.**
+`WidgetController.hitTestWarningShouldBeFatal = true` in the widget suite. The
+same test once passed green while saving nothing: the tap landed on the scroll
+view instead of the button, and the only assertion was `find.text('Nala')` —
+which matched the form's own text field. Assertions now also prove the route
+popped (`find.byType(AnimalFormScreen), findsNothing`), so "it saved" is
+falsifiable rather than assumed.

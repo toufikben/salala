@@ -1,0 +1,73 @@
+name: Flutter CI
+
+# No codegen step: Riverpod providers and l10n are hand-written, and
+# `flutter test`/`flutter build` run `flutter gen-l10n` as part of the build.
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  analyze-and-test:
+    name: Analyze and test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.5'
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Verify localizations are committed-free and regenerate
+        run: flutter gen-l10n
+
+      - name: Analyze
+        run: flutter analyze --fatal-infos
+
+      - name: Test
+        # -j 1: the database tests each open a temp sqlite file through
+        # sqflite_common_ffi; serialising them keeps failures attributable.
+        run: flutter test -j 1
+
+  build-debug:
+    name: Build debug APK
+    needs: analyze-and-test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.5'
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build debug APK
+        # The commit SHA is stamped into the build tag so a phone screenshot
+        # proves which commit an installed APK came from.
+        run: flutter build apk --debug --dart-define=SALALA_BUILD_TAG=${GITHUB_SHA::7}
+
+      - name: Upload debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: salala-debug-apk
+          path: build/app/outputs/flutter-apk/app-debug.apk
+          if-no-files-found: error
+          retention-days: 7

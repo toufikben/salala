@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Pre-Android-12 (legacy) backup rules. `allowBackup="false"` is the primary
+  gate; these exclusions state the same intent in the form Android 11 and below
+  reads, and they are what the Play data-safety declaration will claim.
+-->
+<full-backup-content>
+    <exclude domain="database" path="salala.db" />
+    <exclude domain="database" path="salala.db-journal" />
+    <exclude domain="database" path="salala.db-wal" />
+    <exclude domain="database" path="salala.db-shm" />
+    <exclude domain="sharedpref" path="FlutterSecureStorage.xml" />
+    <exclude domain="sharedpref" path="FlutterSecureKeyStorage.xml" />
+</full-backup-content>

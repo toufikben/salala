@@ -1,0 +1,88 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:salala/app.dart';
+import 'package:salala/data/db/daos.dart';
+import 'package:salala/data/models/animal.dart';
+import 'package:salala/presentation/providers/app_providers.dart';
+import 'package:salala/services/app_lock_service.dart';
+import 'package:sqflite/sqflite.dart';
+
+import 'fake_secure_storage.dart';
+import 'test_db.dart';
+
+/// Seeds the PIN flag the way `main()` does after reading the keystore.
+class SeededHasPin extends HasPin {
+  SeededHasPin(this._value);
+
+  final bool _value;
+
+  @override
+  bool build() => _value;
+}
+
+/// Pumps long enough for background-isolate database work to land.
+///
+/// sqflite runs on another isolate, which the fake-async zone of `testWidgets`
+/// cannot advance: awaiting such a future directly hangs the test forever
+/// without even tripping its own timeout. So every round pumps the fake clock
+/// once and then hands real time to `runAsync` for the isolate to answer in.
+///
+/// The rounds are not cut short when the loading spinner disappears — a save
+/// finishes and pops a route without ever showing a spinner, so the real wait
+/// has to continue regardless. A spinner still on screen afterwards means the
+/// widget really is stuck, and that fails loudly instead of hanging.
+Future<void> settleRealIo(WidgetTester tester) async {
+  for (var round = 0; round < 10; round++) {
+    await tester.pump(const Duration(milliseconds: 25));
+    await tester.runAsync(
+      () => Future<void>.delayed(const Duration(milliseconds: 15)),
+    );
+  }
+
+  if (tester.any(find.byType(CircularProgressIndicator))) {
+    throw StateError('a database-backed widget never finished loading');
+  }
+
+  // Finite pumping, not `pumpAndSettle`: route transitions are animations, and
+  // this helper is also used right after a write pops a route.
+  for (var frame = 0; frame < 12; frame++) {
+    await tester.pump(const Duration(milliseconds: 50));
+  }
+}
+
+/// Boots the real router + theme + localizations against a temporary database
+/// and a fake keystore. [seed] rows are inserted through the real DAO before
+/// the first frame, so the UI is exercised against genuine SQL results.
+Future<FakeSecureStorage> pumpSalala(
+  WidgetTester tester, {
+  Locale? locale,
+  bool hasPin = false,
+  List<Animal> seed = const <Animal>[],
+}) async {
+  final storage = FakeSecureStorage();
+  late Database database;
+
+  await tester.runAsync(() async {
+    database = await openTestDatabase();
+    final daos = Daos(database);
+    var nowMs = 1;
+    for (final animal in seed) {
+      await daos.animals.create(animal, nowMs: nowMs++);
+    }
+  });
+
+  await tester.pumpWidget(
+    ProviderScope(
+      overrides: [
+        databaseProvider.overrideWithValue(database),
+        appLockProvider.overrideWithValue(AppLockService(storage: storage)),
+        hasPinProvider.overrideWith(() => SeededHasPin(hasPin)),
+        if (locale != null) initialLocaleProvider.overrideWithValue(locale),
+      ],
+      child: const SalalaApp(),
+    ),
+  );
+  await settleRealIo(tester);
+  return storage;
+}

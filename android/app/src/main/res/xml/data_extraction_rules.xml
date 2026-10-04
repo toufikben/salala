@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Android 12+ extraction rules. Verified against developer.android.com:
+  `android:allowBackup="false"` stops cloud backup on stock Android, but on
+  some manufacturers it does NOT stop device-to-device transfer, so the
+  transfer rules below are the part that actually carries the privacy
+  guarantee on Android 12 and newer.
+
+  File names are the defaults of the plugins in use, read from their source:
+    - sqflite opens the record database at databases/salala.db
+    - flutter_secure_storage 11.2.0 writes shared_prefs/FlutterSecureStorage.xml
+      (values) and shared_prefs/FlutterSecureKeyStorage.xml (the wrapped key)
+      when no sharedPreferencesName/storageNamespace option is set, which is
+      the case for this app.
+-->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="database" path="salala.db" />
+        <exclude domain="database" path="salala.db-journal" />
+        <exclude domain="database" path="salala.db-wal" />
+        <exclude domain="database" path="salala.db-shm" />
+        <exclude domain="sharedpref" path="FlutterSecureStorage.xml" />
+        <exclude domain="sharedpref" path="FlutterSecureKeyStorage.xml" />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="database" path="salala.db" />
+        <exclude domain="database" path="salala.db-journal" />
+        <exclude domain="database" path="salala.db-wal" />
+        <exclude domain="database" path="salala.db-shm" />
+        <exclude domain="sharedpref" path="FlutterSecureStorage.xml" />
+        <exclude domain="sharedpref" path="FlutterSecureKeyStorage.xml" />
+    </device-transfer>
+</data-extraction-rules>

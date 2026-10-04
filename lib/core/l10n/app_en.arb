@@ -1,0 +1,94 @@
+{
+  "@@locale": "en",
+  "appTitle": "Salala",
+  "@appTitle": {
+    "description": "The product name; never translated."
+  },
+  "navAnimals": "Animals",
+  "navLitters": "Litters",
+  "navSettings": "Settings",
+
+  "homeEmptyTitle": "No animals yet",
+  "homeEmptyBody": "Add your first dog or cat to start a health and lineage record.",
+  "homeAddAnimal": "Add animal",
+  "homeBreedingStock": "Breeding stock",
+  "homeAllAnimals": "All animals",
+  "homeAnimalCount": "{count, plural, =0{No animals} =1{1 animal} other{{count} animals}}",
+  "@homeAnimalCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+
+  "animalName": "Name",
+  "animalSpecies": "Species",
+  "animalBreed": "Breed",
+  "animalSex": "Sex",
+  "animalBirthDate": "Date of birth",
+  "animalStatus": "Status",
+  "animalMicrochip": "Microchip number",
+  "animalRegistrationNo": "Registry number",
+  "animalRegistry": "Registry",
+  "animalColor": "Colour",
+  "animalNotes": "Notes",
+  "animalIsBreedingStock": "Keep as breeding stock",
+  "animalAddTitle": "Add animal",
+  "animalEditTitle": "Edit animal",
+  "animalDeleteTitle": "Delete {name}?",
+  "@animalDeleteTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "animalDeleteBody": "Its vaccinations, health tests, weights and visits are deleted too. This cannot be undone.",
+  "animalNameRequired": "A name is required",
+  "animalSpeciesRequired": "Choose a species",
+
+  "sexMale": "Male",
+  "sexFemale": "Female",
+  "sexUnknown": "Unknown",
+
+  "statusActive": "With me",
+  "statusSold": "Placed",
+  "statusRetired": "Retired",
+  "statusDeceased": "Deceased",
+
+  "recordsVaccinations": "Vaccinations",
+  "recordsHealthTests": "Health tests",
+  "recordsWeights": "Weights",
+  "recordsVisits": "Vet visits",
+  "recordsEmpty": "Nothing recorded yet.",
+
+  "actionSave": "Save",
+  "actionCancel": "Cancel",
+  "actionDelete": "Delete",
+  "actionEdit": "Edit",
+  "actionAdd": "Add",
+  "actionClose": "Close",
+  "actionRetry": "Try again",
+
+  "lockTitle": "Salala is locked",
+  "lockEnterPin": "Enter your PIN",
+  "lockUnlock": "Unlock",
+  "lockWrongPin": "Wrong PIN",
+  "lockSetPinTitle": "Create a PIN",
+  "lockSetPinBody": "Four digits or more. It stays on this device and cannot be recovered, so write it down.",
+  "lockConfirmPin": "Repeat the PIN",
+  "lockPinTooShort": "Four digits or more",
+  "lockPinMismatch": "The two PINs do not match",
+  "lockEnable": "Lock the app",
+  "lockDisable": "Turn the lock off",
+  "lockCurrentPin": "Current PIN",
+
+  "settingsAppLock": "App lock",
+  "settingsLanguage": "Language",
+  "settingsLanguageSystem": "System default",
+  "settingsAbout": "About",
+  "settingsOfflineNote": "Everything is stored on this device. No account, no server, no tracking.",
+  "settingsExport": "Export records",
+  "settingsExportSoon": "PDF and JSON export arrive in Phase 2."
+}

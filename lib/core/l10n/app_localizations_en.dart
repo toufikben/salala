@@ -1,0 +1,224 @@
+// ignore: unused_import
+import 'package:intl/intl.dart' as intl;
+
+import 'app_localizations.dart';
+
+// ignore_for_file: type=lint
+
+/// The translations for English (`en`).
+class AppLocalizationsEn extends AppLocalizations {
+  AppLocalizationsEn([String locale = 'en']) : super(locale);
+
+  @override
+  String get appTitle => 'Salala';
+
+  @override
+  String get navAnimals => 'Animals';
+
+  @override
+  String get navLitters => 'Litters';
+
+  @override
+  String get navSettings => 'Settings';
+
+  @override
+  String get homeEmptyTitle => 'No animals yet';
+
+  @override
+  String get homeEmptyBody =>
+      'Add your first dog or cat to start a health and lineage record.';
+
+  @override
+  String get homeAddAnimal => 'Add animal';
+
+  @override
+  String get homeBreedingStock => 'Breeding stock';
+
+  @override
+  String get homeAllAnimals => 'All animals';
+
+  @override
+  String homeAnimalCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count animals',
+      one: '1 animal',
+      zero: 'No animals',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get animalName => 'Name';
+
+  @override
+  String get animalSpecies => 'Species';
+
+  @override
+  String get animalBreed => 'Breed';
+
+  @override
+  String get animalSex => 'Sex';
+
+  @override
+  String get animalBirthDate => 'Date of birth';
+
+  @override
+  String get animalStatus => 'Status';
+
+  @override
+  String get animalMicrochip => 'Microchip number';
+
+  @override
+  String get animalRegistrationNo => 'Registry number';
+
+  @override
+  String get animalRegistry => 'Registry';
+
+  @override
+  String get animalColor => 'Colour';
+
+  @override
+  String get animalNotes => 'Notes';
+
+  @override
+  String get animalIsBreedingStock => 'Keep as breeding stock';
+
+  @override
+  String get animalAddTitle => 'Add animal';
+
+  @override
+  String get animalEditTitle => 'Edit animal';
+
+  @override
+  String animalDeleteTitle(String name) {
+    return 'Delete $name?';
+  }
+
+  @override
+  String get animalDeleteBody =>
+      'Its vaccinations, health tests, weights and visits are deleted too. This cannot be undone.';
+
+  @override
+  String get animalNameRequired => 'A name is required';
+
+  @override
+  String get animalSpeciesRequired => 'Choose a species';
+
+  @override
+  String get sexMale => 'Male';
+
+  @override
+  String get sexFemale => 'Female';
+
+  @override
+  String get sexUnknown => 'Unknown';
+
+  @override
+  String get statusActive => 'With me';
+
+  @override
+  String get statusSold => 'Placed';
+
+  @override
+  String get statusRetired => 'Retired';
+
+  @override
+  String get statusDeceased => 'Deceased';
+
+  @override
+  String get recordsVaccinations => 'Vaccinations';
+
+  @override
+  String get recordsHealthTests => 'Health tests';
+
+  @override
+  String get recordsWeights => 'Weights';
+
+  @override
+  String get recordsVisits => 'Vet visits';
+
+  @override
+  String get recordsEmpty => 'Nothing recorded yet.';
+
+  @override
+  String get actionSave => 'Save';
+
+  @override
+  String get actionCancel => 'Cancel';
+
+  @override
+  String get actionDelete => 'Delete';
+
+  @override
+  String get actionEdit => 'Edit';
+
+  @override
+  String get actionAdd => 'Add';
+
+  @override
+  String get actionClose => 'Close';
+
+  @override
+  String get actionRetry => 'Try again';
+
+  @override
+  String get lockTitle => 'Salala is locked';
+
+  @override
+  String get lockEnterPin => 'Enter your PIN';
+
+  @override
+  String get lockUnlock => 'Unlock';
+
+  @override
+  String get lockWrongPin => 'Wrong PIN';
+
+  @override
+  String get lockSetPinTitle => 'Create a PIN';
+
+  @override
+  String get lockSetPinBody =>
+      'Four digits or more. It stays on this device and cannot be recovered, so write it down.';
+
+  @override
+  String get lockConfirmPin => 'Repeat the PIN';
+
+  @override
+  String get lockPinTooShort => 'Four digits or more';
+
+  @override
+  String get lockPinMismatch => 'The two PINs do not match';
+
+  @override
+  String get lockEnable => 'Lock the app';
+
+  @override
+  String get lockDisable => 'Turn the lock off';
+
+  @override
+  String get lockCurrentPin => 'Current PIN';
+
+  @override
+  String get settingsAppLock => 'App lock';
+
+  @override
+  String get settingsLanguage => 'Language';
+
+  @override
+  String get settingsLanguageSystem => 'System default';
+
+  @override
+  String get settingsAbout => 'About';
+
+  @override
+  String get settingsOfflineNote =>
+      'Everything is stored on this device. No account, no server, no tracking.';
+
+  @override
+  String get settingsExport => 'Export records';
+
+  @override
+  String get settingsExportSoon => 'PDF and JSON export arrive in Phase 2.';
+}
