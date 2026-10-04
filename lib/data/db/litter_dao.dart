@@ -1,5 +1,3 @@
-import 'package:sqflite/sqflite.dart';
-
 import '../models/animal.dart';
 import '../models/litter.dart';
 import 'record_dao.dart';

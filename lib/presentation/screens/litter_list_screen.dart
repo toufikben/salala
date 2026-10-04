@@ -94,7 +94,7 @@ class _LitterCard extends StatelessWidget {
           <String>[
             '${dam?.name ?? l10n.litterDamMissing} × '
                 '${sire?.name ?? l10n.litterSireUnknown}',
-            if (when != null) when,
+            ?when,
             l10n.litterPuppyCount(puppies.length),
           ].join(' · '),
         ),

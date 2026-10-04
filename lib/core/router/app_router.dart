@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 import '../../presentation/providers/app_providers.dart';
 import '../../presentation/screens/animal_form_screen.dart';
 import '../../presentation/screens/animal_list_screen.dart';
+import '../../presentation/screens/litter_form_screen.dart';
+import '../../presentation/screens/litter_list_screen.dart';
 import '../../presentation/screens/lock_screen.dart';
 import '../../presentation/screens/settings_screen.dart';
 

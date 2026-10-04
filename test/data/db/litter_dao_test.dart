@@ -121,6 +121,7 @@ void main() {
         <Animal>[_puppy('A litter 1')],
         nowMs: 5,
       );
+      expect(await daos.animals.findOffspring(created.id), hasLength(1));
 
       await daos.animals.delete(dam.id);
 
