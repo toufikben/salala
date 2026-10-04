@@ -312,4 +312,84 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get litterDeleteBody =>
       'Les chiots restent dans vos animaux ; seul l\'accouplement est supprimé. Cette action est irréversible.';
+
+  @override
+  String get animalGone => 'Cet animal a été supprimé.';
+
+  @override
+  String get animalDeathDate => 'Mort le';
+
+  @override
+  String get valueUnknown => 'Non enregistré';
+
+  @override
+  String get recordDeleteTitle => 'Supprimer cet enregistrement ?';
+
+  @override
+  String get vaccinationAdd => 'Ajouter une vaccination';
+
+  @override
+  String get vaccinationAddTitle => 'Enregistrer une vaccination';
+
+  @override
+  String get vaccinationEditTitle => 'Modifier la vaccination';
+
+  @override
+  String get vaccinationName => 'Vaccin';
+
+  @override
+  String get vaccinationNameRequired => 'Le nom du vaccin est obligatoire';
+
+  @override
+  String get vaccinationGiven => 'Administré le';
+
+  @override
+  String get vaccinationNextDue => 'Prochaine dose';
+
+  @override
+  String get vaccinationNextDueHint =>
+      'Une dose dont la date est dépassée est marquée en retard.';
+
+  @override
+  String get vaccinationOverdue => 'En retard';
+
+  @override
+  String get vaccinationManufacturer => 'Fabricant';
+
+  @override
+  String get vaccinationBatch => 'N° de lot';
+
+  @override
+  String get vaccinationVet => 'Vétérinaire';
+
+  @override
+  String get vaccinationClinic => 'Clinique';
+
+  @override
+  String get vaccinationCertificate => 'N° du certificat';
+
+  @override
+  String get vaccinationDeleteBody =>
+      'La dose est retirée de l\'historique de cet animal. Action irréversible.';
+
+  @override
+  String get weightAdd => 'Ajouter un poids';
+
+  @override
+  String get weightKg => 'Poids (kg)';
+
+  @override
+  String get weightRequired => 'Saisissez le poids';
+
+  @override
+  String get weightInvalid => 'Saisissez un poids comme 4,2';
+
+  @override
+  String get weightMeasuredOn => 'Mesuré le';
+
+  @override
+  String get weightNote => 'Note';
+
+  @override
+  String get weightDeleteBody => 'La pesée est supprimée. Action irréversible.';
 }

@@ -645,6 +645,162 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The puppies stay in your animals; only the mating record is removed. This cannot be undone.'**
   String get litterDeleteBody;
+
+  /// No description provided for @animalGone.
+  ///
+  /// In en, this message translates to:
+  /// **'This animal was deleted.'**
+  String get animalGone;
+
+  /// No description provided for @animalDeathDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Died'**
+  String get animalDeathDate;
+
+  /// No description provided for @valueUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Not recorded'**
+  String get valueUnknown;
+
+  /// No description provided for @recordDeleteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this record?'**
+  String get recordDeleteTitle;
+
+  /// No description provided for @vaccinationAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add vaccination'**
+  String get vaccinationAdd;
+
+  /// No description provided for @vaccinationAddTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Log a vaccination'**
+  String get vaccinationAddTitle;
+
+  /// No description provided for @vaccinationEditTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit vaccination'**
+  String get vaccinationEditTitle;
+
+  /// No description provided for @vaccinationName.
+  ///
+  /// In en, this message translates to:
+  /// **'Vaccine'**
+  String get vaccinationName;
+
+  /// No description provided for @vaccinationNameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'A vaccine name is required'**
+  String get vaccinationNameRequired;
+
+  /// No description provided for @vaccinationGiven.
+  ///
+  /// In en, this message translates to:
+  /// **'Given'**
+  String get vaccinationGiven;
+
+  /// No description provided for @vaccinationNextDue.
+  ///
+  /// In en, this message translates to:
+  /// **'Next due'**
+  String get vaccinationNextDue;
+
+  /// No description provided for @vaccinationNextDueHint.
+  ///
+  /// In en, this message translates to:
+  /// **'A dose whose next-due date has passed is marked overdue.'**
+  String get vaccinationNextDueHint;
+
+  /// No description provided for @vaccinationOverdue.
+  ///
+  /// In en, this message translates to:
+  /// **'Overdue'**
+  String get vaccinationOverdue;
+
+  /// No description provided for @vaccinationManufacturer.
+  ///
+  /// In en, this message translates to:
+  /// **'Manufacturer'**
+  String get vaccinationManufacturer;
+
+  /// No description provided for @vaccinationBatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Batch number'**
+  String get vaccinationBatch;
+
+  /// No description provided for @vaccinationVet.
+  ///
+  /// In en, this message translates to:
+  /// **'Veterinarian'**
+  String get vaccinationVet;
+
+  /// No description provided for @vaccinationClinic.
+  ///
+  /// In en, this message translates to:
+  /// **'Clinic'**
+  String get vaccinationClinic;
+
+  /// No description provided for @vaccinationCertificate.
+  ///
+  /// In en, this message translates to:
+  /// **'Certificate number'**
+  String get vaccinationCertificate;
+
+  /// No description provided for @vaccinationDeleteBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The dose is removed from this animal\'s history. This cannot be undone.'**
+  String get vaccinationDeleteBody;
+
+  /// No description provided for @weightAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add weight'**
+  String get weightAdd;
+
+  /// No description provided for @weightKg.
+  ///
+  /// In en, this message translates to:
+  /// **'Weight (kg)'**
+  String get weightKg;
+
+  /// No description provided for @weightRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the weight'**
+  String get weightRequired;
+
+  /// No description provided for @weightInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a weight like 4.2'**
+  String get weightInvalid;
+
+  /// No description provided for @weightMeasuredOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Measured on'**
+  String get weightMeasuredOn;
+
+  /// No description provided for @weightNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Note'**
+  String get weightNote;
+
+  /// No description provided for @weightDeleteBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The weigh-in is removed. This cannot be undone.'**
+  String get weightDeleteBody;
 }
 
 class _AppLocalizationsDelegate

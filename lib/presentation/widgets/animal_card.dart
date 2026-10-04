@@ -31,7 +31,9 @@ class AnimalCard extends ConsumerWidget {
 
     return Card(
       child: ListTile(
-        onTap: () => context.push(AppPaths.editAnimal(animal.id)),
+        // The card opens the animal's ledger; editing stays in the menu, because
+        // a breeder tapping a name wants to see doses and weights, not a form.
+        onTap: () => context.push(AppPaths.animal(animal.id)),
         leading: CircleAvatar(
           backgroundColor: animal.isBreedingStock
               ? theme.colorScheme.primaryContainer

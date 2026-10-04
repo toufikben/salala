@@ -117,8 +117,18 @@ state changes. The redirect is two rules and nothing else:
 1. PIN exists and gate is closed and not already on `/lock` → `/lock`.
 2. Gate is satisfied (or no PIN exists) and on `/lock` → `/animals`.
 
-There is no "back to lock" edge case because there is no second route to guard
-yet; when more tab routes arrive the same two rules extend as a prefix check.
+There is no "back to lock" edge case because rule 1 is a *not-on* check rather
+than a prefix list: any new route — litter detail, an animal's ledger, a record
+form — is covered the moment it exists, and rule 2 only ever sends a satisfied
+user to `/animals`.
+
+Below the three tabs, detail and form screens are plain nested `GoRoute`s, which
+go_router pushes as pages over the tab that opened them. That is deliberate: no
+`StatefulShellRoute` (D15), so a tab switch from a pushed route is impossible —
+the nav bar belongs to the list screen, and the back button is the only way out.
+Static segments are declared before their parameterised siblings
+(`/animals/new` before `/animals/:id`, `vaccinations/new` before
+`vaccinations/:recordId`) so the word `new` is never read as an id.
 
 ## Security model (Phase 0–2)
 

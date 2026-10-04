@@ -4,6 +4,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:salala/app.dart';
 import 'package:salala/data/db/daos.dart';
 import 'package:salala/data/models/animal.dart';
+import 'package:salala/data/models/vaccination.dart';
+import 'package:salala/data/models/weight_entry.dart';
 import 'package:salala/presentation/providers/app_providers.dart';
 import 'package:salala/services/app_lock_service.dart';
 import 'package:sqflite/sqflite.dart';
@@ -59,6 +61,8 @@ Future<FakeSecureStorage> pumpSalala(
   Locale? locale,
   bool hasPin = false,
   List<Animal> seed = const <Animal>[],
+  List<Vaccination> seedVaccinations = const <Vaccination>[],
+  List<WeightEntry> seedWeights = const <WeightEntry>[],
 }) async {
   final storage = FakeSecureStorage();
   late Database database;
@@ -69,6 +73,14 @@ Future<FakeSecureStorage> pumpSalala(
     var nowMs = 1;
     for (final animal in seed) {
       await daos.animals.create(animal, nowMs: nowMs++);
+    }
+    // Records are inserted after the animals because `animal_id` is a foreign
+    // key: a dose for an animal that is not there yet would be rejected.
+    for (final dose in seedVaccinations) {
+      await daos.vaccinations.create(dose, nowMs: nowMs++);
+    }
+    for (final entry in seedWeights) {
+      await daos.weights.create(entry, nowMs: nowMs++);
     }
   });
 

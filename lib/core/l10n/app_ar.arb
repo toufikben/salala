@@ -120,5 +120,34 @@
       }
     }
   },
-  "litterDeleteBody": "تبقى الجراء ضمن حيواناتك، ويُحذف سجل التزاوج فقط. لا يمكن التراجع عن هذه الخطوة."
+  "litterDeleteBody": "تبقى الجراء ضمن حيواناتك، ويُحذف سجل التزاوج فقط. لا يمكن التراجع عن هذه الخطوة.",
+
+  "animalGone": "تم حذف هذا الحيوان.",
+  "animalDeathDate": "تاريخ النفوق",
+  "valueUnknown": "غير مسجّل",
+  "recordDeleteTitle": "حذف هذا السجل؟",
+
+  "vaccinationAdd": "تطعيم جديد",
+  "vaccinationAddTitle": "تسجيل تطعيم",
+  "vaccinationEditTitle": "تعديل التطعيم",
+  "vaccinationName": "اللقاح",
+  "vaccinationNameRequired": "اسم اللقاح مطلوب",
+  "vaccinationGiven": "أُعطي في",
+  "vaccinationNextDue": "الجرعة القادمة",
+  "vaccinationNextDueHint": "أي جرعة تجاوزت موعدها تُعلَّم بأنها متأخرة.",
+  "vaccinationOverdue": "متأخر",
+  "vaccinationManufacturer": "الشركة المصنّعة",
+  "vaccinationBatch": "رقم الدفعة",
+  "vaccinationVet": "الطبيب البيطري",
+  "vaccinationClinic": "العيادة",
+  "vaccinationCertificate": "رقم الشهادة",
+  "vaccinationDeleteBody": "يُحذف هذا التطعيم من سجل الحيوان. لا يمكن التراجع عن ذلك.",
+
+  "weightAdd": "وزن جديد",
+  "weightKg": "الوزن (كغ)",
+  "weightRequired": "أدخل الوزن",
+  "weightInvalid": "أدخل وزناً مثل 4.2",
+  "weightMeasuredOn": "تاريخ الوزن",
+  "weightNote": "ملاحظة",
+  "weightDeleteBody": "يُحذف هذا الوزن. لا يمكن التراجع عن ذلك."
 }

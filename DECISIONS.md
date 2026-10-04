@@ -160,3 +160,26 @@ the more testable one.
 null and the UI shows no estimate. Guessing 63 days for a rabbit or a breeder's
 unusual species would put a wrong date in the place of an honest absence, and a
 wrong due date is the kind of thing that costs a litter.
+
+## D17 — A record list is an `autoDispose` family provider, not a controller
+**Decided by the agent, 2026-10-04.**
+`vaccinationsForAnimalProvider` and `weightsForAnimalProvider` are
+`FutureProvider.autoDispose.family<…, String>` keyed by animal id, and the four
+mutating helpers (`saveVaccination`, `deleteVaccination`, `saveWeight`,
+`deleteWeight`) write through the dao and invalidate that one key. Herds are
+open-ended — a controller per animal would hold every animal's history in memory
+for the whole session, and a `FamilyAsyncNotifier` is a class per table per
+screen for the same result. Animals and litters keep their `AsyncNotifier`
+controllers because those two lists are also read by *other* screens; a dose
+belongs to exactly one ledger.
+
+## D18 — Weigh-ins are stored in grams, typed in kilograms, and never edited
+**Decided by the agent, 2026-10-04.**
+`weight_grams` is an integer (no float drift, no unit column, no ambiguity in a
+chart). The form asks for kilograms because that is what a scale and a person
+say — `parseWeightToGrams` converts and rejects anything that is not a positive
+weight, and `formatWeight` switches unit at one kilogram, which is where breeders
+switch it in speech: a 430 g puppy is never "0.43 kg" out loud. A stored weigh-in
+is append-only, so a mis-typed row is deleted and measured again rather than
+edited: a correction silently overwriting a measurement is the failure mode that
+matters once the curve is shown to a buyer or a vet.

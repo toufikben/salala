@@ -45,7 +45,7 @@ the first verdict a change gets and the device is the second.
 
 ## Stage 1 — The breeder's ledger  *(the wedge the app is judged on)*
 
-### 1a — Litters *(code complete, awaiting CI and the phone)*
+### 1a — Litters *(CI green, install verified)*
 
 - `LitterDao.createWithPuppies` — litter + puppies in one transaction, lineage
   stamped by the dao (D14).
@@ -55,9 +55,34 @@ the first verdict a change gets and the device is the second.
 - Tests: 4 litter-DAO cases (linking, rollback, both delete paths), 5 gestation
   cases, 3 widget cases (empty state, refused save, a whelping that registers
   three puppies and shows them under Animals).
+- CI: **run 37233197370** — `Analyze and test` success, `No issues found! (ran in
+  11.4s)`, `47 tests passed.`; `Build debug APK` success, published to the
+  `debug-apk` release (168 MB, `updated_at 2026-10-04T20:51:21Z`).
+- Getting there took three red runs, all of them test-side or import-side:
+  6 analyzer findings (missing screen imports in the router, an unused import,
+  a null-aware element, an unused variable that should have been an assertion),
+  then `45 passed, 2 failed` (a subtitle asserted without picking a sire; an
+  Arabic title check the new nav bar duplicated), then `46 passed, 1 failed`
+  (a tab tap attempted from a pushed route that has no nav bar).
 
-Still open in Stage 1: per-animal record screens (vaccinations, health tests,
-weights, vet visits), the 30-day reminder scheduler — which needs a
+### 1b — The animal ledger  *(code complete, awaiting CI and the phone)*
+
+- Tapping an animal now opens its card (`/animals/:id`) instead of its form;
+  editing stays in the card's menu.
+- Vaccinations: log, correct, delete, with the next-due date as a first-class
+  field and an overdue badge driven by `Vaccination.isOverdue(now)` (D17).
+- Weights: type kilograms, store grams, one kilogram is where the spoken unit
+  changes; a growth curve drawn from the stored series; a mis-typed weigh-in is
+  deleted and measured again rather than edited (D18).
+- `parseWeightToGrams`/`formatWeight` in `core/utils/weight.dart`, covered by
+  unit tests because a unit bug here is invisible until a vet reads the chart.
+- Tests: 6 weight-unit cases (three in grams, three in and out of kilograms),
+  7 widget cases (ledger shape, logging a dose, the overdue badge, correcting a
+  dose, a kilogram weigh-in, a gram weigh-in ordered newest-first, deleting a
+  weigh-in).
+
+Still open in Stage 1: health-test and vet-visit sections on the same ledger,
+the 30-day reminder scheduler — which needs a
 `flutter_local_notifications` spike, not an argument — and `es`/`de` `.arb`
 files once the copy settles.
 

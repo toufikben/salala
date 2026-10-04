@@ -312,4 +312,85 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get litterDeleteBody =>
       'The puppies stay in your animals; only the mating record is removed. This cannot be undone.';
+
+  @override
+  String get animalGone => 'This animal was deleted.';
+
+  @override
+  String get animalDeathDate => 'Died';
+
+  @override
+  String get valueUnknown => 'Not recorded';
+
+  @override
+  String get recordDeleteTitle => 'Delete this record?';
+
+  @override
+  String get vaccinationAdd => 'Add vaccination';
+
+  @override
+  String get vaccinationAddTitle => 'Log a vaccination';
+
+  @override
+  String get vaccinationEditTitle => 'Edit vaccination';
+
+  @override
+  String get vaccinationName => 'Vaccine';
+
+  @override
+  String get vaccinationNameRequired => 'A vaccine name is required';
+
+  @override
+  String get vaccinationGiven => 'Given';
+
+  @override
+  String get vaccinationNextDue => 'Next due';
+
+  @override
+  String get vaccinationNextDueHint =>
+      'A dose whose next-due date has passed is marked overdue.';
+
+  @override
+  String get vaccinationOverdue => 'Overdue';
+
+  @override
+  String get vaccinationManufacturer => 'Manufacturer';
+
+  @override
+  String get vaccinationBatch => 'Batch number';
+
+  @override
+  String get vaccinationVet => 'Veterinarian';
+
+  @override
+  String get vaccinationClinic => 'Clinic';
+
+  @override
+  String get vaccinationCertificate => 'Certificate number';
+
+  @override
+  String get vaccinationDeleteBody =>
+      'The dose is removed from this animal\'s history. This cannot be undone.';
+
+  @override
+  String get weightAdd => 'Add weight';
+
+  @override
+  String get weightKg => 'Weight (kg)';
+
+  @override
+  String get weightRequired => 'Enter the weight';
+
+  @override
+  String get weightInvalid => 'Enter a weight like 4.2';
+
+  @override
+  String get weightMeasuredOn => 'Measured on';
+
+  @override
+  String get weightNote => 'Note';
+
+  @override
+  String get weightDeleteBody =>
+      'The weigh-in is removed. This cannot be undone.';
 }

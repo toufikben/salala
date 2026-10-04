@@ -137,5 +137,34 @@
       }
     }
   },
-  "litterDeleteBody": "The puppies stay in your animals; only the mating record is removed. This cannot be undone."
+  "litterDeleteBody": "The puppies stay in your animals; only the mating record is removed. This cannot be undone.",
+
+  "animalGone": "This animal was deleted.",
+  "animalDeathDate": "Died",
+  "valueUnknown": "Not recorded",
+  "recordDeleteTitle": "Delete this record?",
+
+  "vaccinationAdd": "Add vaccination",
+  "vaccinationAddTitle": "Log a vaccination",
+  "vaccinationEditTitle": "Edit vaccination",
+  "vaccinationName": "Vaccine",
+  "vaccinationNameRequired": "A vaccine name is required",
+  "vaccinationGiven": "Given",
+  "vaccinationNextDue": "Next due",
+  "vaccinationNextDueHint": "A dose whose next-due date has passed is marked overdue.",
+  "vaccinationOverdue": "Overdue",
+  "vaccinationManufacturer": "Manufacturer",
+  "vaccinationBatch": "Batch number",
+  "vaccinationVet": "Veterinarian",
+  "vaccinationClinic": "Clinic",
+  "vaccinationCertificate": "Certificate number",
+  "vaccinationDeleteBody": "The dose is removed from this animal's history. This cannot be undone.",
+
+  "weightAdd": "Add weight",
+  "weightKg": "Weight (kg)",
+  "weightRequired": "Enter the weight",
+  "weightInvalid": "Enter a weight like 4.2",
+  "weightMeasuredOn": "Measured on",
+  "weightNote": "Note",
+  "weightDeleteBody": "The weigh-in is removed. This cannot be undone."
 }

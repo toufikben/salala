@@ -3,12 +3,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../presentation/providers/app_providers.dart';
+import '../../presentation/screens/animal_detail_screen.dart';
 import '../../presentation/screens/animal_form_screen.dart';
 import '../../presentation/screens/animal_list_screen.dart';
 import '../../presentation/screens/litter_form_screen.dart';
 import '../../presentation/screens/litter_list_screen.dart';
 import '../../presentation/screens/lock_screen.dart';
 import '../../presentation/screens/settings_screen.dart';
+import '../../presentation/screens/vaccination_form_screen.dart';
+import '../../presentation/screens/weight_form_screen.dart';
 
 class AppPaths {
   AppPaths._();
@@ -21,6 +24,16 @@ class AppPaths {
   static const String settings = '/settings';
 
   static String editAnimal(String id) => '/animals/$id/edit';
+
+  static String animal(String id) => '/animals/$id';
+
+  static String newVaccination(String animalId) =>
+      '/animals/$animalId/vaccinations/new';
+
+  static String vaccination(String animalId, String id) =>
+      '/animals/$animalId/vaccinations/$id';
+
+  static String newWeight(String animalId) => '/animals/$animalId/weights/new';
 
   static String litter(String id) => '/litters/$id';
 }
@@ -78,6 +91,33 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((ref) {
               mode: AnimalFormMode.edit,
               animalId: state.pathParameters['id']!,
             ),
+          ),
+          GoRoute(
+            path: ':id',
+            builder: (context, state) =>
+                AnimalDetailScreen(animalId: state.pathParameters['id']!),
+            routes: <RouteBase>[
+              // 'new' is declared before ':recordId' so a new dose is never read
+              // as an id, exactly as /litters/new is.
+              GoRoute(
+                path: 'vaccinations/new',
+                builder: (context, state) => VaccinationFormScreen(
+                  animalId: state.pathParameters['id']!,
+                ),
+              ),
+              GoRoute(
+                path: 'vaccinations/:recordId',
+                builder: (context, state) => VaccinationFormScreen(
+                  animalId: state.pathParameters['id']!,
+                  vaccinationId: state.pathParameters['recordId'],
+                ),
+              ),
+              GoRoute(
+                path: 'weights/new',
+                builder: (context, state) =>
+                    WeightFormScreen(animalId: state.pathParameters['id']!),
+              ),
+            ],
           ),
         ],
       ),

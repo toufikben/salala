@@ -1,0 +1,301 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../core/l10n/app_localizations.dart';
+import '../../core/utils/date_utils.dart';
+import '../../data/models/vaccination.dart';
+import '../providers/record_providers.dart';
+import '../widgets/date_tile.dart';
+
+/// One dose: what was given, when, and when the next one is due.
+///
+/// The due date is the whole point of the screen — it is what the reminder
+/// scheduler and the overdue badge read — so it is a first-class field here
+/// rather than a note a breeder would have to re-read by eye.
+class VaccinationFormScreen extends ConsumerStatefulWidget {
+  const VaccinationFormScreen({
+    super.key,
+    required this.animalId,
+    this.vaccinationId,
+  });
+
+  final String animalId;
+  final String? vaccinationId;
+
+  bool get isEdit => vaccinationId != null;
+
+  @override
+  ConsumerState<VaccinationFormScreen> createState() =>
+      _VaccinationFormScreenState();
+}
+
+class _VaccinationFormScreenState extends ConsumerState<VaccinationFormScreen> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  late final TextEditingController _vaccineName;
+  late final TextEditingController _manufacturer;
+  late final TextEditingController _batchNumber;
+  late final TextEditingController _vetName;
+  late final TextEditingController _clinicName;
+  late final TextEditingController _certificateNumber;
+
+  int? _administered;
+  int? _nextDue;
+
+  Vaccination? _existing;
+  bool _saving = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _vaccineName = TextEditingController();
+    _manufacturer = TextEditingController();
+    _batchNumber = TextEditingController();
+    _vetName = TextEditingController();
+    _clinicName = TextEditingController();
+    _certificateNumber = TextEditingController();
+    if (!widget.isEdit) {
+      _administered = msFromDay(DateTime.now());
+    }
+  }
+
+  void _fillFrom(Vaccination dose) {
+    if (_existing != null) return;
+    _existing = dose;
+    _vaccineName.text = dose.vaccineName;
+    _manufacturer.text = dose.manufacturer ?? '';
+    _batchNumber.text = dose.batchNumber ?? '';
+    _vetName.text = dose.vetName ?? '';
+    _clinicName.text = dose.clinicName ?? '';
+    _certificateNumber.text = dose.certificateNumber ?? '';
+    _administered = dose.dateAdministered;
+    _nextDue = dose.nextDueDate;
+  }
+
+  @override
+  void dispose() {
+    _vaccineName.dispose();
+    _manufacturer.dispose();
+    _batchNumber.dispose();
+    _vetName.dispose();
+    _clinicName.dispose();
+    _certificateNumber.dispose();
+    super.dispose();
+  }
+
+  Future<void> _pickDate({
+    required int? current,
+    required void Function(int?) set,
+  }) async {
+    final now = DateTime.now();
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: dayFromMs(current) ?? now,
+      firstDate: DateTime(now.year - 5),
+      // A dose can be booked ahead, so the picker reaches past today.
+      lastDate: DateTime(now.year + 5),
+    );
+    if (picked != null) set(msFromDay(picked));
+  }
+
+  Future<void> _save() async {
+    if (!_formKey.currentState!.validate() || _saving) return;
+    setState(() => _saving = true);
+
+    final base =
+        _existing ??
+        Vaccination(
+          id: '',
+          animalId: widget.animalId,
+          vaccineName: '',
+          dateAdministered: 0,
+          createdAt: 0,
+          updatedAt: 0,
+        );
+
+    final draft = base.copyWith(
+      animalId: widget.animalId,
+      vaccineName: _vaccineName.text.trim(),
+      manufacturer: _manufacturer.text.trim(),
+      batchNumber: _batchNumber.text.trim(),
+      vetName: _vetName.text.trim(),
+      clinicName: _clinicName.text.trim(),
+      certificateNumber: _certificateNumber.text.trim(),
+      dateAdministered: _administered,
+      nextDueDate: _nextDue,
+      clearNextDueDate: _nextDue == null,
+    );
+
+    await saveVaccination(ref, draft);
+    if (mounted) context.pop();
+  }
+
+  Future<void> _delete() async {
+    final dose = _existing;
+    if (dose == null) return;
+    final l10n = AppLocalizations.of(context);
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(l10n.recordDeleteTitle),
+        content: Text(l10n.vaccinationDeleteBody),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: Text(l10n.actionCancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: Text(l10n.actionDelete),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    await deleteVaccination(ref, dose);
+    if (mounted) context.pop();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final doses = ref.watch(vaccinationsForAnimalProvider(widget.animalId));
+
+    if (widget.isEdit) {
+      final found = (doses.value ?? const <Vaccination>[]).where(
+        (v) => v.id == widget.vaccinationId,
+      );
+      if (found.isNotEmpty) _fillFrom(found.first);
+    }
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          widget.isEdit ? l10n.vaccinationEditTitle : l10n.vaccinationAddTitle,
+        ),
+        actions: <Widget>[
+          if (_existing != null)
+            IconButton(
+              tooltip: l10n.actionDelete,
+              icon: const Icon(Icons.delete_outline),
+              onPressed: _saving ? null : _delete,
+            ),
+        ],
+      ),
+      body: widget.isEdit && doses.value == null
+          // Editing a dose that has not arrived yet would open an empty form and
+          // let a save overwrite the real row with blanks.
+          ? const Center(child: CircularProgressIndicator())
+          : Form(
+              key: _formKey,
+              // SingleChildScrollView + Column, never a lazy ListView:
+              // Form.validate() only visits mounted fields.
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: <Widget>[
+                    TextFormField(
+                      controller: _vaccineName,
+                      textCapitalization: TextCapitalization.words,
+                      decoration: InputDecoration(
+                        labelText: l10n.vaccinationName,
+                      ),
+                      validator: (value) =>
+                          (value == null || value.trim().isEmpty)
+                          ? l10n.vaccinationNameRequired
+                          : null,
+                    ),
+                    const SizedBox(height: 12),
+                    DateTile(
+                      label: l10n.vaccinationGiven,
+                      value: formatDay(context, _administered),
+                      onPick: () => _pickDate(
+                        current: _administered,
+                        set: (v) => setState(() => _administered = v),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    DateTile(
+                      label: l10n.vaccinationNextDue,
+                      value: formatDay(context, _nextDue),
+                      onPick: () => _pickDate(
+                        current: _nextDue,
+                        set: (v) => setState(() => _nextDue = v),
+                      ),
+                      onClear: _nextDue == null
+                          ? null
+                          : () => setState(() => _nextDue = null),
+                    ),
+                    if (_nextDue != null)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 4),
+                        child: Text(
+                          l10n.vaccinationNextDueHint,
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                      ),
+                    const SizedBox(height: 12),
+                    TextFormField(
+                      controller: _manufacturer,
+                      textCapitalization: TextCapitalization.words,
+                      decoration: InputDecoration(
+                        labelText: l10n.vaccinationManufacturer,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    TextFormField(
+                      controller: _batchNumber,
+                      decoration: InputDecoration(
+                        labelText: l10n.vaccinationBatch,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    TextFormField(
+                      controller: _vetName,
+                      textCapitalization: TextCapitalization.words,
+                      decoration: InputDecoration(
+                        labelText: l10n.vaccinationVet,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    TextFormField(
+                      controller: _clinicName,
+                      textCapitalization: TextCapitalization.words,
+                      decoration: InputDecoration(
+                        labelText: l10n.vaccinationClinic,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    TextFormField(
+                      controller: _certificateNumber,
+                      decoration: InputDecoration(
+                        labelText: l10n.vaccinationCertificate,
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: _saving ? null : () => context.pop(),
+                            child: Text(l10n.actionCancel),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: FilledButton(
+                            onPressed: _saving ? null : _save,
+                            child: Text(l10n.actionSave),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+    );
+  }
+}

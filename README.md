@@ -17,16 +17,20 @@ network permission in Phase 0–2.
 
 ## Status
 
-- CI run **37230817629** (`Analyze and test`, commit `3ae999e`): **No issues
-  found!** and **35 tests passed** — schema 8, animal DAO 8, record DAOs 7,
-  app-lock 7, widget 5. That is the authoritative verdict; the same commands run
-  on the laptop are a convenience, not a gate (see `ROADMAP.md`).
+- CI run **37233197370** (`Analyze and test`, commit `e5284bf`): **No issues
+  found!** and **47 tests passed** — schema 8, animal DAO 8, record DAOs 7,
+  litter DAO 4, gestation 5, app-lock 7, widget 8 (5 animal list, 3 litter).
+  That is the authoritative verdict; the same commands run on the laptop are a
+  convenience, not a gate (see `ROADMAP.md`).
 - Built: database layer with foreign keys and migrations, animal list/form,
-  settings, app-lock PIN gate, English/Arabic/French with RTL.
-- In flight (Stage 1a, awaiting CI): litter list/form/detail — a whelping
-  registers its puppies as animals in one transaction — plus the three-tab nav
-  bar and a build tag on Settings → About for device-side proof.
-- Not yet done: record screens, PDF/JSON export, reminders.
+  settings, app-lock PIN gate, English/Arabic/French with RTL, litter
+  list/form/detail with a whelping that registers its puppies in one save, and
+  the animal ledger (vaccinations with an overdue badge, weigh-ins with a
+  growth curve).
+- Device: the CI debug APK from the `debug-apk` release installed on the Realme
+  (`com.salala.salala`, `versionName 0.1.0`) at 2026-10-04 21:53. Screenshots
+  and button-by-button checks are still owed.
+- Not yet done: health-test and vet-visit sections, reminders, PDF/JSON export.
 
 ## Toolchain
 

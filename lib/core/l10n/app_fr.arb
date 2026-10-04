@@ -120,5 +120,34 @@
       }
     }
   },
-  "litterDeleteBody": "Les chiots restent dans vos animaux ; seul l'accouplement est supprimé. Cette action est irréversible."
+  "litterDeleteBody": "Les chiots restent dans vos animaux ; seul l'accouplement est supprimé. Cette action est irréversible.",
+
+  "animalGone": "Cet animal a été supprimé.",
+  "animalDeathDate": "Mort le",
+  "valueUnknown": "Non enregistré",
+  "recordDeleteTitle": "Supprimer cet enregistrement ?",
+
+  "vaccinationAdd": "Ajouter une vaccination",
+  "vaccinationAddTitle": "Enregistrer une vaccination",
+  "vaccinationEditTitle": "Modifier la vaccination",
+  "vaccinationName": "Vaccin",
+  "vaccinationNameRequired": "Le nom du vaccin est obligatoire",
+  "vaccinationGiven": "Administré le",
+  "vaccinationNextDue": "Prochaine dose",
+  "vaccinationNextDueHint": "Une dose dont la date est dépassée est marquée en retard.",
+  "vaccinationOverdue": "En retard",
+  "vaccinationManufacturer": "Fabricant",
+  "vaccinationBatch": "N° de lot",
+  "vaccinationVet": "Vétérinaire",
+  "vaccinationClinic": "Clinique",
+  "vaccinationCertificate": "N° du certificat",
+  "vaccinationDeleteBody": "La dose est retirée de l'historique de cet animal. Action irréversible.",
+
+  "weightAdd": "Ajouter un poids",
+  "weightKg": "Poids (kg)",
+  "weightRequired": "Saisissez le poids",
+  "weightInvalid": "Saisissez un poids comme 4,2",
+  "weightMeasuredOn": "Mesuré le",
+  "weightNote": "Note",
+  "weightDeleteBody": "La pesée est supprimée. Action irréversible."
 }

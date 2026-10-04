@@ -317,4 +317,84 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get litterDeleteBody =>
       'تبقى الجراء ضمن حيواناتك، ويُحذف سجل التزاوج فقط. لا يمكن التراجع عن هذه الخطوة.';
+
+  @override
+  String get animalGone => 'تم حذف هذا الحيوان.';
+
+  @override
+  String get animalDeathDate => 'تاريخ النفوق';
+
+  @override
+  String get valueUnknown => 'غير مسجّل';
+
+  @override
+  String get recordDeleteTitle => 'حذف هذا السجل؟';
+
+  @override
+  String get vaccinationAdd => 'تطعيم جديد';
+
+  @override
+  String get vaccinationAddTitle => 'تسجيل تطعيم';
+
+  @override
+  String get vaccinationEditTitle => 'تعديل التطعيم';
+
+  @override
+  String get vaccinationName => 'اللقاح';
+
+  @override
+  String get vaccinationNameRequired => 'اسم اللقاح مطلوب';
+
+  @override
+  String get vaccinationGiven => 'أُعطي في';
+
+  @override
+  String get vaccinationNextDue => 'الجرعة القادمة';
+
+  @override
+  String get vaccinationNextDueHint =>
+      'أي جرعة تجاوزت موعدها تُعلَّم بأنها متأخرة.';
+
+  @override
+  String get vaccinationOverdue => 'متأخر';
+
+  @override
+  String get vaccinationManufacturer => 'الشركة المصنّعة';
+
+  @override
+  String get vaccinationBatch => 'رقم الدفعة';
+
+  @override
+  String get vaccinationVet => 'الطبيب البيطري';
+
+  @override
+  String get vaccinationClinic => 'العيادة';
+
+  @override
+  String get vaccinationCertificate => 'رقم الشهادة';
+
+  @override
+  String get vaccinationDeleteBody =>
+      'يُحذف هذا التطعيم من سجل الحيوان. لا يمكن التراجع عن ذلك.';
+
+  @override
+  String get weightAdd => 'وزن جديد';
+
+  @override
+  String get weightKg => 'الوزن (كغ)';
+
+  @override
+  String get weightRequired => 'أدخل الوزن';
+
+  @override
+  String get weightInvalid => 'أدخل وزناً مثل 4.2';
+
+  @override
+  String get weightMeasuredOn => 'تاريخ الوزن';
+
+  @override
+  String get weightNote => 'ملاحظة';
+
+  @override
+  String get weightDeleteBody => 'يُحذف هذا الوزن. لا يمكن التراجع عن ذلك.';
 }
