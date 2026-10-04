@@ -183,3 +183,17 @@ switch it in speech: a 430 g puppy is never "0.43 kg" out loud. A stored weigh-i
 is append-only, so a mis-typed row is deleted and measured again rather than
 edited: a correction silently overwriting a measurement is the failure mode that
 matters once the curve is shown to a buyer or a vet.
+
+## D19 — The CI debug key is cached, not committed
+**Decided by the agent, 2026-10-04.**
+The first two device installs proved the problem: `INSTALL_FAILED_UPDATE_INCOMPATIBLE`,
+because every GitHub Actions runner generates its own `~/.android/debug.keystore`,
+so build N and build N+1 of the same app are signed by different keys and Android
+will not update one over the other. The fix could have been a committed
+`debug.keystore` (the template gitignores `**/*.keystore` for a reason) or a
+repo secret (a credential in someone else's account, and a build that fails
+loudly when it is missing). `actions/cache` on the generated file gives a stable
+key with nothing to protect and nothing to leak: if the cache is ever evicted the
+next build simply needs one `adb uninstall` first, which is what was happening on
+every install anyway. Release signing is untouched — there is no release key yet,
+and Stage 4 decides that one deliberately.

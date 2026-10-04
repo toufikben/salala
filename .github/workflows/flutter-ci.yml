@@ -62,6 +62,19 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Keep the debug signing key stable between runs
+        # Every fresh runner generates its own ~/.android/debug.keystore, so two
+        # CI builds of the same app are signed by different keys and Android
+        # refuses to update one over the other
+        # (INSTALL_FAILED_UPDATE_INCOMPATIBLE), which would wipe the app's data
+        # on the test phone at every install. Caching the generated key costs no
+        # secret and no committed file; a cache eviction means one reinstall.
+        uses: actions/cache@v4
+        with:
+          path: ~/.android/debug.keystore
+          key: salala-debug-keystore-v1
+          restore-keys: salala-debug-keystore-v1
+
       - name: Build debug APK
         # The commit SHA is stamped into the build tag and shown on Settings →
         # About, so a phone screenshot proves which commit the installed APK is.
