@@ -326,7 +326,22 @@ void main() {
     await _save(tester);
 
     expect(find.text('Enter the result'), findsOneWidget);
-    expect(find.text('BAER'), findsNothing);
+    // Still on the form. The typed name is sitting in the field, so asserting
+    // the row is absent would prove nothing — the route not popping is the
+    // evidence that nothing was written.
+    expect(find.text('Log a health test'), findsOneWidget);
+
+    // Adding the missing result now lets the very same save through, which
+    // shows the refusal was about the result and not a broken form.
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Result'),
+      'Clear',
+    );
+    await _save(tester);
+
+    expect(find.text('Log a health test'), findsNothing);
+    await _scrollTo(tester, find.text('BAER'));
+    expect(find.text('BAER'), findsOneWidget);
   });
 
   testWidgets('a screening is correctable from its own row', (tester) async {
