@@ -65,7 +65,7 @@ the first verdict a change gets and the device is the second.
   Arabic title check the new nav bar duplicated), then `46 passed, 1 failed`
   (a tab tap attempted from a pushed route that has no nav bar).
 
-### 1b — The animal ledger  *(code complete, awaiting CI and the phone)*
+### 1b — The animal ledger *(CI green, install pending device check)*
 
 - Tapping an animal now opens its card (`/animals/:id`) instead of its form;
   editing stays in the card's menu.
@@ -80,6 +80,14 @@ the first verdict a change gets and the device is the second.
   7 widget cases (ledger shape, logging a dose, the overdue badge, correcting a
   dose, a kilogram weigh-in, a gram weigh-in ordered newest-first, deleting a
   weigh-in).
+- CI: **run 37236013403** — `Analyze and test` success, `No issues found! (ran in
+  11.6s)`, `60 tests passed.`; `Build debug APK` success, new asset on the
+  `debug-apk` release (`updated_at 2026-10-04T21:33:17Z`).
+- Three red runs on the way, each one a real defect rather than noise:
+  `Path.addPolyline` does not exist, then neither does `Path.addPoints` (the
+  polyline primitive in `dart:ui` is `addPolygon(points, false)` — checked
+  against the engine source before the third push), then the ledger's parentage
+  row printed the litter form's "Dam (mother)" wording.
 
 Still open in Stage 1: health-test and vet-visit sections on the same ledger,
 the 30-day reminder scheduler — which needs a

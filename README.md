@@ -17,11 +17,11 @@ network permission in Phase 0–2.
 
 ## Status
 
-- CI run **37233197370** (`Analyze and test`, commit `e5284bf`): **No issues
-  found!** and **47 tests passed** — schema 8, animal DAO 8, record DAOs 7,
-  litter DAO 4, gestation 5, app-lock 7, widget 8 (5 animal list, 3 litter).
-  That is the authoritative verdict; the same commands run on the laptop are a
-  convenience, not a gate (see `ROADMAP.md`).
+- CI run **37236013403** (`Analyze and test`, commit `1dbf60c`): **No issues
+  found!** and **60 tests passed** — schema 8, animal DAO 8, record DAOs 7,
+  litter DAO 4, gestation 5, weight units 6, app-lock 7, widget 15 (5 animal
+  list, 3 litter, 7 ledger). That is the authoritative verdict; the same
+  commands run on the laptop are a convenience, not a gate (see `ROADMAP.md`).
 - Built: database layer with foreign keys and migrations, animal list/form,
   settings, app-lock PIN gate, English/Arabic/French with RTL, litter
   list/form/detail with a whelping that registers its puppies in one save, and
