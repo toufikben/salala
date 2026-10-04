@@ -137,6 +137,11 @@ void main() {
     expect(find.text('A litter 3'), findsOneWidget);
     expect(find.textContaining('2 puppies'), findsNothing);
 
+    // A whelping detail is a pushed route with no nav bar of its own, so the
+    // tab switch needs the way back first — the same order a hand follows.
+    await tester.tap(find.byType(BackButton));
+    await tester.pumpAndSettle();
+
     await tester.tap(find.widgetWithText(NavigationDestination, 'Animals'));
     await settleRealIo(tester);
 
