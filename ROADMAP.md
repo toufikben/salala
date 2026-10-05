@@ -128,11 +128,11 @@ the first verdict a change gets and the device is the second.
      written down as expected behaviour — that assertion is now the guard.
   4. The weight unit renders as "kg" in every locale. Open: it needs a decision
      about Arabic unit wording (كغ vs keeping kg), not just a key.
-- Not covered by this check: health tests and vet visits (built in 1c, never run
-  on a device yet), reminder scheduling (unbuilt), and anything needing a second
-  device.
+- Not covered by this check: reminder scheduling (unbuilt), and anything needing
+  a second device. Health tests and vet visits were unchecked at the time of
+  writing; they have since been run on the device — see the 1c pass below.
 
-### 1c — Screenings and consultations on the same ledger *(built, awaiting CI)*
+### 1c — Screenings and consultations on the same ledger *(CI green; device check done)*
 
 - Health tests: the screening a buyer is shown — type, result, testing body,
   certificate number, who verified it, and a `validUntil` that turns a row from
@@ -143,20 +143,109 @@ the first verdict a change gets and the device is the second.
   show what was spent, not what a fluctuating rate says it is worth today.
 - Both are creatable, correctable from their own row, and deletable behind the
   same confirm dialog every record uses.
-- Device finding 1 is fixed here: the species helper text and the screening
-  result helper were hardcoded English inside a localized form; both now go
-  through `.arb` (the OFA/PENNFID grade words stay English on purpose).
+- Device finding 1 is half fixed here: the species helper and the screening
+  result helper no longer hardcode English inside a localized form — both now
+  read from `.arb`. But the `healthTestResultHelper` value was left in English in
+  `app_ar.arb` and `app_fr.arb`, so the Arabic and French forms still show an
+  English hint. `animalSpeciesHelper` does read "كلب · قط" on the device.
 - Tests: 7 DAO cases (certificate round trip, expiry clearing, newest-first
   ordering, decimal fee round trip, a null fee that must not read as zero) and
   8 widget cases, including an Arabic ledger that asserts each row by scrolling
   to it rather than trusting the list to be built.
 
-Still open in Stage 1: the 30-day reminder scheduler — which needs a
+- CI verdict (run `37243802618`, commit `1f59646`): `flutter analyze
+  --fatal-infos` → "No issues found! (ran in 7.9s)"; `flutter test -j 1` →
+  "🎉 75 tests passed."; debug APK published (168,825,323 bytes) and installed
+  on the Realme — Settings prints "Build 1f59646".
+
+- Device check of 1c (Realme RMX3910, build `1f59646`). Every claim below is
+  backed by a screenshot that was opened and read, plus `salala.db` pulled off
+  the phone with `run-as` and queried directly. English UI first, then the same
+  screens in Arabic and French.
+  - Add animal → **Zeus** saved; herd card and one `animals` row.
+  - Ledger renders all four sections — Vaccinations, Health tests, Vet visits,
+    Weights — each with its own add action and empty-state line.
+  - **Health test created**: BAER / Clear / Clinic / BAER-1024 / Dr. Haddad,
+    Tested on prefilled to today. Stored as `test_date 1791154800000` (local
+    midnight Oct 5 2026) and `valid_until 1792018800000` — exactly ten days
+    later, so the day-boundary encoding is right.
+  - **"Expired" flag verified live**: editing Valid until to a past date made the
+    row show "Expired" and reloaded the ledger; the DB then read
+    `valid_until 1788217200000`.
+  - **Vet visit created**: reason, outcome, clinic, vet, cost 350.5 typed as
+    "350.50", stored `cost: 350.5` REAL with `currency: "MAD"` normalised.
+  - **Vaccination and weigh-in created on this build**: `batch_number A123`,
+    `certificate_number VAC-9`, `weight_grams 18500` — the ledger row showed
+    18.50 kg.
+  - **Edit path verified for every record type that has an edit form** — health
+    test, vet visit, vaccination — plus the animal. Each reopened prefilled with
+    every stored value; changing a value and saving wrote it back
+    (`vet_visits.cost` 350.5 → 420, `vaccinations.batch_number` A123 → B777)
+    while `created_at` stayed and `updated_at` moved. Weigh-ins have **no edit
+    route by design** (`WeightFormScreen` takes only an `animalId`; the route is
+    `weights/new`): a weigh-in is a measurement, so correcting one means deleting
+    it and logging it again. That is deliberate, but nothing on the row says so —
+    worth a hint later.
+  - **Delete path verified for all four record types plus the animal itself.**
+    Each confirm dialog names the record type in its body; the Cancel branch was
+    checked too. After each confirm, the section fell back to "Nothing recorded
+    yet." and the table row count dropped to 0.
+  - **Cascade delete proven with live data**, not just an empty animal: a second
+    animal was created, given a weigh-in ("12.40 kg" on the ledger, one
+    `weight_entries` row), then deleted from the herd card menu behind "Delete
+    Pu? — Its vaccinations, health tests, weights and visits are deleted too."
+    Reading the pulled database afterwards: `animals 0`, `weight_entries 0`.
+  - **Required-field validation on-device**: saving an animal with no species
+    kept the form open, outlined the Species field and showed "Choose a species"
+    as the error; filling it in let the same tap save.
+  - **Arabic (RTL) pass**: language switch persisted to `user_settings`
+    (`language_code = ar`) and held across every screen of the pass. RTL
+    mirrored correctly — tab bar order, back arrow, calendar icons, Save on the
+    left, dropdown menus anchored to the left edge. Section titles, add actions,
+    empty states and all four delete dialogs render in Arabic. Dates use
+    Arabic-Indic digits (٥ أكتوبر ٢٠٢٦) while weights and certificate numbers
+    stay Latin in the same screen. **Cold restart verified**: the app was
+    force-stopped and relaunched via the launcher intent and came back straight
+    into Arabic RTL on the empty herd, so the boot-time locale read in `main.dart`
+    works on a real device.
+  - **French pass**: accented strings render (Réglages, À propos, Portées,
+    N° du certificat, Valable jusqu'au) and the longer labels fit; the card menu
+    read Modifier / Supprimer and the animal dialog "Supprimer Zeus ?". Language
+    restored to System default afterwards; the phone was left with no test data.
+- Open device findings from this pass, none of them data-loss bugs:
+  1. `healthTestResultHelper` is "Clear · 0 · Affected" in **all three** `.arb`
+     files — the middle token is the digit zero where the letter O belongs, and
+     the value is untranslated in ar/fr, which is why it shows in Latin script
+     inside the Arabic and French forms.
+  2. `DateTile`'s trailing calendar icon is not a tap target: the accessibility
+     bounds of the tappable region start at x=136 while the icon paints at
+     x≈48–104, so tapping the icon does nothing in both LTR and RTL. The icon is
+     what reads as the affordance.
+  3. A `ListTile` that only carries a `trailing` widget announces itself as one
+     wide Button while only the trailing part reacts — the Settings language row
+     swallows a tap on its own label. Same shape as finding 2; both need the hit
+     area widened.
+  4. `formatWeight` renders "18.50 kg" as **"kg 18.50"** in Arabic — the RTL base
+     direction reorders the number and the unit. Needs a localized unit plus
+     bidi isolation, not just a string key.
+  5. No bottom inset for the system navigation bar. On the ledger the last row
+     sits under it (row bottom y=1556 vs nav bar top y=1516) and cannot be
+     scrolled clear; on the animal form the Save/Cancel row is pinned at
+     y=1444–1540, so the bottom ~24px of the pills is clipped by the nav bar at
+     every scroll position. The tap still lands (the centre is above the bar),
+     so this is cosmetic — but on a shorter screen it would not be. The weigh-in
+     form is short enough to clear the bar, which is why it was missed earlier.
+
+Still open in Stage 1: the five device findings above (all copy/hit-area/layout,
+no data loss), the 30-day reminder scheduler — which needs a
 `flutter_local_notifications` spike, not an argument — and `es`/`de` `.arb`
 files once the copy settles.
 
-Gate: every record type creatable, editable, deletable on the device; reminders
-fire on the phone inside the window; screenshots before/after each function.
+Gate: every record type creatable, editable, deletable on the device — **met**
+(weigh-ins by delete-and-relog, as designed) for all four record types and the
+animal, in English, Arabic and French.
+Reminders firing on the phone inside the window is still open, so Stage 1 is not
+closed.
 
 ## Stage 2 — The transfer pack (the thing people pay for)
 
