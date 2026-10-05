@@ -360,6 +360,17 @@ What is in it:
   `dueMs ?? dueInSixtyDays()`, so the "no due date" case never reached the
   scheduler with a null. The production rule was right — the widget test through
   the real form passed — and the helper was the lie.
+- Run `37353640524` (a commit that touched only the workflow and this file) came
+  back **99 passed, 1 failed**: `saving a dose books its due morning on the phone`
+  read zero alarms from a dose that had one. That was a real race, not a wrong
+  rule — the same code had been green twice, and the only test that can lose a
+  race silently (`written, isEmpty`) stayed green while the one that cannot
+  failed. The widget writes the dose on SQLite's isolate, so the alarms reach the
+  writer some real milliseconds after the tap; the assertion was reading too
+  early. The four reminder widget tests now wait for the scheduler's own call
+  log — two clears plus one write per alarm — and a save that reached the
+  scheduler but booked nothing fails naming how far the log got, so the wait
+  cannot mask the bug it was added for.
 - Realme RMX3910, debug APK from that run (`9872281`), after an empty-database
   check (`0` animals) and a reinstall:
   - The Android 13 prompt really appears, at launch: "Allow **Salala** to send you
