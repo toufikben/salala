@@ -62,14 +62,14 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Keep the debug signing key stable between runs
+      - name: Restore the debug signing key
         # Every fresh runner generates its own ~/.android/debug.keystore, so two
         # CI builds of the same app are signed by different keys and Android
         # refuses to update one over the other
         # (INSTALL_FAILED_UPDATE_INCOMPATIBLE), which would wipe the app's data
         # on the test phone at every install. Caching the generated key costs no
         # secret and no committed file; a cache eviction means one reinstall.
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
           path: ~/.android/debug.keystore
           key: salala-debug-keystore-v1
@@ -79,6 +79,16 @@ jobs:
         # The commit SHA is stamped into the build tag and shown on Settings →
         # About, so a phone screenshot proves which commit the installed APK is.
         run: flutter build apk --debug --dart-define=SALALA_BUILD_TAG=${GITHUB_SHA::7}
+
+      - name: Save the debug signing key
+        # The key does not exist until a build has made it, so the restore step
+        # above can never have anything to write back and the cache stayed empty
+        # for every run. Saving under a per-run key is the documented way round:
+        # the restore step matches it by prefix.
+        uses: actions/cache/save@v4
+        with:
+          path: ~/.android/debug.keystore
+          key: salala-debug-keystore-v1-${{ github.run_id }}
 
       - name: Publish the APK on the rolling debug release
         # This account's Actions artifact storage is capped (~500 MB) and shared

@@ -297,11 +297,12 @@ the first verdict a change gets and the device is the second.
      Moroccan breeder reads both fine, so this is a polish call, not a defect;
      deciding it means picking one system for the whole screen.
 
-Still open in Stage 1: the numeral-system call above (finding 6, cosmetic) and
-`es`/`de` `.arb` files once the copy settles. Findings 1–5 are fixed in `6c874cd`
-and were re-checked on the device.
+Still open in Stage 1: watching the 09:00 alarm actually arrive (1d below), the
+numeral-system call above (finding 6, cosmetic) and `es`/`de` `.arb` files once
+the copy settles. Findings 1–5 are fixed in `6c874cd` and were re-checked on the
+device.
 
-### 1d — The 30-day reminder (spike, NOT RUN yet)
+### 1d — The 30-day reminder (spike: CI green, alarms booked on the phone, delivery pending)
 
 The last Stage 1 gate item was a claim the code had never made: telling the
 breeder *without the app being open*. That needs the operating system to hold an
@@ -349,17 +350,48 @@ What is in it:
   `reminderLeadDays` apart, and deleting a booked dose clears precisely the two ids
   that booking wrote. No test ever talks to a real notification channel.
 
-**Verification status: NOT RUN.** Nothing here has been analysed, tested, built
-or installed. The three things that can only be settled elsewhere: CI for
-`analyze --fatal-infos` + `flutter test`; the phone for whether an alarm is
-actually held by the system (`dumpsys alarm | grep salala`) after a dose is
-booked; and the next morning for whether it is actually delivered — which stays
-open until a screenshot of a real notification exists. Realme/ColorOS is also
-known to kill background alarms aggressively (dontkillmyapp.com), so "no
-notification" on this device would need to be read as a battery-policy result,
-not as proof the scheduling is broken.
+**Verification status: CI green, alarms proven on the phone, delivery still open.**
 
-Gate: reminders firing on the phone inside the window — **not met yet**.
+- CI run `37297326645` on `9872281`: `flutter analyze --fatal-infos` clean and
+  **100 tests passed**. The two earlier reds were both worth having: run
+  `37294879238` refused to compile a double that extended the plugin (its
+  constructor is a `factory`), which is what produced the `NotificationWriter`
+  seam; run `37296888540` failed because the *test helper* wrote
+  `dueMs ?? dueInSixtyDays()`, so the "no due date" case never reached the
+  scheduler with a null. The production rule was right — the widget test through
+  the real form passed — and the helper was the lie.
+- Realme RMX3910, debug APK from that run (`9872281`), after an empty-database
+  check (`0` animals) and a reinstall:
+  - The Android 13 prompt really appears, at launch: "Allow **Salala** to send you
+    notifications?" → `POST_NOTIFICATIONS: granted=true, flags=[USER_SET|…]`.
+  - `aapt2 dump` of the CI-built APK shows both hand-declared receivers
+    (`ScheduledNotificationReceiver`, `ScheduledNotificationBootReceiver`) — the
+    one thing a green build would not have caught on its own.
+  - Booking `Rabies` due tomorrow and `Parvo` due 19 Nov left **exactly three**
+    alarms in `dumpsys alarm`, all `RTC_WAKEUP`, all aimed at
+    `ScheduledNotificationReceiver`, each with `window=+1h0m0s0ms` (the inexact
+    mode, visible from the outside): `2026-10-06 09:00`, `2026-10-20 09:00`,
+    `2026-11-19 09:00`. The Rabies month-ahead alarm is absent because it is
+    already past — the drop rule works on a real date, not only in a test.
+  - Deleting the `Parvo` row took **both** of its alarms out: `dumpsys alarm`
+    then listed only `2026-10-06 09:00`.
+  - The `salala_reminders` channel does **not** exist yet (`grep -c` = 0). That is
+    the plugin's own design, read from its Java source: `createNotification`
+    builds the channel at delivery time, so no `createNotificationChannel` call
+    is needed at startup — and it means the channel cannot be screenshot-proofed
+    before the first alarm fires.
+
+Still open, and the only thing the gate actually asks for: whether the
+`2026-10-06 09:00` alarm is *delivered* as a visible notification. The app is left
+installed and the phone untouched overnight so the answer is the real one —
+no battery-optimisation whitelist, because ColorOS killing background alarms
+(dontkillmyapp.com) is part of what a spike on this device is supposed to find out,
+not something to hide. If nothing appears, the alarm being present in
+`dumpsys alarm` this evening and absent tomorrow morning is the evidence that
+names the cause.
+
+Gate: reminders firing on the phone inside the window — **booked and cancelled on
+the device; delivery not yet observed.**
 
 Gate: every record type creatable, editable, deletable on the device — **met**
 (weigh-ins by delete-and-relog, as designed) for all four record types and the
