@@ -107,11 +107,11 @@ PackRows parsePack(String text) {
 
   final Object? format = pack['formatVersion'];
   if (format is int && format > packFormatVersion) {
-    throw const PackReject(PackProblem.fromTheFuture, 'format $format');
+    throw PackReject(PackProblem.fromTheFuture, 'format $format');
   }
   final Object? schema = pack['schemaVersion'];
   if (schema is int && schema > schemaVersion) {
-    throw const PackReject(PackProblem.fromTheFuture, 'schema $schema');
+    throw PackReject(PackProblem.fromTheFuture, 'schema $schema');
   }
 
   final Object? rows = pack['rows'];

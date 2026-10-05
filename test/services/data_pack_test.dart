@@ -287,7 +287,7 @@ void main() {
         ),
       );
       expect(
-        () => parsePack('{"format":"${packFormat}"}'),
+        () => parsePack('{"format":"$packFormat"}'),
         throwsA(
           isA<PackReject>().having(
             (e) => e.problem,
