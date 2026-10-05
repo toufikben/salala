@@ -132,7 +132,7 @@ the first verdict a change gets and the device is the second.
   a second device. Health tests and vet visits were unchecked at the time of
   writing; they have since been run on the device — see the 1c pass below.
 
-### 1c — Screenings and consultations on the same ledger *(CI green; device check done)*
+### 1c — Screenings and consultations on the same ledger *(CI green; device check done; its five findings fixed and re-checked on `6c874cd`)*
 
 - Health tests: the screening a buyer is shown — type, result, testing body,
   certificate number, who verified it, and a `validUntil` that turns a row from
@@ -143,11 +143,11 @@ the first verdict a change gets and the device is the second.
   show what was spent, not what a fluctuating rate says it is worth today.
 - Both are creatable, correctable from their own row, and deletable behind the
   same confirm dialog every record uses.
-- Device finding 1 is half fixed here: the species helper and the screening
-  result helper no longer hardcode English inside a localized form — both now
-  read from `.arb`. But the `healthTestResultHelper` value was left in English in
-  `app_ar.arb` and `app_fr.arb`, so the Arabic and French forms still show an
-  English hint. `animalSpeciesHelper` does read "كلب · قط" on the device.
+- Device finding 1 was half fixed in `1f59646`: the species helper and the
+  screening result helper no longer hardcoded English inside a localized form —
+  both now read from `.arb`. But the `healthTestResultHelper` value was left in
+  English in `app_ar.arb` and `app_fr.arb`. All five findings were then fixed in
+  `6c874cd` and re-checked on the phone; see the re-check below.
 - Tests: 7 DAO cases (certificate round trip, expiry clearing, newest-first
   ordering, decimal fee round trip, a null fee that must not read as zero) and
   8 widget cases, including an Arabic ledger that asserts each row by scrolling
@@ -237,10 +237,71 @@ the first verdict a change gets and the device is the second.
      so this is cosmetic — but on a shorter screen it would not be. The weigh-in
      form is short enough to clear the bar, which is why it was missed earlier.
 
-Still open in Stage 1: the five device findings above (all copy/hit-area/layout,
-no data loss), the 30-day reminder scheduler — which needs a
+- **Re-check of the five fixes on the phone** (Realme RMX3910, build `6c874cd`,
+  CI run `37284242980` → success: `flutter analyze --fatal-infos` → "No issues
+  found! (ran in 12.0s)", `flutter test -j 1` → "🎉 76 tests passed." (the 75
+  from `1f59646` plus the new locale-unit case), debug APK built and published).
+  The installed build was proven to be the fixes commit by the Settings row itself:
+  "رقم البناء | 6c874cd" in Arabic and "Version | 6c874cd" in French. `install -r`
+  was refused again with `INSTALL_FAILED_UPDATE_INCOMPATIBLE`, so the old build
+  was uninstalled first — after reading the pulled database and confirming every
+  business table held 0 rows, so nothing of the user's was lost.
+  - **Finding 3 (language row) closed.** The row now reports
+    `clickable=true` across its full width (`0,304-720,416`) and the menu opens
+    from a tap at x=90 (over the label), x=360 (centre) and x=650 (over the
+    endonym) — in Arabic RTL and in French LTR. The menu lists all four options
+    unclipped, and picking one changes the whole app.
+  - **Finding 2 (date tile) closed.** "تاريخ الميلاد" reports `clickable=true`
+    over `32,746-688,844`, and five separate taps — centre (360,795), right edge
+    over the label (660,795), left edge over the calendar icon (60,795), top
+    strip (400,752), bottom strip (400,838) — each opened the picker. The picker
+    itself is fully Arabic (١٥ أكتوبر ٢٠٢٥, Arabic-Indic day cells), and the
+    chosen date wrote back into the tile.
+  - **Finding 1 (result helper) closed.** The Arabic screening form reads
+    "كما في الشهادة: Clear · Carrier · Affected" and the French one "Comme au
+    certificat : Clear · Carrier · Affected". The three grade words stay Latin
+    on purpose — that is how a certificate prints them.
+  - **Finding 4 (weight unit) closed.** `formatWeight` now takes its units from
+    the locale: the Arabic ledger shows "18.50 كغ" and "430 غ" (one entry above
+    the kilogram line, one below), and the French ledger shows "18.50 kg" and
+    "430 g". The stored grams are exactly 18500 and 430, read back from
+    `salala.db`.
+  - **Finding 5 (bottom inset) closed.** On the ledger, scrolled to the end, the
+    last weigh-in row sits at y 1312–1456 with the nav bar starting at 1516 —
+    clear, where the same row previously ended at y=1556. On the animal form the
+    حفظ/إلغاء pills sit at y 1356–1452; on the vet-visit edit form the Cancel
+    row ends at y=1410. With the keyboard up every form lands its Save at
+    32,846-348,942, above the IME, so the pill is never clipped or unreachable.
+  - **Regression sweep on the same build**, in Arabic: animal `baraka` created
+    (`species dog`, `birth_date 1760482800000` = 15 Oct 2025), then a
+    vaccination (`dhpp`), a health test (`hip` / `Clear`, `valid_until
+    1790809200000` = 1 Oct 2026 → the row carries "منتهي الصلاحية"), two
+    weigh-ins, and a vet visit (`reason checkup`, `cost 350.5`, `currency MAD`).
+    The vet visit was then deleted from its own edit screen ("Supprimer cet
+    enregistrement ?") and the animal deleted from the herd menu ("Supprimer
+    baraka ?"), which cascaded the rest: the pulled database read
+    `animals 0, vaccinations 0, health_tests 0, weight_entries 0, vet_visits 0`.
+  - **Validation still holds on-device**: typing the weight into the Note field
+    left the Weight field empty and red-outlined with "أدخل الوزن", and the save
+    was refused — the same guard the English pass showed, now seen in Arabic.
+  - **Delete confirmations are localized**: "حذف هذا السجل؟ / يُحذف هذا الوزن. لا
+    يمكن التراجع عن ذلك." in Arabic, "Supprimer cet enregistrement ?" in French.
+    One of these was reached by an accidental tap on a weigh-in's trash icon and
+    cancelled, so the Cancel branch is proven on this build too.
+  - Phone left clean: all business tables 0 rows and `language_code = system`,
+    verified by a force-stop and cold relaunch into the English empty herd.
+- Still open from this re-check, cosmetic only:
+  6. The Arabic ledger mixes numeral systems inside one row — "18.50 كغ" in
+     Latin digits next to "٥ أكتوبر ٢٠٢٦" in Arabic-Indic. Dates go through
+     `intl`, weights are printed by `formatWeight` with `toStringAsFixed`. A
+     Moroccan breeder reads both fine, so this is a polish call, not a defect;
+     deciding it means picking one system for the whole screen.
+
+Still open in Stage 1: the numeral-system call above (finding 6, cosmetic), the
+30-day reminder scheduler — which needs a
 `flutter_local_notifications` spike, not an argument — and `es`/`de` `.arb`
-files once the copy settles.
+files once the copy settles. Findings 1–5 are fixed in `6c874cd` and were
+re-checked on the device.
 
 Gate: every record type creatable, editable, deletable on the device — **met**
 (weigh-ins by delete-and-relog, as designed) for all four record types and the
