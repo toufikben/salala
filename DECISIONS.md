@@ -182,7 +182,9 @@ weight, and `formatWeight` switches unit at one kilogram, which is where breeder
 switch it in speech: a 430 g puppy is never "0.43 kg" out loud. A stored weigh-in
 is append-only, so a mis-typed row is deleted and measured again rather than
 edited: a correction silently overwriting a measurement is the failure mode that
-matters once the curve is shown to a buyer or a vet.
+matters once the curve is shown to a buyer or a vet. The weigh-in form now says
+that out loud (`weightAppendOnlyHint`), because the form is exactly where a
+breeder looks for the edit button the ledger does not have.
 
 ## D19 — The CI debug key is cached, not committed
 **Decided by the agent, 2026-10-04.**
@@ -217,3 +219,19 @@ breeding plan is not a pending alarm, and a launch should not walk it), and aski
 for a foreground service or a battery-optimisation exemption — that is a Play
 policy argument Stage 4 has with measured delivery evidence in hand, not a spike
 guessing at one.
+
+## D21 — One numeral system on screen: Latin digits, in every language
+**Decided with the owner, 2026-10-05.**
+Device finding 6: the Arabic ledger mixed two numeral systems inside one row —
+`18.50 كغ` in Latin digits next to `٥ أكتوبر ٢٠٢٦` in Arabic-Indic — because dates
+go through `intl`, which gives Arabic its CLDR-default digits, while
+`formatWeight` writes ASCII. The owner chose Latin digits for every language,
+over Arabic-Indic and over a settings toggle. The reason is the thing this app
+exists to produce: a dose date gets read against a veterinary certificate typed
+in Latin digits, and Maghrebi paperwork is Latin-numeral even when the
+conversation is Arabic. Month and day *names* stay Arabic, so the row reads
+`6 أكتوبر 2026` — only the digits move. One place does the work: `formatDayFor`
+is the app's only `DateFormat` call, so every screen, notification body and
+future export inherits the rule. A toggle was rejected deliberately — it would
+double the formatting surface (dates, weights, money) to postpone a decision the
+ledger is allowed to just make.

@@ -290,17 +290,20 @@ the first verdict a change gets and the device is the second.
     cancelled, so the Cancel branch is proven on this build too.
   - Phone left clean: all business tables 0 rows and `language_code = system`,
     verified by a force-stop and cold relaunch into the English empty herd.
-- Still open from this re-check, cosmetic only:
-  6. The Arabic ledger mixes numeral systems inside one row — "18.50 كغ" in
-     Latin digits next to "٥ أكتوبر ٢٠٢٦" in Arabic-Indic. Dates go through
-     `intl`, weights are printed by `formatWeight` with `toStringAsFixed`. A
-     Moroccan breeder reads both fine, so this is a polish call, not a defect;
-     deciding it means picking one system for the whole screen.
+- Closed since, by the owner:
+  6. The Arabic ledger mixed numeral systems inside one row — "18.50 كغ" in
+     Latin digits next to "٥ أكتوبر ٢٠٢٦" in Arabic-Indic. Dates went through
+     `intl`, weights through `formatWeight`'s `toStringAsFixed`. **Decided: Latin
+     digits in every language (D21).** Month and day names stay Arabic — only the
+     digits move — because a dose date is read against a certificate typed in
+     Latin. The conversion sits in `formatDayFor`, the app's only `DateFormat`
+     call, and `test/core/date_utils_test.dart` is written to hold the line — that
+     code has not had a CI verdict or a screen yet, so it rides with 1e's next run.
 
 Still open in Stage 1: watching the 09:00 alarm actually arrive (1d below), the
-numeral-system call above (finding 6, cosmetic) and `es`/`de` `.arb` files once
-the copy settles. Findings 1–5 are fixed in `6c874cd` and were re-checked on the
-device.
+D20 device check (1e below), the Arabic digits on a real screen (D21, above) and
+`es`/`de` `.arb` files once the copy settles. Findings 1–5 are fixed in `6c874cd`
+and were re-checked on the device.
 
 ### 1d — The 30-day reminder (spike: CI green, alarms booked on the phone, delivery pending)
 
@@ -410,6 +413,69 @@ names the cause.
 
 Gate: reminders firing on the phone inside the window — **booked and cancelled on
 the device; delivery not yet observed.**
+
+### 1e — The launch that rebuilds the alarms (CI green; device proof pending)
+
+The force-stop measurement in 1d turned a technical fact into a product rule: an
+Android app's pending alarms are not durable state, and Salala's only chance to
+repair them is the next time somebody opens it. The owner chose that ("re-book on
+open") over a settings note, and over waiting for the recents-swipe measurement —
+see **D20**.
+
+What is in it:
+
+- `lib/services/reminder_resync.dart` — `bookingsFor` is the pure half: given the
+  doses and certificates a launch found, whose animal is called what, and what
+  today is, it returns one booking per record and nothing for a record whose
+  mornings have all passed. `resyncReminders` is the thin I/O wrapper: two queries,
+  one name map, then each booking through the *same* `ReminderScheduler.replace` a
+  save uses — which clears the record's own two ids before writing, so a rebuild
+  cannot double-book and a launch is idempotent.
+- `reminderHorizonDays` (45 = the month-ahead lead plus a fortnight) bounds the
+  walk. A five-year breeding plan is not a pending alarm, and a launch should not
+  read it.
+- `RemindersResynced` in `app_providers.dart` is the one-shot: `claim()` hands the
+  rebuild to the first caller per launch and to nobody after it, so switching tabs
+  does not re-book the herd. The animal list calls it from a post-frame callback,
+  after the ledger is on screen, and its failure only reaches `debugPrint` — the
+  same bargain `main()` strikes with the bootstrap.
+- `formatDayFor(localeTag, ms)` exists because that work outlives the widget that
+  started it: the screen can be popped while the rebuild is still running, and a
+  `BuildContext` read after an `await` touches a disposed widget.
+
+**Verification status: CI green; the device half of D20 is not run yet.**
+
+- Run `37358181126` on `7dfb348` came back **112 passed, 3 failed**, all three in
+  the new `test/services/reminder_resync_test.dart`. Two were the trap this repo
+  has already documented once: the `dose()` / `screening()` helpers defaulted
+  their due date, so the fallback-title case silently became a "no due date" case
+  and `bookings.single` threw `Bad state: No element`. The due date is now a
+  `required int?` argument, so a helper cannot pick "no alarm" behind a test's
+  back. The other two were `LocaleDataException` — this file calls the real
+  formatter, and only `main()` and `pumpSalala` registered the date symbols.
+- Run `37359057728` on `7cd3f39`: `flutter analyze --fatal-infos` clean and
+  **115 tests passed**. Same run is the first proof of **D19**: the APK job logged
+  `Cache restored from key: salala-debug-keystore-v1-37354677101`, so two builds
+  on two runners now sign with one debug key and install over each other.
+- Twelve new tests cover it: seven on the pure booking rule (tomorrow's dose,
+  one booking per record however many alarms it carries, an overdue dose left
+  alone, this morning's dose booked only while the morning has not come, no due
+  date and a permanent certificate, a screening named by its type, a record whose
+  animal is gone), five against a real temporary database (empty ledger stays
+  silent, a dose and a screening re-book 3 alarms at 09:00 with their own derived
+  ids, a record beyond the horizon is not walked, a second launch replaces rather
+  than piles up, an overdue dose gets no clears either). Three widget tests drive
+  it through the real screen with **no taps**: opening the herd re-books a dose
+  nobody touched, a dose whose morning has gone does not, and switching tabs and
+  back does not book it twice.
+
+Pending on the device, in this order, once the phone is free: install this build,
+book a dose due tomorrow, read the alarm in `dumpsys alarm`, `am force-stop`,
+read zero alarms, reopen Salala, read the alarm again. That last pair *is* D20.
+Then the overnight delivery watch from 1d, on the same untouched booking.
+
+Gate: a reminder that was lost comes back by itself on the next launch — **proved
+in tests, not yet on the phone.**
 
 Gate: every record type creatable, editable, deletable on the device — **met**
 (weigh-ins by delete-and-relog, as designed) for all four record types and the
