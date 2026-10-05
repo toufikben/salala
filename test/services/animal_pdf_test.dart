@@ -57,6 +57,20 @@ Future<Daos> seedFullLedger(Database db) async {
       updatedAt: 1700000000000,
     ),
   );
+  // The litter row first: animals.litter_id is a real foreign key, so a puppy
+  // written before its litter is refused by SQLite rather than by this test.
+  await daos.litters.create(
+    Litter(
+      id: 'l-1',
+      name: 'L1 2025',
+      damId: 'a-dam',
+      sireId: 'a-sire',
+      matingDate: 1739000000000,
+      whelpingDate: 1740000000000,
+      createdAt: 1740000000000,
+      updatedAt: 1740000000000,
+    ),
+  );
   await daos.animals.create(
     Animal(
       id: 'a-nala',
@@ -75,18 +89,6 @@ Future<Daos> seedFullLedger(Database db) async {
       microchipId: '981021000000001',
       color: 'fawn',
       notes: 'Imported pedigree on the dam side.',
-      createdAt: 1740000000000,
-      updatedAt: 1740000000000,
-    ),
-  );
-  await daos.litters.create(
-    Litter(
-      id: 'l-1',
-      name: 'L1 2025',
-      damId: 'a-dam',
-      sireId: 'a-sire',
-      matingDate: 1739000000000,
-      whelpingDate: 1740000000000,
       createdAt: 1740000000000,
       updatedAt: 1740000000000,
     ),
@@ -317,17 +319,37 @@ void main() {
     final daos = Daos(db);
     await daos.animals.create(
       Animal(
+        id: 'a-gone',
+        name: 'Perdue',
+        species: 'dog',
+        sex: Sex.female,
+        status: AnimalStatus.active,
+        createdAt: 1740000000000,
+        updatedAt: 1740000000000,
+      ),
+    );
+    await daos.animals.create(
+      Animal(
         id: 'a-orphan',
         name: 'Gazelle',
         species: 'dog',
         sex: Sex.female,
         status: AnimalStatus.active,
-        // A dam whose row was deleted, and a sire that was never recorded.
-        damId: 'a-dam-that-is-not-here',
+        damId: 'a-gone',
         createdAt: 1740000000000,
         updatedAt: 1740000000000,
       ),
     );
+    // Refusing to delete a dam with offspring is the app's own behaviour under
+    // `PRAGMA foreign_keys = ON`, so an unresolvable lineage has to be written
+    // past the constraint to exist. The case worth keeping: the buyer's page is
+    // generated from whatever this phone holds, and a lineage it cannot resolve
+    // must leave a row off the pedigree rather than an error where the pack
+    // should have been.
+    await db.execute('PRAGMA foreign_keys = OFF');
+    await db.delete('animals', where: 'id = ?', whereArgs: <Object?>['a-gone']);
+    await db.execute('PRAGMA foreign_keys = ON');
+
     final l10n = await AppLocalizations.delegate.load(const Locale('en'));
 
     final bytes = await animalPackPdf(
