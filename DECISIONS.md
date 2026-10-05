@@ -235,3 +235,11 @@ is the app's only `DateFormat` call, so every screen, notification body and
 future export inherits the rule. A toggle was rejected deliberately — it would
 double the formatting surface (dates, weights, money) to postpone a decision the
 ledger is allowed to just make.
+
+D21 covers the digits Salala writes. The Material date picker is Flutter's own
+surface, and the device check saw it render Arabic-Indic day cells
+(`١٥ أكتوبر ٢٠٢٥`); `showDatePicker` takes a `locale`, but which locale tag makes
+it switch numerals without losing the Arabic month names is a measurement, not a
+guess. Left open deliberately until the first build with the row fix is on the
+phone — if the picker and the row disagree on screen, that is the moment to decide
+whether the picker is in scope.
