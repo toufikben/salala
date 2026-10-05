@@ -193,7 +193,13 @@ class _VetVisitFormScreenState extends ConsumerState<VetVisitFormScreen> {
           : Form(
               key: _formKey,
               child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+                // Clear of the system navigation bar, which used to clip the Save pill.
+                padding: EdgeInsets.fromLTRB(
+                  16,
+                  8,
+                  16,
+                  32 + MediaQuery.paddingOf(context).bottom,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: <Widget>[

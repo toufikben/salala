@@ -122,7 +122,13 @@ class _LitterFormScreenState extends ConsumerState<LitterFormScreen> {
         // outside the cache extent, and Form.validate() skips what is not
         // mounted — so the required checks below would silently pass.
         child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+          // Clear of the system navigation bar, which used to clip the Save pill.
+          padding: EdgeInsets.fromLTRB(
+            16,
+            8,
+            16,
+            32 + MediaQuery.paddingOf(context).bottom,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[

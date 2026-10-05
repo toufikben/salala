@@ -54,7 +54,14 @@ class AnimalDetailScreen extends ConsumerWidget {
             return Center(child: Text(l10n.animalGone));
           }
           return ListView(
-            padding: const EdgeInsets.fromLTRB(8, 8, 8, 24),
+            // The last section is a weigh-in, and on a phone with a three-button
+            // bar it sat under that bar with no scroll left to free it.
+            padding: EdgeInsets.fromLTRB(
+              8,
+              8,
+              8,
+              24 + MediaQuery.paddingOf(context).bottom,
+            ),
             children: <Widget>[
               _IdentityCard(animal: animal, animals: animals),
               _RecordSection(
@@ -424,7 +431,11 @@ class _WeightTile extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     return ListTile(
-      title: Text(formatWeight(entry.weightGrams)),
+      // The unit is localized; the order is left to the bidi algorithm, which
+      // correctly puts the unit to the left of the number in an RTL row.
+      title: Text(
+        formatWeight(entry.weightGrams, kg: l10n.unitKg, g: l10n.unitGrams),
+      ),
       subtitle: Text(
         <String>[
           formatDay(context, entry.measuredAt),

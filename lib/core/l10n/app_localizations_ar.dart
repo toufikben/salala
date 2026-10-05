@@ -399,6 +399,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get weightMeasuredOn => 'تاريخ الوزن';
 
   @override
+  String get unitKg => 'كغ';
+
+  @override
+  String get unitGrams => 'غ';
+
+  @override
   String get weightNote => 'ملاحظة';
 
   @override
@@ -429,7 +435,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get healthTestResultRequired => 'النتيجة مطلوبة';
 
   @override
-  String get healthTestResultHelper => 'Clear · 0 · Affected';
+  String get healthTestResultHelper =>
+      'كما في الشهادة: Clear · Carrier · Affected';
 
   @override
   String get healthTestDate => 'تاريخ الفحص';

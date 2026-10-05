@@ -214,9 +214,9 @@ the first verdict a change gets and the device is the second.
     restored to System default afterwards; the phone was left with no test data.
 - Open device findings from this pass, none of them data-loss bugs:
   1. `healthTestResultHelper` is "Clear · 0 · Affected" in **all three** `.arb`
-     files — the middle token is the digit zero where the letter O belongs, and
-     the value is untranslated in ar/fr, which is why it shows in Latin script
-     inside the Arabic and French forms.
+     files — the middle token is a bare digit that reads as nothing on a phone,
+     and the whole hint is untranslated in ar/fr, which is why it showed in
+     Latin script inside the Arabic and French forms.
   2. `DateTile`'s trailing calendar icon is not a tap target: the accessibility
      bounds of the tappable region start at x=136 while the icon paints at
      x≈48–104, so tapping the icon does nothing in both LTR and RTL. The icon is
@@ -225,9 +225,10 @@ the first verdict a change gets and the device is the second.
      wide Button while only the trailing part reacts — the Settings language row
      swallows a tap on its own label. Same shape as finding 2; both need the hit
      area widened.
-  4. `formatWeight` renders "18.50 kg" as **"kg 18.50"** in Arabic — the RTL base
-     direction reorders the number and the unit. Needs a localized unit plus
-     bidi isolation, not just a string key.
+  4. `formatWeight` hardcoded an English "kg", so the Arabic ledger showed
+     "kg 18.50" beside an Arabic "الوزن (كغ)" label. Checked after writing this
+     up: the unit sitting left of the number is the bidi algorithm doing its job
+     in an RTL paragraph, not a defect — only the unit's language was wrong.
   5. No bottom inset for the system navigation bar. On the ledger the last row
      sits under it (row bottom y=1556 vs nav bar top y=1516) and cannot be
      scrolled clear; on the animal form the Save/Cancel row is pinned at

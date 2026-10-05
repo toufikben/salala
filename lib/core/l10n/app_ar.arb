@@ -150,6 +150,8 @@
   "weightRequired": "أدخل الوزن",
   "weightInvalid": "أدخل وزناً مثل 4.2",
   "weightMeasuredOn": "تاريخ الوزن",
+  "unitKg": "كغ",
+  "unitGrams": "غ",
   "weightNote": "ملاحظة",
   "weightDeleteBody": "يُحذف هذا الوزن. لا يمكن التراجع عن ذلك.",
 
@@ -162,7 +164,7 @@
   "healthTestTypeRequired": "اسم الفحص مطلوب",
   "healthTestResult": "النتيجة",
   "healthTestResultRequired": "النتيجة مطلوبة",
-  "healthTestResultHelper": "Clear · 0 · Affected",
+  "healthTestResultHelper": "كما في الشهادة: Clear · Carrier · Affected",
   "healthTestDate": "تاريخ الفحص",
   "healthTestValidUntil": "صالح حتى",
   "healthTestBody": "الجهة المانحة",

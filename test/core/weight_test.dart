@@ -2,16 +2,23 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:salala/core/utils/weight.dart';
 
 void main() {
+  String fmt(int grams) => formatWeight(grams, kg: 'kg', g: 'g');
+
   group('formatWeight', () {
     test('a puppy is described in grams', () {
-      expect(formatWeight(430), '430 g');
-      expect(formatWeight(999), '999 g');
+      expect(fmt(430), '430 g');
+      expect(fmt(999), '999 g');
     });
 
     test('from a kilogram up the unit switches', () {
-      expect(formatWeight(1000), '1.00 kg');
-      expect(formatWeight(4200), '4.20 kg');
-      expect(formatWeight(31250), '31.25 kg');
+      expect(fmt(1000), '1.00 kg');
+      expect(fmt(4200), '4.20 kg');
+      expect(fmt(31250), '31.25 kg');
+    });
+
+    test('the unit is whatever the locale says', () {
+      expect(formatWeight(18500, kg: 'كغ', g: 'غ'), '18.50 كغ');
+      expect(formatWeight(430, kg: 'كغ', g: 'غ'), '430 غ');
     });
   });
 
@@ -27,7 +34,7 @@ void main() {
     });
 
     test('round-trips with the formatter', () {
-      expect(formatWeight(parseWeightToGrams('4.2')!), '4.20 kg');
+      expect(fmt(parseWeightToGrams('4.2')!), '4.20 kg');
     });
 
     test('refuses anything that is not a positive weight', () {

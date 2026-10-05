@@ -76,36 +76,53 @@ class _AppLockTile extends ConsumerWidget {
 
 /// Language names stay in their own script: "العربية" is what an Arabic reader
 /// recognises, not "Arabic".
-class _LanguageTile extends ConsumerWidget {
+///
+/// A `DropdownButton` in a tile's trailing slot announces the whole row as one
+/// button while only the narrow trailing part reacts to a tap — on the phone a
+/// tap on the "Language" label did nothing at all. The row is now the control.
+class _LanguageTile extends ConsumerStatefulWidget {
   const _LanguageTile();
 
+  @override
+  ConsumerState<_LanguageTile> createState() => _LanguageTileState();
+}
+
+class _LanguageTileState extends ConsumerState<_LanguageTile> {
   static const List<String> _codes = <String>['system', 'en', 'ar', 'fr'];
 
+  final MenuController _menu = MenuController();
+
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final current = ref.watch(localeControllerProvider);
     final selected = current?.languageCode ?? 'system';
 
-    return ListTile(
-      leading: const Icon(Icons.translate),
-      title: Text(l10n.settingsLanguage),
-      trailing: DropdownButton<String>(
-        value: selected,
-        underline: const SizedBox.shrink(),
-        items: <DropdownMenuItem<String>>[
-          for (final code in _codes)
-            DropdownMenuItem<String>(
-              value: code,
-              child: Text(_endonym(code, l10n)),
-            ),
-        ],
-        onChanged: (code) {
-          if (code == null) return;
-          ref
-              .read(localeControllerProvider.notifier)
-              .select(code == 'system' ? null : Locale(code));
-        },
+    return MenuAnchor(
+      controller: _menu,
+      alignmentOffset: const Offset(0, 8),
+      menuChildren: <Widget>[
+        for (final code in _codes)
+          MenuItemButton(
+            onPressed: () {
+              ref
+                  .read(localeControllerProvider.notifier)
+                  .select(code == 'system' ? null : Locale(code));
+            },
+            child: Text(_endonym(code, l10n)),
+          ),
+      ],
+      child: ListTile(
+        leading: const Icon(Icons.translate),
+        title: Text(l10n.settingsLanguage),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Text(_endonym(selected, l10n)),
+            const Icon(Icons.arrow_drop_down),
+          ],
+        ),
+        onTap: _menu.open,
       ),
     );
   }

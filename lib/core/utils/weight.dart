@@ -4,9 +4,13 @@
 /// is never described in kilograms by anyone holding it, and a 30 kg dam is not
 /// described in grams. The split is at one kilogram because that is where people
 /// switch units in speech.
-String formatWeight(int grams) {
-  if (grams < 1000) return '$grams g';
-  return '${(grams / 1000).toStringAsFixed(2)} kg';
+///
+/// The units come in rather than being literals: the Arabic ledger showed an
+/// English "kg" next to an Arabic "الوزن (كغ)" label. The bidi order is left to
+/// the paragraph, which correctly puts the unit to the left of the number in RTL.
+String formatWeight(int grams, {required String kg, required String g}) {
+  if (grams < 1000) return '$grams $g';
+  return '${(grams / 1000).toStringAsFixed(2)} $kg';
 }
 
 /// Parses what a person types into a kilogram box into stored grams. A comma is

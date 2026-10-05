@@ -167,6 +167,11 @@
   "weightRequired": "Enter the weight",
   "weightInvalid": "Enter a weight like 4.2",
   "weightMeasuredOn": "Measured on",
+  "unitKg": "kg",
+  "@unitKg": {
+    "description": "Bare unit so a row can read '4.20 kg'; the form label keeps its own wording."
+  },
+  "unitGrams": "g",
   "weightNote": "Note",
   "weightDeleteBody": "The weigh-in is removed. This cannot be undone.",
 
@@ -182,9 +187,9 @@
   "healthTestTypeRequired": "Name the screening",
   "healthTestResult": "Result",
   "healthTestResultRequired": "Enter the result",
-  "healthTestResultHelper": "Clear · 0 · Affected",
+  "healthTestResultHelper": "Clear · Carrier · Affected",
   "@healthTestResultHelper": {
-    "description": "Registry grade words (OFA, PENNFID) kept in English in every locale."
+    "description": "Grade words exactly as a certificate prints them, so they stay English in every locale. Spelled out because a single grade letter read as the digit zero on a phone."
   },
   "healthTestDate": "Tested on",
   "healthTestValidUntil": "Valid until",

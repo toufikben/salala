@@ -163,7 +163,13 @@ class _AnimalFormScreenState extends ConsumerState<AnimalFormScreen> {
         // Form.validate() only visits mounted fields — so an animal could be
         // saved with no name just because the name box had scrolled away.
         child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+          // Clear of the system navigation bar, which used to clip the Save pill.
+          padding: EdgeInsets.fromLTRB(
+            16,
+            8,
+            16,
+            32 + MediaQuery.paddingOf(context).bottom,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[

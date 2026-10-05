@@ -150,6 +150,8 @@
   "weightRequired": "Saisissez le poids",
   "weightInvalid": "Saisissez un poids comme 4,2",
   "weightMeasuredOn": "Mesuré le",
+  "unitKg": "kg",
+  "unitGrams": "g",
   "weightNote": "Note",
   "weightDeleteBody": "La pesée est supprimée. Action irréversible.",
 
@@ -162,7 +164,7 @@
   "healthTestTypeRequired": "Nommez le dépistage",
   "healthTestResult": "Résultat",
   "healthTestResultRequired": "Saisissez le résultat",
-  "healthTestResultHelper": "Clear · 0 · Affected",
+  "healthTestResultHelper": "Comme au certificat : Clear · Carrier · Affected",
   "healthTestDate": "Testé le",
   "healthTestValidUntil": "Valable jusqu'au",
   "healthTestBody": "Organisme certificateur",

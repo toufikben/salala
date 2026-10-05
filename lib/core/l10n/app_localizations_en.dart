@@ -394,6 +394,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get weightMeasuredOn => 'Measured on';
 
   @override
+  String get unitKg => 'kg';
+
+  @override
+  String get unitGrams => 'g';
+
+  @override
   String get weightNote => 'Note';
 
   @override
@@ -425,7 +431,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get healthTestResultRequired => 'Enter the result';
 
   @override
-  String get healthTestResultHelper => 'Clear · 0 · Affected';
+  String get healthTestResultHelper => 'Clear · Carrier · Affected';
 
   @override
   String get healthTestDate => 'Tested on';

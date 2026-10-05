@@ -802,6 +802,18 @@ abstract class AppLocalizations {
   /// **'Measured on'**
   String get weightMeasuredOn;
 
+  /// Bare unit so a row can read '4.20 kg'; the form label keeps its own wording.
+  ///
+  /// In en, this message translates to:
+  /// **'kg'**
+  String get unitKg;
+
+  /// No description provided for @unitGrams.
+  ///
+  /// In en, this message translates to:
+  /// **'g'**
+  String get unitGrams;
+
   /// No description provided for @weightNote.
   ///
   /// In en, this message translates to:
@@ -862,10 +874,10 @@ abstract class AppLocalizations {
   /// **'Enter the result'**
   String get healthTestResultRequired;
 
-  /// Registry grade words (OFA, PENNFID) kept in English in every locale.
+  /// Grade words exactly as a certificate prints them, so they stay English in every locale. Spelled out because a single grade letter read as the digit zero on a phone.
   ///
   /// In en, this message translates to:
-  /// **'Clear · 0 · Affected'**
+  /// **'Clear · Carrier · Affected'**
   String get healthTestResultHelper;
 
   /// No description provided for @healthTestDate.
