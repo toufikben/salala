@@ -406,6 +406,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get weightDeleteBody => 'La pesée est supprimée. Action irréversible.';
 
   @override
+  String get weightAppendOnlyHint =>
+      'Les pesées ne se modifient pas. Mesure erronée ? Supprimez-la et pesez de nouveau.';
+
+  @override
   String get animalSpeciesHelper => 'chien · chat';
 
   @override

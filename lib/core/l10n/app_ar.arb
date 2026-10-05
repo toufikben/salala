@@ -154,6 +154,7 @@
   "unitGrams": "غ",
   "weightNote": "ملاحظة",
   "weightDeleteBody": "يُحذف هذا الوزن. لا يمكن التراجع عن ذلك.",
+  "weightAppendOnlyHint": "الأوزان لا تُعدَّل. قياس خاطئ؟ احذفه وسجّل الوزن من جديد.",
 
   "animalSpeciesHelper": "كلب · قط",
 

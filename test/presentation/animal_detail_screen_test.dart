@@ -341,6 +341,14 @@ void main() {
     await _openNala(tester);
 
     await _tap(tester, find.widgetWithText(TextButton, 'Add weight'));
+    // The form is the only place a breeder looks for an edit that does not
+    // exist, so it has to say the weigh-in is append-only.
+    expect(
+      find.text(
+        "Weigh-ins are never edited. Measured wrong? Delete it and weigh again.",
+      ),
+      findsOneWidget,
+    );
     await tester.enterText(
       find.widgetWithText(TextFormField, 'Weight (kg)'),
       '4.2',

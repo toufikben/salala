@@ -122,6 +122,15 @@ class _WeightFormScreenState extends ConsumerState<WeightFormScreen> {
                 controller: _note,
                 decoration: InputDecoration(labelText: l10n.weightNote),
               ),
+              // The list offers no edit for a weigh-in on purpose, so the form
+              // says so where the breeder would otherwise look for the button.
+              Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: Text(
+                  l10n.weightAppendOnlyHint,
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+              ),
               const SizedBox(height: 24),
               Row(
                 children: <Widget>[

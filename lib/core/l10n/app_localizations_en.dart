@@ -407,6 +407,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'The weigh-in is removed. This cannot be undone.';
 
   @override
+  String get weightAppendOnlyHint =>
+      'Weigh-ins are never edited. Measured wrong? Delete it and weigh again.';
+
+  @override
   String get animalSpeciesHelper => 'dog · cat';
 
   @override

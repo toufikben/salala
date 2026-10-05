@@ -826,6 +826,12 @@ abstract class AppLocalizations {
   /// **'The weigh-in is removed. This cannot be undone.'**
   String get weightDeleteBody;
 
+  /// No description provided for @weightAppendOnlyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Weigh-ins are never edited. Measured wrong? Delete it and weigh again.'**
+  String get weightAppendOnlyHint;
+
   /// No description provided for @animalSpeciesHelper.
   ///
   /// In en, this message translates to:

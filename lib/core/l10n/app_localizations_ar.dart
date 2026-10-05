@@ -411,6 +411,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get weightDeleteBody => 'يُحذف هذا الوزن. لا يمكن التراجع عن ذلك.';
 
   @override
+  String get weightAppendOnlyHint =>
+      'الأوزان لا تُعدَّل. قياس خاطئ؟ احذفه وسجّل الوزن من جديد.';
+
+  @override
   String get animalSpeciesHelper => 'كلب · قط';
 
   @override
