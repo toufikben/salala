@@ -375,6 +375,12 @@ What is in it:
     already past — the drop rule works on a real date, not only in a test.
   - Deleting the `Parvo` row took **both** of its alarms out: `dumpsys alarm`
     then listed only `2026-10-06 09:00`.
+  - `am force-stop com.salala.salala` took the remaining alarm out too (0 left),
+    while the ledger rows survived. That is AlarmManager's own behaviour rather
+    than a bug in the scheduler, but it is a product finding: clearing the app
+    away can delete next morning's reminder, and only re-saving the dose puts it
+    back. Whether a swipe from the recents screen does the same on ColorOS is
+    untested — it is the next thing to measure, because breeders do swipe.
   - The `salala_reminders` channel does **not** exist yet (`grep -c` = 0). That is
     the plugin's own design, read from its Java source: `createNotification`
     builds the channel at delivery time, so no `createNotificationChannel` call
@@ -382,8 +388,9 @@ What is in it:
     before the first alarm fires.
 
 Still open, and the only thing the gate actually asks for: whether the
-`2026-10-06 09:00` alarm is *delivered* as a visible notification. The app is left
-installed and the phone untouched overnight so the answer is the real one —
+`2026-10-06 09:00` alarm is *delivered* as a visible notification. The dose has to
+be re-booked first (the force-stop above removed its alarm), and the phone then
+left alone overnight so the answer is the real one —
 no battery-optimisation whitelist, because ColorOS killing background alarms
 (dontkillmyapp.com) is part of what a spike on this device is supposed to find out,
 not something to hide. If nothing appears, the alarm being present in

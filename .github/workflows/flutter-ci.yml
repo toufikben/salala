@@ -63,15 +63,16 @@ jobs:
         run: flutter pub get
 
       - name: Restore the debug signing key
-        # Every fresh runner generates its own ~/.android/debug.keystore, so two
-        # CI builds of the same app are signed by different keys and Android
-        # refuses to update one over the other
-        # (INSTALL_FAILED_UPDATE_INCOMPATIBLE), which would wipe the app's data
-        # on the test phone at every install. Caching the generated key costs no
-        # secret and no committed file; a cache eviction means one reinstall.
+        # Every fresh runner generates its own debug.keystore, so two CI builds of
+        # the same app are signed by different keys and Android refuses to update
+        # one over the other (INSTALL_FAILED_UPDATE_INCOMPATIBLE), which would wipe
+        # the app's data on the test phone at every install. Caching the generated
+        # key costs no secret and no committed file; a cache eviction means one
+        # reinstall. The path is `.config/.android`, not `.android` — measured on
+        # run 37317737878, whose save step had reported "Path Validation Error".
         uses: actions/cache/restore@v4
         with:
-          path: ~/.android/debug.keystore
+          path: ~/.config/.android/debug.keystore
           key: salala-debug-keystore-v1
           restore-keys: salala-debug-keystore-v1
 
@@ -80,24 +81,13 @@ jobs:
         # About, so a phone screenshot proves which commit the installed APK is.
         run: flutter build apk --debug --dart-define=SALALA_BUILD_TAG=${GITHUB_SHA::7}
 
-      - name: Locate the debug keystore
-        # Temporary probe: run 37316135462's save step reported "Path Validation
-        # Error", so `~/.android/debug.keystore` is not where the build actually
-        # wrote the key. This prints the real path; delete this step and correct
-        # the two paths above once it is known.
-        run: |
-          echo "HOME=$HOME"
-          ls -la "$HOME/.android" || true
-          find / -name 'debug.keystore' -not -path '/proc/*' 2>/dev/null | head -5
-
       - name: Save the debug signing key
         # The key does not exist until a build has made it, so the restore step
-        # above can never have anything to write back and the cache stayed empty
-        # for every run. Saving under a per-run key is the documented way round:
-        # the restore step matches it by prefix.
+        # above can never have anything to write back. Saving under a per-run key
+        # is the documented way round: the restore step matches it by prefix.
         uses: actions/cache/save@v4
         with:
-          path: ~/.android/debug.keystore
+          path: ~/.config/.android/debug.keystore
           key: salala-debug-keystore-v1-${{ github.run_id }}
 
       - name: Publish the APK on the rolling debug release
