@@ -133,12 +133,15 @@ Future<String> fingerprint(Database db) async {
 Future<PackRows> packOf(Database db) async =>
     parsePack(encodePack(await packFrom(db)));
 
-/// The pack's rows, typed, over the same lists the pack holds — so the tests
-/// that break a pack can do it without rebuilding the document.
+/// The pack's rows, typed and copied.
+///
+/// Copied, not viewed: a row list that came out of `db.query` is read-only, so
+/// a test that wants to break a pack has to build its own mutable rows first.
 Map<String, List<Map<String, Object?>>> tableRows(Map<String, Object?> pack) =>
     (pack['rows']! as Map<String, Object?>).map(
-      (table, rows) =>
-          MapEntry(table, (rows! as List).cast<Map<String, Object?>>()),
+      (table, rows) => MapEntry(table, [
+        for (final row in rows! as List) Map<String, Object?>.from(row as Map),
+      ]),
     );
 
 void main() {
@@ -385,10 +388,11 @@ void main() {
       await seed(source);
       final pack = await packFrom(source);
       // The dam goes missing, so her litter and two records point at nothing.
-      tableRows(pack)['animals']!.removeWhere((row) => row['id'] == 'a-dam');
+      final broken = tableRows(pack)
+        ..['animals']!.removeWhere((row) => row['id'] == 'a-dam');
 
       await expectLater(
-        restorePack(db, parsePack(encodePack(pack))),
+        restorePack(db, parsePack(encodePack({...pack, 'rows': broken}))),
         throwsA(
           isA<DatabaseException>().having(
             (e) => e.toString().toLowerCase(),
