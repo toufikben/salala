@@ -29,7 +29,7 @@ class SystemPackFiles extends PackFiles {
     // `share_plus` publishes only its own `cache/share_plus` folder through a
     // FileProvider, so a file anywhere else cannot be granted to another app.
     // The pack goes where the sheet is allowed to reach, not where it is tidy.
-    final cache = await getCacheDirectory();
+    final cache = await getApplicationCacheDirectory();
     final folder = Directory(p.join(cache.path, 'share_plus'));
     await folder.create(recursive: true);
     final name = 'salala-pack-${_stamp(now)}.json';
@@ -49,7 +49,7 @@ class SystemPackFiles extends PackFiles {
     // hides the file reads as the app refusing the backup.
     final XFile? file = await openFile();
     if (file == null) return null;
-    return file.readAsAsString();
+    return file.readAsString();
   }
 }
 
