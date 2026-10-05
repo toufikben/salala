@@ -32,10 +32,14 @@ void main() {
       .copyWith(hour: 15)
       .millisecondsSinceEpoch;
 
-  Future<void> book({required String recordId, int? dueMs}) {
+  /// Books a dose the way a form does. [dueMs] is required and deliberately not
+  /// defaulted: a `dueMs ?? farAhead()` here once turned the "no due date" case
+  /// into a booked one without saying so, and the test that was supposed to
+  /// catch that passed it instead.
+  Future<void> book({required String recordId, required int? dueMs}) {
     return scheduler.replace(
       recordId: recordId,
-      dueMs: dueMs ?? dueInSixtyDays(),
+      dueMs: dueMs,
       l10n: l10n,
       title: 'Nala',
       what: 'Rabies',
@@ -45,7 +49,10 @@ void main() {
 
   group('replace', () {
     test('a booked dose writes the month ahead and the due morning', () async {
-      await book(recordId: '0f1e2d3c-4b5a-6789-abcd-ef0123456789');
+      await book(
+        recordId: '0f1e2d3c-4b5a-6789-abcd-ef0123456789',
+        dueMs: dueInSixtyDays(),
+      );
 
       expect(writer.written, hasLength(2));
       expect(writer.written.map((a) => a.id).toList(), <int>[
@@ -67,7 +74,7 @@ void main() {
     });
 
     test('both alarms are inexact on purpose', () async {
-      await book(recordId: '0f1e2d3c-4b5a');
+      await book(recordId: '0f1e2d3c-4b5a', dueMs: dueInSixtyDays());
 
       // An exact alarm needs SCHEDULE_EXACT_ALARM, which Google Play audits, for
       // a message whose only deadline is "that morning".
@@ -96,7 +103,7 @@ void main() {
     });
 
     test("the dose's own alarms are cleared before new ones are written", () async {
-      await book(recordId: '0f1e2d3c-4b5a');
+      await book(recordId: '0f1e2d3c-4b5a', dueMs: dueInSixtyDays());
 
       // A dose moved two days on must not leave the old morning behind — and the
       // clearing has to come first, because writing first would cancel the new
@@ -123,11 +130,12 @@ void main() {
     });
 
     test('re-saving the same dose writes the same two ids again', () async {
-      await book(recordId: '0f1e2d3c-4b5a');
+      final due = dueInSixtyDays();
+      await book(recordId: '0f1e2d3c-4b5a', dueMs: due);
       final firstPass = writer.written.map((a) => a.id).toList();
       writer.written.clear();
 
-      await book(recordId: '0f1e2d3c-4b5a');
+      await book(recordId: '0f1e2d3c-4b5a', dueMs: due);
 
       // Stable ids are what let an edit replace its own alarm rather than pile a
       // second copy onto the phone.
