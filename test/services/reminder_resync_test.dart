@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart' show Locale;
 import 'package:flutter_test/flutter_test.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:salala/core/l10n/app_localizations.dart';
 import 'package:salala/core/utils/date_utils.dart';
 import 'package:salala/core/utils/reminders.dart';
@@ -21,6 +22,11 @@ import '../helpers/test_db.dart';
 /// about which mornings are still ahead, so a test that asked the runner what
 /// time it was could pass on one day and fail on the next.
 void main() {
+  // `main()` does this for the app, and `pumpSalala` does it for widget tests.
+  // This file calls the real formatter, so it owes the same setup: without the
+  // symbol tables a `DateFormat` throws on the first day it is asked to render.
+  setUpAll(() => initializeDateFormatting());
+
   final noon = DateTime(2026, 10, 5, 12);
   final eight = DateTime(2026, 10, 5, 8);
 
@@ -38,7 +44,7 @@ void main() {
     String id = 'dose-1',
     String animalId = 'animal-1',
     String name = 'Rabies',
-    int? dueMs,
+    required int? dueMs,
   }) => Vaccination(
     id: id,
     animalId: animalId,
@@ -53,7 +59,7 @@ void main() {
     String id = 'test-1',
     String animalId = 'animal-1',
     String type = 'OFA hips',
-    int? untilMs,
+    required int? untilMs,
   }) => HealthTest(
     id: id,
     animalId: animalId,
@@ -140,8 +146,8 @@ void main() {
       'a dose with no due date and a permanent certificate book nothing',
       () {
         final bookings = bookingsFor(
-          doses: <Vaccination>[dose()],
-          screenings: <HealthTest>[screening()],
+          doses: <Vaccination>[dose(dueMs: null)],
+          screenings: <HealthTest>[screening(untilMs: null)],
           animalNames: const <String, String>{'animal-1': 'Nala'},
           fallbackTitle: 'Salala',
           dueDayText: stampedDay,
@@ -169,7 +175,7 @@ void main() {
 
     test('a record whose animal has gone falls back to the app title', () {
       final bookings = bookingsFor(
-        doses: <Vaccination>[dose(animalId: 'gone')],
+        doses: <Vaccination>[dose(animalId: 'gone', dueMs: dayAhead(1))],
         screenings: const <HealthTest>[],
         animalNames: const <String, String>{'animal-1': 'Nala'},
         fallbackTitle: 'Salala',
