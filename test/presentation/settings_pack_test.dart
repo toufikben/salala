@@ -117,14 +117,14 @@ void main() {
       await tapTile(tester, 'Export records');
 
       final rows =
-          (jsonDecode(files.shared.single) as Map<String, Object?>)['rows']
+          (jsonDecode(files.sharedJson) as Map<String, Object?>)['rows']
               as Map<String, Object?>;
       expect(rows['animals'], hasLength(2));
       expect(rows['vaccinations'], hasLength(1));
-      expect(
-        find.text('salala-pack-test.json is ready to send'),
-        findsOneWidget,
-      );
+      // The name is the breeder's handle on the file, so it is part of what the
+      // screen promises: a pack, stamped to the minute, that says it is JSON.
+      expect(files.shared.keys.single, matches(r'^salala-pack-\d{8}-\d{4}\.json$'));
+      expect(find.textContaining('is ready to send'), findsOneWidget);
     });
 
     testWidgets('a phone that refuses the sheet says so', (tester) async {

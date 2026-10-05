@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -5,6 +7,7 @@ import '../../core/build_info.dart';
 import '../../core/l10n/app_localizations.dart';
 import '../../core/utils/date_utils.dart';
 import '../../services/data_pack.dart';
+import '../../services/pack_files.dart';
 import '../../services/reminder_resync.dart';
 import '../providers/app_providers.dart';
 import '../widgets/pin_dialogs.dart';
@@ -178,7 +181,7 @@ Future<void> _exportPack(BuildContext context, WidgetRef ref) async {
     final json = encodePack(await packFrom(ref.read(databaseProvider)));
     final name = await ref
         .read(packFilesProvider)
-        .share(json, now: DateTime.now());
+        .shareBytes(packFileName(DateTime.now()), utf8.encode(json));
     messenger.showSnackBar(SnackBar(content: Text(l10n.packShared(name))));
   } catch (error) {
     // A phone that refuses the share sheet still shows the ledger; the failure
@@ -278,5 +281,8 @@ String _whyRejected(AppLocalizations l10n, PackReject reject) =>
       PackProblem.fromTheFuture => l10n.packFromTheFuture,
       PackProblem.missingTable => l10n.packIncomplete(reject.detail),
       PackProblem.unknownTable => l10n.packUnknownTable(reject.detail),
+      // Reachable only from inside the transaction, and the restore catch below
+      // already says the sentence that fits: nothing on this phone moved.
+      PackProblem.danglingReference => l10n.packRestoreFailed,
       PackProblem.unreadable || PackProblem.notAPack => l10n.packNotAPack,
     };

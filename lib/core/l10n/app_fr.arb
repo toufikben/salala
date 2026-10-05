@@ -211,5 +211,21 @@
     "placeholders": {
       "what": { "type": "String" }
     }
-  }
+  },
+
+  "pdfAction": "Fiche PDF",
+  "pdfFailed": "Le PDF n'a pas pu être créé",
+  "pdfTitle": "Fiche sanitaire et généalogique",
+  "pdfGenerated": "Généré le {day}",
+  "pdfPedigree": "Généalogie",
+  "pdfLitters": "Portées de cet animal",
+  "pdfPuppies": "Chiots",
+  "pdfPlacement": "Placement",
+  "pdfBuyer": "Acquéreur",
+  "pdfPhone": "Téléphone",
+  "pdfEmail": "Courriel",
+  "pdfPlacedOn": "Placé le",
+  "pdfPrice": "Prix",
+  "pdfGuarantee": "Conditions de garantie",
+  "pdfDisclaimer": "Établi hors ligne par Salala à partir des registres de l'éleveur. Ce document n'est pas un certificat vétérinaire."
 }

@@ -211,5 +211,21 @@
     "placeholders": {
       "what": { "type": "String" }
     }
-  }
+  },
+
+  "pdfAction": "ملف PDF",
+  "pdfFailed": "تعذّر إنشاء ملف PDF",
+  "pdfTitle": "السجل الصحي والنسب",
+  "pdfGenerated": "أُنشئ في {day}",
+  "pdfPedigree": "النسب",
+  "pdfLitters": "ولادات هذا الحيوان",
+  "pdfPuppies": "الجراء",
+  "pdfPlacement": "سجل البيع",
+  "pdfBuyer": "المشتري",
+  "pdfPhone": "الهاتف",
+  "pdfEmail": "البريد الإلكتروني",
+  "pdfPlacedOn": "تاريخ البيع",
+  "pdfPrice": "الثمن",
+  "pdfGuarantee": "شروط الضمان",
+  "pdfDisclaimer": "أُنشئ هذا الملف على جهاز المربّي دون اتصال بالإنترنت من سجلاته الخاصة، وهو ليس شهادة بيطرية."
 }

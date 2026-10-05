@@ -261,5 +261,24 @@
     "placeholders": {
       "what": { "type": "String" }
     }
-  }
+  },
+
+  "pdfAction": "PDF pack",
+  "pdfFailed": "The PDF could not be made",
+  "pdfTitle": "Health and lineage record",
+  "pdfGenerated": "Generated on {day}",
+  "@pdfGenerated": {
+    "placeholders": { "day": { "type": "String" } }
+  },
+  "pdfPedigree": "Pedigree",
+  "pdfLitters": "Litters from this animal",
+  "pdfPuppies": "Puppies",
+  "pdfPlacement": "Placement",
+  "pdfBuyer": "Buyer",
+  "pdfPhone": "Phone",
+  "pdfEmail": "Email",
+  "pdfPlacedOn": "Placed on",
+  "pdfPrice": "Price",
+  "pdfGuarantee": "Guarantee terms",
+  "pdfDisclaimer": "Produced offline by Salala from the breeder's own records. This is not a veterinary certificate."
 }

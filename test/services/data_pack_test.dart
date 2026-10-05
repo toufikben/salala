@@ -394,14 +394,17 @@ void main() {
       await expectLater(
         restorePack(db, parsePack(encodePack({...pack, 'rows': broken}))),
         throwsA(
-          isA<DatabaseException>().having(
-            (e) => e.toString().toLowerCase(),
-            'reason',
-            contains('constraint'),
+          isA<PackReject>().having(
+            (e) => e.problem,
+            'problem',
+            PackProblem.danglingReference,
           ),
         ),
       );
 
+      // Querying after the refusal is the half of this test that used to hang:
+      // a commit rejected on a deferred foreign key leaves the handle inside the
+      // transaction, and the next call waits for a lock nobody releases.
       expect(await fingerprint(db), before);
     });
 

@@ -40,7 +40,10 @@ jobs:
       - name: Test
         # -j 1: the database tests each open a temp sqlite file through
         # sqflite_common_ffi; serialising them keeps failures attributable.
-        run: flutter test -j 1
+        # use_arabic is a compile-time switch inside the pdf package, so tests
+        # have to be built the way the APK is or they verify a different binary
+        # (DECISIONS.md D24).
+        run: flutter test -j 1 --dart-define=use_arabic=true
 
   build-debug:
     name: Build debug APK
@@ -79,7 +82,7 @@ jobs:
       - name: Build debug APK
         # The commit SHA is stamped into the build tag and shown on Settings →
         # About, so a phone screenshot proves which commit the installed APK is.
-        run: flutter build apk --debug --dart-define=SALALA_BUILD_TAG=${GITHUB_SHA::7}
+        run: flutter build apk --debug --dart-define=SALALA_BUILD_TAG=${GITHUB_SHA::7} --dart-define=use_arabic=true
 
       - name: Save the debug signing key
         # The key does not exist until a build has made it, so the restore step

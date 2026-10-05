@@ -1,11 +1,13 @@
+import 'dart:convert';
+
 import 'package:salala/services/pack_files.dart';
 
 /// Stands in for the share sheet and the file picker, which are Android dialogs
 /// no test runner can answer.
 ///
-/// It records every pack the screen tried to share and plays back whatever
-/// import the test asked for, so the Settings screen can be tested against a
-/// real database with no phone.
+/// It records every file the screen tried to share, under the name it asked for,
+/// and plays back whatever import the test requested — so the screens can be
+/// tested against a real database with no phone.
 class FakePackFiles implements PackFiles {
   FakePackFiles({this.pickedText});
 
@@ -18,14 +20,17 @@ class FakePackFiles implements PackFiles {
   /// Thrown instead of picking, for the unopenable-file message.
   Object? pickFailure;
 
-  /// Every pack the screen handed to the sheet, oldest first.
-  final List<String> shared = <String>[];
+  /// Every file handed to the sheet, by the name it was given.
+  final Map<String, List<int>> shared = <String, List<int>>{};
+
+  /// The JSON of the last pack the screen shared, decoded for assertions.
+  String get sharedJson => utf8.decode(shared.values.last);
 
   @override
-  Future<String> share(String json, {required DateTime now}) async {
+  Future<String> shareBytes(String name, List<int> bytes) async {
     if (shareFailure != null) throw shareFailure!;
-    shared.add(json);
-    return 'salala-pack-test.json';
+    shared[name] = bytes;
+    return name;
   }
 
   @override

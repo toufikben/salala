@@ -495,6 +495,33 @@ closed.
 Gate: a generated PDF opened on the phone, verified page by page against the
 record for a real animal.
 
+### Progress, 2026-10-05
+
+- **2a — JSON pack of the whole database: written, `NOT RUN` by CI yet.**
+  `services/data_pack.dart` with 41 tests in `test/services/data_pack_test.dart`.
+  Run `37369464399` on `a729871` died in the analyzer (three wrong API names);
+  run `37370382102` on `cf4b38c` reached the tests and returned **142 passed, 1
+  failed** — the failure was ours, not SQLite's: a restore rejected on a deferred
+  foreign key fails at `COMMIT`, which leaves the handle inside the transaction,
+  so the query after it waited out the test's 30-second timeout. Fixed by checking
+  `PRAGMA foreign_key_check` inside the transaction and throwing while a rollback
+  still works.
+- **2b — Settings tiles: written, same verdict.** Export writes the pack, hands it
+  to `PackFiles.shareBytes`, and says which file is ready; import opens the system
+  picker, names the counts it is about to destroy, replaces on confirmation and
+  re-arms the alarms. 11 widget tests in `settings_pack_test.dart` run against real
+  SQLite with `FakePackFiles`, so the only unverified part is the share sheet
+  itself — that is the device pass.
+- **2c — Buyer PDF: written, `NOT RUN`.** `services/animal_pdf.dart` plus an AppBar
+  action on the animal's page; Amiri bundled (D24); `--dart-define=use_arabic=true`
+  added to both CI steps so the tests build the binary the phone runs.
+- The feeding plan still on the Stage 2 list is **not buildable from the current
+  schema** — there is no feeding table, so it is a data-model decision, not a PDF
+  change. It stays listed until someone decides what a feed record has to hold.
+- The wiring of the PDF button is covered by the service tests and the device pass;
+  there is no widget test that taps it, because that needs `rootBundle` to serve an
+  asset inside `flutter test`, which has not been established here.
+
 ## Stage 3 — Rule-based triage + small intent classifier
 
 - Deterministic triage first: symptom→urgency rules over the stored record

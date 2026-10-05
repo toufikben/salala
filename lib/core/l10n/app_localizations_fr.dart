@@ -555,4 +555,52 @@ class AppLocalizationsFr extends AppLocalizations {
   String reminderDueBody(String what) {
     return '$what arrive à échéance aujourd\'hui';
   }
+
+  @override
+  String get pdfAction => 'Fiche PDF';
+
+  @override
+  String get pdfFailed => 'Le PDF n\'a pas pu être créé';
+
+  @override
+  String get pdfTitle => 'Fiche sanitaire et généalogique';
+
+  @override
+  String pdfGenerated(String day) {
+    return 'Généré le $day';
+  }
+
+  @override
+  String get pdfPedigree => 'Généalogie';
+
+  @override
+  String get pdfLitters => 'Portées de cet animal';
+
+  @override
+  String get pdfPuppies => 'Chiots';
+
+  @override
+  String get pdfPlacement => 'Placement';
+
+  @override
+  String get pdfBuyer => 'Acquéreur';
+
+  @override
+  String get pdfPhone => 'Téléphone';
+
+  @override
+  String get pdfEmail => 'Courriel';
+
+  @override
+  String get pdfPlacedOn => 'Placé le';
+
+  @override
+  String get pdfPrice => 'Prix';
+
+  @override
+  String get pdfGuarantee => 'Conditions de garantie';
+
+  @override
+  String get pdfDisclaimer =>
+      'Établi hors ligne par Salala à partir des registres de l\'éleveur. Ce document n\'est pas un certificat vétérinaire.';
 }

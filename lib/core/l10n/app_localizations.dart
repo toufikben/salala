@@ -1083,6 +1083,96 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{what} is due today'**
   String reminderDueBody(String what);
+
+  /// No description provided for @pdfAction.
+  ///
+  /// In en, this message translates to:
+  /// **'PDF pack'**
+  String get pdfAction;
+
+  /// No description provided for @pdfFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'The PDF could not be made'**
+  String get pdfFailed;
+
+  /// No description provided for @pdfTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Health and lineage record'**
+  String get pdfTitle;
+
+  /// No description provided for @pdfGenerated.
+  ///
+  /// In en, this message translates to:
+  /// **'Generated on {day}'**
+  String pdfGenerated(String day);
+
+  /// No description provided for @pdfPedigree.
+  ///
+  /// In en, this message translates to:
+  /// **'Pedigree'**
+  String get pdfPedigree;
+
+  /// No description provided for @pdfLitters.
+  ///
+  /// In en, this message translates to:
+  /// **'Litters from this animal'**
+  String get pdfLitters;
+
+  /// No description provided for @pdfPuppies.
+  ///
+  /// In en, this message translates to:
+  /// **'Puppies'**
+  String get pdfPuppies;
+
+  /// No description provided for @pdfPlacement.
+  ///
+  /// In en, this message translates to:
+  /// **'Placement'**
+  String get pdfPlacement;
+
+  /// No description provided for @pdfBuyer.
+  ///
+  /// In en, this message translates to:
+  /// **'Buyer'**
+  String get pdfBuyer;
+
+  /// No description provided for @pdfPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone'**
+  String get pdfPhone;
+
+  /// No description provided for @pdfEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get pdfEmail;
+
+  /// No description provided for @pdfPlacedOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Placed on'**
+  String get pdfPlacedOn;
+
+  /// No description provided for @pdfPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Price'**
+  String get pdfPrice;
+
+  /// No description provided for @pdfGuarantee.
+  ///
+  /// In en, this message translates to:
+  /// **'Guarantee terms'**
+  String get pdfGuarantee;
+
+  /// No description provided for @pdfDisclaimer.
+  ///
+  /// In en, this message translates to:
+  /// **'Produced offline by Salala from the breeder\'s own records. This is not a veterinary certificate.'**
+  String get pdfDisclaimer;
 }
 
 class _AppLocalizationsDelegate

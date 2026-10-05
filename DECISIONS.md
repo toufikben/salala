@@ -243,3 +243,102 @@ it switch numerals without losing the Arabic month names is a measurement, not a
 guess. Left open deliberately until the first build with the row fix is on the
 phone — if the picker and the row disagree on screen, that is the moment to decide
 whether the picker is in scope.
+
+## D22 — The pack is the whole database, and restoring means replacing it
+**Decided here, 2026-10-05.**
+The question behind "what if I lose my phone" has one honest offline answer: a
+file that holds everything, and a restore that puts it back. So a pack is every
+row of every table in `dataTables`, in one JSON document, and importing one
+**replaces** the ledger rather than merging into it.
+
+Merge was rejected on purpose. Merging needs a rule for "same id, different
+row" — a phone that has been used since the export has edits the pack does not
+know about, and no offline app can decide which side wins without a field-level
+diff the breeder cannot audit. Replace needs no such rule: the pack is a snapshot
+of a device at a moment, and the dialog names the animal count, the record count
+and the day it was made before anything is destroyed. The breeder compares that
+against what they expect and presses Replace.
+
+The restore is all-or-nothing, and not by hand-written validation. `animals` and
+`litters` reference each other, so no insertion order satisfies both; the
+transaction opens with `PRAGMA defer_foreign_keys = ON`, which moves every
+foreign-key check to COMMIT. A pack with a dangling reference — or a column this
+build does not have — therefore fails at COMMIT, SQLite rolls the whole thing
+back, and the phone keeps the ledger it had. Three tests pin this instead of a
+paragraph claiming it: a missing dam, an unknown column, and a clean round trip
+fingerprinted table by table.
+
+Two refusals are also deliberate. A pack that names a table this build does not
+know, or is missing one it does, is rejected rather than half-read: a silent
+partial restore is how a backup quietly loses a puppy. A pack whose `formatVersion`
+or `schemaVersion` is newer than this build is rejected too — a newer app knows
+things this one cannot, and "restore anyway" would destroy rows to write nothing.
+
+Not in the pack: photos, because `photo_path` points at a file on *this* phone and
+copying a path would ship a broken reference (the PDF pack is where an image
+belongs); and the PIN, because the digest lives in the device keystore rather than
+in `user_settings`. A restored file can therefore neither hand over the PIN nor
+lock its owner out of the app.
+
+## D23 — Files move through the system share sheet and the system picker
+**Decided here, 2026-10-05.**
+Export hands the pack to Android's own share sheet; import opens Android's own
+file picker. There is no account, no upload and no cloud package in `pubspec.yaml`,
+which is what makes the offline promise checkable rather than a claim: the backup
+leaves the phone through the breeder's own hands, into WhatsApp or Drive or a USB
+stick, whichever they already trust.
+
+Two platform facts shaped the code, both read out of the plugins' own sources
+rather than guessed.
+
+- `share_plus` 13 bundles a `FileProvider` that publishes **only**
+  `<cache>/share_plus/`. A file anywhere else cannot be granted to another app, so
+  the pack is written where the sheet is allowed to reach, not where it is tidy.
+  The cache is also evictable, which is fine here: the pack is a handoff, the
+  ledger is the durable copy.
+- `file_selector` is called with **no** `acceptedTypeGroups`. A pack that was
+  renamed, emailed, or copied off a stick arrives as `text/plain` or with no type
+  at all, and a filter that hides the file reads to the breeder as the app
+  refusing their backup. Whether a picked file is a pack is then decided by
+  `parsePack`, with a message that says which of the refusals it met.
+
+Open, and to be measured on the device rather than guessed at: the Android picker
+returns the chosen file's whole bytes in memory (`XFile.fromData`), so a large
+ledger is held twice at once — once as text, once decoded. A pack of a few hundred
+animals is small enough not to matter, and the device pass will say what "few
+hundred" costs in megabytes before any streaming reader is justified.
+
+## D24 — The buyer's PDF embeds one Arabic font, and CI builds with shaping on
+**Decided here, 2026-10-05.**
+The per-animal pack a buyer keeps has to be readable in the language the breeder
+sold in. `pdf` 3.13.1 has no text shaping engine: `obj/ttffont.dart` maps each
+codepoint through the font's `cmap` and draws that glyph, nothing more. Arabic
+therefore cannot be fixed by a smarter writer — it needs a font whose `cmap`
+already carries the presentation forms the shaped text lands on.
+
+So the app bundles **Amiri** (`google/fonts` `ofl/amiri/Amiri-Regular.ttf`, 431 KB,
+SIL OFL 1.1, licence text committed beside it), measured rather than assumed:
+
+- 1699 mapped codepoints; Arabic block `0600–06FF` 255; Presentation Forms-A
+  `FB50–FDFF` 611; Presentation Forms-B `FE70–FEFF` 140.
+- Every codepoint `pdf`'s own `arabic.convert()` emitted for eleven realistic
+  Arabic strings was present in that `cmap` — the test that decided the font,
+  because a form the file lacks is drawn as an empty box, silently.
+- Latin letters and Latin digits are in the same file, so one font covers `ar`,
+  `en` and `fr` and the document never mixes faces mid-line.
+
+Two consequences are written down because they are the parts that can rot:
+
+- Shaping is a **compile-time** switch inside the package
+  (`use_arabic`, default `!use_bidi`, i.e. off). CI passes
+  `--dart-define=use_arabic=true` to both `flutter test` and `flutter build apk`,
+  so the tests verify the binary the phone runs. Built without it, Arabic pages
+  come out unshaped and the code still reports success.
+- The direction has to be set on the page (`MultiPage(textDirection:)`), because
+  `text.dart` only calls `arabic.convert` when the resolved direction is RTL. The
+  writer derives it from `AppLocalizations.localeName`, not from a parameter a
+  caller can get wrong.
+
+The font is loaded from `assets/`, not declared as the app's typeface: the
+screens keep the platform font, and 431 KB is worth carrying only for a document
+that has to look the same on a printer as on the phone.

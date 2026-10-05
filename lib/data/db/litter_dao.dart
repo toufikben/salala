@@ -20,6 +20,16 @@ class LitterDao extends RecordDao<Litter> {
     orderBy: 'whelping_date IS NULL, whelping_date DESC',
   );
 
+  /// The litters an animal got rather than carried.
+  ///
+  /// A sire's paper value is this list, so the buyer's pack has to ask for it;
+  /// the same newest-first rule as [forDam] so the two read as one history.
+  Future<List<Litter>> forSire(String sireId) => byColumn(
+    'sire_id',
+    sireId,
+    orderBy: 'whelping_date IS NULL, whelping_date DESC',
+  );
+
   Future<List<Litter>> recent() => all(
     orderBy: 'whelping_date IS NULL, whelping_date DESC, created_at DESC',
   );

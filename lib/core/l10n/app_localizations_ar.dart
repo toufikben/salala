@@ -557,4 +557,52 @@ class AppLocalizationsAr extends AppLocalizations {
   String reminderDueBody(String what) {
     return '$what مستحق اليوم';
   }
+
+  @override
+  String get pdfAction => 'ملف PDF';
+
+  @override
+  String get pdfFailed => 'تعذّر إنشاء ملف PDF';
+
+  @override
+  String get pdfTitle => 'السجل الصحي والنسب';
+
+  @override
+  String pdfGenerated(String day) {
+    return 'أُنشئ في $day';
+  }
+
+  @override
+  String get pdfPedigree => 'النسب';
+
+  @override
+  String get pdfLitters => 'ولادات هذا الحيوان';
+
+  @override
+  String get pdfPuppies => 'الجراء';
+
+  @override
+  String get pdfPlacement => 'سجل البيع';
+
+  @override
+  String get pdfBuyer => 'المشتري';
+
+  @override
+  String get pdfPhone => 'الهاتف';
+
+  @override
+  String get pdfEmail => 'البريد الإلكتروني';
+
+  @override
+  String get pdfPlacedOn => 'تاريخ البيع';
+
+  @override
+  String get pdfPrice => 'الثمن';
+
+  @override
+  String get pdfGuarantee => 'شروط الضمان';
+
+  @override
+  String get pdfDisclaimer =>
+      'أُنشئ هذا الملف على جهاز المربّي دون اتصال بالإنترنت من سجلاته الخاصة، وهو ليس شهادة بيطرية.';
 }

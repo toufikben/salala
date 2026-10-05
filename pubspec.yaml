@@ -50,6 +50,12 @@ dependencies:
   share_plus: ^13.3.1
   file_selector: ^1.1.0
 
+  # Buyer pack (Stage 2). `pdf` writes the record a breeder hands to a buyer: a
+  # fixed-layout document that survives a phone change, an app the buyer does
+  # not have, and a printed piece of paper. It has no server side and no
+  # JavaScript, which is why it is the right format for a document about a dog.
+  pdf: ^3.13.1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -59,3 +65,11 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   generate: true
+
+  # Amiri ships as bytes, not as the app's typeface: the screens keep the
+  # platform font, and the PDF writer reads this file because it has to embed a
+  # face into the document. It is here in particular because `pdf` substitutes
+  # glyphs without a shaping engine, so the font itself must carry the Arabic
+  # presentation forms — see DECISIONS.md D24. OFL 1.1, licence text beside it.
+  assets:
+    - assets/fonts/Amiri-Regular.ttf

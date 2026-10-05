@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -12,6 +13,8 @@ import '../../data/models/health_test.dart';
 import '../../data/models/vaccination.dart';
 import '../../data/models/vet_visit.dart';
 import '../../data/models/weight_entry.dart';
+import '../../services/animal_pdf.dart';
+import '../../services/pack_files.dart';
 import '../providers/app_providers.dart';
 import '../providers/record_providers.dart';
 
@@ -33,6 +36,12 @@ class AnimalDetailScreen extends ConsumerWidget {
       appBar: AppBar(
         title: Text(animal?.name ?? l10n.animalGone),
         actions: <Widget>[
+          if (animal != null)
+            IconButton(
+              tooltip: l10n.pdfAction,
+              icon: const Icon(Icons.picture_as_pdf_outlined),
+              onPressed: () => _sharePdfPack(context, ref, animal),
+            ),
           if (animal != null)
             IconButton(
               tooltip: l10n.actionEdit,
@@ -183,6 +192,38 @@ class AnimalDetailScreen extends ConsumerWidget {
         },
       ),
     );
+  }
+}
+
+/// Writes this animal's buyer pack and hands it to the share sheet.
+///
+/// The font is read on each tap instead of at startup: it is 431 KB, this app has
+/// to open fast on a five-year-old phone, and a breeder makes a handful of these
+/// documents. A failure leaves the ledger on screen with one line about it — no
+/// dialog, because nothing in a PDF is worth interrupting a person for.
+Future<void> _sharePdfPack(
+  BuildContext context,
+  WidgetRef ref,
+  Animal animal,
+) async {
+  final l10n = AppLocalizations.of(context);
+  final messenger = ScaffoldMessenger.of(context);
+
+  try {
+    final baseFont = await rootBundle.load(pdfFontAsset);
+    final bytes = await animalPackPdf(
+      ref.read(daosProvider),
+      animalId: animal.id,
+      l10n: l10n,
+      baseFont: baseFont,
+    );
+    final name = await ref
+        .read(packFilesProvider)
+        .shareBytes(pdfFileName(animal.name, DateTime.now()), bytes);
+    messenger.showSnackBar(SnackBar(content: Text(l10n.packShared(name))));
+  } catch (error) {
+    debugPrint('PDF pack failed: $error');
+    messenger.showSnackBar(SnackBar(content: Text(l10n.pdfFailed)));
   }
 }
 

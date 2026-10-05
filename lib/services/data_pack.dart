@@ -41,6 +41,12 @@ enum PackProblem {
 
   /// Leaves out a table this app has.
   missingTable,
+
+  /// Points a row at a record the pack does not carry.
+  ///
+  /// Only knowable once the rows are in place, so this one surfaces from
+  /// [restorePack] rather than [parsePack].
+  danglingReference,
 }
 
 class PackReject implements Exception {
@@ -158,9 +164,15 @@ PackRows parsePack(String text) {
 /// One transaction with `defer_foreign_keys` because the ledger is circular: an
 /// animal names its litter while the litter names its dam, so mid-restore there
 /// is always a row pointing at one that has not been inserted yet. Deferring
-/// moves the check to COMMIT, by which time the whole database is in place — and
-/// a pack that still fails then takes the transaction down with it, leaving the
-/// rows that were on the phone before the attempt.
+/// keeps those intermediate states legal; it does not cancel the check, it moves
+/// it to COMMIT.
+///
+/// That is why this asks SQLite directly with `foreign_key_check` before
+/// finishing. A commit that fails is not the clean end of a transaction — the
+/// database stays inside it, and the next call on that handle waits forever. The
+/// pack's dangling rows are therefore rejected while a rollback still works, so
+/// the rows that were on the phone before the attempt are still there and the
+/// database is still answering questions.
 Future<void> restorePack(Database db, PackRows pack) {
   return db.transaction((txn) async {
     await txn.execute('PRAGMA defer_foreign_keys = ON');
@@ -178,7 +190,20 @@ Future<void> restorePack(Database db, PackRows pack) {
       }
       await batch.commit(noResult: true);
     }
+
+    final dangling = await txn.rawQuery('PRAGMA foreign_key_check');
+    if (dangling.isNotEmpty) {
+      throw PackReject(PackProblem.danglingReference, _rowRef(dangling.first));
+    }
   });
 }
+
+/// `vaccinations #7 → animals`, the shortest honest description of a bad row.
+///
+/// The rowid is SQLite's own and is not the record's uuid, so this is for the
+/// log, not for the breeder: the screen says the restore failed and that nothing
+/// on the phone moved.
+String _rowRef(Map<String, Object?> row) =>
+    '${row['table']} #${row['rowid']} → ${row['parent']}';
 
 int _nowMs() => DateTime.now().toUtc().millisecondsSinceEpoch;

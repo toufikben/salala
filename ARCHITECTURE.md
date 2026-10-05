@@ -138,6 +138,46 @@ whose only deadline is "somewhere in that morning". The notification channel is
 created by the plugin at first delivery, not at startup, so it cannot be observed
 on a device before an alarm has actually fired.
 
+## The transfer pack
+
+The paid deliverable is a file that leaves the phone: a PDF for a buyer, a JSON
+pack of the whole ledger for the breeder's own backup. Three files, and only the
+last one needs a device:
+
+- `services/data_pack.dart` writes and reads the pack against real SQLite. It is
+  generic over `dataTables` rather than over the models, so a new table is one
+  line in `schema.dart` plus the drift test that compares that list with the
+  `CREATE TABLE` statements. Restore runs inside one transaction with
+  `PRAGMA defer_foreign_keys = ON`, because `animals.litter_id` and
+  `litters.dam_id` point at each other and no insertion order can satisfy both.
+  Deferring moves the check to COMMIT, and a rejected COMMIT is not a clean end —
+  the handle stays inside the transaction and the next call on it waits forever,
+  which is how CI found this. So `restorePack` asks SQLite itself with
+  `PRAGMA foreign_key_check` before finishing and throws while a rollback still
+  works: a pack that would leave half a ledger changes nothing (D22).
+- `services/pack_files.dart` is the whole platform surface: write the bytes where
+  the share sheet is allowed to reach them, open the sheet, read a picked file
+  back. It is small and it has no logic, which is what leaves the flow above it
+  testable (D23).
+- `presentation/screens/settings_screen.dart` is the only place that asks before
+  it replaces, and it names the counts it is about to destroy first. A restore
+  re-arms the alarms afterwards, because the phone holds a different ledger and
+  nothing else would tell the alarm manager about it.
+- `services/animal_pdf.dart` is the buyer's document: one animal's identity, three
+  generations of pedigree, its doses, screenings, weigh-ins with a growth curve,
+  visits, the litters it produced or sired, and the placement. It reads the
+  ledger through `Daos` and needs no device, so it is CI-testable in every
+  shipping language; only the share sheet it hands the bytes to is `pack_files`
+  again. It builds its whole widget list before describing the page, because
+  `MultiPage`'s `build` callback is synchronous and cannot await a database.
+  The font it embeds and the compile-time switch that makes Arabic legible in it
+  are D24.
+
+Photos are deliberately not in a pack: `photo_path` is a path on *this* phone, so
+copying it would ship a broken reference — the PDF pack is where an image belongs.
+The PIN digest is not in a pack either (it lives in the keystore, not in
+`user_settings`), so a restored file can neither leak it nor lock anybody out.
+
 ## Routing and the PIN gate
 
 `app_router.dart` holds a `refreshListenable` that subscribes to

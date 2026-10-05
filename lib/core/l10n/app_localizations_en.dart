@@ -554,4 +554,52 @@ class AppLocalizationsEn extends AppLocalizations {
   String reminderDueBody(String what) {
     return '$what is due today';
   }
+
+  @override
+  String get pdfAction => 'PDF pack';
+
+  @override
+  String get pdfFailed => 'The PDF could not be made';
+
+  @override
+  String get pdfTitle => 'Health and lineage record';
+
+  @override
+  String pdfGenerated(String day) {
+    return 'Generated on $day';
+  }
+
+  @override
+  String get pdfPedigree => 'Pedigree';
+
+  @override
+  String get pdfLitters => 'Litters from this animal';
+
+  @override
+  String get pdfPuppies => 'Puppies';
+
+  @override
+  String get pdfPlacement => 'Placement';
+
+  @override
+  String get pdfBuyer => 'Buyer';
+
+  @override
+  String get pdfPhone => 'Phone';
+
+  @override
+  String get pdfEmail => 'Email';
+
+  @override
+  String get pdfPlacedOn => 'Placed on';
+
+  @override
+  String get pdfPrice => 'Price';
+
+  @override
+  String get pdfGuarantee => 'Guarantee terms';
+
+  @override
+  String get pdfDisclaimer =>
+      'Produced offline by Salala from the breeder\'s own records. This is not a veterinary certificate.';
 }
