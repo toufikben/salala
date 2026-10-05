@@ -315,7 +315,7 @@ pw.Widget? _growthChart(Animal animal, List<WeightEntry> weighIns) {
 
   final points = <pw.PointChartValue>[
     for (final WeightEntry entry in weighIns)
-      pw.PointChartValue<double>(
+      pw.PointChartValue(
         (entry.measuredAt - birthDate) / _dayMs,
         entry.weightKg,
       ),
