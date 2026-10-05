@@ -10,8 +10,23 @@ Future<int> _count(Database db, String table) async {
   return rows.first['c']! as int;
 }
 
+final RegExp _whitespace = RegExp(r'\s+');
+
 void main() {
   group('schema v1', () {
+    test('the table list a pack carries matches the tables it creates', () {
+      final created = <String>[
+        for (final statement in createStatements)
+          if (statement.trimLeft().startsWith('CREATE TABLE'))
+            statement.trimLeft().split(_whitespace)[2],
+      ];
+
+      // A table missing from `dataTables` would be silently left out of every
+      // export, which is the kind of data loss no screen shows.
+      expect(dataTables.toSet(), created.toSet());
+      expect(dataTables, hasLength(created.length));
+    });
+
     test('creates every table the app reads', () async {
       final db = await openTestDatabase();
       addTearDown(db.close);

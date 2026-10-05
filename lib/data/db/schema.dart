@@ -160,3 +160,26 @@ const List<String> createStatements = <String>[
   'CREATE INDEX idx_visits_animal ON vet_visits (animal_id, visit_date)',
   'CREATE INDEX idx_placements_animal ON placements (animal_id)',
 ];
+
+/// Every table the database holds, in the order a reader thinks about the
+/// ledger: an animal before its litter, a buyer before a placement.
+///
+/// The order is for reading, not for correctness — `animals.litter_id` and
+/// `litters.dam_id` point at each other, so no order inserts without a dangling
+/// reference. That circular pair is why a restore defers its foreign key checks
+/// (see `data_pack.dart`) instead of trusting this list to break the cycle.
+///
+/// Export and import iterate this list, so a new table is one line here and
+/// nothing else; the test that compares it against the `CREATE TABLE`
+/// statements above is what stops a table from quietly going unexported.
+const List<String> dataTables = <String>[
+  'animals',
+  'litters',
+  'vaccinations',
+  'health_tests',
+  'weight_entries',
+  'vet_visits',
+  'buyers',
+  'placements',
+  'user_settings',
+];
