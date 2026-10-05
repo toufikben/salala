@@ -4,16 +4,51 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/l10n/app_localizations.dart';
 import '../../core/router/app_router.dart';
+import '../../core/utils/date_utils.dart';
 import '../../data/models/animal.dart';
+import '../../services/reminder_resync.dart';
 import '../providers/app_providers.dart';
 import '../widgets/animal_card.dart';
 import '../widgets/salala_nav_bar.dart';
 
-class AnimalListScreen extends ConsumerWidget {
+class AnimalListScreen extends ConsumerStatefulWidget {
   const AnimalListScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<AnimalListScreen> createState() => _AnimalListScreenState();
+}
+
+class _AnimalListScreenState extends ConsumerState<AnimalListScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // After the frame, not inside it: the rebuild talks to the platform, and
+    // the ledger must not wait on an alarm manager to show a breeder their dogs.
+    WidgetsBinding.instance.addPostFrameCallback((_) => _resyncReminders());
+  }
+
+  Future<void> _resyncReminders() async {
+    // Mounted first, so a screen that went away before its own callback leaves
+    // the one-shot unclaimed for whichever list screen comes next.
+    if (!mounted) return;
+    if (!ref.read(remindersResyncProvider.notifier).claim()) return;
+    final localeTag = Localizations.localeOf(context).toString();
+    try {
+      await resyncReminders(
+        ref.read(reminderSchedulerProvider),
+        daos: ref.read(daosProvider),
+        l10n: AppLocalizations.of(context),
+        dueDayText: (ms) => formatDayFor(localeTag, ms),
+      );
+    } catch (error) {
+      // Same bargain `main()` strikes with the bootstrap: a phone that refuses
+      // notifications still opens the ledger, and the failure leaves a trace.
+      debugPrint('Reminder resync failed: $error');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final animals = ref.watch(animalsProvider);
 

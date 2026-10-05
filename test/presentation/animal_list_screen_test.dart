@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:salala/core/utils/reminders.dart';
 import 'package:salala/data/models/animal.dart';
+import 'package:salala/data/models/vaccination.dart';
 import 'package:salala/presentation/screens/animal_form_screen.dart';
 
+import '../helpers/fake_notification_writer.dart';
 import '../helpers/pump_app.dart';
 
 Animal _draft({String name = 'Atlas', bool breeding = false}) => Animal(
@@ -119,5 +122,101 @@ void main() {
     ); // the nav bar repeats the label, so scope the check to the title
     final context = tester.element(find.byType(AppBar).first);
     expect(Directionality.of(context), TextDirection.rtl);
+  });
+
+  group('the launch that rebuilds the alarms', () {
+    // Android drops an app's pending alarms when it is force-stopped or cleared
+    // from recents — measured on the test phone, where `am force-stop` took
+    // every booked reminder out and left the ledger rows untouched. Opening the
+    // app is therefore the recovery, and these two tests are it: one dose due
+    // in twenty days, and an alarm that reappears without anyone saving.
+    const String nalaId = 'animal-nala';
+
+    Animal nala() => Animal(
+      id: nalaId,
+      name: 'Nala',
+      species: 'dog',
+      sex: Sex.female,
+      status: AnimalStatus.active,
+      createdAt: 0,
+      updatedAt: 0,
+    );
+
+    Vaccination doseDueInDays(int days) => Vaccination(
+      id: '',
+      animalId: nalaId,
+      vaccineName: 'Rabies',
+      dateAdministered: DateTime.now()
+          .subtract(const Duration(days: 10))
+          .millisecondsSinceEpoch,
+      nextDueDate: DateTime.now()
+          .add(Duration(days: days))
+          .millisecondsSinceEpoch,
+      createdAt: 0,
+      updatedAt: 0,
+    );
+
+    testWidgets('opening the ledger re-books a dose nobody touched', (
+      tester,
+    ) async {
+      final notifications = FakeNotificationWriter();
+      await pumpSalala(
+        tester,
+        notifications: notifications,
+        resyncOnLaunch: true,
+        seed: <Animal>[nala()],
+        seedVaccinations: <Vaccination>[doseDueInDays(20)],
+      );
+
+      // Two clears plus the one alarm still ahead — and not one tap.
+      await waitForSchedulerCalls(tester, notifications, 3);
+
+      expect(notifications.written, hasLength(1));
+      expect(notifications.written.single.title, 'Nala');
+      expect(notifications.written.single.body, contains('Rabies'));
+      expect(notifications.written.single.at.hour, reminderHour);
+    });
+
+    testWidgets('a dose whose morning has gone is not re-booked', (
+      tester,
+    ) async {
+      final notifications = FakeNotificationWriter();
+      await pumpSalala(
+        tester,
+        notifications: notifications,
+        resyncOnLaunch: true,
+        seed: <Animal>[nala()],
+        // Read as overdue on the ledger, and quiet in the alarm manager.
+        seedVaccinations: <Vaccination>[doseDueInDays(-3)],
+      );
+
+      await settleRealIo(tester);
+      expect(notifications.log, isEmpty);
+    });
+
+    testWidgets('switching tabs does not book it all over again', (
+      tester,
+    ) async {
+      final notifications = FakeNotificationWriter();
+      await pumpSalala(
+        tester,
+        notifications: notifications,
+        resyncOnLaunch: true,
+        seed: <Animal>[nala()],
+        seedVaccinations: <Vaccination>[doseDueInDays(20)],
+      );
+      await waitForSchedulerCalls(tester, notifications, 3);
+
+      // The bar moves with `go`, which throws the animal list away and builds a
+      // fresh one on the way back — so this is the round trip that would
+      // re-reach the platform if the one-shot lived in the screen's own state.
+      await tester.tap(find.widgetWithText(NavigationDestination, 'Litters'));
+      await settleRealIo(tester);
+      await tester.tap(find.widgetWithText(NavigationDestination, 'Animals'));
+      await settleRealIo(tester);
+
+      expect(notifications.log, hasLength(3));
+      expect(notifications.written, hasLength(1));
+    });
   });
 }

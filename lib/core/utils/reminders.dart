@@ -10,6 +10,19 @@ const int reminderLeadDays = 30;
 /// late enough that no phone goes off in a barn before sunrise.
 const int reminderHour = 9;
 
+/// How far ahead a launch re-books alarms of its own accord.
+///
+/// Android drops an app's pending alarms when it is force-stopped or cleared
+/// away — measured on the test phone, where `am force-stop` took every booked
+/// reminder out and left the ledger rows untouched — so the alarm is not
+/// durable state and the database has to rebuild it. Rebuilding *every* due
+/// date in the ledger would walk years of history to serve the handful of
+/// alarms that can fire soon, so a launch takes the window a month-ahead
+/// reminder can still be inside, plus a fortnight for a ledger that has been
+/// shut longer than the lead. Anything later is inside some following launch's
+/// window.
+const int reminderHorizonDays = reminderLeadDays + 15;
+
 enum ReminderKind { headsUp, dueToday }
 
 /// One scheduled message for one record.

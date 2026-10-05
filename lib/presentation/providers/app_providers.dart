@@ -24,6 +24,27 @@ final reminderSchedulerProvider = Provider<ReminderScheduler>(
       throw UnimplementedError('reminderSchedulerProvider must be overridden'),
 );
 
+/// Whether this launch has already rebuilt the alarms from the ledger.
+///
+/// The guard cannot live in the screen's own state: the nav bar moves between
+/// tabs with `go`, which throws the previous screen away, so every return to
+/// the animal list would rebuild the alarms all over again.
+class RemindersResynced extends Notifier<bool> {
+  @override
+  bool build() => false;
+
+  /// True to the first caller of a launch, false to everyone after it.
+  bool claim() {
+    if (state) return false;
+    state = true;
+    return true;
+  }
+}
+
+final remindersResyncProvider = NotifierProvider<RemindersResynced, bool>(
+  RemindersResynced.new,
+);
+
 final daosProvider = Provider<Daos>((ref) => Daos(ref.watch(databaseProvider)));
 
 final settingsDaoProvider = Provider<SettingsDao>(

@@ -187,8 +187,10 @@ matters once the curve is shown to a buyer or a vet.
 ## D19 — The CI debug key is cached, not committed
 **Decided by the agent, 2026-10-04.**
 The first two device installs proved the problem: `INSTALL_FAILED_UPDATE_INCOMPATIBLE`,
-because every GitHub Actions runner generates its own `~/.android/debug.keystore`,
-so build N and build N+1 of the same app are signed by different keys and Android
+because every GitHub Actions runner generates its own `debug.keystore` — under
+`~/.config/.android/`, measured on run 37353640524's probe, not the `~/.android`
+the docs suggest — so build N and build N+1 of the same app are signed by
+different keys and Android
 will not update one over the other. The fix could have been a committed
 `debug.keystore` (the template gitignores `**/*.keystore` for a reason) or a
 repo secret (a credential in someone else's account, and a build that fails
@@ -197,3 +199,21 @@ key with nothing to protect and nothing to leak: if the cache is ever evicted th
 next build simply needs one `adb uninstall` first, which is what was happening on
 every install anyway. Release signing is untouched — there is no release key yet,
 and Stage 4 decides that one deliberately.
+
+## D20 — A launch rebuilds the alarms; the ledger is the durable copy
+**Decided with the owner, 2026-10-05.**
+Measured on the test phone: `am force-stop com.salala.salala` took every booked
+reminder out of AlarmManager while the ledger rows survived untouched. Android is
+allowed to do that — an app's pending alarms are not durable state — and there is
+no way to be woken to notice, so the only moment left to repair them is the next
+time the person opens the app. `resyncReminders` therefore runs once per launch
+from the animal list, reads the doses and certificates due inside
+`reminderHorizonDays` (the month-ahead lead plus a fortnight), and hands each one
+to the same `ReminderScheduler.replace` a save uses, which clears the record's own
+ids before writing so a rebuild cannot double-book.
+
+Deliberately *not* done: re-booking every due date in the ledger (a five-year
+breeding plan is not a pending alarm, and a launch should not walk it), and asking
+for a foreground service or a battery-optimisation exemption — that is a Play
+policy argument Stage 4 has with measured delivery evidence in hand, not a spike
+guessing at one.

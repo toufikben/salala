@@ -30,6 +30,12 @@ class SeededHasPin extends HasPin {
   bool build() => _value;
 }
 
+/// A launch that already rebuilt its alarms, so `claim()` refuses the screen.
+class AlreadyResynced extends RemindersResynced {
+  @override
+  bool build() => true;
+}
+
 /// Pumps long enough for background-isolate database work to land.
 ///
 /// sqflite runs on another isolate, which the fake-async zone of `testWidgets`
@@ -60,6 +66,38 @@ Future<void> settleRealIo(WidgetTester tester) async {
   }
 }
 
+/// Waits until the scheduler has been handed a whole save or a whole launch.
+///
+/// The dose is written on another isolate, so the alarms reach the writer some
+/// real milliseconds after the tap or the first frame that asked for them.
+/// Asserting straight after either raced that: run 37353640524 read zero alarms
+/// from a dose that had them, while the identical code had been green twice.
+///
+/// [calls] is the writer's own count — the two clears a replace always makes,
+/// plus one write per alarm — so a save that reached the scheduler and booked
+/// nothing still fails here, naming how far the log got, instead of quietly
+/// satisfying an `isEmpty` check either way.
+Future<void> waitForSchedulerCalls(
+  WidgetTester tester,
+  FakeNotificationWriter notifications,
+  int calls,
+) async {
+  for (var round = 0; round < 40 && notifications.log.length < calls; round++) {
+    await tester.pump();
+    await tester.runAsync(
+      () => Future<void>.delayed(const Duration(milliseconds: 25)),
+    );
+  }
+  if (notifications.log.length < calls) {
+    throw StateError(
+      'the scheduler reached ${notifications.log.length} of $calls calls '
+      '(${notifications.log.join(', ')}), and wrote '
+      '${notifications.written.length} alarm(s)',
+    );
+  }
+  await settleRealIo(tester);
+}
+
 /// Boots the real router + theme + localizations against a temporary database
 /// and a fake keystore. [seed] rows are inserted through the real DAO before
 /// the first frame, so the UI is exercised against genuine SQL results.
@@ -68,6 +106,11 @@ Future<FakeSecureStorage> pumpSalala(
   Locale? locale,
   bool hasPin = false,
   FakeNotificationWriter? notifications,
+  // Whether opening the app rebuilds the alarms from the ledger, which is what
+  // a real launch does. Off by default: a test about saving one dose should not
+  // also be handed the alarms that opening the list booked for it. The launch
+  // path switches this on and tests itself.
+  bool resyncOnLaunch = false,
   List<Animal> seed = const <Animal>[],
   List<Vaccination> seedVaccinations = const <Vaccination>[],
   List<WeightEntry> seedWeights = const <WeightEntry>[],
@@ -127,6 +170,8 @@ Future<FakeSecureStorage> pumpSalala(
         appLockProvider.overrideWithValue(AppLockService(storage: storage)),
         hasPinProvider.overrideWith(() => SeededHasPin(hasPin)),
         reminderSchedulerProvider.overrideWithValue(scheduler),
+        if (!resyncOnLaunch)
+          remindersResyncProvider.overrideWith(AlreadyResynced.new),
         if (locale != null) initialLocaleProvider.overrideWithValue(locale),
       ],
       child: const SalalaApp(),

@@ -107,6 +107,36 @@ the dependency graph and CI has no generation step.
 - `LocaleController` writes the choice to `user_settings` and publishes a
   `Locale?`; `initialLocaleProvider` is seeded at startup so a restart does not
   flash the wrong language.
+- `RemindersResynced` is a `Notifier<bool>` one-shot: `claim()` answers true to
+  the first caller of a launch. It is a provider rather than widget state
+  because the nav bar moves with `go` and rebuilds the animal list on every
+  return (D15), which would otherwise rebuild the alarms on every tab switch.
+
+## Reminders
+
+A dose's `next_due_date` and a screening certificate's `valid_until` are the only
+dates this app interrupts a person for. Three files own the mechanism, and none
+of them needs a notification channel to be tested:
+
+- `core/utils/reminders.dart` is the policy and nothing else: two reminders per
+  due date (a month ahead, and the due morning at `reminderHour`), mornings that
+  have already gone dropped, and the record's uuid folded into the two 32-bit
+  ids Android identifies a notification by.
+- `services/reminder_scheduler.dart` is the only place in the app allowed to name
+  `flutter_local_notifications`, and it does so through a seam the app owns —
+  `abstract class NotificationWriter`. The seam is not stylistic: the plugin's
+  constructor is a `factory`, so it cannot be subclassed and no test double can
+  be written without an interface. `replace()` clears the record's own two ids
+  before writing them, which is what makes a save and a launch rebuild idempotent.
+- `services/reminder_resync.dart` rebuilds the near future from the ledger once
+  per launch, because Android drops an app's pending alarms when it is
+  force-stopped or cleared away and cannot be woken to notice (D20).
+
+Alarms are scheduled `AndroidScheduleMode.inexactAllowWhileIdle` deliberately: an
+exact one needs `SCHEDULE_EXACT_ALARM`, which Google Play audits, for a message
+whose only deadline is "somewhere in that morning". The notification channel is
+created by the plugin at first delivery, not at startup, so it cannot be observed
+on a device before an alarm has actually fired.
 
 ## Routing and the PIN gate
 

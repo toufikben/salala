@@ -96,37 +96,10 @@ Future<void> _save(WidgetTester tester) async {
   await settleRealIo(tester);
 }
 
-/// Waits until the scheduler has been handed a whole save.
-///
-/// The dose is written on another isolate, so the alarms reach the writer some
-/// real milliseconds after the tap lands. Asserting straight after `_save`
-/// raced that: run 37353640524 read zero alarms from a dose that had them,
-/// while the identical code was green on the two runs before it.
-///
-/// The count asked for is the two clears `replace` always makes, plus one per
-/// alarm — so a save that reached the scheduler but booked nothing still fails
-/// here, naming how far the log got, instead of quietly satisfying an
-/// `isEmpty`/`hasLength(1)` check either way.
-Future<void> _waitForScheduler(
-  WidgetTester tester,
-  FakeNotificationWriter notifications,
-  int calls,
-) async {
-  for (var round = 0; round < 40 && notifications.log.length < calls; round++) {
-    await tester.pump();
-    await tester.runAsync(
-      () => Future<void>.delayed(const Duration(milliseconds: 25)),
-    );
-  }
-  if (notifications.log.length < calls) {
-    throw StateError(
-      'the scheduler reached ${notifications.log.length} of $calls calls '
-      '(${notifications.log.join(', ')}), and wrote '
-      '${notifications.written.length} alarm(s)',
-    );
-  }
-  await settleRealIo(tester);
-}
+/// How many writer calls one save owes: `replace` clears the record's two ids
+/// before writing, so two plus whatever alarms the due date still has ahead.
+/// [waitForSchedulerCalls] waits for that many before the assertions run.
+int _callsFor(int alarms) => 2 + alarms;
 
 int _daysAgo(int days) =>
     DateTime.now().subtract(Duration(days: days)).millisecondsSinceEpoch;
@@ -190,7 +163,7 @@ void main() {
     await _save(tester);
     // The save always clears the record's two ids before writing, so two calls
     // is the proof it reached the scheduler; nothing more was written.
-    await _waitForScheduler(tester, notifications, 2);
+    await waitForSchedulerCalls(tester, notifications, _callsFor(0));
 
     expect(find.text('DHPP'), findsOneWidget);
     // A dose given today with no next-due date is not overdue.
@@ -221,7 +194,7 @@ void main() {
 
     await _tap(tester, find.text('Distemper'));
     await _save(tester);
-    await _waitForScheduler(tester, notifications, 3);
+    await waitForSchedulerCalls(tester, notifications, _callsFor(1));
 
     expect(notifications.written, hasLength(1));
     final alarm = notifications.written.single;
@@ -259,7 +232,7 @@ void main() {
 
     await _tap(tester, find.text('Parvo'));
     await _save(tester);
-    await _waitForScheduler(tester, notifications, 4);
+    await waitForSchedulerCalls(tester, notifications, _callsFor(2));
 
     expect(notifications.written, hasLength(2));
     final headsUp = notifications.written.first.at;
@@ -289,7 +262,7 @@ void main() {
 
     await _tap(tester, find.text('Lepto'));
     await _save(tester);
-    await _waitForScheduler(tester, notifications, 4);
+    await waitForSchedulerCalls(tester, notifications, _callsFor(2));
     // Saving clears the record's own ids before writing them again, so the ids
     // the alarms ended up under are known here.
     final booked = notifications.written.map((a) => a.id).toList();
@@ -299,8 +272,9 @@ void main() {
     await _tap(tester, find.byIcon(Icons.delete_outline));
     expect(find.text('Delete this record?'), findsOneWidget);
     await tester.tap(find.widgetWithText(FilledButton, 'Delete'));
-    // The delete reaches the scheduler with two more clears and no writes.
-    await _waitForScheduler(tester, notifications, 6);
+    // Four calls from the booking just above, plus the delete's two clears and
+    // no write of its own.
+    await waitForSchedulerCalls(tester, notifications, 6);
 
     expect(find.text('Lepto'), findsNothing);
     // The row is gone, so an alarm for it would be a message about nothing — and
