@@ -1173,6 +1173,96 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Produced offline by Salala from the breeder\'s own records. This is not a veterinary certificate.'**
   String get pdfDisclaimer;
+
+  /// No description provided for @triageTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What to do next'**
+  String get triageTitle;
+
+  /// No description provided for @triageActNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Act now'**
+  String get triageActNow;
+
+  /// No description provided for @triageWatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep watching'**
+  String get triageWatch;
+
+  /// No description provided for @triageRoutineVet.
+  ///
+  /// In en, this message translates to:
+  /// **'Routine vet visit'**
+  String get triageRoutineVet;
+
+  /// No description provided for @triageNothing.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing in this record calls for a next step'**
+  String get triageNothing;
+
+  /// No description provided for @triageNotDiagnosis.
+  ///
+  /// In en, this message translates to:
+  /// **'Salala reads only what you typed here. This is not a veterinary diagnosis.'**
+  String get triageNotDiagnosis;
+
+  /// No description provided for @triageNoDoseYoung.
+  ///
+  /// In en, this message translates to:
+  /// **'No vaccination recorded, at {days} days old'**
+  String triageNoDoseYoung(String days);
+
+  /// No description provided for @triageDoseOverdue.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} was due {days} days ago'**
+  String triageDoseOverdue(String name, String days);
+
+  /// No description provided for @triageDoseDueSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} is due in {days} days'**
+  String triageDoseDueSoon(String name, String days);
+
+  /// No description provided for @triageWeightLossPuppy.
+  ///
+  /// In en, this message translates to:
+  /// **'A young animal has lost {percent}% of its weight since the last weigh-in'**
+  String triageWeightLossPuppy(String percent);
+
+  /// No description provided for @triageWeightLoss.
+  ///
+  /// In en, this message translates to:
+  /// **'Weight has fallen {percent}% since the last weigh-in'**
+  String triageWeightLoss(String percent);
+
+  /// No description provided for @triageNoGainPuppy.
+  ///
+  /// In en, this message translates to:
+  /// **'Barely any weight gain over {days} days'**
+  String triageNoGainPuppy(String days);
+
+  /// No description provided for @triageTestFlagged.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} did not come back clear'**
+  String triageTestFlagged(String name);
+
+  /// No description provided for @triageTestExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'The {name} certificate expired {days} days ago'**
+  String triageTestExpired(String name, String days);
+
+  /// No description provided for @triageWhelpingOverdue.
+  ///
+  /// In en, this message translates to:
+  /// **'{name}: whelping is {days} days past the expected date'**
+  String triageWhelpingOverdue(String name, String days);
 }
 
 class _AppLocalizationsDelegate

@@ -227,5 +227,21 @@
   "pdfPlacedOn": "تاريخ البيع",
   "pdfPrice": "الثمن",
   "pdfGuarantee": "شروط الضمان",
-  "pdfDisclaimer": "أُنشئ هذا الملف على جهاز المربّي دون اتصال بالإنترنت من سجلاته الخاصة، وهو ليس شهادة بيطرية."
+  "pdfDisclaimer": "أُنشئ هذا الملف على جهاز المربّي دون اتصال بالإنترنت من سجلاته الخاصة، وهو ليس شهادة بيطرية.",
+
+  "triageTitle": "ما الخطوة التالية؟",
+  "triageActNow": "تصرّف الآن",
+  "triageWatch": "راقب عن قرب",
+  "triageRoutineVet": "زيارة بيطرية روتينية",
+  "triageNothing": "لا شيء في هذا السجل يستدعي خطوة الآن",
+  "triageNotDiagnosis": "لا تقرأ سلالة إلا ما كتبته هنا، وهذا ليس تشخيصًا بيطريًا.",
+  "triageNoDoseYoung": "لم يُسجَّل أي تلقيح والعمر {days} يومًا",
+  "triageDoseOverdue": "{name} كان مستحقًا منذ {days} يومًا",
+  "triageDoseDueSoon": "{name} مستحق خلال {days} يومًا",
+  "triageWeightLossPuppy": "فقد الحيوان الصغير {percent}% من وزنه منذ آخر وزن",
+  "triageWeightLoss": "انخفض الوزن {percent}% منذ آخر وزن",
+  "triageNoGainPuppy": "زيادة الوزن شبه معدومة خلال {days} يومًا",
+  "triageTestFlagged": "لم تعد نتيجة {name} سالمة",
+  "triageTestExpired": "انتهت شهادة {name} منذ {days} يومًا",
+  "triageWhelpingOverdue": "{name}: تجاوزت الولادة التاريخ المتوقع بـ {days} يومًا"
 }

@@ -605,4 +605,68 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get pdfDisclaimer =>
       'أُنشئ هذا الملف على جهاز المربّي دون اتصال بالإنترنت من سجلاته الخاصة، وهو ليس شهادة بيطرية.';
+
+  @override
+  String get triageTitle => 'ما الخطوة التالية؟';
+
+  @override
+  String get triageActNow => 'تصرّف الآن';
+
+  @override
+  String get triageWatch => 'راقب عن قرب';
+
+  @override
+  String get triageRoutineVet => 'زيارة بيطرية روتينية';
+
+  @override
+  String get triageNothing => 'لا شيء في هذا السجل يستدعي خطوة الآن';
+
+  @override
+  String get triageNotDiagnosis =>
+      'لا تقرأ سلالة إلا ما كتبته هنا، وهذا ليس تشخيصًا بيطريًا.';
+
+  @override
+  String triageNoDoseYoung(String days) {
+    return 'لم يُسجَّل أي تلقيح والعمر $days يومًا';
+  }
+
+  @override
+  String triageDoseOverdue(String name, String days) {
+    return '$name كان مستحقًا منذ $days يومًا';
+  }
+
+  @override
+  String triageDoseDueSoon(String name, String days) {
+    return '$name مستحق خلال $days يومًا';
+  }
+
+  @override
+  String triageWeightLossPuppy(String percent) {
+    return 'فقد الحيوان الصغير $percent% من وزنه منذ آخر وزن';
+  }
+
+  @override
+  String triageWeightLoss(String percent) {
+    return 'انخفض الوزن $percent% منذ آخر وزن';
+  }
+
+  @override
+  String triageNoGainPuppy(String days) {
+    return 'زيادة الوزن شبه معدومة خلال $days يومًا';
+  }
+
+  @override
+  String triageTestFlagged(String name) {
+    return 'لم تعد نتيجة $name سالمة';
+  }
+
+  @override
+  String triageTestExpired(String name, String days) {
+    return 'انتهت شهادة $name منذ $days يومًا';
+  }
+
+  @override
+  String triageWhelpingOverdue(String name, String days) {
+    return '$name: تجاوزت الولادة التاريخ المتوقع بـ $days يومًا';
+  }
 }

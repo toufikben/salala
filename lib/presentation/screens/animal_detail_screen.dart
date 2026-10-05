@@ -17,6 +17,8 @@ import '../../services/animal_pdf.dart';
 import '../../services/pack_files.dart';
 import '../providers/app_providers.dart';
 import '../providers/record_providers.dart';
+import '../providers/triage_providers.dart';
+import '../widgets/triage_card.dart';
 
 /// One animal's whole ledger: identity, parentage, doses and weigh-ins.
 class AnimalDetailScreen extends ConsumerWidget {
@@ -73,6 +75,18 @@ class AnimalDetailScreen extends ConsumerWidget {
             ),
             children: <Widget>[
               _IdentityCard(animal: animal, animals: animals),
+              // Above the records, because it is the one part of this page that
+              // answers a question rather than showing what was typed.
+              ref
+                  .watch(triageForAnimalProvider(animal.id))
+                  .when(
+                    loading: () => const _SectionLoading(),
+                    error: (error, stack) => _SectionError(
+                      onRetry: () =>
+                          ref.invalidate(triageForAnimalProvider(animal.id)),
+                    ),
+                    data: (findings) => TriageCard(findings: findings),
+                  ),
               _RecordSection(
                 title: l10n.recordsVaccinations,
                 addLabel: l10n.vaccinationAdd,

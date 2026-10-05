@@ -342,3 +342,57 @@ Two consequences are written down because they are the parts that can rot:
 The font is loaded from `assets/`, not declared as the app's typeface: the
 screens keep the platform font, and 431 KB is worth carrying only for a document
 that has to look the same on a printer as on the phone.
+
+## D25 — Triage is a rule table over the record, and it never names a disease
+**Decided here, 2026-10-05.**
+
+The ledger already holds the facts that matter on the day a puppy is due or a
+rabies shot slipped: dates, ages, weights. A deterministic table can turn those
+into "how fast to move" without pretending to know what is wrong. That is the
+whole of Stage 3's first half, and the limit is the point — the three answers
+`TriageUrgency` allows are **act now**, **keep watching** and **routine vet
+visit**. There is no fourth, because a rule over a record nobody verified cannot
+honestly produce a diagnosis.
+
+**Rules are data, predicates are code.** `assets/triage/rules.json` carries each
+rule's id, urgency, on/off switch and thresholds; `lib/core/utils/triage.dart`
+holds one predicate per rule, keyed by a `TriageRuleId` enum. `parseRules` refuses
+a table that drifts from the engine in either direction: an id nobody wrote a
+predicate for, a rule the engine has that the table left out (a silent gap in the
+answer), the same rule twice, an urgency outside the three, and a threshold typed
+under a name the predicate does not read — the last one matters most, because a
+silently ignored `maxDays` would keep firing at the number nobody meant.
+
+"Editable without a rebuild" is written down honestly here: the numbers and the
+switches are one file a release retunes without touching the engine, but **adding
+a new rule still needs a build**, because a predicate is code. The alternative —
+an expression interpreter inside a vet ledger — buys a flexibility nobody asked
+for and spends the one thing the app has, which is that its output is auditable.
+
+**What the table may not read.** Vet visits are not inputs: `reason` and
+`outcome` are free text, so a rule over them would be guessing at what "check
+again" meant three weeks ago, and a wrong "act now" costs more trust than a
+missing one. Breed-specific risk, which the roadmap listed, is **not**
+implemented: `breed` is free text too, and a table keyed on breed names would
+assert a health claim this app has no way to check. It stays an open item.
+
+**Where the record is thin, the table keeps quiet.** A missing birth date
+silences every age-dependent rule rather than assuming an age. A weight drop on
+an animal of unknown age reads as the adult case ("watch"), since "act now" is
+reserved for the young, who dehydrate in a day. A health test result is only
+treated as clear when it is one of six words a breeder types for "nothing found"
+(`clear`, `normal`, `negative`, `free`, `unaffected`, `0`); anything else is
+quoted back as typed, because the app does not know what "Grade 2" means. A
+deceased animal gets no findings at all, said once in the engine rather than in
+nine predicates.
+
+**Wording is checked by the compiler.** `triageMessage` switches over
+`TriageRuleId`, so a rule added to the engine without a sentence does not
+compile. Numbers reach those sentences as ASCII strings, never as `int`
+placeholders through `intl`, which would render "١٢" in Arabic and break D21
+mid-card.
+
+The small intent classifier the same roadmap stage mentions is **not** in this
+batch: there is no labelled Arabic symptom data in hand and no measured
+benchmark, and a classifier without either is a second, less auditable opinion
+beside the table.

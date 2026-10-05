@@ -603,4 +603,68 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get pdfDisclaimer =>
       'Établi hors ligne par Salala à partir des registres de l\'éleveur. Ce document n\'est pas un certificat vétérinaire.';
+
+  @override
+  String get triageTitle => 'Prochaine étape';
+
+  @override
+  String get triageActNow => 'Agir maintenant';
+
+  @override
+  String get triageWatch => 'Surveiller';
+
+  @override
+  String get triageRoutineVet => 'Visite vétérinaire courante';
+
+  @override
+  String get triageNothing => 'Rien dans ce dossier n\'appelle une action';
+
+  @override
+  String get triageNotDiagnosis =>
+      'Salala ne lit que ce que vous avez saisi ici. Ceci n\'est pas un diagnostic vétérinaire.';
+
+  @override
+  String triageNoDoseYoung(String days) {
+    return 'Aucune vaccination enregistrée, à $days jours';
+  }
+
+  @override
+  String triageDoseOverdue(String name, String days) {
+    return '$name en retard de $days jours';
+  }
+
+  @override
+  String triageDoseDueSoon(String name, String days) {
+    return '$name prévu dans $days jours';
+  }
+
+  @override
+  String triageWeightLossPuppy(String percent) {
+    return 'Le jeune animal a perdu $percent% de poids depuis la dernière pesée';
+  }
+
+  @override
+  String triageWeightLoss(String percent) {
+    return 'Perte de $percent% depuis la dernière pesée';
+  }
+
+  @override
+  String triageNoGainPuppy(String days) {
+    return 'Quasi aucune prise de poids en $days jours';
+  }
+
+  @override
+  String triageTestFlagged(String name) {
+    return 'Le résultat $name n\'est pas revenu clair';
+  }
+
+  @override
+  String triageTestExpired(String name, String days) {
+    return 'Le certificat $name a expiré il y a $days jours';
+  }
+
+  @override
+  String triageWhelpingOverdue(String name, String days) {
+    return '$name : mise bas retardée de $days jours';
+  }
 }

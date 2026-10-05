@@ -178,6 +178,27 @@ copying it would ship a broken reference — the PDF pack is where an image belo
 The PIN digest is not in a pack either (it lives in the keystore, not in
 `user_settings`), so a restored file can neither leak it nor lock anybody out.
 
+## Triage
+
+One card on the animal's ledger answers "what now?" from the record alone. Two
+files, and the split between them is what makes the answer testable:
+
+- `core/utils/triage.dart` is the engine: `LedgerFacts` (the animal, its doses,
+  weigh-ins and screenings, the litters it stands on, and `nowMs`), one predicate
+  per `TriageRuleId`, and `evaluateTriage` which applies the table and returns the
+  findings worst-urgency-first. It reads no database, no asset and no clock it was
+  not handed, so every rule is a function call in a test.
+- `assets/triage/rules.json` is the table: which rules are on, how urgent each
+  one is, and every threshold they compare against. `parseRules` refuses a table
+  that disagrees with the engine in either direction (D25).
+
+Above them sit `presentation/providers/triage_providers.dart` — the only file that
+touches `rootBundle` for the table — and `presentation/widgets/triage_card.dart`,
+which takes a `List<TriageFinding>` and renders it, so the wording can be shown to
+a widget test without a database. `core/l10n/triage_labels.dart` holds the switch
+from rule to sentence; it is exhaustive over the enum, which is what stops a new
+rule from shipping with no text in three languages.
+
 ## Routing and the PIN gate
 
 `app_router.dart` holds a `refreshListenable` that subscribes to

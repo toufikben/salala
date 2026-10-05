@@ -602,4 +602,68 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get pdfDisclaimer =>
       'Produced offline by Salala from the breeder\'s own records. This is not a veterinary certificate.';
+
+  @override
+  String get triageTitle => 'What to do next';
+
+  @override
+  String get triageActNow => 'Act now';
+
+  @override
+  String get triageWatch => 'Keep watching';
+
+  @override
+  String get triageRoutineVet => 'Routine vet visit';
+
+  @override
+  String get triageNothing => 'Nothing in this record calls for a next step';
+
+  @override
+  String get triageNotDiagnosis =>
+      'Salala reads only what you typed here. This is not a veterinary diagnosis.';
+
+  @override
+  String triageNoDoseYoung(String days) {
+    return 'No vaccination recorded, at $days days old';
+  }
+
+  @override
+  String triageDoseOverdue(String name, String days) {
+    return '$name was due $days days ago';
+  }
+
+  @override
+  String triageDoseDueSoon(String name, String days) {
+    return '$name is due in $days days';
+  }
+
+  @override
+  String triageWeightLossPuppy(String percent) {
+    return 'A young animal has lost $percent% of its weight since the last weigh-in';
+  }
+
+  @override
+  String triageWeightLoss(String percent) {
+    return 'Weight has fallen $percent% since the last weigh-in';
+  }
+
+  @override
+  String triageNoGainPuppy(String days) {
+    return 'Barely any weight gain over $days days';
+  }
+
+  @override
+  String triageTestFlagged(String name) {
+    return '$name did not come back clear';
+  }
+
+  @override
+  String triageTestExpired(String name, String days) {
+    return 'The $name certificate expired $days days ago';
+  }
+
+  @override
+  String triageWhelpingOverdue(String name, String days) {
+    return '$name: whelping is $days days past the expected date';
+  }
 }

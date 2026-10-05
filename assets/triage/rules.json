@@ -1,0 +1,54 @@
+{
+  "version": 1,
+  "rules": [
+    {
+      "id": "whelping_overdue",
+      "urgency": "actNow",
+      "params": { "graceDays": 1 }
+    },
+    {
+      "id": "no_dose_young",
+      "urgency": "actNow",
+      "params": { "maxAgeDays": 140 }
+    },
+    {
+      "id": "weight_loss_puppy",
+      "urgency": "actNow",
+      "params": { "minPercent": 10, "puppyMaxAgeDays": 180 }
+    },
+    {
+      "id": "weight_loss",
+      "urgency": "watch",
+      "params": { "minPercent": 10, "puppyMaxAgeDays": 180 }
+    },
+    {
+      "id": "no_weight_gain_puppy",
+      "urgency": "watch",
+      "params": {
+        "minGainPercent": 5,
+        "minGapDays": 21,
+        "puppyMaxAgeDays": 180
+      }
+    },
+    {
+      "id": "dose_overdue",
+      "urgency": "routineVet",
+      "params": { "graceDays": 3 }
+    },
+    {
+      "id": "dose_due_soon",
+      "urgency": "routineVet",
+      "params": { "withinDays": 14 }
+    },
+    {
+      "id": "health_test_flagged",
+      "urgency": "routineVet",
+      "params": {}
+    },
+    {
+      "id": "health_test_expired",
+      "urgency": "routineVet",
+      "params": {}
+    }
+  ]
+}

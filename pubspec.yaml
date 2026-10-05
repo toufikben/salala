@@ -73,3 +73,7 @@ flutter:
   # presentation forms — see DECISIONS.md D24. OFL 1.1, licence text beside it.
   assets:
     - assets/fonts/Amiri-Regular.ttf
+    # The triage table. Thresholds, urgency and which rules are on live here so
+    # the answer the screen gives can be retuned without touching the engine that
+    # reads them — see DECISIONS.md D25.
+    - assets/triage/rules.json

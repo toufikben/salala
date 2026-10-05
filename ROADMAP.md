@@ -543,6 +543,25 @@ record for a real animal.
 Gate: the rule table ships with the triage screen; every rule has a test; the
 classifier is behind a measured benchmark or it does not ship.
 
+### Progress, 2026-10-05
+
+- **3a — the rule table and the card: written, `NOT RUN` by CI yet.** Nine rules in
+  `assets/triage/rules.json` over `core/utils/triage.dart`, one card on the
+  animal's ledger, and the explicit non-claim under it. 24 rule and table tests in
+  `test/core/triage_test.dart`, four in `test/presentation/triage_card_test.dart`
+  that pump the real app — including the one that proves the bundle serves the
+  same table the repository holds. D25 records what "rules are data" does and does
+  not buy.
+- The line above says *symptom*→urgency. There is **no symptom record in the
+  schema**, so what shipped is date-and-measurement→urgency: due doses, ages,
+  weight trends, screenings, a whelping that never got written down. A symptom a
+  breeder types is the same data-model decision the feeding plan is, and the
+  classifier below needs that table to exist before it has anything to classify.
+- Breed-specific risk is **not** implemented, and the reason is in D25: `breed` is
+  free text, and a table keyed on breed names asserts a health claim nothing here
+  can check.
+- The classifier has not been started. It stays behind a measured benchmark.
+
 ## Stage 4 — Distribution
 
 Blocked on the business question in `docs/FEASIBILITY.md` §Payments: a Morocco

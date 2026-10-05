@@ -227,5 +227,21 @@
   "pdfPlacedOn": "Placé le",
   "pdfPrice": "Prix",
   "pdfGuarantee": "Conditions de garantie",
-  "pdfDisclaimer": "Établi hors ligne par Salala à partir des registres de l'éleveur. Ce document n'est pas un certificat vétérinaire."
+  "pdfDisclaimer": "Établi hors ligne par Salala à partir des registres de l'éleveur. Ce document n'est pas un certificat vétérinaire.",
+
+  "triageTitle": "Prochaine étape",
+  "triageActNow": "Agir maintenant",
+  "triageWatch": "Surveiller",
+  "triageRoutineVet": "Visite vétérinaire courante",
+  "triageNothing": "Rien dans ce dossier n'appelle une action",
+  "triageNotDiagnosis": "Salala ne lit que ce que vous avez saisi ici. Ceci n'est pas un diagnostic vétérinaire.",
+  "triageNoDoseYoung": "Aucune vaccination enregistrée, à {days} jours",
+  "triageDoseOverdue": "{name} en retard de {days} jours",
+  "triageDoseDueSoon": "{name} prévu dans {days} jours",
+  "triageWeightLossPuppy": "Le jeune animal a perdu {percent}% de poids depuis la dernière pesée",
+  "triageWeightLoss": "Perte de {percent}% depuis la dernière pesée",
+  "triageNoGainPuppy": "Quasi aucune prise de poids en {days} jours",
+  "triageTestFlagged": "Le résultat {name} n'est pas revenu clair",
+  "triageTestExpired": "Le certificat {name} a expiré il y a {days} jours",
+  "triageWhelpingOverdue": "{name} : mise bas retardée de {days} jours"
 }
