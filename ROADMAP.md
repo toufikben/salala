@@ -497,7 +497,7 @@ record for a real animal.
 
 ### Progress, 2026-10-05
 
-- **2a — JSON pack of the whole database: written, `NOT RUN` by CI yet.**
+- **2a — JSON pack of the whole database: green on CI.**
   `services/data_pack.dart` with 41 tests in `test/services/data_pack_test.dart`.
   Run `37369464399` on `a729871` died in the analyzer (three wrong API names);
   run `37370382102` on `cf4b38c` reached the tests and returned **142 passed, 1
@@ -506,15 +506,24 @@ record for a real animal.
   so the query after it waited out the test's 30-second timeout. Fixed by checking
   `PRAGMA foreign_key_check` inside the transaction and throwing while a rollback
   still works.
-- **2b — Settings tiles: written, same verdict.** Export writes the pack, hands it
+- **2b — Settings tiles: green on CI, same verdict.** Export writes the pack, hands it
   to `PackFiles.shareBytes`, and says which file is ready; import opens the system
   picker, names the counts it is about to destroy, replaces on confirmation and
   re-arms the alarms. 11 widget tests in `settings_pack_test.dart` run against real
   SQLite with `FakePackFiles`, so the only unverified part is the share sheet
   itself — that is the device pass.
-- **2c — Buyer PDF: written, `NOT RUN`.** `services/animal_pdf.dart` plus an AppBar
-  action on the animal's page; Amiri bundled (D24); `--dart-define=use_arabic=true`
-  added to both CI steps so the tests build the binary the phone runs.
+- **2c — Buyer PDF: green on CI, `NOT RUN` on a screen.** `services/animal_pdf.dart`
+  plus an AppBar action on the animal's page; Amiri bundled (D24);
+  `--dart-define=use_arabic=true` added to both CI steps so the tests build the
+  binary the phone runs. Two more runs were spent on our own mistakes:
+  `37375010670` (`5dea9da`) failed the analyzer on a type argument
+  `PointChartValue` never had, and `37375844283` (`4a598b4`) reached the tests and
+  returned **153 passed, 4 failed**, all four in the new fixture — a puppy written
+  before its litter row (a real foreign key, see `animal_dao_test`) and a dangling
+  `dam_id` SQLite refuses to insert. Run `37376982174` on `a33364e` passed both
+  jobs, so the writer has produced a document for a full ledger, an empty one, and
+  three languages — as bytes checked for a header and a trailer, not as pages
+  anyone read.
 - The feeding plan still on the Stage 2 list is **not buildable from the current
   schema** — there is no feeding table, so it is a data-model decision, not a PDF
   change. It stays listed until someone decides what a feed record has to hold.
