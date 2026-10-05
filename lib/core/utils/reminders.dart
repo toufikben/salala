@@ -45,27 +45,17 @@ List<Reminder> remindersFor({
   if (dueMs == null) return const <Reminder>[];
   final from = now ?? DateTime.now();
   final due = dayFromMs(dueMs)!;
+  DateTime morning(DateTime day) =>
+      DateTime(day.year, day.month, day.day, reminderHour);
+
   return <Reminder>[
-        (
-          kind: ReminderKind.headsUp,
-          day: due.subtract(const Duration(days: reminderLeadDays)),
-        ),
-        (kind: ReminderKind.dueToday, day: due),
-      ]
-      .map(
-        (candidate) => Reminder(
-          recordId: recordId,
-          kind: candidate.kind,
-          at: DateTime(
-            candidate.day.year,
-            candidate.day.month,
-            candidate.day.day,
-            reminderHour,
-          ),
-        ),
-      )
-      .where((reminder) => reminder.at.isAfter(from))
-      .toList();
+    Reminder(
+      recordId: recordId,
+      kind: ReminderKind.headsUp,
+      at: morning(due.subtract(const Duration(days: reminderLeadDays))),
+    ),
+    Reminder(recordId: recordId, kind: ReminderKind.dueToday, at: morning(due)),
+  ].where((reminder) => reminder.at.isAfter(from)).toList();
 }
 
 /// Android identifies a notification by a 32-bit int, and re-saving a record

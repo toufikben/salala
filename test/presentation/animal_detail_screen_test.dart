@@ -4,10 +4,12 @@ import 'package:salala/data/models/animal.dart';
 import 'package:salala/data/models/health_test.dart';
 import 'package:salala/data/models/vaccination.dart';
 import 'package:salala/data/models/vet_visit.dart';
+import 'package:salala/core/utils/date_utils.dart';
+import 'package:salala/core/utils/reminders.dart';
 import 'package:salala/data/models/weight_entry.dart';
 import 'package:salala/presentation/screens/animal_detail_screen.dart';
 
-import '../helpers/fake_reminder_scheduler.dart';
+import '../helpers/fake_notification_writer.dart';
 import '../helpers/pump_app.dart';
 
 /// An animal with a fixed id: the record rows seed under it by foreign key, so
@@ -138,8 +140,12 @@ void main() {
     tester,
   ) async {
     _usePhoneViewport(tester);
-    final reminders = FakeReminderScheduler();
-    await pumpSalala(tester, reminders: reminders, seed: <Animal>[_nala()]);
+    final notifications = FakeNotificationWriter();
+    await pumpSalala(
+      tester,
+      notifications: notifications,
+      seed: <Animal>[_nala()],
+    );
     await _openNala(tester);
 
     await _tap(tester, find.widgetWithText(TextButton, 'Add vaccination'));
@@ -155,25 +161,22 @@ void main() {
     // A dose given today with no next-due date is not overdue.
     expect(find.text('Overdue'), findsNothing);
 
-    // And nothing is handed to the operating system either: the reminder needs a
-    // date to be early about. The call is still made, because saving a dose that
-    // lost its due date has to clear the alarm it used to have.
-    expect(reminders.replacements, hasLength(1));
-    expect(reminders.replacements.single.dueMs, isNull);
-    expect(reminders.replacements.single.title, 'Nala');
+    // And it gets no alarm either: a reminder needs a date to be early about.
+    expect(notifications.written, isEmpty);
   });
 
-  testWidgets('saving a booked dose hands its due date to the reminders', (
+  testWidgets('saving a dose books its due morning on the phone', (
     tester,
   ) async {
     _usePhoneViewport(tester);
-    final reminders = FakeReminderScheduler();
-    // Re-saving a dose that is already booked is the ordinary case: the breeder
-    // corrects the vaccine name a week later and the booking must survive it.
+    final notifications = FakeNotificationWriter();
+    // Twenty days out is inside the month-ahead window, so only the due morning
+    // itself is still to come.
     final due = _daysAhead(20);
+    final dueDay = dayFromMs(due)!;
     await pumpSalala(
       tester,
-      reminders: reminders,
+      notifications: notifications,
       seed: <Animal>[_nala()],
       seedVaccinations: <Vaccination>[
         _dose(name: 'Distemper', administered: _daysAgo(10), nextDue: due),
@@ -184,26 +187,29 @@ void main() {
     await _tap(tester, find.text('Distemper'));
     await _save(tester);
 
-    expect(reminders.replacements, hasLength(1));
-    final request = reminders.replacements.single;
-    expect(request.what, 'Distemper');
-    expect(request.title, 'Nala');
-    expect(request.dueMs, due);
-    expect(request.dueDay, isNotEmpty);
-    // The dose was written before the alarm was scheduled, so it has a real id by
-    // then — an empty one here would mean every reminder was filed against
-    // nothing and no edit could ever clear it.
-    expect(request.recordId, isNotEmpty);
+    expect(notifications.written, hasLength(1));
+    final alarm = notifications.written.single;
+    // Titled with the animal, because a breeder with thirty dogs cannot act on a
+    // message that says only that something is due.
+    expect(alarm.title, 'Nala');
+    expect(alarm.body, contains('Distemper'));
+    expect(
+      [alarm.at.year, alarm.at.month, alarm.at.day],
+      [dueDay.year, dueDay.month, dueDay.day],
+    );
+    expect(alarm.at.hour, reminderHour);
+    // The placeholders were filled before the copy left the app.
+    expect(alarm.body, isNot(contains('{')));
   });
 
-  testWidgets('deleting a booked dose cancels what it scheduled', (
+  testWidgets('a dose due further out is also announced a month ahead', (
     tester,
   ) async {
     _usePhoneViewport(tester);
-    final reminders = FakeReminderScheduler();
+    final notifications = FakeNotificationWriter();
     await pumpSalala(
       tester,
-      reminders: reminders,
+      notifications: notifications,
       seed: <Animal>[_nala()],
       seedVaccinations: <Vaccination>[
         _dose(
@@ -217,23 +223,54 @@ void main() {
 
     await _tap(tester, find.text('Parvo'));
     await _save(tester);
-    // Opening the dose and saving it unchanged is what schedules the reminder, so
-    // the id it was filed under is now known.
-    final scheduled = reminders.replacements.single.recordId;
-    expect(scheduled, isNotEmpty);
 
-    await _tap(tester, find.text('Parvo'));
+    expect(notifications.written, hasLength(2));
+    final headsUp = notifications.written.first.at;
+    final dueMorning = notifications.written.last.at;
+    final daysApart = dueMorning.difference(headsUp).inDays;
+    expect(daysApart, reminderLeadDays);
+  });
+
+  testWidgets('deleting a booked dose clears exactly the alarms it booked', (
+    tester,
+  ) async {
+    _usePhoneViewport(tester);
+    final notifications = FakeNotificationWriter();
+    await pumpSalala(
+      tester,
+      notifications: notifications,
+      seed: <Animal>[_nala()],
+      seedVaccinations: <Vaccination>[
+        _dose(
+          name: 'Lepto',
+          administered: _daysAgo(3),
+          nextDue: _daysAhead(45),
+        ),
+      ],
+    );
+    await _openNala(tester);
+
+    await _tap(tester, find.text('Lepto'));
+    await _save(tester);
+    // Saving clears the record's own ids before writing them again, so the ids
+    // the alarms ended up under are known here.
+    final booked = notifications.written.map((a) => a.id).toList();
+    expect(booked, hasLength(2));
+
+    await _tap(tester, find.text('Lepto'));
     await _tap(tester, find.byIcon(Icons.delete_outline));
     expect(find.text('Delete this record?'), findsOneWidget);
     await tester.tap(find.widgetWithText(FilledButton, 'Delete'));
     await settleRealIo(tester);
     await settleRealIo(tester);
 
-    expect(find.text('Parvo'), findsNothing);
+    expect(find.text('Lepto'), findsNothing);
     // The row is gone, so an alarm for it would be a message about nothing — and
-    // the cancellation names the very id the alarm was filed under, which is the
-    // only reason a delete can reach it.
-    expect(reminders.cancellations, <String>[scheduled]);
+    // the delete reaches exactly the two alarms the booking wrote, no others.
+    expect(
+      notifications.cleared.sublist(notifications.cleared.length - 2),
+      booked,
+    );
   });
 
   testWidgets('a dose whose due date passed is badged overdue', (tester) async {

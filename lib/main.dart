@@ -27,7 +27,7 @@ Future<void> main() async {
   // timezone pin are both settled by the time a dose can be saved. The single
   // instance is handed to the tree: a second, unbootstrapped scheduler would
   // throw on its first schedule call.
-  final reminders = ReminderScheduler();
+  final reminders = ReminderScheduler(PluginNotifications());
   try {
     await reminders.bootstrap();
   } catch (error) {

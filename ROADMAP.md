@@ -335,14 +335,19 @@ What is in it:
   manifest. Gradle: core-library desugaring switched on, which the plugin has
   required since v10 for `java.time` on older APIs.
 - Tests: the date policy and id folding are covered directly
-  (`test/core/reminders_test.dart`, 12 cases), and `ReminderScheduler` itself is
-  run against a plugin object whose channel is replaced by a recorder
-  (`test/services/reminder_scheduler_test.dart`, 8 cases) — that is what proves
-  two alarms are written per due date, at 09:00 in the pinned zone, inexact, with
-  the stale ones cancelled *before* the new ones, and in the language on screen.
-  Three widget tests now assert what the interface *handed over* (the animal name,
-  the dose name, the exact due millis, and that a delete names the same id the
-  schedule used). No test ever talks to a real notification channel.
+  (`test/core/reminders_test.dart`, 12 cases). The scheduler is reached through a
+  seam the app owns — `abstract class NotificationWriter`, implemented in
+  production by `PluginNotifications` — because the plugin's own constructor is a
+  `factory` and so cannot be subclassed: the first CI run proved that by refusing
+  to compile a test that tried. So `test/services/reminder_scheduler_test.dart`
+  (9 cases) runs the real scheduling rules over `FakeNotificationWriter`, which is
+  what shows two alarms per due date, at 09:00 in the pinned zone, inexact, with
+  the stale ids cleared *before* the new ones are written, and in the language on
+  screen. Four widget tests drive the same real scheduler through the form: a dose
+  with no due date books nothing, a dose 20 days out books only its due morning
+  under the animal's name, a dose 45 days out books two alarms exactly
+  `reminderLeadDays` apart, and deleting a booked dose clears precisely the two ids
+  that booking wrote. No test ever talks to a real notification channel.
 
 **Verification status: NOT RUN.** Nothing here has been analysed, tested, built
 or installed. The three things that can only be settled elsewhere: CI for

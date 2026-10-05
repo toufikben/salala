@@ -11,9 +11,12 @@ import 'package:salala/data/models/vet_visit.dart';
 import 'package:salala/data/models/weight_entry.dart';
 import 'package:salala/presentation/providers/app_providers.dart';
 import 'package:salala/services/app_lock_service.dart';
+import 'package:salala/services/reminder_scheduler.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:timezone/data/latest_all.dart' as tz_data;
+import 'package:timezone/timezone.dart' as tz;
 
-import 'fake_reminder_scheduler.dart';
+import 'fake_notification_writer.dart';
 import 'fake_secure_storage.dart';
 import 'test_db.dart';
 
@@ -64,7 +67,7 @@ Future<FakeSecureStorage> pumpSalala(
   WidgetTester tester, {
   Locale? locale,
   bool hasPin = false,
-  FakeReminderScheduler? reminders,
+  FakeNotificationWriter? notifications,
   List<Animal> seed = const <Animal>[],
   List<Vaccination> seedVaccinations = const <Vaccination>[],
   List<WeightEntry> seedWeights = const <WeightEntry>[],
@@ -78,10 +81,21 @@ Future<FakeSecureStorage> pumpSalala(
   // throws on the first date a widget test asks a reminder to render.
   await initializeDateFormatting();
 
-  // The provider refuses a default instance on purpose — an unbootstrapped
-  // plugin throws on the first schedule call — so every boot needs a fake, and
-  // a test that cares about what was scheduled passes its own and reads it back.
-  final scheduler = reminders ?? FakeReminderScheduler();
+  // The scheduling rules are the app's own code, so widget tests run them for
+  // real and only the writer below stands in for the phone. `timezone` refuses
+  // to convert any instant until its tables are loaded, which `bootstrap()` does
+  // in the app and cannot do here because the timezone lookup is a channel call.
+  // UTC because the runner's own clock is UTC: pinning another zone would make
+  // the wall-clock times below drift with the machine the tests ran on.
+  tz_data.initializeTimeZones();
+  tz.setLocalLocation(tz.getLocation('UTC'));
+
+  // The provider refuses a default instance on purpose: an unbootstrapped plugin
+  // throws on the first schedule call. Every test therefore gets the real
+  // scheduler over a writer that records instead of delivering, and one that
+  // cares about the alarms passes its own writer and reads it back.
+  final writer = notifications ?? FakeNotificationWriter();
+  final scheduler = ReminderScheduler(writer);
 
   await tester.runAsync(() async {
     database = await openTestDatabase();
