@@ -388,6 +388,12 @@ abstract class AppLocalizations {
   /// **'Clear'**
   String get actionClear;
 
+  /// No description provided for @actionReplace.
+  ///
+  /// In en, this message translates to:
+  /// **'Replace'**
+  String get actionReplace;
+
   /// No description provided for @lockTitle.
   ///
   /// In en, this message translates to:
@@ -502,11 +508,89 @@ abstract class AppLocalizations {
   /// **'Export records'**
   String get settingsExport;
 
-  /// No description provided for @settingsExportSoon.
+  /// No description provided for @settingsExportBody.
   ///
   /// In en, this message translates to:
-  /// **'PDF and JSON export arrive in Phase 2.'**
-  String get settingsExportSoon;
+  /// **'One JSON file with every record on this phone'**
+  String get settingsExportBody;
+
+  /// No description provided for @settingsImport.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore from a pack'**
+  String get settingsImport;
+
+  /// No description provided for @settingsImportBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Read a pack back onto this phone'**
+  String get settingsImportBody;
+
+  /// No description provided for @packShared.
+  ///
+  /// In en, this message translates to:
+  /// **'{file} is ready to send'**
+  String packShared(String file);
+
+  /// No description provided for @packShareFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'The pack could not be written on this phone'**
+  String get packShareFailed;
+
+  /// No description provided for @packReadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'That file could not be opened'**
+  String get packReadFailed;
+
+  /// No description provided for @packNotAPack.
+  ///
+  /// In en, this message translates to:
+  /// **'That file is not a Salala pack, or it is damaged'**
+  String get packNotAPack;
+
+  /// No description provided for @packFromTheFuture.
+  ///
+  /// In en, this message translates to:
+  /// **'That pack comes from a newer Salala than this one'**
+  String get packFromTheFuture;
+
+  /// No description provided for @packIncomplete.
+  ///
+  /// In en, this message translates to:
+  /// **'That pack is missing part of the ledger: {table}'**
+  String packIncomplete(String table);
+
+  /// No description provided for @packUnknownTable.
+  ///
+  /// In en, this message translates to:
+  /// **'That pack holds a table this Salala does not know: {table}'**
+  String packUnknownTable(String table);
+
+  /// No description provided for @packRestoreTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Replace everything on this phone?'**
+  String get packRestoreTitle;
+
+  /// Labelled counts instead of a sentence: the numbers range from one animal to hundreds, and no language here agrees them all. The placeholder order below is the generated method's argument order.
+  ///
+  /// In en, this message translates to:
+  /// **'From {day}. Animals: {animals}. Records: {rows}. Restoring replaces everything that is on this phone now.'**
+  String packRestoreBody(int animals, int rows, String day);
+
+  /// No description provided for @packRestored.
+  ///
+  /// In en, this message translates to:
+  /// **'Records restored: {rows}'**
+  String packRestored(int rows);
+
+  /// No description provided for @packRestoreFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'The pack could not be restored. Nothing on this phone changed.'**
+  String get packRestoreFailed;
 
   /// No description provided for @litterAdd.
   ///

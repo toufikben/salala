@@ -167,6 +167,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get actionClear => 'Effacer';
 
   @override
+  String get actionReplace => 'Remplacer';
+
+  @override
   String get lockTitle => 'Salala est verrouillé';
 
   @override
@@ -226,7 +229,60 @@ class AppLocalizationsFr extends AppLocalizations {
   String get settingsExport => 'Exporter les dossiers';
 
   @override
-  String get settingsExportSoon => 'L\'export PDF et JSON arrive en phase 2.';
+  String get settingsExportBody =>
+      'Un fichier JSON avec tous les enregistrements de ce téléphone';
+
+  @override
+  String get settingsImport => 'Restaurer un pack';
+
+  @override
+  String get settingsImportBody => 'Relire un pack sur ce téléphone';
+
+  @override
+  String packShared(String file) {
+    return '$file est prêt à envoyer';
+  }
+
+  @override
+  String get packShareFailed => 'Impossible d\'écrire le pack sur ce téléphone';
+
+  @override
+  String get packReadFailed => 'Impossible d\'ouvrir ce fichier';
+
+  @override
+  String get packNotAPack =>
+      'Ce fichier n\'est pas un pack Salala, ou il est endommagé';
+
+  @override
+  String get packFromTheFuture =>
+      'Ce pack vient d\'une version plus récente de Salala';
+
+  @override
+  String packIncomplete(String table) {
+    return 'Il manque une partie du dossier dans ce pack : $table';
+  }
+
+  @override
+  String packUnknownTable(String table) {
+    return 'Ce pack contient une table que Salala ne connaît pas : $table';
+  }
+
+  @override
+  String get packRestoreTitle => 'Remplacer tout ce qui est sur ce téléphone ?';
+
+  @override
+  String packRestoreBody(int animals, int rows, String day) {
+    return 'Du $day. Animaux : $animals. Enregistrements : $rows. La restauration remplacera tout ce qui est sur ce téléphone.';
+  }
+
+  @override
+  String packRestored(int rows) {
+    return 'Enregistrements restaurés : $rows';
+  }
+
+  @override
+  String get packRestoreFailed =>
+      'Le pack n\'a pas pu être restauré. Rien n\'a changé sur ce téléphone.';
 
   @override
   String get litterAdd => 'Nouvelle portée';

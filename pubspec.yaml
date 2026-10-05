@@ -43,6 +43,13 @@ dependencies:
   flutter_timezone: ^5.1.1
   timezone: ^0.11.0
 
+  # Transfer pack (Stage 2). The pack itself is plain JSON written from the
+  # database; these two only move bytes: `share_plus` hands the file to another
+  # app, `file_selector` reads one back. No cloud storage package exists here on
+  # purpose — the backup leaves the phone through the breeder's own hands.
+  share_plus: ^13.3.1
+  file_selector: ^1.1.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

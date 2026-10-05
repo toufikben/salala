@@ -3,6 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/build_info.dart';
 import '../../core/l10n/app_localizations.dart';
+import '../../core/utils/date_utils.dart';
+import '../../services/data_pack.dart';
+import '../../services/reminder_resync.dart';
 import '../providers/app_providers.dart';
 import '../widgets/pin_dialogs.dart';
 import '../widgets/salala_nav_bar.dart';
@@ -23,11 +26,8 @@ class SettingsScreen extends ConsumerWidget {
           const _AppLockTile(),
           const _LanguageTile(),
           const Divider(height: 32),
-          ListTile(
-            leading: const Icon(Icons.ios_share),
-            title: Text(l10n.settingsExport),
-            subtitle: Text(l10n.settingsExportSoon),
-          ),
+          const _PackTiles(),
+          const Divider(height: 32),
           ListTile(
             leading: const Icon(Icons.workspace_premium_outlined),
             title: Text(l10n.settingsAbout),
@@ -134,3 +134,149 @@ class _LanguageTileState extends ConsumerState<_LanguageTile> {
     _ => l10n.settingsLanguageSystem,
   };
 }
+
+/// The transfer pack (Stage 2): every record on this phone out as one JSON file,
+/// and back.
+///
+/// Export leaves the phone only through the breeder's own hands — the system
+/// share sheet, no account, nothing uploaded — which is the whole promise of an
+/// offline app: the backup is theirs, not ours.
+///
+/// Import is the dangerous direction, so it names the counts it is about to
+/// destroy and asks before it wipes anything.
+class _PackTiles extends ConsumerWidget {
+  const _PackTiles();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+
+    return Column(
+      children: <Widget>[
+        ListTile(
+          leading: const Icon(Icons.ios_share),
+          title: Text(l10n.settingsExport),
+          subtitle: Text(l10n.settingsExportBody),
+          onTap: () => _exportPack(context, ref),
+        ),
+        ListTile(
+          leading: const Icon(Icons.upload_file),
+          title: Text(l10n.settingsImport),
+          subtitle: Text(l10n.settingsImportBody),
+          onTap: () => _importPack(context, ref),
+        ),
+      ],
+    );
+  }
+}
+
+Future<void> _exportPack(BuildContext context, WidgetRef ref) async {
+  final l10n = AppLocalizations.of(context);
+  final messenger = ScaffoldMessenger.of(context);
+
+  try {
+    final json = encodePack(await packFrom(ref.read(databaseProvider)));
+    final name = await ref
+        .read(packFilesProvider)
+        .share(json, now: DateTime.now());
+    messenger.showSnackBar(SnackBar(content: Text(l10n.packShared(name))));
+  } catch (error) {
+    // A phone that refuses the share sheet still shows the ledger; the failure
+    // leaves a trace instead of a spinner.
+    debugPrint('Pack export failed: $error');
+    messenger.showSnackBar(SnackBar(content: Text(l10n.packShareFailed)));
+  }
+}
+
+Future<void> _importPack(BuildContext context, WidgetRef ref) async {
+  final l10n = AppLocalizations.of(context);
+  final localeTag = Localizations.localeOf(context).toString();
+  final messenger = ScaffoldMessenger.of(context);
+  final db = ref.read(databaseProvider);
+  final files = ref.read(packFilesProvider);
+
+  final String? text;
+  try {
+    text = await files.pick();
+  } catch (error) {
+    debugPrint('Pack file could not be opened: $error');
+    messenger.showSnackBar(SnackBar(content: Text(l10n.packReadFailed)));
+    return;
+  }
+  // Backing out of the file picker is the breeder's own decision, not a fault,
+  // so it ends here without a message.
+  if (text == null) return;
+
+  final PackRows pack;
+  try {
+    pack = parsePack(text);
+  } on PackReject catch (reject) {
+    messenger.showSnackBar(SnackBar(content: Text(_whyRejected(l10n, reject))));
+    return;
+  }
+
+  if (!context.mounted) return;
+  final confirmed = await showDialog<bool>(
+    context: context,
+    builder: (dialogContext) => AlertDialog(
+      title: Text(l10n.packRestoreTitle),
+      content: Text(
+        l10n.packRestoreBody(
+          pack.countOf('animals'),
+          pack.totalRows,
+          formatDayFor(localeTag, pack.exportedAtMs),
+        ),
+      ),
+      actions: <Widget>[
+        TextButton(
+          onPressed: () => Navigator.of(dialogContext).pop(false),
+          child: Text(l10n.actionCancel),
+        ),
+        FilledButton(
+          onPressed: () => Navigator.of(dialogContext).pop(true),
+          child: Text(l10n.actionReplace),
+        ),
+      ],
+    ),
+  );
+  if (confirmed != true) return;
+
+  try {
+    await restorePack(db, pack);
+  } catch (error) {
+    // The transaction is what failed, so the rows that were here are still here
+    // and the message can say so out loud.
+    debugPrint('Pack restore failed: $error');
+    messenger.showSnackBar(SnackBar(content: Text(l10n.packRestoreFailed)));
+    return;
+  }
+
+  // The phone holds a different ledger now. Two things were derived from the
+  // rows that used to be here — the lists on screen and the alarms booked off
+  // them — and nothing on screen would tell the breeder that either moved.
+  try {
+    await resyncReminders(
+      ref.read(reminderSchedulerProvider),
+      daos: ref.read(daosProvider),
+      l10n: l10n,
+      dueDayText: (ms) => formatDayFor(localeTag, ms),
+    );
+  } catch (error) {
+    // The records are back; that is the win. A phone that refuses alarms must
+    // not be reported as a failed restore.
+    debugPrint('Reminder resync after a restore failed: $error');
+  }
+  await ref.read(animalsProvider.notifier).refresh();
+  await ref.read(littersProvider.notifier).refresh();
+  messenger.showSnackBar(
+    SnackBar(content: Text(l10n.packRestored(pack.totalRows))),
+  );
+}
+
+String _whyRejected(AppLocalizations l10n, PackReject reject) =>
+    switch (reject.problem) {
+      PackProblem.fromTheFuture => l10n.packFromTheFuture,
+      PackProblem.missingTable => l10n.packIncomplete(reject.detail),
+      PackProblem.unknownTable => l10n.packUnknownTable(reject.detail),
+      PackProblem.unreadable || PackProblem.notAPack => l10n.packNotAPack,
+    };

@@ -71,6 +71,7 @@
   "actionClose": "Close",
   "actionRetry": "Try again",
   "actionClear": "Clear",
+  "actionReplace": "Replace",
 
   "lockTitle": "Salala is locked",
   "lockEnterPin": "Enter your PIN",
@@ -92,7 +93,40 @@
   "settingsBuildTag": "Build",
   "settingsOfflineNote": "Everything is stored on this device. No account, no server, no tracking.",
   "settingsExport": "Export records",
-  "settingsExportSoon": "PDF and JSON export arrive in Phase 2.",
+  "settingsExportBody": "One JSON file with every record on this phone",
+  "settingsImport": "Restore from a pack",
+  "settingsImportBody": "Read a pack back onto this phone",
+  "packShared": "{file} is ready to send",
+  "@packShared": {
+    "placeholders": { "file": { "type": "String" } }
+  },
+  "packShareFailed": "The pack could not be written on this phone",
+  "packReadFailed": "That file could not be opened",
+  "packNotAPack": "That file is not a Salala pack, or it is damaged",
+  "packFromTheFuture": "That pack comes from a newer Salala than this one",
+  "packIncomplete": "That pack is missing part of the ledger: {table}",
+  "@packIncomplete": {
+    "placeholders": { "table": { "type": "String" } }
+  },
+  "packUnknownTable": "That pack holds a table this Salala does not know: {table}",
+  "@packUnknownTable": {
+    "placeholders": { "table": { "type": "String" } }
+  },
+  "packRestoreTitle": "Replace everything on this phone?",
+  "packRestoreBody": "From {day}. Animals: {animals}. Records: {rows}. Restoring replaces everything that is on this phone now.",
+  "@packRestoreBody": {
+    "description": "Labelled counts instead of a sentence: the numbers range from one animal to hundreds, and no language here agrees them all. The placeholder order below is the generated method's argument order.",
+    "placeholders": {
+      "animals": { "type": "int" },
+      "rows": { "type": "int" },
+      "day": { "type": "String" }
+    }
+  },
+  "packRestored": "Records restored: {rows}",
+  "@packRestored": {
+    "placeholders": { "rows": { "type": "int" } }
+  },
+  "packRestoreFailed": "The pack could not be restored. Nothing on this phone changed.",
 
   "litterAdd": "New litter",
   "litterAddTitle": "Register a litter",

@@ -167,6 +167,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get actionClear => 'Clear';
 
   @override
+  String get actionReplace => 'Replace';
+
+  @override
   String get lockTitle => 'Salala is locked';
 
   @override
@@ -226,7 +229,59 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsExport => 'Export records';
 
   @override
-  String get settingsExportSoon => 'PDF and JSON export arrive in Phase 2.';
+  String get settingsExportBody =>
+      'One JSON file with every record on this phone';
+
+  @override
+  String get settingsImport => 'Restore from a pack';
+
+  @override
+  String get settingsImportBody => 'Read a pack back onto this phone';
+
+  @override
+  String packShared(String file) {
+    return '$file is ready to send';
+  }
+
+  @override
+  String get packShareFailed => 'The pack could not be written on this phone';
+
+  @override
+  String get packReadFailed => 'That file could not be opened';
+
+  @override
+  String get packNotAPack => 'That file is not a Salala pack, or it is damaged';
+
+  @override
+  String get packFromTheFuture =>
+      'That pack comes from a newer Salala than this one';
+
+  @override
+  String packIncomplete(String table) {
+    return 'That pack is missing part of the ledger: $table';
+  }
+
+  @override
+  String packUnknownTable(String table) {
+    return 'That pack holds a table this Salala does not know: $table';
+  }
+
+  @override
+  String get packRestoreTitle => 'Replace everything on this phone?';
+
+  @override
+  String packRestoreBody(int animals, int rows, String day) {
+    return 'From $day. Animals: $animals. Records: $rows. Restoring replaces everything that is on this phone now.';
+  }
+
+  @override
+  String packRestored(int rows) {
+    return 'Records restored: $rows';
+  }
+
+  @override
+  String get packRestoreFailed =>
+      'The pack could not be restored. Nothing on this phone changed.';
 
   @override
   String get litterAdd => 'New litter';

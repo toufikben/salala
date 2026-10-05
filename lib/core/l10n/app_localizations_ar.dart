@@ -170,6 +170,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get actionClear => 'مسح';
 
   @override
+  String get actionReplace => 'استبدال';
+
+  @override
   String get lockTitle => 'سلالة مقفل';
 
   @override
@@ -229,7 +232,57 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settingsExport => 'تصدير السجلات';
 
   @override
-  String get settingsExportSoon => 'تصدير PDF و JSON يأتي في المرحلة الثانية.';
+  String get settingsExportBody => 'ملف JSON واحد فيه كل سجلات هذا الهاتف';
+
+  @override
+  String get settingsImport => 'استرجاع من حزمة';
+
+  @override
+  String get settingsImportBody => 'قراءة حزمة وإرجاعها إلى هذا الهاتف';
+
+  @override
+  String packShared(String file) {
+    return '$file جاهز للإرسال';
+  }
+
+  @override
+  String get packShareFailed => 'لم يمكن كتابة الحزمة على هذا الهاتف';
+
+  @override
+  String get packReadFailed => 'لم يمكن فتح هذا الملف';
+
+  @override
+  String get packNotAPack => 'هذا الملف ليس حزمة سلالة أو أنه تالف';
+
+  @override
+  String get packFromTheFuture => 'هذه الحزمة من نسخة سلالة أحدث من هذه النسخة';
+
+  @override
+  String packIncomplete(String table) {
+    return 'تنقص هذه الحزمة جزء من السجلات: $table';
+  }
+
+  @override
+  String packUnknownTable(String table) {
+    return 'تحتوي هذه الحزمة على جدول لا تعرفه سلالة: $table';
+  }
+
+  @override
+  String get packRestoreTitle => 'استبدال كل شيء على هذا الهاتف؟';
+
+  @override
+  String packRestoreBody(int animals, int rows, String day) {
+    return 'من $day. الحيوانات: $animals. السجلات: $rows. الاسترجاع يستبدل كل ما على هذا الهاتف الآن.';
+  }
+
+  @override
+  String packRestored(int rows) {
+    return 'عدد السجلات المسترجعة: $rows';
+  }
+
+  @override
+  String get packRestoreFailed =>
+      'لم يمكن استرجاع الحزمة. لم يتغير شيء على هذا الهاتف.';
 
   @override
   String get litterAdd => 'ولادة جديدة';

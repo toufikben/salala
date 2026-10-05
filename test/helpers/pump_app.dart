@@ -17,6 +17,7 @@ import 'package:timezone/data/latest_all.dart' as tz_data;
 import 'package:timezone/timezone.dart' as tz;
 
 import 'fake_notification_writer.dart';
+import 'fake_pack_files.dart';
 import 'fake_secure_storage.dart';
 import 'test_db.dart';
 
@@ -106,6 +107,8 @@ Future<FakeSecureStorage> pumpSalala(
   Locale? locale,
   bool hasPin = false,
   FakeNotificationWriter? notifications,
+  // The share sheet and the file picker, which no test runner can answer.
+  FakePackFiles? packFiles,
   // Whether opening the app rebuilds the alarms from the ledger, which is what
   // a real launch does. Off by default: a test about saving one dose should not
   // also be handed the alarms that opening the list booked for it. The launch
@@ -170,6 +173,7 @@ Future<FakeSecureStorage> pumpSalala(
         appLockProvider.overrideWithValue(AppLockService(storage: storage)),
         hasPinProvider.overrideWith(() => SeededHasPin(hasPin)),
         reminderSchedulerProvider.overrideWithValue(scheduler),
+        if (packFiles != null) packFilesProvider.overrideWithValue(packFiles),
         if (!resyncOnLaunch)
           remindersResyncProvider.overrideWith(AlreadyResynced.new),
         if (locale != null) initialLocaleProvider.overrideWithValue(locale),

@@ -7,6 +7,7 @@ import '../../data/db/settings_dao.dart';
 import '../../data/models/animal.dart';
 import '../../data/models/litter.dart';
 import '../../services/app_lock_service.dart';
+import '../../services/pack_files.dart';
 import '../../services/reminder_scheduler.dart';
 
 /// The opened database. `main()` overrides this after `ensureInitialized`, and
@@ -52,6 +53,10 @@ final settingsDaoProvider = Provider<SettingsDao>(
 );
 
 final appLockProvider = Provider<AppLockService>((ref) => AppLockService());
+
+/// The share sheet and the file picker. Tests hand in a recorder, because the
+/// real one talks to Android.
+final packFilesProvider = Provider<PackFiles>((ref) => const SystemPackFiles());
 
 /// True once the PIN gate has been satisfied (or never armed). The router
 /// redirects on this, so it is a synchronous flag, not the async digest check.
