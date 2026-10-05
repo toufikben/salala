@@ -182,5 +182,19 @@
   "visitCost": "التكلفة",
   "visitCostInvalid": "أدخل مبلغاً مثل 250",
   "visitCurrency": "العملة",
-  "visitDeleteBody": "تُحذف هذه الزيارة من سجل الحيوان. لا يمكن التراجع عن ذلك."
+  "visitDeleteBody": "تُحذف هذه الزيارة من سجل الحيوان. لا يمكن التراجع عن ذلك.",
+
+  "reminderHeadsUpBody": "تنبيه: {what} مستحق في {dueDay}",
+  "@reminderHeadsUpBody": {
+    "placeholders": {
+      "what": { "type": "String" },
+      "dueDay": { "type": "String" }
+    }
+  },
+  "reminderDueBody": "{what} مستحق اليوم",
+  "@reminderDueBody": {
+    "placeholders": {
+      "what": { "type": "String" }
+    }
+  }
 }

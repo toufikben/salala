@@ -35,6 +35,14 @@ dependencies:
   # Localization
   intl: any
 
+  # Reminders. A dose due in thirty days is only worth anything if the breeder
+  # is told without opening the app, so the alarm is handed to the operating
+  # system. `timezone` is declared rather than borrowed transitively because
+  # `zonedSchedule` takes a TZDateTime straight from it.
+  flutter_local_notifications: ^22.3.1
+  flutter_timezone: ^5.1.1
+  timezone: ^0.11.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

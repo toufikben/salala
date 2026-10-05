@@ -297,11 +297,64 @@ the first verdict a change gets and the device is the second.
      Moroccan breeder reads both fine, so this is a polish call, not a defect;
      deciding it means picking one system for the whole screen.
 
-Still open in Stage 1: the numeral-system call above (finding 6, cosmetic), the
-30-day reminder scheduler — which needs a
-`flutter_local_notifications` spike, not an argument — and `es`/`de` `.arb`
-files once the copy settles. Findings 1–5 are fixed in `6c874cd` and were
-re-checked on the device.
+Still open in Stage 1: the numeral-system call above (finding 6, cosmetic) and
+`es`/`de` `.arb` files once the copy settles. Findings 1–5 are fixed in `6c874cd`
+and were re-checked on the device.
+
+### 1d — The 30-day reminder (spike, NOT RUN yet)
+
+The last Stage 1 gate item was a claim the code had never made: telling the
+breeder *without the app being open*. That needs the operating system to hold an
+alarm, so it was built as a spike against the real plugin rather than argued
+about.
+
+What is in it:
+
+- `lib/core/utils/reminders.dart` — the policy, pure Dart: two moments per due
+  date (30 days ahead, and the due morning at 09:00 local), anything already in
+  the past dropped rather than delivered late, and a stable 32-bit notification
+  id derived from the record's uuid so re-saving a dose replaces its own alarms
+  instead of stacking copies.
+- `lib/services/reminder_scheduler.dart` — the only file that touches
+  `flutter_local_notifications`. Channel `salala_reminders`; the phone's own
+  timezone pinned through `flutter_timezone` before anything is scheduled, or a
+  nine-in-the-morning note wakes a breeder at midnight;
+  `AndroidScheduleMode.inexactAllowWhileIdle` deliberately, because an exact
+  alarm needs `SCHEDULE_EXACT_ALARM` and a Play policy audit for a message whose
+  only deadline is "that morning" is not worth it.
+- The forms call it: saving a dose or a screening replaces its reminders, deleting
+  cancels them, and the notification is titled with the animal's name and carries
+  the localized body (`reminderHeadsUpBody` / `reminderDueBody` in `en`, `ar`,
+  `fr`). Scheduling happens after the database write, so a record is never lost
+  because a notification failed.
+- `main()` bootstraps one scheduler before the first frame and injects it, inside
+  a `try` — a phone that refuses notifications still opens the ledger.
+- Manifest: `RECEIVE_BOOT_COMPLETED` plus the plugin's two receivers declared by
+  hand (the plugin stopped merging them in at v16, and without them a scheduled
+  reminder simply never arrives). `POST_NOTIFICATIONS` is left to the plugin's own
+  manifest. Gradle: core-library desugaring switched on, which the plugin has
+  required since v10 for `java.time` on older APIs.
+- Tests: the date policy and id folding are covered directly
+  (`test/core/reminders_test.dart`, 12 cases), and `ReminderScheduler` itself is
+  run against a plugin object whose channel is replaced by a recorder
+  (`test/services/reminder_scheduler_test.dart`, 8 cases) — that is what proves
+  two alarms are written per due date, at 09:00 in the pinned zone, inexact, with
+  the stale ones cancelled *before* the new ones, and in the language on screen.
+  Three widget tests now assert what the interface *handed over* (the animal name,
+  the dose name, the exact due millis, and that a delete names the same id the
+  schedule used). No test ever talks to a real notification channel.
+
+**Verification status: NOT RUN.** Nothing here has been analysed, tested, built
+or installed. The three things that can only be settled elsewhere: CI for
+`analyze --fatal-infos` + `flutter test`; the phone for whether an alarm is
+actually held by the system (`dumpsys alarm | grep salala`) after a dose is
+booked; and the next morning for whether it is actually delivered — which stays
+open until a screenshot of a real notification exists. Realme/ColorOS is also
+known to kill background alarms aggressively (dontkillmyapp.com), so "no
+notification" on this device would need to be read as a battery-policy result,
+not as proof the scheduling is broken.
+
+Gate: reminders firing on the phone inside the window — **not met yet**.
 
 Gate: every record type creatable, editable, deletable on the device — **met**
 (weigh-ins by delete-and-relog, as designed) for all four record types and the

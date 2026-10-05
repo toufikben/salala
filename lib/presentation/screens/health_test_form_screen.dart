@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../core/l10n/app_localizations.dart';
 import '../../core/utils/date_utils.dart';
 import '../../data/models/health_test.dart';
+import '../providers/app_providers.dart';
 import '../providers/record_providers.dart';
 import '../widgets/date_tile.dart';
 
@@ -111,7 +112,7 @@ class _HealthTestFormScreenState extends ConsumerState<HealthTestFormScreen> {
           updatedAt: 0,
         );
 
-    await saveHealthTest(
+    final saved = await saveHealthTest(
       ref,
       base.copyWith(
         animalId: widget.animalId,
@@ -126,7 +127,25 @@ class _HealthTestFormScreenState extends ConsumerState<HealthTestFormScreen> {
         clearValidUntil: _validUntil == null,
       ),
     );
+    await _syncReminder(saved);
     if (mounted) context.pop();
+  }
+
+  /// A screening is worth a reminder only while its certificate has an expiry:
+  /// an OFA grade is permanent, so `validUntil` being absent cancels whatever
+  /// was scheduled for this record rather than leaving a stale alarm behind.
+  Future<void> _syncReminder(HealthTest test) async {
+    final l10n = AppLocalizations.of(context);
+    await ref
+        .read(reminderSchedulerProvider)
+        .replace(
+          recordId: test.id,
+          dueMs: test.validUntil,
+          l10n: l10n,
+          title: reminderTitle(ref, l10n, widget.animalId),
+          what: test.testType,
+          dueDay: formatDay(context, test.validUntil),
+        );
   }
 
   Future<void> _delete() async {
@@ -152,6 +171,7 @@ class _HealthTestFormScreenState extends ConsumerState<HealthTestFormScreen> {
     );
     if (confirmed != true) return;
     await deleteHealthTest(ref, test);
+    await ref.read(reminderSchedulerProvider).cancel(test.id);
     if (mounted) context.pop();
   }
 

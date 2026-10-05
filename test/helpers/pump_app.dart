@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:salala/app.dart';
 import 'package:salala/data/db/daos.dart';
 import 'package:salala/data/models/animal.dart';
@@ -12,6 +13,7 @@ import 'package:salala/presentation/providers/app_providers.dart';
 import 'package:salala/services/app_lock_service.dart';
 import 'package:sqflite/sqflite.dart';
 
+import 'fake_reminder_scheduler.dart';
 import 'fake_secure_storage.dart';
 import 'test_db.dart';
 
@@ -62,6 +64,7 @@ Future<FakeSecureStorage> pumpSalala(
   WidgetTester tester, {
   Locale? locale,
   bool hasPin = false,
+  FakeReminderScheduler? reminders,
   List<Animal> seed = const <Animal>[],
   List<Vaccination> seedVaccinations = const <Vaccination>[],
   List<WeightEntry> seedWeights = const <WeightEntry>[],
@@ -70,6 +73,15 @@ Future<FakeSecureStorage> pumpSalala(
 }) async {
   final storage = FakeSecureStorage();
   late Database database;
+
+  // `main()` does this for the real app; without it a non-English DateFormat
+  // throws on the first date a widget test asks a reminder to render.
+  await initializeDateFormatting();
+
+  // The provider refuses a default instance on purpose — an unbootstrapped
+  // plugin throws on the first schedule call — so every boot needs a fake, and
+  // a test that cares about what was scheduled passes its own and reads it back.
+  final scheduler = reminders ?? FakeReminderScheduler();
 
   await tester.runAsync(() async {
     database = await openTestDatabase();
@@ -100,6 +112,7 @@ Future<FakeSecureStorage> pumpSalala(
         databaseProvider.overrideWithValue(database),
         appLockProvider.overrideWithValue(AppLockService(storage: storage)),
         hasPinProvider.overrideWith(() => SeededHasPin(hasPin)),
+        reminderSchedulerProvider.overrideWithValue(scheduler),
         if (locale != null) initialLocaleProvider.overrideWithValue(locale),
       ],
       child: const SalalaApp(),

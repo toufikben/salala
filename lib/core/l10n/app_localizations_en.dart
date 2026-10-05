@@ -485,4 +485,14 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get visitDeleteBody =>
       'The visit is removed from this animal\'s history. This cannot be undone.';
+
+  @override
+  String reminderHeadsUpBody(String what, String dueDay) {
+    return 'Heads up: $what is due on $dueDay';
+  }
+
+  @override
+  String reminderDueBody(String what) {
+    return '$what is due today';
+  }
 }

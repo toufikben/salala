@@ -981,6 +981,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The visit is removed from this animal\'s history. This cannot be undone.'**
   String get visitDeleteBody;
+
+  /// The month-ahead alarm. {what} is the dose or screening name as the breeder typed it, {dueDay} a localised date.
+  ///
+  /// In en, this message translates to:
+  /// **'Heads up: {what} is due on {dueDay}'**
+  String reminderHeadsUpBody(String what, String dueDay);
+
+  /// No description provided for @reminderDueBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{what} is due today'**
+  String reminderDueBody(String what);
 }
 
 class _AppLocalizationsDelegate

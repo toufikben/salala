@@ -490,4 +490,14 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get visitDeleteBody =>
       'تُحذف هذه الزيارة من سجل الحيوان. لا يمكن التراجع عن ذلك.';
+
+  @override
+  String reminderHeadsUpBody(String what, String dueDay) {
+    return 'تنبيه: $what مستحق في $dueDay';
+  }
+
+  @override
+  String reminderDueBody(String what) {
+    return '$what مستحق اليوم';
+  }
 }

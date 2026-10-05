@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../core/l10n/app_localizations.dart';
 import '../../core/utils/date_utils.dart';
 import '../../data/models/vaccination.dart';
+import '../providers/app_providers.dart';
 import '../providers/record_providers.dart';
 import '../widgets/date_tile.dart';
 
@@ -127,8 +128,29 @@ class _VaccinationFormScreenState extends ConsumerState<VaccinationFormScreen> {
       clearNextDueDate: _nextDue == null,
     );
 
-    await saveVaccination(ref, draft);
+    final saved = await saveVaccination(ref, draft);
+    await _syncReminder(saved);
     if (mounted) context.pop();
+  }
+
+  /// Hands this dose's due date to the operating system.
+  ///
+  /// Everything is read off `saved`, not off the form: the row in the database
+  /// is the one the alarm has to match, and a new dose only learns its id when
+  /// the write happened. A dose with no next-due date clears the alarms instead
+  /// of scheduling one, which is what `remindersFor` does with a null due date.
+  Future<void> _syncReminder(Vaccination dose) async {
+    final l10n = AppLocalizations.of(context);
+    await ref
+        .read(reminderSchedulerProvider)
+        .replace(
+          recordId: dose.id,
+          dueMs: dose.nextDueDate,
+          l10n: l10n,
+          title: reminderTitle(ref, l10n, widget.animalId),
+          what: dose.vaccineName,
+          dueDay: formatDay(context, dose.nextDueDate),
+        );
   }
 
   Future<void> _delete() async {
@@ -154,6 +176,7 @@ class _VaccinationFormScreenState extends ConsumerState<VaccinationFormScreen> {
     );
     if (confirmed != true) return;
     await deleteVaccination(ref, dose);
+    await ref.read(reminderSchedulerProvider).cancel(dose.id);
     if (mounted) context.pop();
   }
 

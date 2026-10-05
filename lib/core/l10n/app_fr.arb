@@ -182,5 +182,19 @@
   "visitCost": "Coût",
   "visitCostInvalid": "Saisissez un montant comme 250",
   "visitCurrency": "Devise",
-  "visitDeleteBody": "La visite est retirée de l'historique de cet animal. Action irréversible."
+  "visitDeleteBody": "La visite est retirée de l'historique de cet animal. Action irréversible.",
+
+  "reminderHeadsUpBody": "À noter : {what} arrive à échéance le {dueDay}",
+  "@reminderHeadsUpBody": {
+    "placeholders": {
+      "what": { "type": "String" },
+      "dueDay": { "type": "String" }
+    }
+  },
+  "reminderDueBody": "{what} arrive à échéance aujourd'hui",
+  "@reminderDueBody": {
+    "placeholders": {
+      "what": { "type": "String" }
+    }
+  }
 }

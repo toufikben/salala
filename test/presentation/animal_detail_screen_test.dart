@@ -7,6 +7,7 @@ import 'package:salala/data/models/vet_visit.dart';
 import 'package:salala/data/models/weight_entry.dart';
 import 'package:salala/presentation/screens/animal_detail_screen.dart';
 
+import '../helpers/fake_reminder_scheduler.dart';
 import '../helpers/pump_app.dart';
 
 /// An animal with a fixed id: the record rows seed under it by foreign key, so
@@ -137,7 +138,8 @@ void main() {
     tester,
   ) async {
     _usePhoneViewport(tester);
-    await pumpSalala(tester, seed: <Animal>[_nala()]);
+    final reminders = FakeReminderScheduler();
+    await pumpSalala(tester, reminders: reminders, seed: <Animal>[_nala()]);
     await _openNala(tester);
 
     await _tap(tester, find.widgetWithText(TextButton, 'Add vaccination'));
@@ -152,6 +154,86 @@ void main() {
     expect(find.text('DHPP'), findsOneWidget);
     // A dose given today with no next-due date is not overdue.
     expect(find.text('Overdue'), findsNothing);
+
+    // And nothing is handed to the operating system either: the reminder needs a
+    // date to be early about. The call is still made, because saving a dose that
+    // lost its due date has to clear the alarm it used to have.
+    expect(reminders.replacements, hasLength(1));
+    expect(reminders.replacements.single.dueMs, isNull);
+    expect(reminders.replacements.single.title, 'Nala');
+  });
+
+  testWidgets('saving a booked dose hands its due date to the reminders', (
+    tester,
+  ) async {
+    _usePhoneViewport(tester);
+    final reminders = FakeReminderScheduler();
+    // Re-saving a dose that is already booked is the ordinary case: the breeder
+    // corrects the vaccine name a week later and the booking must survive it.
+    final due = _daysAhead(20);
+    await pumpSalala(
+      tester,
+      reminders: reminders,
+      seed: <Animal>[_nala()],
+      seedVaccinations: <Vaccination>[
+        _dose(name: 'Distemper', administered: _daysAgo(10), nextDue: due),
+      ],
+    );
+    await _openNala(tester);
+
+    await _tap(tester, find.text('Distemper'));
+    await _save(tester);
+
+    expect(reminders.replacements, hasLength(1));
+    final request = reminders.replacements.single;
+    expect(request.what, 'Distemper');
+    expect(request.title, 'Nala');
+    expect(request.dueMs, due);
+    expect(request.dueDay, isNotEmpty);
+    // The dose was written before the alarm was scheduled, so it has a real id by
+    // then — an empty one here would mean every reminder was filed against
+    // nothing and no edit could ever clear it.
+    expect(request.recordId, isNotEmpty);
+  });
+
+  testWidgets('deleting a booked dose cancels what it scheduled', (
+    tester,
+  ) async {
+    _usePhoneViewport(tester);
+    final reminders = FakeReminderScheduler();
+    await pumpSalala(
+      tester,
+      reminders: reminders,
+      seed: <Animal>[_nala()],
+      seedVaccinations: <Vaccination>[
+        _dose(
+          name: 'Parvo',
+          administered: _daysAgo(3),
+          nextDue: _daysAhead(40),
+        ),
+      ],
+    );
+    await _openNala(tester);
+
+    await _tap(tester, find.text('Parvo'));
+    await _save(tester);
+    // Opening the dose and saving it unchanged is what schedules the reminder, so
+    // the id it was filed under is now known.
+    final scheduled = reminders.replacements.single.recordId;
+    expect(scheduled, isNotEmpty);
+
+    await _tap(tester, find.text('Parvo'));
+    await _tap(tester, find.byIcon(Icons.delete_outline));
+    expect(find.text('Delete this record?'), findsOneWidget);
+    await tester.tap(find.widgetWithText(FilledButton, 'Delete'));
+    await settleRealIo(tester);
+    await settleRealIo(tester);
+
+    expect(find.text('Parvo'), findsNothing);
+    // The row is gone, so an alarm for it would be a message about nothing — and
+    // the cancellation names the very id the alarm was filed under, which is the
+    // only reason a delete can reach it.
+    expect(reminders.cancellations, <String>[scheduled]);
   });
 
   testWidgets('a dose whose due date passed is badged overdue', (tester) async {

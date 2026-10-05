@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/l10n/app_localizations.dart';
+import '../../data/models/animal.dart';
 import '../../data/models/health_test.dart';
 import '../../data/models/vaccination.dart';
 import '../../data/models/vet_visit.dart';
@@ -24,14 +26,22 @@ final weightsForAnimalProvider = FutureProvider.autoDispose
     );
 
 /// Writes a dose either way and re-reads only the animal it belongs to.
-Future<void> saveVaccination(WidgetRef ref, Vaccination vaccination) async {
+///
+/// The row as it is now stored comes back: an insert only gains its uuid in the
+/// dao, and the caller needs that id to schedule reminders against the dose.
+Future<Vaccination> saveVaccination(
+  WidgetRef ref,
+  Vaccination vaccination,
+) async {
   final daos = ref.read(daosProvider);
   if (vaccination.id.isEmpty) {
-    await daos.vaccinations.create(vaccination);
-  } else {
-    await daos.vaccinations.update(vaccination);
+    final created = await daos.vaccinations.create(vaccination);
+    ref.invalidate(vaccinationsForAnimalProvider(created.animalId));
+    return created;
   }
+  await daos.vaccinations.update(vaccination);
   ref.invalidate(vaccinationsForAnimalProvider(vaccination.animalId));
+  return vaccination;
 }
 
 Future<void> deleteVaccination(WidgetRef ref, Vaccination vaccination) async {
@@ -61,14 +71,16 @@ final visitsForAnimalProvider = FutureProvider.autoDispose
       (ref, animalId) => ref.read(daosProvider).vetVisits.forAnimal(animalId),
     );
 
-Future<void> saveHealthTest(WidgetRef ref, HealthTest test) async {
+Future<HealthTest> saveHealthTest(WidgetRef ref, HealthTest test) async {
   final daos = ref.read(daosProvider);
   if (test.id.isEmpty) {
-    await daos.healthTests.create(test);
-  } else {
-    await daos.healthTests.update(test);
+    final created = await daos.healthTests.create(test);
+    ref.invalidate(healthTestsForAnimalProvider(created.animalId));
+    return created;
   }
+  await daos.healthTests.update(test);
   ref.invalidate(healthTestsForAnimalProvider(test.animalId));
+  return test;
 }
 
 Future<void> deleteHealthTest(WidgetRef ref, HealthTest test) async {
@@ -89,4 +101,18 @@ Future<void> saveVisit(WidgetRef ref, VetVisit visit) async {
 Future<void> deleteVisit(WidgetRef ref, VetVisit visit) async {
   await ref.read(daosProvider).vetVisits.delete(visit.id);
   ref.invalidate(visitsForAnimalProvider(visit.animalId));
+}
+
+/// The name a reminder notification is filed under.
+///
+/// Read off the herd list every screen already watches, so naming a dose costs
+/// no second query. `l10n.appTitle` stands in when the animal is not in that
+/// list: a notification with an empty title cannot be acted on, and the app's
+/// own name is the honest thing to show instead.
+String reminderTitle(WidgetRef ref, AppLocalizations l10n, String animalId) {
+  final animals = ref.read(animalsProvider).value ?? const <Animal>[];
+  for (final animal in animals) {
+    if (animal.id == animalId) return animal.name;
+  }
+  return l10n.appTitle;
 }

@@ -211,5 +211,20 @@
   "visitCost": "Cost",
   "visitCostInvalid": "Enter an amount like 250",
   "visitCurrency": "Currency",
-  "visitDeleteBody": "The visit is removed from this animal's history. This cannot be undone."
+  "visitDeleteBody": "The visit is removed from this animal's history. This cannot be undone.",
+
+  "reminderHeadsUpBody": "Heads up: {what} is due on {dueDay}",
+  "@reminderHeadsUpBody": {
+    "description": "The month-ahead alarm. {what} is the dose or screening name as the breeder typed it, {dueDay} a localised date.",
+    "placeholders": {
+      "what": { "type": "String" },
+      "dueDay": { "type": "String" }
+    }
+  },
+  "reminderDueBody": "{what} is due today",
+  "@reminderDueBody": {
+    "placeholders": {
+      "what": { "type": "String" }
+    }
+  }
 }

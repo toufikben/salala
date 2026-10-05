@@ -7,12 +7,21 @@ import '../../data/db/settings_dao.dart';
 import '../../data/models/animal.dart';
 import '../../data/models/litter.dart';
 import '../../services/app_lock_service.dart';
+import '../../services/reminder_scheduler.dart';
 
 /// The opened database. `main()` overrides this after `ensureInitialized`, and
 /// tests override it with a temporary file database — which is why nothing here
 /// reaches for `getDatabasesPath()` itself.
 final databaseProvider = Provider<Database>(
   (ref) => throw UnimplementedError('databaseProvider must be overridden'),
+);
+
+/// The notifier `main()` built and bootstrapped. Overriding matters: scheduling
+/// against a second, uninitialised plugin instance throws on the first save,
+/// so tests inject a recorder instead of letting the real one be constructed.
+final reminderSchedulerProvider = Provider<ReminderScheduler>(
+  (ref) =>
+      throw UnimplementedError('reminderSchedulerProvider must be overridden'),
 );
 
 final daosProvider = Provider<Daos>((ref) => Daos(ref.watch(databaseProvider)));
