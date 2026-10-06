@@ -190,8 +190,9 @@ void main() {
 
       expect(pack.countOf('animals'), 2);
       expect(pack.countOf('weight_entries'), 2);
+      expect(pack.countOf('symptoms'), 2);
       expect(pack.countOf('secrets'), 0);
-      expect(pack.totalRows, 12);
+      expect(pack.totalRows, 14);
     });
   });
 

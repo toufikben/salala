@@ -340,6 +340,9 @@ void main() {
     await pumpSalala(tester, seed: <Animal>[_nala()]);
     await _openNala(tester);
 
+    // The symptoms section sits above the weights one, so the weights button is
+    // below the fold and the lazy list has not built it yet.
+    await _scrollTo(tester, find.widgetWithText(TextButton, 'Add weight'));
     await _tap(tester, find.widgetWithText(TextButton, 'Add weight'));
     // The form is the only place a breeder looks for an edit that does not
     // exist, so it has to say the weigh-in is append-only.
@@ -391,7 +394,9 @@ void main() {
 
     // The newest weigh-in is the first row, and the only control it gets is a
     // delete: a weigh-in is never edited, it is removed and measured again.
-    await _scrollTo(tester, find.byIcon(Icons.delete_outline).first);
+    // Scroll for the section itself — a `.first` finder thrown at
+    // scrollUntilVisible cannot answer "not built yet", it raises instead.
+    await _scrollTo(tester, find.byIcon(Icons.delete_outline));
     await tester.tap(find.byIcon(Icons.delete_outline).first);
     await tester.pumpAndSettle();
 
