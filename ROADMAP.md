@@ -545,12 +545,12 @@ classifier is behind a measured benchmark or it does not ship.
 
 ### Progress, 2026-10-05
 
-- **3a — the rule table and the card: four red CI runs, traced to the test harness.**
+- **3a — the rule table and the card: five red CI runs, traced to the test harness.**
   Nine rules in `assets/triage/rules.json` over `core/utils/triage.dart`, one card on the
   animal's ledger, and the explicit non-claim under it. 34 engine tests in
-  `test/core/triage_test.dart`, and five in `test/presentation/triage_card_test.dart`:
-  three that pump the real app's ledger, one that proves the bundle serves the
-  table the repository holds, and one that reads it through the shipped provider.
+  `test/core/triage_test.dart`, and four in `test/presentation/triage_card_test.dart`:
+  three that pump the real app's ledger and one that proves the bundle serves
+  the table the repository holds.
   D25 records what "rules are data" does and does
   not buy.
   Run `37383228340` on `9b5d98b` came back **176 passed, 19 failed**: every engine
@@ -578,15 +578,24 @@ classifier is behind a measured benchmark or it does not ship.
   that isolation test.** A provider body that awaits `rootBundle` does not
   resolve inside `testWidgets`' fake-async zone, while the same call from a test
   body does — that is the cause, and it is a harness limit, not an app bug.
-  The remedy is in the harness: `pumpSalala` reads `assets/triage/rules.json`
-  itself on the real clock and overrides `triageRulesProvider` with the file's
-  own contents, so the parse and every threshold stay genuine; the provider's
-  real read path keeps a test of its own under `tester.runAsync`, and the phone
-  stays the only judge of the shipped path.
-  **Verification state of this remedy: `NOT RUN`** — pushed as the next CI
-  verdict, with the on-device triage card unverified until the consolidated
-  Stage 2 + 3a install. D6 now carries the constraint that actually explained
-  it; D7 keeps the `ref` rule without the false claim about what it caused.
+  The first remedy was in the harness rather than the app: `pumpSalala` supplies
+  the table itself and overrides `triageRulesProvider` with the file's own
+  contents, so the parse and every threshold stay genuine. That version read the
+  file with `rootBundle` inside the harness's existing `runAsync` block, and run
+  `37437885813` on `d7fb5ee` showed what that costs: **192 passed, 4 failed** —
+  the ledger screens were no longer stuck on a progress bar, but the new
+  `runAsync` asset read hung for ten minutes, and a pending `runAsync` denies the
+  next one, so the three tests behind it died with `Reentrant call to runAsync()
+  denied` at a helper line they never touched. Forty-one minutes of CI to learn
+  that the asset bundle is unreadable from `runAsync` too. The table is now read
+  the way the engine test has always read it — `File(...).readAsStringSync()`,
+  no zone and no clock involved — and the only thing without harness coverage is
+  the provider's own `await rootBundle`, which this harness cannot execute at
+  all.
+  **Verification state of that: `NOT RUN`** — the next CI verdict decides it, and
+  the on-device triage card stays unverified until the consolidated Stage 2 + 3a
+  install. D6 now carries the four harness constraints that actually explain the
+  symptom; D7 keeps the `ref` rule without the false claim about what it caused.
 - The line above says *symptom*→urgency. There is **no symptom record in the
   schema**, so what shipped is date-and-measurement→urgency: due doses, ages,
   weight trends, screenings, a whelping that never got written down. A symptom a

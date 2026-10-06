@@ -71,16 +71,26 @@ inside a provider body never lands under `testWidgets`, while the identical
 read from a test body lands fine.** `rootBundle.loadString` awaited by a
 provider left the bar up even in a tree of one `Consumer` with no database, no
 ledger page and nothing else in it (run `37435525579`, whose 22nd test was
-exactly that tree). So the harness reads `assets/triage/rules.json` itself,
-inside the `runAsync` block where the real clock runs, and hands the file's own
-contents to the tree through an override of `triageRulesProvider`. Nothing is
-stubbed — the parse still runs, the thresholds are the shipped ones — and the
-provider's real read path keeps its own coverage under `tester.runAsync`, plus
-the phone as the only judge of what ships.
-Two diagnoses were published and retracted before this one: a round budget that
-was too small, and the `ref`-after-`await` hazard in D7 below. The second was
-source-verified and still wrong about *this* symptom, which is why D7 now keeps
-it as hygiene rather than as a fix.
+exactly that tree). So the harness supplies the table itself and hands the
+file's own contents to the tree through an override of `triageRulesProvider`.
+Nothing is stubbed — the parse still runs, the thresholds are the shipped ones.
+
+Fifth constraint, which is what the first version of that remedy cost: **the
+asset bundle cannot be read inside `tester.runAsync` either.** Run
+`37437885813` moved the `rootBundle` call into the harness's existing `runAsync`
+block and added one test that read the shipped provider the same way; that test
+hung for ten minutes, and because a pending `runAsync` denies the next one, the
+three ledger tests behind it failed with `Reentrant call to runAsync() denied`
+at a line they never touched — 4 failures where 1 was real, 41 minutes where the
+suite takes two. So the table is read the way the engine test has always read
+it: `File('assets/triage/rules.json').readAsStringSync()`, no zone, no clock, no
+channel. The one thing left without harness coverage is the provider's own
+`await rootBundle` — a line that cannot be executed inside this harness at all,
+which is what the phone is for.
+Three diagnoses were published and retracted before this one: a round budget
+that was too small, the `ref`-after-`await` hazard in D7 below, and reading the
+bundle from `runAsync`. The second is a real hazard and still wrong about *this*
+symptom, which is why D7 keeps it as hygiene rather than as a fix.
 
 Adjacent trap, recorded because it nearly made that fix a no-op: `find.byType`
 compares `runtimeType` exactly and does **not** match subtypes

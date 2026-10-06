@@ -11,11 +11,13 @@ import 'app_providers.dart';
 /// and the on/off switches are one file a release can retune without touching
 /// the code that reads them (D25).
 ///
-/// Widget tests replace this with the same file read on the real clock: the
-/// fake-async zone of `testWidgets` does not let an `await rootBundle` land
-/// from inside a provider body, though the same call from a test body is fine
-/// (`test/helpers/pump_app.dart`). The read path itself is covered by
-/// `triage_card_test.dart` under `tester.runAsync`, and on a phone.
+/// Widget tests replace this with the same file read off disk, because an
+/// `await rootBundle` does not land anywhere inside `testWidgets` — not from a
+/// provider body and not from inside `tester.runAsync` either (see D6 and
+/// `test/helpers/pump_app.dart`). What that costs this provider is one line of
+/// untested wiring: the path is covered by `triage_card_test.dart`, the parser
+/// by `test/core/triage_test.dart`, and the read as it actually runs on a phone
+/// is covered on a phone.
 final triageRulesProvider = FutureProvider.autoDispose<List<TriageRule>>(
   (ref) async => parseRules(await rootBundle.loadString(triageRulesAsset)),
 );

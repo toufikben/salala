@@ -1,5 +1,6 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -160,7 +161,19 @@ Future<FakeSecureStorage> pumpSalala(
 }) async {
   final storage = FakeSecureStorage();
   late Database database;
-  late String rulesSource;
+
+  // The triage table, read here instead of from inside its provider, and read
+  // the way `test/core/triage_test.dart` reads it: synchronously, off disk.
+  // Three measured facts rule out the app's own `rootBundle` call here. It
+  // completes from a test body; it never completes from a provider body (run
+  // 37435525579 left 21 screens holding a linear bar); and it never completes
+  // inside `tester.runAsync` either, which run 37437885813 proved the hard way
+  // — that attempt hung ten minutes and then denied every later `runAsync` in
+  // the file, since a pending one blocks the next. Nothing about the contents is
+  // faked: this is the shipped file, parsed by the shipped parser, and the
+  // provider's own read path has no harness coverage because the fake-async zone
+  // cannot host it. Real Flutter has no such zone, and the phone is its judge.
+  final rulesSource = File(triageRulesAsset).readAsStringSync();
 
   // `main()` does this for the real app; without it a non-English DateFormat
   // throws on the first date a widget test asks a reminder to render.
@@ -203,20 +216,6 @@ Future<FakeSecureStorage> pumpSalala(
     for (final visit in seedVisits) {
       await daos.vetVisits.create(visit, nowMs: nowMs++);
     }
-    // The triage table, read here instead of from inside its provider.
-    //
-    // Not a shortcut around the file — this is the app's own `rootBundle` call
-    // on the app's own asset path, made while the fake clock is off and then
-    // handed to the tree below through `triageRulesProvider`. The reason it has
-    // to be read here is a harness limit, measured rather than guessed: an
-    // `await rootBundle.loadString` in a provider body never completes under
-    // `testWidgets`, even in a tree of one `Consumer` with no database at all,
-    // while the identical call from a test body completes (run 37435525579,
-    // which failed 21 screens with a linear bar still on them and proved the
-    // point with a 22nd test). Real Flutter has no fake-async zone, so the
-    // shipped read path is unaffected — and the phone, not this file, is its
-    // judge.
-    rulesSource = await rootBundle.loadString(triageRulesAsset);
   });
 
   await tester.pumpWidget(

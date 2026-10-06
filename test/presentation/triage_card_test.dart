@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:salala/core/utils/triage.dart';
 import 'package:salala/data/models/animal.dart';
 import 'package:salala/data/models/vaccination.dart';
-import 'package:salala/presentation/providers/triage_providers.dart';
 
 import '../helpers/pump_app.dart';
 
@@ -57,29 +55,14 @@ void main() {
     // whatever the bundle hands it. This is the step that proves those are the
     // same file: an asset missing from `pubspec.yaml` would leave the card
     // showing an error on the phone while every other test stayed green.
+    //
+    // It is also the only place this repo can put an `await rootBundle` and have
+    // it land. From a provider body it never completes, and neither does it from
+    // inside `tester.runAsync` — see the note in `test/helpers/pump_app.dart`,
+    // which is where the shipped table now comes from and why the provider's own
+    // read path is verified on a phone rather than here.
     final source = await rootBundle.loadString(triageRulesAsset);
     expect(parseRules(source).length, TriageRuleId.values.length);
-  });
-
-  testWidgets('the provider that ships reads and parses that same table', (
-    tester,
-  ) async {
-    // The body under test awaits `rootBundle` from inside a provider, and the
-    // fake clock of `testWidgets` never lets such an await land: that is what
-    // turned 21 screens into permanent progress bars in run 37435525579, and
-    // why `pumpSalala` reads the file on the real clock and injects it. Here
-    // `runAsync` puts the real clock back under this one call, so the read and
-    // the parse the phone does stay covered — with no override, no stub, no
-    // widget, and no database to hide behind.
-    final container = ProviderContainer();
-    addTearDown(container.dispose);
-
-    List<TriageRule>? rules;
-    await tester.runAsync(
-      () async => rules = await container.read(triageRulesProvider.future),
-    );
-
-    expect(rules, hasLength(TriageRuleId.values.length));
   });
 
   testWidgets('a young animal with no dose is shown as act now', (
