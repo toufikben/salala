@@ -31,13 +31,19 @@ class TriageCard extends StatelessWidget {
           children: <Widget>[
             Row(
               children: <Widget>[
-                Text(
-                  l10n.triageTitle,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
+                // The title gives way and the urgency word does not: the label
+                // is the answer, and a `Spacer` between two unbounded texts
+                // overflows on a narrow phone once Arabic makes both of them
+                // longer than English does.
+                Expanded(
+                  child: Text(
+                    l10n.triageTitle,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
-                const Spacer(),
+                const SizedBox(width: 8),
                 if (top != null)
                   Text(
                     triageUrgencyLabel(l10n, top),

@@ -553,14 +553,20 @@ classifier is behind a measured benchmark or it does not ship.
   same table the repository holds. D25 records what "rules are data" does and does
   not buy.
   Run `37383228340` on `9b5d98b` came back **176 passed, 19 failed**: every engine
-  test green, and all 19 failures in the two files that open an animal's ledger.
-  One cause, and it was the harness's: `settleRealIo` waited a fixed ten rounds and
-  then looked only for a `CircularProgressIndicator`, while the new section loads
-  with a *linear* bar behind seven sequential round trips. Ten rounds ran out, the
-  assertions saw a page still loading, and the sixteen screens failed even later as
-  `pumpAndSettle timed out` — an indeterminate bar never settles. The helper now
-  keeps waiting while any `ProgressIndicator` is on screen, bounded so a truly stuck
-  section still fails by name. Nothing in the engine or the card changed.
+  test green, and all 19 failures in the two files that open an animal's ledger —
+  sixteen of them as `pumpAndSettle timed out`, which is what an indeterminate
+  progress bar looks like from a test's side of the screen. The first diagnosis
+  (the harness's ten-round wait running out on a section that makes seven round
+  trips) was **wrong**, and the way to see that was to make the harness say what
+  it was waiting for: `settleRealIo` now keeps settling while any
+  `ProgressIndicator` is on screen and then fails by name. Run `37431948933` on
+  `97171b8` returned **20 failures, each one "a database-backed widget never
+  finished loading"** — a section that *never* resolves, not a slow one. The cause
+  was one line of the new provider: it watched the rule table *after* awaiting a
+  database row, and that watch resolving is the event that re-runs the element and
+  makes the abandoned `ref.watch` throw, which Riverpod paints as retrying-loading
+  rather than as an error. D7 now carries the rule; the card, the engine and the
+  table were not at fault in either run.
 - The line above says *symptom*→urgency. There is **no symptom record in the
   schema**, so what shipped is date-and-measurement→urgency: due doses, ages,
   weight trends, screenings, a whelping that never got written down. A symptom a
@@ -569,6 +575,14 @@ classifier is behind a measured benchmark or it does not ship.
 - Breed-specific risk is **not** implemented, and the reason is in D25: `breed` is
   free text, and a table keyed on breed names asserts a health claim nothing here
   can check.
+- **Open owner question, raised while writing the card and deliberately not
+  answered in code:** should the weight-trend rules speak for an animal whose
+  status is `sold`? A puppy that left three months ago has no weigh-ins after its
+  last day here, so the card can keep showing "barely any gain over 21 days" about
+  a period that is closed — true about the record, but not something the breeder
+  can act on. Suppressing it is also wrong for the sales that carry a growth or
+  return agreement, where the breeder keeps weighing the animal. No measurement
+  settles this; a breeder answering "do you weigh out-pups?" does.
 - The classifier has not been started. It stays behind a measured benchmark.
 
 ## Stage 4 — Distribution

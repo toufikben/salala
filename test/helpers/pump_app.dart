@@ -46,11 +46,13 @@ class AlreadyResynced extends RemindersResynced {
 ///
 /// The rounds are not cut short when the loading spinner disappears — a save
 /// finishes and pops a route without ever showing a spinner, so the real wait
-/// has to continue regardless. Ten rounds are a floor and not a ceiling: a
-/// section that resolves only after several separate round trips is still
-/// working when the tenth one ends, so the wait continues while a progress bar
-/// is on screen. A bar still up after that means the widget really is stuck, and
-/// that fails loudly instead of hanging.
+/// has to continue regardless. Ten rounds are a floor, and after them the wait
+/// is keyed on the bar instead of on a count: while an indeterminate bar is on
+/// screen the page is demonstrably not finished, and when the bound runs out
+/// that is stated outright. The bound is what made run `37431948933` say "a
+/// database-backed widget never finished loading" twenty times, which is a
+/// section that *never* resolves — the ten-round theory this replaced had
+/// guessed a slow one, and was wrong.
 Future<void> settleRealIo(WidgetTester tester) async {
   for (var round = 0; round < 10; round++) {
     await tester.pump(const Duration(milliseconds: 25));
@@ -80,7 +82,17 @@ Future<void> settleRealIo(WidgetTester tester) async {
   }
 
   if (tester.any(find.bySubtype<ProgressIndicator>())) {
-    throw StateError('a database-backed widget never finished loading');
+    // Named by widget type, because the app has two bars and they mean
+    // different things: a linear one is the triage section, a circular one is a
+    // whole page or a form still waiting on its first query.
+    final stuck = tester
+        .widgetList(find.bySubtype<ProgressIndicator>())
+        .map((widget) => widget.runtimeType.name)
+        .toSet()
+        .join(', ');
+    throw StateError(
+      'a database-backed widget never finished loading ($stuck)',
+    );
   }
 
   // Finite pumping, not `pumpAndSettle`: route transitions are animations, and

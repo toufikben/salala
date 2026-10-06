@@ -56,10 +56,44 @@ such work through `tester.runAsync` (`settleRealIo` in
 `test/helpers/pump_app.dart`) and asserts on outcomes rather than on elapsed
 frames.
 
+Third constraint, found the hard way across runs `37383228340` and `37431948933`:
+a widget test needs to distinguish *slow* from *stuck*, and a fixed round count
+cannot. The first guess was that ten rounds were not enough for a section that
+resolves behind seven sequential round trips. Wrong — with forty more rounds of
+real time on offer the bar was still up, and that is the point of keying the wait
+on the bar and then stating it: the second run said "a database-backed widget
+never finished loading" twenty times instead of leaving nineteen screens to fail
+as `pumpAndSettle timed out`, which is what an indeterminate bar looks like from
+the outside and tells you nothing about why. The real cause was in the provider,
+not the harness (D7).
+
+Adjacent trap, recorded because it nearly made that fix a no-op: `find.byType`
+compares `runtimeType` exactly and does **not** match subtypes
+(`flutter_test/lib/src/finders.dart:1642`), so `find.byType(ProgressIndicator)`
+finds neither `LinearProgressIndicator` nor `CircularProgressIndicator`. Asking
+for a base class here means `find.bySubtype<ProgressIndicator>()`.
+
 ## D7 — No codegen (hand-written Riverpod 3 notifiers, `flutter gen-l10n`)
 **Decided by the agent, 2026-10-04.**
 Removes `build_runner` from the dependency graph and from CI, which on a
 metered, 2-core connection is worth real time. Cost: provider wiring is manual.
+
+Rule that came out of paying for it: **in an async provider body, every use of
+`ref` goes before the first `await`.** `Ref.mounted` is
+`identical(_element.ref, this)` (riverpod 3.4.3 `lib/src/core/ref.dart:112`), and
+when a watched dependency changes while the body is suspended, the element
+re-runs and installs a new `Ref`; the abandoned continuation's `ref.watch` then
+throws `UnmountedRefException` (`ref.dart:232-242`, reached from the guard in
+`element.dart:989`). Riverpod's retry path renders a thrown `Exception` as
+*loading, retrying*, so the UI shows a spinner and never an error, and reaching
+the error would take roughly 41 seconds of escalating retries that no widget test
+ever waits out. The provider that found this watched its rule table after a
+database round trip — the watch succeeding is exactly the event that invalidated
+the run, which is how one line turned a ledger page into a permanent progress bar
+(`lib/presentation/providers/triage_providers.dart`).
+Registering the dependency first costs one extra run of the body, early, while
+nothing else is in flight. This is a typing-level hazard the analyzer cannot see:
+`ref` is in scope after an `await` and using it there compiles quietly.
 
 ## D8 — Payments from Morocco: an unresolved blocker on D3
 **Open. Owner decision required before Stage 4.**
