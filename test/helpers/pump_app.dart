@@ -9,6 +9,7 @@ import 'package:salala/core/utils/triage.dart';
 import 'package:salala/data/db/daos.dart';
 import 'package:salala/data/models/animal.dart';
 import 'package:salala/data/models/health_test.dart';
+import 'package:salala/data/models/symptom.dart';
 import 'package:salala/data/models/vaccination.dart';
 import 'package:salala/data/models/vet_visit.dart';
 import 'package:salala/data/models/weight_entry.dart';
@@ -158,6 +159,7 @@ Future<FakeSecureStorage> pumpSalala(
   List<WeightEntry> seedWeights = const <WeightEntry>[],
   List<HealthTest> seedHealthTests = const <HealthTest>[],
   List<VetVisit> seedVisits = const <VetVisit>[],
+  List<Symptom> seedSymptoms = const <Symptom>[],
 }) async {
   final storage = FakeSecureStorage();
   late Database database;
@@ -215,6 +217,9 @@ Future<FakeSecureStorage> pumpSalala(
     }
     for (final visit in seedVisits) {
       await daos.vetVisits.create(visit, nowMs: nowMs++);
+    }
+    for (final symptom in seedSymptoms) {
+      await daos.symptoms.create(symptom, nowMs: nowMs++);
     }
   });
 
