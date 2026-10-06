@@ -394,9 +394,10 @@ void main() {
 
     // The newest weigh-in is the first row, and the only control it gets is a
     // delete: a weigh-in is never edited, it is removed and measured again.
-    // Scroll for the section itself — a `.first` finder thrown at
-    // scrollUntilVisible cannot answer "not built yet", it raises instead.
-    await _scrollTo(tester, find.byIcon(Icons.delete_outline));
+    // Scroll to the row's own text, not to the delete icon: both weigh-ins are
+    // on screen by the time the scroll ends, and scrollUntilVisible finishes by
+    // asking for the single element it was given. Two icons, one answer.
+    await _scrollTo(tester, find.text('4.20 kg'));
     await tester.tap(find.byIcon(Icons.delete_outline).first);
     await tester.pumpAndSettle();
 
