@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:salala/app.dart';
+import 'package:salala/core/utils/triage.dart';
 import 'package:salala/data/db/daos.dart';
 import 'package:salala/data/models/animal.dart';
 import 'package:salala/data/models/health_test.dart';
@@ -10,6 +12,7 @@ import 'package:salala/data/models/vaccination.dart';
 import 'package:salala/data/models/vet_visit.dart';
 import 'package:salala/data/models/weight_entry.dart';
 import 'package:salala/presentation/providers/app_providers.dart';
+import 'package:salala/presentation/providers/triage_providers.dart';
 import 'package:salala/services/app_lock_service.dart';
 import 'package:salala/services/reminder_scheduler.dart';
 import 'package:sqflite/sqflite.dart';
@@ -157,6 +160,7 @@ Future<FakeSecureStorage> pumpSalala(
 }) async {
   final storage = FakeSecureStorage();
   late Database database;
+  late String rulesSource;
 
   // `main()` does this for the real app; without it a non-English DateFormat
   // throws on the first date a widget test asks a reminder to render.
@@ -199,12 +203,29 @@ Future<FakeSecureStorage> pumpSalala(
     for (final visit in seedVisits) {
       await daos.vetVisits.create(visit, nowMs: nowMs++);
     }
+    // The triage table, read here instead of from inside its provider.
+    //
+    // Not a shortcut around the file — this is the app's own `rootBundle` call
+    // on the app's own asset path, made while the fake clock is off and then
+    // handed to the tree below through `triageRulesProvider`. The reason it has
+    // to be read here is a harness limit, measured rather than guessed: an
+    // `await rootBundle.loadString` in a provider body never completes under
+    // `testWidgets`, even in a tree of one `Consumer` with no database at all,
+    // while the identical call from a test body completes (run 37435525579,
+    // which failed 21 screens with a linear bar still on them and proved the
+    // point with a 22nd test). Real Flutter has no fake-async zone, so the
+    // shipped read path is unaffected — and the phone, not this file, is its
+    // judge.
+    rulesSource = await rootBundle.loadString(triageRulesAsset);
   });
 
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
         databaseProvider.overrideWithValue(database),
+        triageRulesProvider.overrideWith(
+          (ref) async => parseRules(rulesSource),
+        ),
         appLockProvider.overrideWithValue(AppLockService(storage: storage)),
         hasPinProvider.overrideWith(() => SeededHasPin(hasPin)),
         reminderSchedulerProvider.overrideWithValue(scheduler),

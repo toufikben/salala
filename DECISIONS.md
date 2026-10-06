@@ -64,8 +64,23 @@ real time on offer the bar was still up, and that is the point of keying the wai
 on the bar and then stating it: the second run said "a database-backed widget
 never finished loading" twenty times instead of leaving nineteen screens to fail
 as `pumpAndSettle timed out`, which is what an indeterminate bar looks like from
-the outside and tells you nothing about why. The real cause was in the provider,
-not the harness (D7).
+the outside and tells you nothing about why.
+
+Fourth constraint, and the actual cause of those twenty: **an asset read from
+inside a provider body never lands under `testWidgets`, while the identical
+read from a test body lands fine.** `rootBundle.loadString` awaited by a
+provider left the bar up even in a tree of one `Consumer` with no database, no
+ledger page and nothing else in it (run `37435525579`, whose 22nd test was
+exactly that tree). So the harness reads `assets/triage/rules.json` itself,
+inside the `runAsync` block where the real clock runs, and hands the file's own
+contents to the tree through an override of `triageRulesProvider`. Nothing is
+stubbed — the parse still runs, the thresholds are the shipped ones — and the
+provider's real read path keeps its own coverage under `tester.runAsync`, plus
+the phone as the only judge of what ships.
+Two diagnoses were published and retracted before this one: a round budget that
+was too small, and the `ref`-after-`await` hazard in D7 below. The second was
+source-verified and still wrong about *this* symptom, which is why D7 now keeps
+it as hygiene rather than as a fix.
 
 Adjacent trap, recorded because it nearly made that fix a no-op: `find.byType`
 compares `runtimeType` exactly and does **not** match subtypes
@@ -89,11 +104,15 @@ throws `UnmountedRefException` (`ref.dart:232-242`, reached from the guard in
 the error would take roughly 41 seconds of escalating retries that no widget test
 ever waits out. The provider that found this watched its rule table after a
 database round trip — the watch succeeding is exactly the event that invalidated
-the run, which is how one line turned a ledger page into a permanent progress bar
-(`lib/presentation/providers/triage_providers.dart`).
-Registering the dependency first costs one extra run of the body, early, while
-nothing else is in flight. This is a typing-level hazard the analyzer cannot see:
-`ref` is in scope after an `await` and using it there compiles quietly.
+the run. This shape is a real hazard and is fixed on sight
+(`lib/presentation/providers/triage_providers.dart`), but it was **not** what
+left the ledger pages spinning: the asset read in the watched provider was, and
+that fails the same way with no `ref` anywhere near an `await` (see D6). Do not
+reach for this rule again to explain a stuck bar without a test that separates
+the two. Registering the dependency first costs one extra run of the body,
+early, while nothing else is in flight. This is a typing-level hazard the
+analyzer cannot see: `ref` is in scope after an `await` and using it there
+compiles quietly.
 
 ## D8 — Payments from Morocco: an unresolved blocker on D3
 **Open. Owner decision required before Stage 4.**

@@ -61,37 +61,25 @@ void main() {
     expect(parseRules(source).length, TriageRuleId.values.length);
   });
 
-  testWidgets('the table reaches a widget through its own provider', (
+  testWidgets('the provider that ships reads and parses that same table', (
     tester,
   ) async {
-    // What the two red runs left unproven: the bundle is reachable from a test
-    // body, but the screen reads the table through a provider, and that is a
-    // different await chain running inside the fake-async zone. Standing alone,
-    // with no database and no ledger page in it, this is the test that says
-    // which layer failed — a stuck progress bar here is the bundle, and
-    // anywhere else it is the wiring around it.
-    List<TriageRule>? seen;
-    await tester.pumpWidget(
-      ProviderScope(
-        child: MaterialApp(
-          home: Consumer(
-            builder: (context, ref, _) => ref
-                .watch(triageRulesProvider)
-                .when(
-                  loading: () => const LinearProgressIndicator(),
-                  error: (error, stack) => const Text('the table did not load'),
-                  data: (rules) {
-                    seen = rules;
-                    return Text('ready ${rules.length}');
-                  },
-                ),
-          ),
-        ),
-      ),
-    );
-    await settleRealIo(tester);
+    // The body under test awaits `rootBundle` from inside a provider, and the
+    // fake clock of `testWidgets` never lets such an await land: that is what
+    // turned 21 screens into permanent progress bars in run 37435525579, and
+    // why `pumpSalala` reads the file on the real clock and injects it. Here
+    // `runAsync` puts the real clock back under this one call, so the read and
+    // the parse the phone does stay covered — with no override, no stub, no
+    // widget, and no database to hide behind.
+    final container = ProviderContainer();
+    addTearDown(container.dispose);
 
-    expect(seen?.length, TriageRuleId.values.length);
+    List<TriageRule>? rules;
+    await tester.runAsync(
+      () async => rules = await container.read(triageRulesProvider.future),
+    );
+
+    expect(rules, hasLength(TriageRuleId.values.length));
   });
 
   testWidgets('a young animal with no dose is shown as act now', (

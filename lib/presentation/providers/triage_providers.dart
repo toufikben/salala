@@ -10,6 +10,12 @@ import 'app_providers.dart';
 /// Read from the bundle rather than written into the engine so the thresholds
 /// and the on/off switches are one file a release can retune without touching
 /// the code that reads them (D25).
+///
+/// Widget tests replace this with the same file read on the real clock: the
+/// fake-async zone of `testWidgets` does not let an `await rootBundle` land
+/// from inside a provider body, though the same call from a test body is fine
+/// (`test/helpers/pump_app.dart`). The read path itself is covered by
+/// `triage_card_test.dart` under `tester.runAsync`, and on a phone.
 final triageRulesProvider = FutureProvider.autoDispose<List<TriageRule>>(
   (ref) async => parseRules(await rootBundle.loadString(triageRulesAsset)),
 );
@@ -20,16 +26,19 @@ final triageRulesProvider = FutureProvider.autoDispose<List<TriageRule>>(
 /// `autoDispose` because a herd is open-ended.
 ///
 /// Every use of `ref` happens before the first `await`. `Ref.mounted` is
-/// `identical(_element.ref, this)` (riverpod `ref.dart:112`), and a `watch`
+/// `identical(_element.ref, this)` (riverpod `ref.dart:112`) and a `watch`
 /// through a stale `Ref` throws `UnmountedRefException` (`ref.dart:232-242`,
-/// reached from `element.dart:989`) — which riverpod's retry path renders as
-/// *loading, retrying* rather than as an error. So a body that awaited the
-/// database first and watched the table afterwards had its element re-run by
-/// that very watch resolving, threw on the way back, and left the ledger page
-/// holding a progress bar forever with nothing to show for it (run
-/// `37431948933`: 20 screens, each failing as "never finished loading").
-/// Registering the dependency while the `Ref` is certainly live costs one extra
-/// run of this body, early, while no database work is in flight.
+/// reached from `element.dart:989`), which riverpod's retry path renders as
+/// *loading, retrying* rather than as an error — so a body that reaches back
+/// for `ref` after the database has answered can be silently re-run and left
+/// nowhere. This ordering also keeps the table in hand before any query, so the
+/// one extra run of this body that the first `watch` provokes happens while
+/// nothing is in flight.
+///
+/// That ordering was *not* what had 20 ledger screens stuck on a progress bar in
+/// run `37431948933`; the asset read above was. It is recorded here as the
+/// hygiene it is, not as a fix, because claiming it as the cause was wrong once
+/// already and cost a CI cycle.
 final triageForAnimalProvider = FutureProvider.autoDispose
     .family<List<TriageFinding>, String>((ref, animalId) async {
       final daos = ref.read(daosProvider);

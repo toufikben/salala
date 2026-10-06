@@ -545,12 +545,13 @@ classifier is behind a measured benchmark or it does not ship.
 
 ### Progress, 2026-10-05
 
-- **3a — the rule table and the card: red on CI, then fixed in the test harness.**
+- **3a — the rule table and the card: four red CI runs, traced to the test harness.**
   Nine rules in `assets/triage/rules.json` over `core/utils/triage.dart`, one card on the
-  animal's ledger, and the explicit non-claim under it. 34 rule and table tests in
-  `test/core/triage_test.dart`, four in `test/presentation/triage_card_test.dart`
-  that pump the real app — including the one that proves the bundle serves the
-  same table the repository holds. D25 records what "rules are data" does and does
+  animal's ledger, and the explicit non-claim under it. 34 engine tests in
+  `test/core/triage_test.dart`, and five in `test/presentation/triage_card_test.dart`:
+  three that pump the real app's ledger, one that proves the bundle serves the
+  table the repository holds, and one that reads it through the shipped provider.
+  D25 records what "rules are data" does and does
   not buy.
   Run `37383228340` on `9b5d98b` came back **176 passed, 19 failed**: every engine
   test green, and all 19 failures in the two files that open an animal's ledger —
@@ -561,19 +562,31 @@ classifier is behind a measured benchmark or it does not ship.
   it was waiting for: `settleRealIo` now keeps settling while any
   `ProgressIndicator` is on screen and then fails by name. Run `37431948933` on
   `97171b8` returned **20 failures, each one "a database-backed widget never
-  finished loading"** — a section that *never* resolves, not a slow one. The cause
-  was one line of the new provider: it watched the rule table *after* awaiting a
-  database row, and that watch resolving is the event that re-runs the element and
-  makes the abandoned `ref.watch` throw, which Riverpod paints as retrying-loading
-  rather than as an error. D7 now carries the rule; the card, the engine and the
-  table were not at fault in either run.
-  **Verification state of that fix: `NOT RUN`.** `6e96fb5` died in the analyzer
-  two minutes in — `Type` has no `name` getter in this SDK, so the stuck-bar
-  report I added would not compile — and `Analyze` failing means `Test` never
-  ran, which means the provider reordering has not been put to anything yet. A new test
-  (`the table reaches a widget through its own provider`) now isolates the one
-  thing both runs left ambiguous: whether an asset-backed provider resolves at
-  all inside the fake-async zone, with no database and no ledger page involved.
+  finished loading"** — a section that *never* resolves, not a slow one. The
+  second diagnosis blamed one line of the new provider: it watched the rule table
+  *after* awaiting a database row, and that watch resolving is the event that
+  re-runs the element and makes the abandoned `ref.watch` throw, which Riverpod
+  paints as retrying-loading rather than as an error. That hazard is real and
+  D7 carries the rule, but as an explanation for these screens it was **also
+  wrong**, and it cost two CI cycles to prove it. `6e96fb5` reordered the
+  provider and died in the analyzer before any test ran (`Type` has no `name`
+  getter in this SDK, so the stuck-bar report would not compile; `Analyze`
+  failing means `Test` never runs). `31a384e` fixed the report and added a test
+  that stands the asset-backed provider alone in a tree of one `Consumer` — no
+  database, no ledger page — and run `37435525579` came back with **21 failures:
+  all twenty-one "never finished loading (LinearProgressIndicator)", including
+  that isolation test.** A provider body that awaits `rootBundle` does not
+  resolve inside `testWidgets`' fake-async zone, while the same call from a test
+  body does — that is the cause, and it is a harness limit, not an app bug.
+  The remedy is in the harness: `pumpSalala` reads `assets/triage/rules.json`
+  itself on the real clock and overrides `triageRulesProvider` with the file's
+  own contents, so the parse and every threshold stay genuine; the provider's
+  real read path keeps a test of its own under `tester.runAsync`, and the phone
+  stays the only judge of the shipped path.
+  **Verification state of this remedy: `NOT RUN`** — pushed as the next CI
+  verdict, with the on-device triage card unverified until the consolidated
+  Stage 2 + 3a install. D6 now carries the constraint that actually explained
+  it; D7 keeps the `ref` rule without the false claim about what it caused.
 - The line above says *symptom*→urgency. There is **no symptom record in the
   schema**, so what shipped is date-and-measurement→urgency: due doses, ages,
   weight trends, screenings, a whelping that never got written down. A symptom a
