@@ -87,7 +87,7 @@ Future<void> settleRealIo(WidgetTester tester) async {
     // whole page or a form still waiting on its first query.
     final stuck = tester
         .widgetList(find.bySubtype<ProgressIndicator>())
-        .map((widget) => widget.runtimeType.name)
+        .map((bar) => bar.runtimeType.toString())
         .toSet()
         .join(', ');
     throw StateError(

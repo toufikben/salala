@@ -567,6 +567,13 @@ classifier is behind a measured benchmark or it does not ship.
   makes the abandoned `ref.watch` throw, which Riverpod paints as retrying-loading
   rather than as an error. D7 now carries the rule; the card, the engine and the
   table were not at fault in either run.
+  **Verification state of that fix: `NOT RUN`.** `6e96fb5` died in the analyzer
+  two minutes in — `Type` has no `name` getter in this SDK, so the stuck-bar
+  report I added would not compile — and `Analyze` failing means `Test` never
+  ran, which means the provider reordering has not been put to anything yet. A new test
+  (`the table reaches a widget through its own provider`) now isolates the one
+  thing both runs left ambiguous: whether an asset-backed provider resolves at
+  all inside the fake-async zone, with no database and no ledger page involved.
 - The line above says *symptom*→urgency. There is **no symptom record in the
   schema**, so what shipped is date-and-measurement→urgency: due doses, ages,
   weight trends, screenings, a whelping that never got written down. A symptom a

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:salala/core/utils/triage.dart';
 import 'package:salala/data/models/animal.dart';
 import 'package:salala/data/models/vaccination.dart';
+import 'package:salala/presentation/providers/triage_providers.dart';
 
 import '../helpers/pump_app.dart';
 
@@ -57,6 +59,39 @@ void main() {
     // showing an error on the phone while every other test stayed green.
     final source = await rootBundle.loadString(triageRulesAsset);
     expect(parseRules(source).length, TriageRuleId.values.length);
+  });
+
+  testWidgets('the table reaches a widget through its own provider', (
+    tester,
+  ) async {
+    // What the two red runs left unproven: the bundle is reachable from a test
+    // body, but the screen reads the table through a provider, and that is a
+    // different await chain running inside the fake-async zone. Standing alone,
+    // with no database and no ledger page in it, this is the test that says
+    // which layer failed — a stuck progress bar here is the bundle, and
+    // anywhere else it is the wiring around it.
+    List<TriageRule>? seen;
+    await tester.pumpWidget(
+      ProviderScope(
+        child: MaterialApp(
+          home: Consumer(
+            builder: (context, ref, _) => ref
+                .watch(triageRulesProvider)
+                .when(
+                  loading: () => const LinearProgressIndicator(),
+                  error: (error, stack) => const Text('the table did not load'),
+                  data: (rules) {
+                    seen = rules;
+                    return Text('ready ${rules.length}');
+                  },
+                ),
+          ),
+        ),
+      ),
+    );
+    await settleRealIo(tester);
+
+    expect(seen?.length, TriageRuleId.values.length);
   });
 
   testWidgets('a young animal with no dose is shown as act now', (
