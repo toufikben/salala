@@ -455,7 +455,46 @@ compile. Numbers reach those sentences as ASCII strings, never as `int`
 placeholders through `intl`, which would render "١٢" in Arabic and break D21
 mid-card.
 
+**A counted noun is picked in Dart, not by `intl`.** The same D21 rule that
+keeps the digits Latin rules out `Intl.plural`, because plural logic renders the
+number itself through the locale's number format. So the day count lives in
+`daysSingle`/`daysDual`/`daysPlural` ARB entries that take a `String`, and
+`daysPhrase` chooses among them. That is also the only place the app's Arabic
+grammar is written down: 2 takes the dual, 3-10 the plural, 1 and 11-99 the
+singular accusative. English and French need only the first and the third, and
+say so by filling the three keys with two distinct phrases. The alternative —
+embedding " days" in each rule's sentence — shipped "due in 1 days" to a phone
+screen, which is what put this here.
+
 The small intent classifier the same roadmap stage mentions is **not** in this
 batch: there is no labelled Arabic symptom data in hand and no measured
 benchmark, and a classifier without either is a second, less auditable opinion
 beside the table.
+
+## D26 — A derived screen watches what it derives from
+
+**Date:** 2026-10-06. **Status:** in force.
+
+A screen that computes something over stored rows must read those rows through
+the providers that show them, not through the DAOs underneath.
+
+**Why.** The triage card did the opposite, and a phone found it: saving a Rabies
+dose updated the Vaccinations section on the same screen and left the card above
+it saying "Nothing in this record calls for a next step" until the breeder
+navigated away and back. The verdict had been a snapshot of the instant the page
+opened. Every write path in `record_providers.dart` already invalidates the list
+it touched, so the card was one `watch` away from being correct — and, more to
+the point, one `watch` away from staying correct for any record type written
+later that nobody remembers to add an invalidation for.
+
+**How to apply.** Read facts off `ref.watch(...future)` for the providers the
+screen already keeps, and put every `ref` use before the first `await` (D7). The
+alternative fix — a matching `ref.invalidate(triageForAnimalProvider(id))` at
+each of the ten write sites — was rejected because it is a rule with no
+enforcement: the next record type added to the ledger would silently reproduce
+the bug, and 195 tests would stay green while it did.
+
+**Cost, stated.** The card now re-runs on any herd or litter refresh, and it
+reads the whole herd and litter lists where it once asked for one row by id. At
+the sizes this app's users work at that is nothing; at a herd of thousands it
+would be a query to revisit.

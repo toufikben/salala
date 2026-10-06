@@ -288,18 +288,18 @@
   "triageRoutineVet": "Routine vet visit",
   "triageNothing": "Nothing in this record calls for a next step",
   "triageNotDiagnosis": "Salala reads only what you typed here. This is not a veterinary diagnosis.",
-  "triageNoDoseYoung": "No vaccination recorded, at {days} days old",
+  "triageNoDoseYoung": "No vaccination recorded, at {days} old",
   "@triageNoDoseYoung": {
     "placeholders": { "days": { "type": "String" } }
   },
-  "triageDoseOverdue": "{name} was due {days} days ago",
+  "triageDoseOverdue": "{name} was due {days} ago",
   "@triageDoseOverdue": {
     "placeholders": {
       "name": { "type": "String" },
       "days": { "type": "String" }
     }
   },
-  "triageDoseDueSoon": "{name} is due in {days} days",
+  "triageDoseDueSoon": "{name} is due in {days}",
   "@triageDoseDueSoon": {
     "placeholders": {
       "name": { "type": "String" },
@@ -314,7 +314,7 @@
   "@triageWeightLoss": {
     "placeholders": { "percent": { "type": "String" } }
   },
-  "triageNoGainPuppy": "Barely any weight gain over {days} days",
+  "triageNoGainPuppy": "Barely any weight gain over {days}",
   "@triageNoGainPuppy": {
     "placeholders": { "days": { "type": "String" } }
   },
@@ -322,18 +322,25 @@
   "@triageTestFlagged": {
     "placeholders": { "name": { "type": "String" } }
   },
-  "triageTestExpired": "The {name} certificate expired {days} days ago",
+  "triageTestExpired": "The {name} certificate expired {days} ago",
   "@triageTestExpired": {
     "placeholders": {
       "name": { "type": "String" },
       "days": { "type": "String" }
     }
   },
-  "triageWhelpingOverdue": "{name}: whelping is {days} days past the expected date",
+  "triageWhelpingOverdue": "{name}: whelping is {days} past the expected date",
   "@triageWhelpingOverdue": {
     "placeholders": {
       "name": { "type": "String" },
       "days": { "type": "String" }
     }
-  }
+  },
+
+  "daysSingle": "{n} day",
+  "@daysSingle": { "placeholders": { "n": { "type": "String" } } },
+  "daysDual": "{n} days",
+  "@daysDual": { "placeholders": { "n": { "type": "String" } } },
+  "daysPlural": "{n} days",
+  "@daysPlural": { "placeholders": { "n": { "type": "String" } } }
 }

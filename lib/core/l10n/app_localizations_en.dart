@@ -624,17 +624,17 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String triageNoDoseYoung(String days) {
-    return 'No vaccination recorded, at $days days old';
+    return 'No vaccination recorded, at $days old';
   }
 
   @override
   String triageDoseOverdue(String name, String days) {
-    return '$name was due $days days ago';
+    return '$name was due $days ago';
   }
 
   @override
   String triageDoseDueSoon(String name, String days) {
-    return '$name is due in $days days';
+    return '$name is due in $days';
   }
 
   @override
@@ -649,7 +649,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String triageNoGainPuppy(String days) {
-    return 'Barely any weight gain over $days days';
+    return 'Barely any weight gain over $days';
   }
 
   @override
@@ -659,11 +659,26 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String triageTestExpired(String name, String days) {
-    return 'The $name certificate expired $days days ago';
+    return 'The $name certificate expired $days ago';
   }
 
   @override
   String triageWhelpingOverdue(String name, String days) {
-    return '$name: whelping is $days days past the expected date';
+    return '$name: whelping is $days past the expected date';
+  }
+
+  @override
+  String daysSingle(String n) {
+    return '$n day';
+  }
+
+  @override
+  String daysDual(String n) {
+    return '$n days';
+  }
+
+  @override
+  String daysPlural(String n) {
+    return '$n days';
   }
 }

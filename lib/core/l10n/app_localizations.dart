@@ -1213,19 +1213,19 @@ abstract class AppLocalizations {
   /// No description provided for @triageNoDoseYoung.
   ///
   /// In en, this message translates to:
-  /// **'No vaccination recorded, at {days} days old'**
+  /// **'No vaccination recorded, at {days} old'**
   String triageNoDoseYoung(String days);
 
   /// No description provided for @triageDoseOverdue.
   ///
   /// In en, this message translates to:
-  /// **'{name} was due {days} days ago'**
+  /// **'{name} was due {days} ago'**
   String triageDoseOverdue(String name, String days);
 
   /// No description provided for @triageDoseDueSoon.
   ///
   /// In en, this message translates to:
-  /// **'{name} is due in {days} days'**
+  /// **'{name} is due in {days}'**
   String triageDoseDueSoon(String name, String days);
 
   /// No description provided for @triageWeightLossPuppy.
@@ -1243,7 +1243,7 @@ abstract class AppLocalizations {
   /// No description provided for @triageNoGainPuppy.
   ///
   /// In en, this message translates to:
-  /// **'Barely any weight gain over {days} days'**
+  /// **'Barely any weight gain over {days}'**
   String triageNoGainPuppy(String days);
 
   /// No description provided for @triageTestFlagged.
@@ -1255,14 +1255,32 @@ abstract class AppLocalizations {
   /// No description provided for @triageTestExpired.
   ///
   /// In en, this message translates to:
-  /// **'The {name} certificate expired {days} days ago'**
+  /// **'The {name} certificate expired {days} ago'**
   String triageTestExpired(String name, String days);
 
   /// No description provided for @triageWhelpingOverdue.
   ///
   /// In en, this message translates to:
-  /// **'{name}: whelping is {days} days past the expected date'**
+  /// **'{name}: whelping is {days} past the expected date'**
   String triageWhelpingOverdue(String name, String days);
+
+  /// No description provided for @daysSingle.
+  ///
+  /// In en, this message translates to:
+  /// **'{n} day'**
+  String daysSingle(String n);
+
+  /// No description provided for @daysDual.
+  ///
+  /// In en, this message translates to:
+  /// **'{n} days'**
+  String daysDual(String n);
+
+  /// No description provided for @daysPlural.
+  ///
+  /// In en, this message translates to:
+  /// **'{n} days'**
+  String daysPlural(String n);
 }
 
 class _AppLocalizationsDelegate

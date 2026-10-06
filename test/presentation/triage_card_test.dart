@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:salala/core/utils/triage.dart';
 import 'package:salala/data/models/animal.dart';
 import 'package:salala/data/models/vaccination.dart';
+import 'package:salala/data/models/weight_entry.dart';
 
 import '../helpers/pump_app.dart';
 
@@ -46,6 +47,31 @@ Future<void> _openLedger(WidgetTester tester) async {
   await tester.tap(find.text('Sira'));
   await settleRealIo(tester);
 }
+
+Future<void> _tap(WidgetTester tester, Finder finder) async {
+  await tester.ensureVisible(finder);
+  await tester.pumpAndSettle();
+  await tester.tap(finder);
+  await tester.pumpAndSettle();
+}
+
+Future<void> _save(WidgetTester tester) async {
+  final save = find.widgetWithText(FilledButton, 'Save');
+  await tester.ensureVisible(save);
+  await tester.pumpAndSettle();
+  await tester.tap(save);
+  // The row is written through SQLite and the section re-reads itself
+  // afterwards, so one round of real waiting is not enough.
+  await settleRealIo(tester);
+  await settleRealIo(tester);
+}
+
+WeightEntry _weigh(int grams, int daysAgo) => WeightEntry(
+  id: '',
+  animalId: _animalId,
+  weightGrams: grams,
+  measuredAt: _daysAgo(daysAgo),
+);
 
 void main() {
   testWidgets('the table the app loads is the table in the repository', (
@@ -117,5 +143,42 @@ void main() {
     expect(find.text('زيارة بيطرية روتينية'), findsOneWidget);
     // D21: the count of days is Latin even in the Arabic sentence.
     expect(find.text('Rabies كان مستحقًا منذ 20 يومًا'), findsOneWidget);
+  });
+
+  testWidgets('the card moves when a record is saved on top of it', (
+    tester,
+  ) async {
+    // This is the phone's bug, written down. On the Realme the ledger said
+    // "Nothing in this record calls for a next step" while a Rabies dose due the
+    // next morning sat in the section below it, and only leaving the screen and
+    // coming back moved the card: the verdict was a snapshot of the moment the
+    // page opened, because nothing in the write path invalidated it. The whole
+    // point of deriving it from the record lists instead is that this test has
+    // to pass without a navigation in it.
+    _usePhoneViewport(tester);
+    await pumpSalala(
+      tester,
+      seed: <Animal>[_animal()],
+      seedWeights: <WeightEntry>[_weigh(1000, 25)],
+    );
+    await _openLedger(tester);
+
+    expect(
+      find.text('Nothing in this record calls for a next step'),
+      findsOneWidget,
+    );
+
+    await _tap(tester, find.widgetWithText(TextButton, 'Add weight'));
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Weight (kg)'),
+      '0.8',
+    );
+    await _save(tester);
+
+    expect(find.text('Keep watching'), findsOneWidget);
+    expect(
+      find.text('Weight has fallen 20% since the last weigh-in'),
+      findsOneWidget,
+    );
   });
 }

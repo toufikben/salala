@@ -617,6 +617,72 @@ classifier is behind a measured benchmark or it does not ship.
   settles this; a breeder answering "do you weigh out-pups?" does.
 - The classifier has not been started. It stays behind a measured benchmark.
 
+### Device check — Stage 3a card on the Realme RMX3910 *(in progress, 2026-10-06)*
+
+The build under test is the one run `37444073871` published from `e47cedf`
+(APK sha1 `79c06dcf…`), installed over the previous build after its database was
+backed up off the phone. The old build held one test row of mine and nothing
+else. Notifications were granted by the runtime prompt (`POST_NOTIFICATIONS:
+granted=true, flags=[USER_SET|…]`).
+
+What the phone has now answered, by its own screen rather than a test:
+
+- **The provider's own bundle read works.** A ledger opened on the phone shows
+  the card — *"What to do next / Nothing in this record calls for a next step /
+  Salala reads only what you typed here…"* — which is the one line the harness
+  can never execute (`await rootBundle` in a provider body). The five red runs
+  were a fake-async limit, not an app defect, and that is now measured rather
+  than asserted.
+- **A negative control holds.** A screening saved as `Clear` added no finding:
+  the card still said "nothing calls for a next step" after the row appeared
+  under Health tests. The clear-result list is real behaviour on a real screen,
+  not only an engine test.
+- **A due dose reaches the card.** Rabies given `Oct 7, 2025`, next due
+  `Oct 7, 2026` produced *"Routine vet visit / Rabies is due in 1 days"* —
+  `dose_due_soon` with `withinDays: 14`, one day out.
+- **The alarm is booked by the save.** `dumpsys alarm` afterwards holds exactly
+  one Salala entry: `RTC_WAKEUP … origWhen=2026-10-07 09:00:00.000` against
+  `ScheduledNotificationReceiver`. The month-ahead half of that dose's pair is
+  absent because its morning has already passed, which is the rule
+  `remindersFor` states. Delivery is still unproven: it needs the phone to sit
+  untouched until 09:00.
+- **D21 holds on every date the pass produced** — `Jan 1, 2024`, `Oct 7, 2025`,
+  `Oct 6, 2026` — Latin digits in the form, the list, the ledger and the card.
+
+Two defects the phone found and CI's 195 tests did not:
+
+1. **The card was a snapshot.** Saving a dose moved the Vaccinations section
+   under the card and left the card itself saying "nothing calls for a next
+   step"; the verdict only appeared after leaving the ledger and coming back.
+   Cause: `triageForAnimalProvider` read its facts straight from the DAOs, and
+   no write path in `record_providers.dart` invalidates it. Fixed by deriving
+   the verdict from the providers the ledger already keeps — the herd, the
+   litters and the three per-animal lists — all `watch`ed before the first
+   `await`, so D7's `ref` rule still holds. `test/presentation/triage_card_test.dart`
+   now carries that exact sequence as a regression test, and it is RED
+   against the old body for the right reason: the family element survives the
+   popped route, so the old card keeps its cached value.
+2. **"1 days".** Every day count in the card was an ARB sentence with the unit
+   hard-coded in the plural, so a dose due tomorrow read "due in 1 days" and a
+   two-day-old unvaccinated puppy would read "2 days". Arabic was wrong in the
+   other direction: one word for every count, where 2 takes the dual and 3-10
+   the plural. Fixed by moving the number-and-unit phrase into
+   `daysSingle`/`daysDual`/`daysPlural` and choosing the form in
+   `triage_labels.dart` — not with `intl`'s plural logic, which renders the
+   *number* through the locale's number format and would have put Arabic-Indic
+   digits back on screen against D21. `test/core/triage_labels_test.dart`
+   covers 1/2/3/10/11/20/90 in all three languages and asserts the digit stays
+   Latin.
+
+**Verification state of both fixes: NOT RUN.** Nothing above was re-checked on
+the phone after the change; the first gate is CI.
+
+Still owed by this pass: the `act now` and `watch` cards on screen, a `sold`
+animal with a stalled curve (the open question above, for the owner to see
+rather than guess at), the Arabic ledger, the JSON pack out through the share
+sheet and back in, the buyer PDF in both languages, the force-stop → reopen
+alarm rebuild on this build, and the 09:00 delivery.
+
 ## Stage 4 — Distribution
 
 Blocked on the business question in `docs/FEASIBILITY.md` §Payments: a Morocco

@@ -627,17 +627,17 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String triageNoDoseYoung(String days) {
-    return 'لم يُسجَّل أي تلقيح والعمر $days يومًا';
+    return 'لم يُسجَّل أي تلقيح والعمر $days';
   }
 
   @override
   String triageDoseOverdue(String name, String days) {
-    return '$name كان مستحقًا منذ $days يومًا';
+    return '$name كان مستحقًا منذ $days';
   }
 
   @override
   String triageDoseDueSoon(String name, String days) {
-    return '$name مستحق خلال $days يومًا';
+    return '$name مستحق خلال $days';
   }
 
   @override
@@ -652,7 +652,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String triageNoGainPuppy(String days) {
-    return 'زيادة الوزن شبه معدومة خلال $days يومًا';
+    return 'زيادة الوزن شبه معدومة خلال $days';
   }
 
   @override
@@ -662,11 +662,26 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String triageTestExpired(String name, String days) {
-    return 'انتهت شهادة $name منذ $days يومًا';
+    return 'انتهت شهادة $name منذ $days';
   }
 
   @override
   String triageWhelpingOverdue(String name, String days) {
-    return '$name: تجاوزت الولادة التاريخ المتوقع بـ $days يومًا';
+    return '$name: تجاوزت الولادة التاريخ المتوقع بـ $days';
+  }
+
+  @override
+  String daysSingle(String n) {
+    return '$n يومًا';
+  }
+
+  @override
+  String daysDual(String n) {
+    return '$n يومين';
+  }
+
+  @override
+  String daysPlural(String n) {
+    return '$n أيام';
   }
 }

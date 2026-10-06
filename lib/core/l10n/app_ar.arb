@@ -235,13 +235,17 @@
   "triageRoutineVet": "زيارة بيطرية روتينية",
   "triageNothing": "لا شيء في هذا السجل يستدعي خطوة الآن",
   "triageNotDiagnosis": "لا تقرأ سلالة إلا ما كتبته هنا، وهذا ليس تشخيصًا بيطريًا.",
-  "triageNoDoseYoung": "لم يُسجَّل أي تلقيح والعمر {days} يومًا",
-  "triageDoseOverdue": "{name} كان مستحقًا منذ {days} يومًا",
-  "triageDoseDueSoon": "{name} مستحق خلال {days} يومًا",
+  "triageNoDoseYoung": "لم يُسجَّل أي تلقيح والعمر {days}",
+  "triageDoseOverdue": "{name} كان مستحقًا منذ {days}",
+  "triageDoseDueSoon": "{name} مستحق خلال {days}",
   "triageWeightLossPuppy": "فقد الحيوان الصغير {percent}% من وزنه منذ آخر وزن",
   "triageWeightLoss": "انخفض الوزن {percent}% منذ آخر وزن",
-  "triageNoGainPuppy": "زيادة الوزن شبه معدومة خلال {days} يومًا",
+  "triageNoGainPuppy": "زيادة الوزن شبه معدومة خلال {days}",
   "triageTestFlagged": "لم تعد نتيجة {name} سالمة",
-  "triageTestExpired": "انتهت شهادة {name} منذ {days} يومًا",
-  "triageWhelpingOverdue": "{name}: تجاوزت الولادة التاريخ المتوقع بـ {days} يومًا"
+  "triageTestExpired": "انتهت شهادة {name} منذ {days}",
+  "triageWhelpingOverdue": "{name}: تجاوزت الولادة التاريخ المتوقع بـ {days}",
+
+  "daysSingle": "{n} يومًا",
+  "daysDual": "{n} يومين",
+  "daysPlural": "{n} أيام"
 }

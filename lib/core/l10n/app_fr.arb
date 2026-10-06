@@ -235,13 +235,17 @@
   "triageRoutineVet": "Visite vétérinaire courante",
   "triageNothing": "Rien dans ce dossier n'appelle une action",
   "triageNotDiagnosis": "Salala ne lit que ce que vous avez saisi ici. Ceci n'est pas un diagnostic vétérinaire.",
-  "triageNoDoseYoung": "Aucune vaccination enregistrée, à {days} jours",
-  "triageDoseOverdue": "{name} en retard de {days} jours",
-  "triageDoseDueSoon": "{name} prévu dans {days} jours",
+  "triageNoDoseYoung": "Aucune vaccination enregistrée, à {days}",
+  "triageDoseOverdue": "{name} en retard de {days}",
+  "triageDoseDueSoon": "{name} prévu dans {days}",
   "triageWeightLossPuppy": "Le jeune animal a perdu {percent}% de poids depuis la dernière pesée",
   "triageWeightLoss": "Perte de {percent}% depuis la dernière pesée",
-  "triageNoGainPuppy": "Quasi aucune prise de poids en {days} jours",
+  "triageNoGainPuppy": "Quasi aucune prise de poids en {days}",
   "triageTestFlagged": "Le résultat {name} n'est pas revenu clair",
-  "triageTestExpired": "Le certificat {name} a expiré il y a {days} jours",
-  "triageWhelpingOverdue": "{name} : mise bas retardée de {days} jours"
+  "triageTestExpired": "Le certificat {name} a expiré il y a {days}",
+  "triageWhelpingOverdue": "{name} : mise bas retardée de {days}",
+
+  "daysSingle": "{n} jour",
+  "daysDual": "{n} jours",
+  "daysPlural": "{n} jours"
 }
