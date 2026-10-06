@@ -44,7 +44,7 @@
       }
     }
   },
-  "animalDeleteBody": "Its vaccinations, health tests, weights and visits are deleted too. This cannot be undone.",
+  "animalDeleteBody": "Its vaccinations, health tests, weights, visits and symptoms are deleted too. This cannot be undone.",
   "animalNameRequired": "A name is required",
   "animalSpeciesRequired": "Choose a species",
 
@@ -61,6 +61,7 @@
   "recordsHealthTests": "Health tests",
   "recordsWeights": "Weights",
   "recordsVisits": "Vet visits",
+  "recordsSymptoms": "Symptoms",
   "recordsEmpty": "Nothing recorded yet.",
 
   "actionSave": "Save",
@@ -248,6 +249,30 @@
   "visitCurrency": "Currency",
   "visitDeleteBody": "The visit is removed from this animal's history. This cannot be undone.",
 
+  "symptomAdd": "Add symptom",
+  "symptomAddTitle": "Log a symptom",
+  "@symptomAddTitle": {
+    "description": "A sign the breeder saw and typed, not a diagnosis. 'Symptom' is the word the roadmap uses and the word a vet's intake form uses."
+  },
+  "symptomEditTitle": "Edit symptom",
+  "symptomName": "Symptom",
+  "@symptomName": {
+    "description": "The sign as the breeder typed it: 'vomiting', 'limping on the left'. Free text, because the signs worth writing down depend on the breed and the age — the same reason `healthTestType` has no list."
+  },
+  "symptomNameRequired": "Say what you saw",
+  "symptomSeverity": "Severity",
+  "severityMild": "Mild",
+  "severityModerate": "Moderate",
+  "severitySevere": "Severe",
+  "symptomObservedOn": "Seen on",
+  "symptomState": "Status",
+  "@symptomState": {
+    "description": "Ongoing or resolved, the column the triage rules read. Its own key because reusing the animal's own `status` would put that word's translations in a buyer's document as a symptom heading."
+  },
+  "symptomOngoing": "Still happening",
+  "symptomResolved": "Resolved",
+  "symptomDeleteBody": "The symptom is removed from this animal's history. This cannot be undone.",
+
   "reminderHeadsUpBody": "Heads up: {what} is due on {dueDay}",
   "@reminderHeadsUpBody": {
     "description": "The month-ahead alarm. {what} is the dose or screening name as the breeder typed it, {dueDay} a localised date.",
@@ -331,6 +356,17 @@
   },
   "triageWhelpingOverdue": "{name}: whelping is {days} past the expected date",
   "@triageWhelpingOverdue": {
+    "placeholders": {
+      "name": { "type": "String" },
+      "days": { "type": "String" }
+    }
+  },
+  "triageSevereSymptom": "{name} was recorded as severe and is still happening",
+  "@triageSevereSymptom": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "triageSymptomUnresolved": "{name} was seen {days} ago and is still happening",
+  "@triageSymptomUnresolved": {
     "placeholders": {
       "name": { "type": "String" },
       "days": { "type": "String" }

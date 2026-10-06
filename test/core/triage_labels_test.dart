@@ -77,4 +77,70 @@ void main() {
       'Rabies كان مستحقًا منذ 5 أيام',
     );
   });
+
+  // The symptom sentences are the first wording where the subject is free text
+  // a breeder typed, so the noun agreement has to survive it.
+  test('a symptom says its name once and its age in the right form', () async {
+    final en = await _locale('en');
+    expect(
+      triageMessage(
+        en,
+        const TriageFinding(
+          ruleId: TriageRuleId.severeSymptom,
+          urgency: TriageUrgency.actNow,
+          subject: 'Loose stool',
+        ),
+      ),
+      'Loose stool was recorded as severe and is still happening',
+    );
+    expect(
+      triageMessage(
+        en,
+        const TriageFinding(
+          ruleId: TriageRuleId.symptomUnresolved,
+          urgency: TriageUrgency.watch,
+          days: 1,
+          subject: 'Loose stool',
+        ),
+      ),
+      'Loose stool was seen 1 day ago and is still happening',
+    );
+
+    final ar = await _locale('ar');
+    expect(
+      triageMessage(
+        ar,
+        const TriageFinding(
+          ruleId: TriageRuleId.severeSymptom,
+          urgency: TriageUrgency.actNow,
+          subject: 'Loose stool',
+        ),
+      ),
+      'Loose stool سُجِّل بدرجة شديدة وما زال مستمرًا',
+    );
+    expect(
+      triageMessage(
+        ar,
+        const TriageFinding(
+          ruleId: TriageRuleId.symptomUnresolved,
+          urgency: TriageUrgency.watch,
+          days: 2,
+          subject: 'Loose stool',
+        ),
+      ),
+      'ما زال Loose stool مستمرًا بعد 2 يومين من رصده',
+    );
+    expect(
+      triageMessage(
+        ar,
+        const TriageFinding(
+          ruleId: TriageRuleId.symptomUnresolved,
+          urgency: TriageUrgency.watch,
+          days: 6,
+          subject: 'Loose stool',
+        ),
+      ),
+      'ما زال Loose stool مستمرًا بعد 6 أيام من رصده',
+    );
+  });
 }

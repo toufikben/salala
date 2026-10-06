@@ -119,6 +119,10 @@ PackRows parsePack(String text) {
   if (schema is int && schema > schemaVersion) {
     throw PackReject(PackProblem.fromTheFuture, 'schema $schema');
   }
+  // A file stamped with no schema version at all is read as one from this
+  // schema: it is a hand-made or damaged file rather than an old export, and the
+  // table check below is what catches it.
+  final writtenAtSchema = schema is int ? schema : schemaVersion;
 
   final Object? rows = pack['rows'];
   if (rows is! Map) throw const PackReject(PackProblem.notAPack, 'rows');
@@ -150,13 +154,39 @@ PackRows parsePack(String text) {
     }
   }
 
+  // Every table this app has has to be in the file, or the restore would leave
+  // rows behind without saying so. The one exception is a table newer than the
+  // pack: `symptoms` arrived with schema version 2, so a pack exported by
+  // version 1 never held it. Refusing that file would tell a breeder their only
+  // backup is incomplete when the honest reading is that the ledger had no
+  // symptoms in it yet, so a table the pack predates is restored as an empty
+  // one. Nothing else is forgiven: a pack stamped with the current schema that
+  // lost a table it should have carried is damaged, and D22 stands.
   for (final table in dataTables) {
-    if (!tables.containsKey(table)) {
-      throw PackReject(PackProblem.missingTable, table);
+    if (tables.containsKey(table)) continue;
+    if (_addedAfterPack(table, writtenAtSchema)) {
+      tables[table] = const <Map<String, Object?>>[];
+      continue;
     }
+    throw PackReject(PackProblem.missingTable, table);
   }
 
   return PackRows(exportedAtMs: decoded['exportedAt'] as int?, tables: tables);
+}
+
+/// Tables that entered the schema after version 1, with the version that added
+/// them. A pack stamped below that number is entitled not to carry them.
+///
+/// `symptoms` is here because it is the first table this app has grown rather
+/// than shipped with; a future one joins the list, and a pack from before it
+/// still restores.
+const Map<String, int> _addedInSchemaVersion = <String, int>{'symptoms': 2};
+
+/// Whether [table] was written into the schema later than the version
+/// [packSchema] this file was exported at, so the file could not have held it.
+bool _addedAfterPack(String table, int packSchema) {
+  final added = _addedInSchemaVersion[table];
+  return added != null && packSchema < added;
 }
 
 /// Replaces everything on this device with the pack, or nothing.

@@ -3,6 +3,7 @@ import 'dart:convert';
 import '../../data/models/animal.dart';
 import '../../data/models/health_test.dart';
 import '../../data/models/litter.dart';
+import '../../data/models/symptom.dart';
 import '../../data/models/vaccination.dart';
 import '../../data/models/weight_entry.dart';
 import 'gestation.dart';
@@ -34,6 +35,8 @@ enum TriageRuleId {
   noWeightGainPuppy('no_weight_gain_puppy'),
   healthTestFlagged('health_test_flagged'),
   healthTestExpired('health_test_expired'),
+  severeSymptom('severe_symptom'),
+  symptomUnresolved('symptom_unresolved'),
   whelpingOverdue('whelping_overdue');
 
   const TriageRuleId(this.tableName);
@@ -48,17 +51,21 @@ TriageRuleId _ruleFromTableName(String name) => TriageRuleId.values.firstWhere(
 );
 
 /// Everything a rule is allowed to know: the animal and what the breeder typed
-/// about it. Nothing else — no lab feed, no symptom the record does not hold.
+/// about it. Nothing else — no lab feed, no weight the scale did not take, no
+/// sign that was never written down.
 ///
 /// Vet visits are deliberately absent. Their reason and outcome are free text, so
 /// a rule over them would be guessing at what "check again" meant three weeks
-/// ago, and a wrong "act now" costs more trust than a missing one.
+/// ago, and a wrong "act now" costs more trust than a missing one. A symptom
+/// record is the opposite case: the breeder named the sign, dated it and graded
+/// it themselves, so it can be read as a fact.
 class LedgerFacts {
   const LedgerFacts({
     required this.animal,
     required this.doses,
     required this.weighIns,
     required this.tests,
+    required this.symptoms,
     required this.litters,
     required this.nowMs,
   });
@@ -67,6 +74,10 @@ class LedgerFacts {
   final List<Vaccination> doses;
   final List<WeightEntry> weighIns;
   final List<HealthTest> tests;
+
+  /// What the breeder saw. Ordered by nothing the engine relies on: the
+  /// predicates that care about recency sort by `observedAt` themselves.
+  final List<Symptom> symptoms;
 
   /// Litters this animal stands on as dam or sire, because a mated dam whose
   /// whelping never got recorded is the one overdue event a ledger can see.
@@ -163,6 +174,8 @@ const Map<TriageRuleId, _Spec> _specs = <TriageRuleId, _Spec>{
   }, _noGainPuppy),
   TriageRuleId.healthTestFlagged: _Spec({}, _flaggedTest),
   TriageRuleId.healthTestExpired: _Spec({}, _expiredTest),
+  TriageRuleId.severeSymptom: _Spec({}, _severeSymptom),
+  TriageRuleId.symptomUnresolved: _Spec({'fromDays'}, _unresolvedSymptom),
   TriageRuleId.whelpingOverdue: _Spec({'graceDays'}, _whelpingOverdue),
 };
 
@@ -240,8 +253,8 @@ List<TriageRule> parseRules(String source) {
 
 /// The verdict: every enabled rule that fires, worst urgency first.
 List<TriageFinding> evaluateTriage(LedgerFacts facts, List<TriageRule> rules) {
-  // A deceased animal has no next action. Said here rather than in nine
-  // predicates, so "nothing applies" stays one rule.
+  // A deceased animal has no next action. Said here rather than in every
+  // predicate, so "nothing applies" stays one rule.
   if (facts.animal.status == AnimalStatus.deceased) {
     return const <TriageFinding>[];
   }
@@ -399,6 +412,55 @@ List<_Hit> _expiredTest(LedgerFacts facts, Map<String, double> params) {
     if (until == null || until > facts.nowMs) return;
     hits.add(_Hit(days: facts.daysSince(until), subject: type));
   });
+  return hits;
+}
+
+/// Sightings still marked as happening, most recent first.
+///
+/// The list is sorted here rather than trusted from the provider: a rule that
+/// reads "the newest one" cannot be correct on an unordered list, and the engine
+/// is also driven straight from tests and from a pack someone restored.
+List<Symptom> _openSymptoms(LedgerFacts facts) {
+  final open = <Symptom>[
+    for (final symptom in facts.symptoms)
+      if (symptom.ongoing) symptom,
+  ]..sort((a, b) => b.observedAt.compareTo(a.observedAt));
+  return open;
+}
+
+/// The newest sign the breeder graded as severe. Two severe signs are one
+/// action, the same way two overdue doses are one phone call, so the card says
+/// it once and quotes the label it was worst about.
+///
+/// No age window: a severe sign nobody has marked resolved is still the news,
+/// whether it was seen this morning or last week. What keeps it honest is that
+/// the row is correctable — the breeder who got over it marks it resolved from
+/// the ledger and the finding stops.
+List<_Hit> _severeSymptom(LedgerFacts facts, Map<String, double> params) {
+  for (final symptom in _openSymptoms(facts)) {
+    if (symptom.severity == SymptomSeverity.severe) {
+      return <_Hit>[_Hit(subject: symptom.label)];
+    }
+  }
+  return const <_Hit>[];
+}
+
+/// A mild or moderate sign that has been open for [fromDays] and nobody has
+/// acted on. The severity the breeder chose keeps this rule out of the way of
+/// `_severeSymptom`, so one row never produces both an "act now" and a "watch".
+///
+/// A floor on the age rather than a window: an open sign is worth a reminder
+/// from the second day onwards and stays worth one, while a freshness window
+/// would let a long-running problem drop off the card exactly when it has
+/// lasted long enough to matter.
+List<_Hit> _unresolvedSymptom(LedgerFacts facts, Map<String, double> params) {
+  final hits = <_Hit>[];
+  for (final symptom in _openSymptoms(facts)) {
+    if (symptom.severity == SymptomSeverity.severe) continue;
+    final age = facts.daysSince(symptom.observedAt);
+    if (age < params['fromDays']!) continue;
+    hits.add(_Hit(days: age, subject: symptom.label));
+  }
   return hits;
 }
 

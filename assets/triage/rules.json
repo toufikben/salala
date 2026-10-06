@@ -1,6 +1,11 @@
 {
-  "version": 1,
+  "version": 2,
   "rules": [
+    {
+      "id": "severe_symptom",
+      "urgency": "actNow",
+      "params": {}
+    },
     {
       "id": "whelping_overdue",
       "urgency": "actNow",
@@ -15,6 +20,11 @@
       "id": "weight_loss_puppy",
       "urgency": "actNow",
       "params": { "minPercent": 10, "puppyMaxAgeDays": 180 }
+    },
+    {
+      "id": "symptom_unresolved",
+      "urgency": "watch",
+      "params": { "fromDays": 2 }
     },
     {
       "id": "weight_loss",

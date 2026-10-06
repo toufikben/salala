@@ -12,6 +12,7 @@ import '../data/models/animal.dart';
 import '../data/models/health_test.dart';
 import '../data/models/litter.dart';
 import '../data/models/placement.dart';
+import '../data/models/symptom.dart';
 import '../data/models/vaccination.dart';
 import '../data/models/vet_visit.dart';
 import '../data/models/weight_entry.dart';
@@ -67,6 +68,7 @@ Future<Uint8List> animalPackPdf(
   final screenings = await daos.healthTests.forAnimal(animal.id);
   final visits = await daos.vetVisits.forAnimal(animal.id);
   final weighIns = await daos.weights.forAnimal(animal.id);
+  final sightings = await daos.symptoms.forAnimal(animal.id);
 
   final litters = await _everyLitterOf(daos, animal.id);
   final litterRows = <List<String>>[];
@@ -185,6 +187,30 @@ Future<Uint8List> animalPackPdf(
             _day(l10n, localeTag, visit.visitDate),
             visit.reason ?? l10n.visitNoReason,
             visit.outcome ?? l10n.valueUnknown,
+          ],
+      ],
+    ),
+    // What the breeder saw, in the buyer's document too: a symptom is the least
+    // verifiable line in this record and the one most likely to be left out of a
+    // paper summary, so it gets a table rather than a sentence in the notes.
+    ..._table(
+      l10n,
+      l10n.recordsSymptoms,
+      <String>[
+        l10n.symptomName,
+        l10n.symptomObservedOn,
+        l10n.symptomSeverity,
+        l10n.symptomState,
+        l10n.animalNotes,
+      ],
+      <List<String>>[
+        for (final Symptom symptom in sightings)
+          <String>[
+            symptom.label,
+            _day(l10n, localeTag, symptom.observedAt),
+            severityLabel(l10n, symptom.severity),
+            symptom.ongoing ? l10n.symptomOngoing : l10n.symptomResolved,
+            symptom.note ?? l10n.valueUnknown,
           ],
       ],
     ),

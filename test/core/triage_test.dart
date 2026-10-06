@@ -9,6 +9,7 @@ import 'package:salala/core/utils/triage.dart';
 import 'package:salala/data/models/animal.dart';
 import 'package:salala/data/models/health_test.dart';
 import 'package:salala/data/models/litter.dart';
+import 'package:salala/data/models/symptom.dart';
 import 'package:salala/data/models/vaccination.dart';
 import 'package:salala/data/models/weight_entry.dart';
 
@@ -91,6 +92,22 @@ Litter _litter({
   updatedAt: _ago(100),
 );
 
+Symptom _sight(
+  String label, {
+  SymptomSeverity severity = SymptomSeverity.mild,
+  int daysAgo = 0,
+  bool ongoing = true,
+}) => Symptom(
+  id: 's-$label-$daysAgo',
+  animalId: 'a',
+  label: label,
+  severity: severity,
+  observedAt: _ago(daysAgo),
+  ongoing: ongoing,
+  createdAt: _ago(daysAgo),
+  updatedAt: _ago(daysAgo),
+);
+
 LedgerFacts _facts({
   Animal animal = const Animal(
     id: 'a',
@@ -104,12 +121,14 @@ LedgerFacts _facts({
   List<Vaccination> doses = const <Vaccination>[],
   List<WeightEntry> weighIns = const <WeightEntry>[],
   List<HealthTest> tests = const <HealthTest>[],
+  List<Symptom> symptoms = const <Symptom>[],
   List<Litter> litters = const <Litter>[],
 }) => LedgerFacts(
   animal: animal,
   doses: doses,
   weighIns: weighIns,
   tests: tests,
+  symptoms: symptoms,
   litters: litters,
   nowMs: _now,
 );
@@ -469,6 +488,147 @@ void main() {
       expect(_finding(pet, TriageRuleId.healthTestExpired), isNull);
     });
 
+    test('a sign the breeder graded severe is an emergency on its own', () {
+      final findings = evaluateTriage(
+        _facts(
+          animal: _animal('a', ageDays: 900),
+          symptoms: <Symptom>[
+            _sight('Blood in stool', severity: SymptomSeverity.severe),
+          ],
+        ),
+        rules,
+      );
+      final finding = _finding(findings, TriageRuleId.severeSymptom)!;
+      expect(finding.urgency, TriageUrgency.actNow);
+      expect(finding.subject, 'Blood in stool');
+    });
+
+    test('a severe sign that was marked resolved stops alarming', () {
+      // The row is the only thing that can silence it, which is why the ledger
+      // opens the dialog on a tap instead of only offering a delete.
+      final findings = evaluateTriage(
+        _facts(
+          animal: _animal('a', ageDays: 900),
+          symptoms: <Symptom>[
+            _sight(
+              'Blood in stool',
+              severity: SymptomSeverity.severe,
+              daysAgo: 20,
+              ongoing: false,
+            ),
+          ],
+        ),
+        rules,
+      );
+      expect(_finding(findings, TriageRuleId.severeSymptom), isNull);
+      expect(_finding(findings, TriageRuleId.symptomUnresolved), isNull);
+    });
+
+    test('a severe sign is reported once, as the newest one', () {
+      final findings = evaluateTriage(
+        _facts(
+          animal: _animal('a', ageDays: 900),
+          symptoms: <Symptom>[
+            _sight('Shaking', severity: SymptomSeverity.severe, daysAgo: 9),
+            _sight('Collapsing', severity: SymptomSeverity.severe, daysAgo: 1),
+          ],
+        ),
+        rules,
+      );
+      final severe = findings
+          .where((f) => f.ruleId == TriageRuleId.severeSymptom)
+          .toList();
+      expect(severe, hasLength(1));
+      expect(severe.single.subject, 'Collapsing');
+    });
+
+    test('a mild sign today is not yet worth a line on the card', () {
+      final findings = evaluateTriage(
+        _facts(
+          animal: _animal('a', ageDays: 900),
+          symptoms: <Symptom>[_sight('Scratching an ear')],
+        ),
+        rules,
+      );
+      expect(findings, isEmpty);
+    });
+
+    test('one day short of the threshold is still left alone', () {
+      final findings = evaluateTriage(
+        _facts(
+          animal: _animal('a', ageDays: 900),
+          symptoms: <Symptom>[_sight('Scratching an ear', daysAgo: 1)],
+        ),
+        rules,
+      );
+      expect(findings, isEmpty);
+    });
+
+    test('a sign still open on the threshold day is worth watching', () {
+      final findings = evaluateTriage(
+        _facts(
+          animal: _animal('a', ageDays: 900),
+          symptoms: <Symptom>[_sight('Loose stool', daysAgo: 2)],
+        ),
+        rules,
+      );
+      final finding = _finding(findings, TriageRuleId.symptomUnresolved)!;
+      expect(finding.urgency, TriageUrgency.watch);
+      expect(finding.days, 2);
+      expect(finding.subject, 'Loose stool');
+    });
+
+    test('each mild and moderate sign that drags gets its own line', () {
+      final findings = evaluateTriage(
+        _facts(
+          animal: _animal('a', ageDays: 900),
+          symptoms: <Symptom>[
+            _sight('Loose stool', daysAgo: 2),
+            _sight('Dull', severity: SymptomSeverity.moderate, daysAgo: 6),
+            _sight('Scratching', daysAgo: 0),
+          ],
+        ),
+        rules,
+      );
+      final open = findings
+          .where((f) => f.ruleId == TriageRuleId.symptomUnresolved)
+          .toList();
+      expect(open, hasLength(2));
+    });
+
+    test('a severe sign never earns a second, quieter line', () {
+      // The two rules split the grades: one row, one urgency. A card that said
+      // "act now" and "keep watching" about the same sighting reads like an app
+      // that does not know its own answer.
+      final findings = evaluateTriage(
+        _facts(
+          animal: _animal('a', ageDays: 900),
+          symptoms: <Symptom>[
+            _sight('Seizure', severity: SymptomSeverity.severe, daysAgo: 30),
+          ],
+        ),
+        rules,
+      );
+      expect(findings, hasLength(1));
+      expect(findings.single.ruleId, TriageRuleId.severeSymptom);
+    });
+
+    test('a sighting dated ahead of this phone is not an overdue one', () {
+      // Only a restored pack can hold one (the picker refuses a future day), and
+      // a negative age must not slip past the threshold by being small.
+      final findings = evaluateTriage(
+        _facts(
+          animal: _animal('a', ageDays: 900),
+          symptoms: <Symptom>[
+            _sight('Loose stool', daysAgo: -4),
+            _sight('Dull', severity: SymptomSeverity.moderate, daysAgo: -4),
+          ],
+        ),
+        rules,
+      );
+      expect(_finding(findings, TriageRuleId.symptomUnresolved), isNull);
+    });
+
     test('a mated dam past her date is an emergency', () {
       final findings = evaluateTriage(
         _facts(
@@ -600,7 +760,8 @@ void main() {
           // Which part of the finding the sentence is allowed to read.
           final expected = switch (id) {
             TriageRuleId.weightLoss || TriageRuleId.weightLossPuppy => '19',
-            TriageRuleId.healthTestFlagged => 'Rabies',
+            TriageRuleId.healthTestFlagged ||
+            TriageRuleId.severeSymptom => 'Rabies',
             _ => '12',
           };
           for (final l10n in localizations) {

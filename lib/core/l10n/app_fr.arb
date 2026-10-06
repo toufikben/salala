@@ -27,7 +27,7 @@
   "animalAddTitle": "Ajouter un animal",
   "animalEditTitle": "Modifier l'animal",
   "animalDeleteTitle": "Supprimer {name} ?",
-  "animalDeleteBody": "Ses vaccins, tests de santé, pesées et visites seront supprimés aussi. Action irréversible.",
+  "animalDeleteBody": "Ses vaccins, tests de santé, pesées, visites et symptômes seront supprimés aussi. Action irréversible.",
   "animalNameRequired": "Le nom est obligatoire",
   "animalSpeciesRequired": "Choisissez une espèce",
 
@@ -44,6 +44,7 @@
   "recordsHealthTests": "Tests de santé",
   "recordsWeights": "Pesées",
   "recordsVisits": "Visites vétérinaires",
+  "recordsSymptoms": "Symptômes",
   "recordsEmpty": "Rien d'enregistré.",
 
   "actionSave": "Enregistrer",
@@ -199,6 +200,21 @@
   "visitCurrency": "Devise",
   "visitDeleteBody": "La visite est retirée de l'historique de cet animal. Action irréversible.",
 
+  "symptomAdd": "Ajouter un symptôme",
+  "symptomAddTitle": "Enregistrer un symptôme",
+  "symptomEditTitle": "Modifier le symptôme",
+  "symptomName": "Symptôme",
+  "symptomNameRequired": "Décrivez ce que vous avez constaté",
+  "symptomSeverity": "Intensité",
+  "severityMild": "Légère",
+  "severityModerate": "Modérée",
+  "severitySevere": "Sévère",
+  "symptomObservedOn": "Constaté le",
+  "symptomState": "État",
+  "symptomOngoing": "Toujours en cours",
+  "symptomResolved": "Résolu",
+  "symptomDeleteBody": "Le symptôme est retiré de l'historique de cet animal. Action irréversible.",
+
   "reminderHeadsUpBody": "À noter : {what} arrive à échéance le {dueDay}",
   "@reminderHeadsUpBody": {
     "placeholders": {
@@ -244,6 +260,8 @@
   "triageTestFlagged": "Le résultat {name} n'est pas revenu clair",
   "triageTestExpired": "Le certificat {name} a expiré il y a {days}",
   "triageWhelpingOverdue": "{name} : mise bas retardée de {days}",
+  "triageSevereSymptom": "{name} enregistré comme sévère et toujours en cours",
+  "triageSymptomUnresolved": "{name} constaté il y a {days} et toujours en cours",
 
   "daysSingle": "{n} jour",
   "daysDual": "{n} jours",

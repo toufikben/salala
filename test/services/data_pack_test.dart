@@ -95,6 +95,27 @@ Future<void> seed(Database db) async {
     'created_at': 1740000000000,
     'updated_at': 1740000000000,
   });
+  await db.insert('symptoms', <String, Object?>{
+    'id': 's-1',
+    'animal_id': 'a-pup',
+    'label': 'Loose stool',
+    'severity': 'moderate',
+    'observed_at': 1740500000000,
+    'ongoing': 1,
+    'note': 'Started after the change of food',
+    'created_at': 1740500000000,
+    'updated_at': 1740500000000,
+  });
+  await db.insert('symptoms', <String, Object?>{
+    'id': 's-2',
+    'animal_id': 'a-dam',
+    'label': 'Limping',
+    'severity': 'severe',
+    'observed_at': 1710000000000,
+    'ongoing': 0,
+    'created_at': 1710000000000,
+    'updated_at': 1712000000000,
+  });
   await db.insert('buyers', <String, Object?>{
     'id': 'b-1',
     'name': 'Sofia',

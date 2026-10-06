@@ -56,6 +56,7 @@ final triageForAnimalProvider = FutureProvider.autoDispose
       final doses = ref.watch(vaccinationsForAnimalProvider(animalId).future);
       final weighIns = ref.watch(weightsForAnimalProvider(animalId).future);
       final tests = ref.watch(healthTestsForAnimalProvider(animalId).future);
+      final symptoms = ref.watch(symptomsForAnimalProvider(animalId).future);
 
       Animal? animal;
       for (final held in await herd) {
@@ -69,6 +70,7 @@ final triageForAnimalProvider = FutureProvider.autoDispose
           doses: await doses,
           weighIns: await weighIns,
           tests: await tests,
+          symptoms: await symptoms,
           litters: <Litter>[
             for (final litter in await litters)
               if (litter.damId == animalId || litter.sireId == animalId) litter,

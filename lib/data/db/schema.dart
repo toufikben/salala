@@ -1,4 +1,4 @@
-// Database schema v1 for Salala (breeder health + lineage records).
+// Database schema v2 for Salala (breeder health + lineage records).
 //
 // Design notes (see ARCHITECTURE.md):
 // - Single breeder per device: no `owners` table (the consumer-app idea from the
@@ -6,8 +6,33 @@
 // - `animals` covers both breeding stock and puppies; lineage is dam_id/sire_id.
 // - `health_tests` is the paid differentiator (OFA/PENNFID/FCI-style screening).
 // - Timestamps are Unix milliseconds (INTEGER) so they survive locale changes.
+// - `symptoms` hangs off an animal like every other record type, never off a
+//   litter: a litter's puppies *are* animals, so a second ownership model would
+//   only be a second way for a row to end up belonging to nobody.
 
-const int schemaVersion = 1;
+const int schemaVersion = 2;
+
+/// The `symptoms` table is named here rather than written inline because version
+/// 2 has to create exactly this shape for the installs it upgrades; a copy that
+/// drifts from the one below would leave old phones with a table the DAO in this
+/// build cannot read.
+const String createSymptomsTable = '''
+  CREATE TABLE symptoms (
+    id TEXT PRIMARY KEY,
+    animal_id TEXT NOT NULL,
+    label TEXT NOT NULL,
+    severity TEXT NOT NULL DEFAULT 'mild',
+    observed_at INTEGER NOT NULL,
+    ongoing INTEGER NOT NULL DEFAULT 1,
+    note TEXT,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+    FOREIGN KEY (animal_id) REFERENCES animals (id) ON DELETE CASCADE
+  )
+''';
+
+const String createSymptomsIndex =
+    'CREATE INDEX idx_symptoms_animal ON symptoms (animal_id, observed_at)';
 
 const List<String> createStatements = <String>[
   '''
@@ -115,6 +140,7 @@ const List<String> createStatements = <String>[
     FOREIGN KEY (animal_id) REFERENCES animals (id) ON DELETE CASCADE
   )
   ''',
+  createSymptomsTable,
   '''
   CREATE TABLE buyers (
     id TEXT PRIMARY KEY,
@@ -158,6 +184,7 @@ const List<String> createStatements = <String>[
   'CREATE INDEX idx_health_tests_animal ON health_tests (animal_id)',
   'CREATE INDEX idx_weights_animal ON weight_entries (animal_id, measured_at)',
   'CREATE INDEX idx_visits_animal ON vet_visits (animal_id, visit_date)',
+  createSymptomsIndex,
   'CREATE INDEX idx_placements_animal ON placements (animal_id)',
 ];
 
@@ -179,6 +206,7 @@ const List<String> dataTables = <String>[
   'health_tests',
   'weight_entries',
   'vet_visits',
+  'symptoms',
   'buyers',
   'placements',
   'user_settings',

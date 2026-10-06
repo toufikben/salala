@@ -98,7 +98,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get animalDeleteBody =>
-      'Its vaccinations, health tests, weights and visits are deleted too. This cannot be undone.';
+      'Its vaccinations, health tests, weights, visits and symptoms are deleted too. This cannot be undone.';
 
   @override
   String get animalNameRequired => 'A name is required';
@@ -138,6 +138,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get recordsVisits => 'Vet visits';
+
+  @override
+  String get recordsSymptoms => 'Symptoms';
 
   @override
   String get recordsEmpty => 'Nothing recorded yet.';
@@ -546,6 +549,49 @@ class AppLocalizationsEn extends AppLocalizations {
       'The visit is removed from this animal\'s history. This cannot be undone.';
 
   @override
+  String get symptomAdd => 'Add symptom';
+
+  @override
+  String get symptomAddTitle => 'Log a symptom';
+
+  @override
+  String get symptomEditTitle => 'Edit symptom';
+
+  @override
+  String get symptomName => 'Symptom';
+
+  @override
+  String get symptomNameRequired => 'Say what you saw';
+
+  @override
+  String get symptomSeverity => 'Severity';
+
+  @override
+  String get severityMild => 'Mild';
+
+  @override
+  String get severityModerate => 'Moderate';
+
+  @override
+  String get severitySevere => 'Severe';
+
+  @override
+  String get symptomObservedOn => 'Seen on';
+
+  @override
+  String get symptomState => 'Status';
+
+  @override
+  String get symptomOngoing => 'Still happening';
+
+  @override
+  String get symptomResolved => 'Resolved';
+
+  @override
+  String get symptomDeleteBody =>
+      'The symptom is removed from this animal\'s history. This cannot be undone.';
+
+  @override
   String reminderHeadsUpBody(String what, String dueDay) {
     return 'Heads up: $what is due on $dueDay';
   }
@@ -665,6 +711,16 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String triageWhelpingOverdue(String name, String days) {
     return '$name: whelping is $days past the expected date';
+  }
+
+  @override
+  String triageSevereSymptom(String name) {
+    return '$name was recorded as severe and is still happening';
+  }
+
+  @override
+  String triageSymptomUnresolved(String name, String days) {
+    return '$name was seen $days ago and is still happening';
   }
 
   @override

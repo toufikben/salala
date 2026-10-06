@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:salala/data/db/daos.dart';
 import 'package:salala/data/models/animal.dart';
 import 'package:salala/data/models/health_test.dart';
+import 'package:salala/data/models/symptom.dart';
 import 'package:salala/data/models/vaccination.dart';
 import 'package:salala/data/models/vet_visit.dart';
 import 'package:salala/data/models/weight_entry.dart';
@@ -241,6 +242,141 @@ void main() {
 
       final rows = await daos.vetVisits.forAnimal(animalId);
       expect(rows.map((r) => r.visitDate).toList(), <int>[40, 10]);
+    });
+  });
+
+  group('SymptomDao', () {
+    Symptom sight({
+      String label = 'Limping on the left',
+      SymptomSeverity severity = SymptomSeverity.mild,
+      int at = 1000,
+      bool ongoing = true,
+      String? note,
+    }) {
+      return Symptom(
+        id: '',
+        animalId: animalId,
+        label: label,
+        severity: severity,
+        observedAt: at,
+        ongoing: ongoing,
+        note: note,
+        createdAt: 0,
+        updatedAt: 0,
+      );
+    }
+
+    test(
+      'round-trips the sign, its grade and whether it is still there',
+      () async {
+        final created = await daos.symptoms.create(
+          sight(severity: SymptomSeverity.severe, note: 'won\'t bear weight'),
+          nowMs: 7,
+        );
+
+        final read = await daos.symptoms.findById(created.id);
+        expect(read, created);
+        expect(read!.label, 'Limping on the left');
+        expect(read.severity, SymptomSeverity.severe);
+        expect(read.ongoing, isTrue);
+        expect(read.note, 'won\'t bear weight');
+        expect(read.createdAt, 7);
+      },
+    );
+
+    test('a resolved sighting is stored as a fact that stopped', () async {
+      final created = await daos.symptoms.create(sight(), nowMs: 1);
+      await daos.symptoms.update(created.copyWith(ongoing: false), nowMs: 2);
+
+      final row = await daos.symptoms.findById(created.id);
+      expect(row!.ongoing, isFalse);
+      expect(row.observedAt, 1000);
+      expect(row.updatedAt, 2);
+    });
+
+    test('clearing a note writes a null, not an empty string', () async {
+      final created = await daos.symptoms.create(
+        sight(note: 'since Tuesday'),
+        nowMs: 1,
+      );
+      await daos.symptoms.update(created.copyWith(clearNote: true), nowMs: 2);
+
+      expect((await daos.symptoms.findById(created.id))!.note, isNull);
+    });
+
+    test('newest sighting first, and only this animal\'s', () async {
+      await daos.symptoms.create(sight(label: 'Cough', at: 10), nowMs: 1);
+      await daos.symptoms.create(sight(at: 30), nowMs: 2);
+      final other = await daos.animals.create(
+        Animal(
+          id: '',
+          name: 'Other',
+          species: 'cat',
+          sex: Sex.female,
+          status: AnimalStatus.active,
+          createdAt: 0,
+          updatedAt: 0,
+        ),
+        nowMs: 1,
+      );
+      await daos.symptoms.create(
+        Symptom(
+          id: '',
+          animalId: other.id,
+          label: 'Dull',
+          severity: SymptomSeverity.moderate,
+          observedAt: 90,
+          ongoing: true,
+          createdAt: 0,
+          updatedAt: 0,
+        ),
+        nowMs: 1,
+      );
+
+      final mine = await daos.symptoms.forAnimal(animalId);
+      expect(mine.map((s) => s.observedAt).toList(), <int>[30, 10]);
+      expect(await daos.symptoms.forAnimal('missing'), isEmpty);
+    });
+
+    test('deleting the row takes only that sighting', () async {
+      final kept = await daos.symptoms.create(sight(label: 'Cough'), nowMs: 1);
+      final gone = await daos.symptoms.create(sight(at: 2000), nowMs: 2);
+
+      expect(await daos.symptoms.delete(gone.id), 1);
+      expect(await daos.symptoms.findById(gone.id), isNull);
+      expect(await daos.symptoms.forAnimal(animalId), <Symptom>[kept]);
+    });
+
+    test('a sighting for an animal that is not there is rejected', () async {
+      await expectLater(
+        daos.symptoms.create(
+          Symptom(
+            id: '',
+            animalId: 'nobody',
+            label: 'Anything',
+            severity: SymptomSeverity.mild,
+            observedAt: 1,
+            ongoing: true,
+            createdAt: 0,
+            updatedAt: 0,
+          ),
+        ),
+        throwsA(anything),
+      );
+    });
+
+    test('a severity this build does not know reads as mild', () async {
+      // Same rule as `sexFromName`: a row written by a future app must not
+      // break this one. `mild` is the safe reading, because the louder grades
+      // are the ones that move a screen.
+      final created = await daos.symptoms.create(sight(), nowMs: 1);
+      await daos.symptoms.db.rawUpdate(
+        'UPDATE symptoms SET severity = ? WHERE id = ?',
+        <Object?>['critical', created.id],
+      );
+
+      final row = await daos.symptoms.findById(created.id);
+      expect(row!.severity, SymptomSeverity.mild);
     });
   });
 }

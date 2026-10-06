@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/l10n/app_localizations.dart';
 import '../../data/models/animal.dart';
 import '../../data/models/health_test.dart';
+import '../../data/models/symptom.dart';
 import '../../data/models/vaccination.dart';
 import '../../data/models/vet_visit.dart';
 import '../../data/models/weight_entry.dart';
@@ -101,6 +102,27 @@ Future<void> saveVisit(WidgetRef ref, VetVisit visit) async {
 Future<void> deleteVisit(WidgetRef ref, VetVisit visit) async {
   await ref.read(daosProvider).vetVisits.delete(visit.id);
   ref.invalidate(visitsForAnimalProvider(visit.animalId));
+}
+
+/// Sightings the breeder typed, newest first.
+final symptomsForAnimalProvider = FutureProvider.autoDispose
+    .family<List<Symptom>, String>(
+      (ref, animalId) => ref.read(daosProvider).symptoms.forAnimal(animalId),
+    );
+
+Future<void> saveSymptom(WidgetRef ref, Symptom symptom) async {
+  final daos = ref.read(daosProvider);
+  if (symptom.id.isEmpty) {
+    await daos.symptoms.create(symptom);
+  } else {
+    await daos.symptoms.update(symptom);
+  }
+  ref.invalidate(symptomsForAnimalProvider(symptom.animalId));
+}
+
+Future<void> deleteSymptom(WidgetRef ref, Symptom symptom) async {
+  await ref.read(daosProvider).symptoms.delete(symptom.id);
+  ref.invalidate(symptomsForAnimalProvider(symptom.animalId));
 }
 
 /// The name a reminder notification is filed under.

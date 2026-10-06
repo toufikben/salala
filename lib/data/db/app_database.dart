@@ -45,8 +45,10 @@ class AppDatabase {
   }
 
   /// Migrations are listed by the version they produce. v1 has no predecessors;
-  /// append future steps here instead of editing [createStatements], otherwise
-  /// existing installs silently skip new columns.
+  /// append future steps to [_productionMigrations] instead of editing
+  /// [createStatements] alone, otherwise existing installs silently skip new
+  /// tables and columns — an install created before version 2 has no `symptoms`
+  /// to insert into.
   static Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) =>
       runMigrations(db, oldVersion, newVersion);
 
@@ -61,17 +63,41 @@ class AppDatabase {
     }
   }
 
+  /// The live registry: the shipped steps plus anything a test registers over
+  /// it. Kept separate from [_productionMigrations] so a test can add a scratch
+  /// version and hand it back without erasing a real migration.
   static final Map<int, Future<void> Function(Database db)> _migrations =
-      <int, Future<void> Function(Database db)>{};
+      Map.of(_productionMigrations);
 
-  /// Production migrations belong in [_migrations] as a literal; this hook only
-  /// exists so tests can prove the runner steps forward exactly once per version.
+  /// Version 2 adds the `symptoms` table. It runs the very [createSymptomsTable]
+  /// text a fresh install runs, so an upgraded phone and a brand-new one end up
+  /// holding one shape of row rather than two.
+  static const Map<int, Future<void> Function(Database db)>
+  _productionMigrations = <int, Future<void> Function(Database db)>{
+    2: AppDatabase._addSymptoms,
+  };
+
+  static Future<void> _addSymptoms(Database db) async {
+    await db.execute(createSymptomsTable);
+    await db.execute(createSymptomsIndex);
+  }
+
+  /// Production migrations belong in [_productionMigrations] as a literal; this
+  /// hook only exists so tests can prove the runner steps forward exactly once
+  /// per version.
   @visibleForTesting
   static void registerMigration(
     int version,
     Future<void> Function(Database db) step,
   ) => _migrations[version] = step;
 
+  /// Restores the shipped steps rather than emptying the map, because a test
+  /// that cleared it would hand the rest of the file a database with no real
+  /// migrations in it.
   @visibleForTesting
-  static void resetMigrationsForTest() => _migrations.clear();
+  static void resetMigrationsForTest() {
+    _migrations
+      ..clear()
+      ..addAll(_productionMigrations);
+  }
 }

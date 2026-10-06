@@ -101,7 +101,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get animalDeleteBody =>
-      'سيُحذف معها التطعيمات وفحوصات الصحة والأوزان والزيارات البيطرية. لا يمكن التراجع عن هذه الخطوة.';
+      'سيُحذف معها التطعيمات وفحوصات الصحة والأوزان والزيارات البيطرية والأعراض. لا يمكن التراجع عن هذه الخطوة.';
 
   @override
   String get animalNameRequired => 'الاسم مطلوب';
@@ -141,6 +141,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get recordsVisits => 'الزيارات البيطرية';
+
+  @override
+  String get recordsSymptoms => 'الأعراض';
 
   @override
   String get recordsEmpty => 'لا يوجد سجل بعد.';
@@ -549,6 +552,49 @@ class AppLocalizationsAr extends AppLocalizations {
       'تُحذف هذه الزيارة من سجل الحيوان. لا يمكن التراجع عن ذلك.';
 
   @override
+  String get symptomAdd => 'عَرَض جديد';
+
+  @override
+  String get symptomAddTitle => 'تسجيل عَرَض';
+
+  @override
+  String get symptomEditTitle => 'تعديل العَرَض';
+
+  @override
+  String get symptomName => 'العَرَض';
+
+  @override
+  String get symptomNameRequired => 'اذكر ما رأيته';
+
+  @override
+  String get symptomSeverity => 'الشدّة';
+
+  @override
+  String get severityMild => 'خفيف';
+
+  @override
+  String get severityModerate => 'متوسط';
+
+  @override
+  String get severitySevere => 'شديد';
+
+  @override
+  String get symptomObservedOn => 'رُصد في';
+
+  @override
+  String get symptomState => 'الحالة';
+
+  @override
+  String get symptomOngoing => 'ما زال مستمرًا';
+
+  @override
+  String get symptomResolved => 'زائل';
+
+  @override
+  String get symptomDeleteBody =>
+      'يُحذف هذا العَرَض من سجل الحيوان. لا يمكن التراجع عن ذلك.';
+
+  @override
   String reminderHeadsUpBody(String what, String dueDay) {
     return 'تنبيه: $what مستحق في $dueDay';
   }
@@ -668,6 +714,16 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String triageWhelpingOverdue(String name, String days) {
     return '$name: تجاوزت الولادة التاريخ المتوقع بـ $days';
+  }
+
+  @override
+  String triageSevereSymptom(String name) {
+    return '$name سُجِّل بدرجة شديدة وما زال مستمرًا';
+  }
+
+  @override
+  String triageSymptomUnresolved(String name, String days) {
+    return 'ما زال $name مستمرًا بعد $days من رصده';
   }
 
   @override

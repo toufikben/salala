@@ -10,6 +10,7 @@ import '../../core/utils/date_utils.dart';
 import '../../core/utils/weight.dart';
 import '../../data/models/animal.dart';
 import '../../data/models/health_test.dart';
+import '../../data/models/symptom.dart';
 import '../../data/models/vaccination.dart';
 import '../../data/models/vet_visit.dart';
 import '../../data/models/weight_entry.dart';
@@ -18,6 +19,7 @@ import '../../services/pack_files.dart';
 import '../providers/app_providers.dart';
 import '../providers/record_providers.dart';
 import '../providers/triage_providers.dart';
+import '../widgets/symptom_dialog.dart';
 import '../widgets/triage_card.dart';
 
 /// One animal's whole ledger: identity, parentage, doses and weigh-ins.
@@ -87,6 +89,30 @@ class AnimalDetailScreen extends ConsumerWidget {
                     ),
                     data: (findings) => TriageCard(findings: findings),
                   ),
+              _RecordSection(
+                title: l10n.recordsSymptoms,
+                addLabel: l10n.symptomAdd,
+                onAdd: () => showSymptomDialog(context, animalId: animal.id),
+                body: ref
+                    .watch(symptomsForAnimalProvider(animal.id))
+                    .when(
+                      loading: () => const _SectionLoading(),
+                      error: (error, stack) => _SectionError(
+                        onRetry: () => ref.invalidate(
+                          symptomsForAnimalProvider(animal.id),
+                        ),
+                      ),
+                      data: (records) => records.isEmpty
+                          ? _SectionEmpty(text: l10n.recordsEmpty)
+                          : Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                for (final record in records)
+                                  _SymptomTile(symptom: record),
+                              ],
+                            ),
+                    ),
+              ),
               _RecordSection(
                 title: l10n.recordsVaccinations,
                 addLabel: l10n.vaccinationAdd,
@@ -352,6 +378,37 @@ class _RecordSection extends StatelessWidget {
           body,
         ],
       ),
+    );
+  }
+}
+
+/// A sign the breeder saw. Tapping it opens the same dialog, because `ongoing`
+/// is what the rules read: the row that keeps the card alarming has to be the
+/// row that can say it has passed.
+class _SymptomTile extends StatelessWidget {
+  const _SymptomTile({required this.symptom});
+
+  final Symptom symptom;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return ListTile(
+      onTap: () => showSymptomDialog(
+        context,
+        animalId: symptom.animalId,
+        existing: symptom,
+      ),
+      title: Text(symptom.label),
+      subtitle: Text(
+        <String>[
+          severityLabel(l10n, symptom.severity),
+          symptom.ongoing ? l10n.symptomOngoing : l10n.symptomResolved,
+          formatDay(context, symptom.observedAt),
+          if (symptom.note != null && symptom.note!.isNotEmpty) symptom.note!,
+        ].join(' · '),
+      ),
+      trailing: const Icon(Icons.chevron_right),
     );
   }
 }

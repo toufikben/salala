@@ -27,7 +27,7 @@
   "animalAddTitle": "إضافة حيوان",
   "animalEditTitle": "تعديل الحيوان",
   "animalDeleteTitle": "حذف {name}؟",
-  "animalDeleteBody": "سيُحذف معها التطعيمات وفحوصات الصحة والأوزان والزيارات البيطرية. لا يمكن التراجع عن هذه الخطوة.",
+  "animalDeleteBody": "سيُحذف معها التطعيمات وفحوصات الصحة والأوزان والزيارات البيطرية والأعراض. لا يمكن التراجع عن هذه الخطوة.",
   "animalNameRequired": "الاسم مطلوب",
   "animalSpeciesRequired": "اختر الفصيلة",
 
@@ -44,6 +44,7 @@
   "recordsHealthTests": "فحوصات الصحة",
   "recordsWeights": "الأوزان",
   "recordsVisits": "الزيارات البيطرية",
+  "recordsSymptoms": "الأعراض",
   "recordsEmpty": "لا يوجد سجل بعد.",
 
   "actionSave": "حفظ",
@@ -199,6 +200,21 @@
   "visitCurrency": "العملة",
   "visitDeleteBody": "تُحذف هذه الزيارة من سجل الحيوان. لا يمكن التراجع عن ذلك.",
 
+  "symptomAdd": "عَرَض جديد",
+  "symptomAddTitle": "تسجيل عَرَض",
+  "symptomEditTitle": "تعديل العَرَض",
+  "symptomName": "العَرَض",
+  "symptomNameRequired": "اذكر ما رأيته",
+  "symptomSeverity": "الشدّة",
+  "severityMild": "خفيف",
+  "severityModerate": "متوسط",
+  "severitySevere": "شديد",
+  "symptomObservedOn": "رُصد في",
+  "symptomState": "الحالة",
+  "symptomOngoing": "ما زال مستمرًا",
+  "symptomResolved": "زائل",
+  "symptomDeleteBody": "يُحذف هذا العَرَض من سجل الحيوان. لا يمكن التراجع عن ذلك.",
+
   "reminderHeadsUpBody": "تنبيه: {what} مستحق في {dueDay}",
   "@reminderHeadsUpBody": {
     "placeholders": {
@@ -244,6 +260,8 @@
   "triageTestFlagged": "لم تعد نتيجة {name} سالمة",
   "triageTestExpired": "انتهت شهادة {name} منذ {days}",
   "triageWhelpingOverdue": "{name}: تجاوزت الولادة التاريخ المتوقع بـ {days}",
+  "triageSevereSymptom": "{name} سُجِّل بدرجة شديدة وما زال مستمرًا",
+  "triageSymptomUnresolved": "ما زال {name} مستمرًا بعد {days} من رصده",
 
   "daysSingle": "{n} يومًا",
   "daysDual": "{n} يومين",

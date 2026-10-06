@@ -38,6 +38,11 @@ String triageMessage(
     _subject(finding),
     _days(l10n, finding),
   ),
+  TriageRuleId.severeSymptom => l10n.triageSevereSymptom(_subject(finding)),
+  TriageRuleId.symptomUnresolved => l10n.triageSymptomUnresolved(
+    _subject(finding),
+    _days(l10n, finding),
+  ),
   TriageRuleId.whelpingOverdue => l10n.triageWhelpingOverdue(
     _subject(finding),
     _days(l10n, finding),

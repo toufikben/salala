@@ -253,7 +253,7 @@ abstract class AppLocalizations {
   /// No description provided for @animalDeleteBody.
   ///
   /// In en, this message translates to:
-  /// **'Its vaccinations, health tests, weights and visits are deleted too. This cannot be undone.'**
+  /// **'Its vaccinations, health tests, weights, visits and symptoms are deleted too. This cannot be undone.'**
   String get animalDeleteBody;
 
   /// No description provided for @animalNameRequired.
@@ -333,6 +333,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Vet visits'**
   String get recordsVisits;
+
+  /// No description provided for @recordsSymptoms.
+  ///
+  /// In en, this message translates to:
+  /// **'Symptoms'**
+  String get recordsSymptoms;
 
   /// No description provided for @recordsEmpty.
   ///
@@ -1072,6 +1078,90 @@ abstract class AppLocalizations {
   /// **'The visit is removed from this animal\'s history. This cannot be undone.'**
   String get visitDeleteBody;
 
+  /// No description provided for @symptomAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add symptom'**
+  String get symptomAdd;
+
+  /// A sign the breeder saw and typed, not a diagnosis. 'Symptom' is the word the roadmap uses and the word a vet's intake form uses.
+  ///
+  /// In en, this message translates to:
+  /// **'Log a symptom'**
+  String get symptomAddTitle;
+
+  /// No description provided for @symptomEditTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit symptom'**
+  String get symptomEditTitle;
+
+  /// The sign as the breeder typed it: 'vomiting', 'limping on the left'. Free text, because the signs worth writing down depend on the breed and the age — the same reason `healthTestType` has no list.
+  ///
+  /// In en, this message translates to:
+  /// **'Symptom'**
+  String get symptomName;
+
+  /// No description provided for @symptomNameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Say what you saw'**
+  String get symptomNameRequired;
+
+  /// No description provided for @symptomSeverity.
+  ///
+  /// In en, this message translates to:
+  /// **'Severity'**
+  String get symptomSeverity;
+
+  /// No description provided for @severityMild.
+  ///
+  /// In en, this message translates to:
+  /// **'Mild'**
+  String get severityMild;
+
+  /// No description provided for @severityModerate.
+  ///
+  /// In en, this message translates to:
+  /// **'Moderate'**
+  String get severityModerate;
+
+  /// No description provided for @severitySevere.
+  ///
+  /// In en, this message translates to:
+  /// **'Severe'**
+  String get severitySevere;
+
+  /// No description provided for @symptomObservedOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Seen on'**
+  String get symptomObservedOn;
+
+  /// Ongoing or resolved, the column the triage rules read. Its own key because reusing the animal's own `status` would put that word's translations in a buyer's document as a symptom heading.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get symptomState;
+
+  /// No description provided for @symptomOngoing.
+  ///
+  /// In en, this message translates to:
+  /// **'Still happening'**
+  String get symptomOngoing;
+
+  /// No description provided for @symptomResolved.
+  ///
+  /// In en, this message translates to:
+  /// **'Resolved'**
+  String get symptomResolved;
+
+  /// No description provided for @symptomDeleteBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The symptom is removed from this animal\'s history. This cannot be undone.'**
+  String get symptomDeleteBody;
+
   /// The month-ahead alarm. {what} is the dose or screening name as the breeder typed it, {dueDay} a localised date.
   ///
   /// In en, this message translates to:
@@ -1263,6 +1353,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{name}: whelping is {days} past the expected date'**
   String triageWhelpingOverdue(String name, String days);
+
+  /// No description provided for @triageSevereSymptom.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} was recorded as severe and is still happening'**
+  String triageSevereSymptom(String name);
+
+  /// No description provided for @triageSymptomUnresolved.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} was seen {days} ago and is still happening'**
+  String triageSymptomUnresolved(String name, String days);
 
   /// No description provided for @daysSingle.
   ///

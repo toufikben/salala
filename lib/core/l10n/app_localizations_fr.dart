@@ -98,7 +98,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get animalDeleteBody =>
-      'Ses vaccins, tests de santé, pesées et visites seront supprimés aussi. Action irréversible.';
+      'Ses vaccins, tests de santé, pesées, visites et symptômes seront supprimés aussi. Action irréversible.';
 
   @override
   String get animalNameRequired => 'Le nom est obligatoire';
@@ -138,6 +138,9 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get recordsVisits => 'Visites vétérinaires';
+
+  @override
+  String get recordsSymptoms => 'Symptômes';
 
   @override
   String get recordsEmpty => 'Rien d\'enregistré.';
@@ -547,6 +550,49 @@ class AppLocalizationsFr extends AppLocalizations {
       'La visite est retirée de l\'historique de cet animal. Action irréversible.';
 
   @override
+  String get symptomAdd => 'Ajouter un symptôme';
+
+  @override
+  String get symptomAddTitle => 'Enregistrer un symptôme';
+
+  @override
+  String get symptomEditTitle => 'Modifier le symptôme';
+
+  @override
+  String get symptomName => 'Symptôme';
+
+  @override
+  String get symptomNameRequired => 'Décrivez ce que vous avez constaté';
+
+  @override
+  String get symptomSeverity => 'Intensité';
+
+  @override
+  String get severityMild => 'Légère';
+
+  @override
+  String get severityModerate => 'Modérée';
+
+  @override
+  String get severitySevere => 'Sévère';
+
+  @override
+  String get symptomObservedOn => 'Constaté le';
+
+  @override
+  String get symptomState => 'État';
+
+  @override
+  String get symptomOngoing => 'Toujours en cours';
+
+  @override
+  String get symptomResolved => 'Résolu';
+
+  @override
+  String get symptomDeleteBody =>
+      'Le symptôme est retiré de l\'historique de cet animal. Action irréversible.';
+
+  @override
   String reminderHeadsUpBody(String what, String dueDay) {
     return 'À noter : $what arrive à échéance le $dueDay';
   }
@@ -666,6 +712,16 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String triageWhelpingOverdue(String name, String days) {
     return '$name : mise bas retardée de $days';
+  }
+
+  @override
+  String triageSevereSymptom(String name) {
+    return '$name enregistré comme sévère et toujours en cours';
+  }
+
+  @override
+  String triageSymptomUnresolved(String name, String days) {
+    return '$name constaté il y a $days et toujours en cours';
   }
 
   @override
