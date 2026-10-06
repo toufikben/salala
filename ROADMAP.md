@@ -545,7 +545,7 @@ classifier is behind a measured benchmark or it does not ship.
 
 ### Progress, 2026-10-05
 
-- **3a — the rule table and the card: five red CI runs, traced to the test harness.**
+- **3a — the rule table and the card: five red CI runs, then green on `e47cedf`.**
   Nine rules in `assets/triage/rules.json` over `core/utils/triage.dart`, one card on the
   animal's ledger, and the explicit non-claim under it. 34 engine tests in
   `test/core/triage_test.dart`, and four in `test/presentation/triage_card_test.dart`:
@@ -592,10 +592,13 @@ classifier is behind a measured benchmark or it does not ship.
   no zone and no clock involved — and the only thing without harness coverage is
   the provider's own `await rootBundle`, which this harness cannot execute at
   all.
-  **Verification state of that: `NOT RUN`** — the next CI verdict decides it, and
-  the on-device triage card stays unverified until the consolidated Stage 2 + 3a
-  install. D6 now carries the four harness constraints that actually explain the
-  symptom; D7 keeps the `ref` rule without the false claim about what it caused.
+  **Verification state of that: green.** Run `37444073871` on `e47cedf` —
+  `Analyze` clean, **195 tests passed, 0 failed** in 2 minutes 18 seconds, and
+  `Build debug APK` succeeded after it. What that does *not* cover: the one line
+  of the provider that reads the bundle, and the card on a real screen. Both
+  belong to the consolidated Stage 2 + 3a phone pass, which is still owed. D6
+  now carries the four harness constraints that actually explained the symptom;
+  D7 keeps the `ref` rule without the false claim about what it caused.
 - The line above says *symptom*→urgency. There is **no symptom record in the
   schema**, so what shipped is date-and-measurement→urgency: due doses, ages,
   weight trends, screenings, a whelping that never got written down. A symptom a
