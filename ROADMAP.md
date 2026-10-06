@@ -648,8 +648,25 @@ What the phone has now answered, by its own screen rather than a test:
   untouched until 09:00.
 - **D21 holds on every date the pass produced** — `Jan 1, 2024`, `Oct 7, 2025`,
   `Oct 6, 2026` — Latin digits in the form, the list, the ledger and the card.
+- **The same pass in Arabic.** Switched from Settings, the whole ledger
+  re-renders right-to-left and every digit stays Latin: `1 يناير 2024`,
+  `أُعطي في 7 أكتوبر 2025 · الجرعة القادمة 7 أكتوبر 2026`, `30.00 كغ`,
+  `انخفض الوزن 13% منذ آخر وزن`, `Rabies مستحق خلال 1 يومًا`. The urgency label
+  and its bullet colour move with the finding: `زيارة بيطرية روتينية` (orange)
+  for the due dose alone, `راقب عن قرب` (olive) once the weight drop joined it.
+  Nothing in the Arabic screen mixes numeral systems — except the date picker,
+  which is the open question D21 left itself.
+- **The date picker disagrees with itself.** Screenshot on the phone: its header
+  reads `الثلاثاء، ٦ أكتوبر` and its month label `أكتوبر ٢٠٢٦` in Arabic-Indic,
+  while its own day cells read `1 2 3 … 31` in Latin and the tile behind it says
+  `6 أكتوبر 2026`. D21 had left the picker open until exactly this happened; it
+  is now in scope, and the fix is `intl`'s own digit switch called once in
+  `main()`. `ar_DZ` and `ar_EG` were ruled out from `intl`'s data — one rewrites
+  the month names, the other is the locale that *carries* the Arabic-Indic
+  digits. **Verification: the same dialog, screenshotted after this build is on
+  the phone.**
 
-Two defects the phone found and CI's 195 tests did not:
+Three defects the phone found and CI's 195 tests did not:
 
 1. **The card was a snapshot.** Saving a dose moved the Vaccinations section
    under the card and left the card itself saying "nothing calls for a next
@@ -673,15 +690,37 @@ Two defects the phone found and CI's 195 tests did not:
    digits back on screen against D21. `test/core/triage_labels_test.dart`
    covers 1/2/3/10/11/20/90 in all three languages and asserts the digit stays
    Latin.
+3. **Export never reaches the share sheet.** Tapping `تصدير السجلات` produced no
+   sheet and no visible failure — only a snackbar a second later, and in the log
+   `Pack export failed: PlatformException(Share failed, Shared file can not be
+   located in '/data/data/com.salala.salala/cache/share_plus'…)`. Cause, read
+   out of `share_plus-13.3.1`'s own `Share.kt`: `share()` calls
+   `clearShareCacheFolder()` as its *first* act (line 119), which deletes
+   everything in `<cacheDir>/share_plus` — the folder `SystemPackFiles.shareBytes`
+   was writing the pack into, on the strength of a comment describing how the
+   10.x plugin worked. The bytes were on screen for microseconds and gone before
+   `getUrisForPaths` reached them, which then refuses any file inside its own
+   scratch folder (line 235). Fixed by writing to `<cacheDir>/salala_out`; the
+   plugin copies from anywhere else into its folder and publishes that copy.
+   The same seam carries the buyer PDF, so both Stage 2 exports were dead on a
+   real phone while every harness test stayed green — the harness injects a
+   recording `PackFiles` that never touches a folder. **This is the seam the
+   file's own doc comment says needs a phone; it now has one.**
 
-**Verification state of both fixes: NOT RUN.** Nothing above was re-checked on
-the phone after the change; the first gate is CI.
+**Verification state of the three fixes:** the card and the day count are green
+on CI — run `37526092690` on `e731735`, `Analyze` clean and **201 tests passed,
+0 failed** in 2 minutes 28 seconds, with `Build debug APK` after it. None of the
+three has been re-checked on the phone yet; the export fix in particular can only
+be settled there.
 
-Still owed by this pass: the `act now` and `watch` cards on screen, a `sold`
-animal with a stalled curve (the open question above, for the owner to see
-rather than guess at), the Arabic ledger, the JSON pack out through the share
-sheet and back in, the buyer PDF in both languages, the force-stop → reopen
-alarm rebuild on this build, and the 09:00 delivery.
+Still owed by this pass: the export and the PDF actually reaching a sheet, a
+pack restored back onto the phone, the buyer PDF read in both languages, the
+force-stop → reopen alarm rebuild on this build, a `sold` animal with a stalled
+curve (the open question above, for the owner to see rather than guess at), and
+the 09:00 delivery. The `act now` and `watch` cards are no longer owed: a second
+dog created on the phone, 90 days old with nothing recorded, produced
+`Act now / No vaccination recorded, at 90 days old` in English and the same
+urgency in Arabic on Nala's ledger.
 
 ## Stage 4 — Distribution
 

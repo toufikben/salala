@@ -300,12 +300,31 @@ double the formatting surface (dates, weights, money) to postpone a decision the
 ledger is allowed to just make.
 
 D21 covers the digits Salala writes. The Material date picker is Flutter's own
-surface, and the device check saw it render Arabic-Indic day cells
-(`١٥ أكتوبر ٢٠٢٥`); `showDatePicker` takes a `locale`, but which locale tag makes
-it switch numerals without losing the Arabic month names is a measurement, not a
-guess. Left open deliberately until the first build with the row fix is on the
-phone — if the picker and the row disagree on screen, that is the moment to decide
-whether the picker is in scope.
+surface, and the device check saw it disagree **with itself**: its day cells
+paint `1 2 3…` (they go through `MaterialLocalizations.formatDecimal`, which
+gives Latin digits for `ar`) while its header and month label paint
+`الثلاثاء، ٦ أكتوبر` and `أكتوبر ٢٠٢٦`, and the tile behind it reads
+`6 أكتوبر 2026`. That is the disagreement D21 said would settle the question, so
+the picker is in scope: a date is chosen in one numeral system and confirmed in
+another, inside one dialog, on the way into the ledger.
+
+What the dependency ruled out, read rather than guessed: `ar_DZ` is the only
+other Arabic tag `intl` ships besides `ar` and `ar_EG`, and its month names are
+Algerian (`جانفي، فيفري، أفريل، ماي`) — it would silently rewrite every label;
+`ar_EG` is the one whose `DateSymbols` carries `ZERODIGIT: '\u0660'`, i.e. the
+Arabic-Indic digits themselves. So no `showDatePicker(locale: …)` value fixes
+this, and `ar` — the tag the app already uses — is the one that keeps the words.
+
+What shipped is `intl`'s own switch, called once in `main()` beside
+`initializeDateFormatting()`: `DateFormat.useNativeDigitsByDefaultFor('ar',
+false)`. One line, every Flutter surface that formats a date rather than only
+the picker, and it cannot change a word — only the digits. **The verification is
+the phone's screenshot of that same dialog.** A scratch `DateFormat` run against
+the resolved `intl` 0.20.3 printed Latin digits for `ar`, which is the opposite
+of what the build on the phone painted; the dependency source and the device
+disagree here, so only the device counts, and if the picker still shows
+`٢٠٢٦` the line comes back out and the deviation is recorded as open instead of
+papered over.
 
 ## D22 — The pack is the whole database, and restoring means replacing it
 **Decided here, 2026-10-05.**

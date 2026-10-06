@@ -27,11 +27,14 @@ class SystemPackFiles extends PackFiles {
 
   @override
   Future<String> shareBytes(String name, List<int> bytes) async {
-    // `share_plus` publishes only its own `cache/share_plus` folder through a
-    // FileProvider, so a file anywhere else cannot be granted to another app.
-    // The pack goes where the sheet is allowed to reach, not where it is tidy.
+    // Not `cache/share_plus`: that is the plugin's own scratch folder, which it
+    // empties as the first act of every share and then refuses to read from. A
+    // pack written there was deleted before the sheet opened — measured on the
+    // phone, where export failed with "Shared file can not be located in
+    // '.../cache/share_plus'". Any other folder works: the plugin copies the
+    // file into its own and publishes that copy through its FileProvider.
     final cache = await getApplicationCacheDirectory();
-    final folder = Directory(p.join(cache.path, 'share_plus'));
+    final folder = Directory(p.join(cache.path, 'salala_out'));
     await folder.create(recursive: true);
     final file = File(p.join(folder.path, name));
     await file.writeAsBytes(bytes, flush: true);

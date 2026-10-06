@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:intl/intl.dart';
 import 'package:path/path.dart' as p;
 import 'package:sqflite/sqflite.dart';
 
@@ -15,6 +16,12 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // DateFormat needs the non-English symbol tables registered up front.
   await initializeDateFormatting();
+  // D21: one numeral system on screen. The Material date picker renders its
+  // header and month label through `intl` rather than through `formatDayFor`,
+  // and on the phone it painted `٦ أكتوبر ٢٠٢٦` beside a tile reading
+  // `6 أكتوبر 2026`. This is `intl`'s own switch for that; the picker is the
+  // surface it exists for.
+  DateFormat.useNativeDigitsByDefaultFor('ar', false);
 
   final db = await AppDatabase.openAt(
     p.join(await getDatabasesPath(), 'salala.db'),
