@@ -545,13 +545,22 @@ classifier is behind a measured benchmark or it does not ship.
 
 ### Progress, 2026-10-05
 
-- **3a — the rule table and the card: written, `NOT RUN` by CI yet.** Nine rules in
-  `assets/triage/rules.json` over `core/utils/triage.dart`, one card on the
-  animal's ledger, and the explicit non-claim under it. 24 rule and table tests in
+- **3a — the rule table and the card: red on CI, then fixed in the test harness.**
+  Nine rules in `assets/triage/rules.json` over `core/utils/triage.dart`, one card on the
+  animal's ledger, and the explicit non-claim under it. 34 rule and table tests in
   `test/core/triage_test.dart`, four in `test/presentation/triage_card_test.dart`
   that pump the real app — including the one that proves the bundle serves the
   same table the repository holds. D25 records what "rules are data" does and does
   not buy.
+  Run `37383228340` on `9b5d98b` came back **176 passed, 19 failed**: every engine
+  test green, and all 19 failures in the two files that open an animal's ledger.
+  One cause, and it was the harness's: `settleRealIo` waited a fixed ten rounds and
+  then looked only for a `CircularProgressIndicator`, while the new section loads
+  with a *linear* bar behind seven sequential round trips. Ten rounds ran out, the
+  assertions saw a page still loading, and the sixteen screens failed even later as
+  `pumpAndSettle timed out` — an indeterminate bar never settles. The helper now
+  keeps waiting while any `ProgressIndicator` is on screen, bounded so a truly stuck
+  section still fails by name. Nothing in the engine or the card changed.
 - The line above says *symptom*→urgency. There is **no symptom record in the
   schema**, so what shipped is date-and-measurement→urgency: due doses, ages,
   weight trends, screenings, a whelping that never got written down. A symptom a

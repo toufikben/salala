@@ -46,8 +46,11 @@ class AlreadyResynced extends RemindersResynced {
 ///
 /// The rounds are not cut short when the loading spinner disappears — a save
 /// finishes and pops a route without ever showing a spinner, so the real wait
-/// has to continue regardless. A spinner still on screen afterwards means the
-/// widget really is stuck, and that fails loudly instead of hanging.
+/// has to continue regardless. Ten rounds are a floor and not a ceiling: a
+/// section that resolves only after several separate round trips is still
+/// working when the tenth one ends, so the wait continues while a progress bar
+/// is on screen. A bar still up after that means the widget really is stuck, and
+/// that fails loudly instead of hanging.
 Future<void> settleRealIo(WidgetTester tester) async {
   for (var round = 0; round < 10; round++) {
     await tester.pump(const Duration(milliseconds: 25));
@@ -56,7 +59,27 @@ Future<void> settleRealIo(WidgetTester tester) async {
     );
   }
 
-  if (tester.any(find.byType(CircularProgressIndicator))) {
+  // Anything indeterminate is still spinning, which `pumpAndSettle` reads as a
+  // page that never settles: the timeout it throws names the animation, not the
+  // section that never resolved. So this waits for the bar itself, and asks for
+  // the `ProgressIndicator` *subtype* because `find.byType` compares runtime
+  // types exactly and would match neither of the concrete bars (finders.dart
+  // :1642). A section that loads with a linear bar used to slip past the guard
+  // below and fail 19 screens later as `pumpAndSettle timed out` (run
+  // 37383228340). The bound stays finite so a genuinely stuck widget still
+  // fails loudly rather than hanging the suite.
+  for (
+    var round = 0;
+    round < 40 && tester.any(find.bySubtype<ProgressIndicator>());
+    round++
+  ) {
+    await tester.pump(const Duration(milliseconds: 25));
+    await tester.runAsync(
+      () => Future<void>.delayed(const Duration(milliseconds: 15)),
+    );
+  }
+
+  if (tester.any(find.bySubtype<ProgressIndicator>())) {
     throw StateError('a database-backed widget never finished loading');
   }
 
