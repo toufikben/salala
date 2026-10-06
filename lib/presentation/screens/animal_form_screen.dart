@@ -88,8 +88,10 @@ class _AnimalFormScreenState extends ConsumerState<AnimalFormScreen> {
     final now = DateTime.now();
     final picked = await showDatePicker(
       context: context,
-      initialDate:
-          dayFromMs(_birthDate) ?? DateTime(now.year - 1, now.month, now.day),
+      // A year back from today is what this used to open on, and a breeder who
+      // tapped Save without touching the calendar filed a phantom birthday 365
+      // days early — which is exactly the number the age rules read.
+      initialDate: dayFromMs(_birthDate) ?? now,
       firstDate: DateTime(now.year - 30),
       lastDate: now,
     );
