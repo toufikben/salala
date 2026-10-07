@@ -340,6 +340,12 @@ abstract class AppLocalizations {
   /// **'Symptoms'**
   String get recordsSymptoms;
 
+  /// No description provided for @recordsPlacements.
+  ///
+  /// In en, this message translates to:
+  /// **'Placements'**
+  String get recordsPlacements;
+
   /// No description provided for @recordsEmpty.
   ///
   /// In en, this message translates to:
@@ -1161,6 +1167,108 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The symptom is removed from this animal\'s history. This cannot be undone.'**
   String get symptomDeleteBody;
+
+  /// No description provided for @placementAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add placement'**
+  String get placementAdd;
+
+  /// The animal went to a new home. 'Placement' is the word the roadmap, the transfer pack and the animal's own 'Placed' status use — not 'sale', because a study animal and a gift are placed too.
+  ///
+  /// In en, this message translates to:
+  /// **'Log a placement'**
+  String get placementAddTitle;
+
+  /// No description provided for @placementEditTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit placement'**
+  String get placementEditTitle;
+
+  /// The person the animal went home with. The form's own label; the document keeps its `pdfBuyer` wording.
+  ///
+  /// In en, this message translates to:
+  /// **'Buyer'**
+  String get placementBuyer;
+
+  /// No description provided for @placementNoBuyer.
+  ///
+  /// In en, this message translates to:
+  /// **'Buyer not recorded'**
+  String get placementNoBuyer;
+
+  /// No description provided for @placementDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Placed on'**
+  String get placementDate;
+
+  /// No description provided for @placementPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Price'**
+  String get placementPrice;
+
+  /// No description provided for @placementPriceInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter an amount like 2500'**
+  String get placementPriceInvalid;
+
+  /// No description provided for @placementCurrency.
+  ///
+  /// In en, this message translates to:
+  /// **'Currency'**
+  String get placementCurrency;
+
+  /// What the breeder promised in writing: health guarantee, return clause, neutering condition. Free text, because the promise is theirs to word.
+  ///
+  /// In en, this message translates to:
+  /// **'Guarantee terms'**
+  String get placementGuarantee;
+
+  /// No description provided for @placementDeleteBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The placement is removed from this animal\'s history. The buyer stays in your contacts. This cannot be undone.'**
+  String get placementDeleteBody;
+
+  /// No description provided for @buyerAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'New buyer'**
+  String get buyerAdd;
+
+  /// No description provided for @buyerAddTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a buyer'**
+  String get buyerAddTitle;
+
+  /// No description provided for @buyerEditTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit buyer'**
+  String get buyerEditTitle;
+
+  /// No description provided for @buyerPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone'**
+  String get buyerPhone;
+
+  /// No description provided for @buyerEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get buyerEmail;
+
+  /// The two-letter code, e.g. MA. A code rather than a country name because a name typed freely would be sorted and spelled differently every time.
+  ///
+  /// In en, this message translates to:
+  /// **'Country code'**
+  String get buyerCountryCode;
 
   /// The month-ahead alarm. {what} is the dose or screening name as the breeder typed it, {dueDay} a localised date.
   ///

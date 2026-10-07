@@ -146,6 +146,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get recordsSymptoms => 'الأعراض';
 
   @override
+  String get recordsPlacements => 'التسليم';
+
+  @override
   String get recordsEmpty => 'لا يوجد سجل بعد.';
 
   @override
@@ -593,6 +596,58 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get symptomDeleteBody =>
       'يُحذف هذا العَرَض من سجل الحيوان. لا يمكن التراجع عن ذلك.';
+
+  @override
+  String get placementAdd => 'تسليم جديد';
+
+  @override
+  String get placementAddTitle => 'تسجيل تسليم';
+
+  @override
+  String get placementEditTitle => 'تعديل التسليم';
+
+  @override
+  String get placementBuyer => 'المشتري';
+
+  @override
+  String get placementNoBuyer => 'المشتري غير مسجَّل';
+
+  @override
+  String get placementDate => 'تاريخ التسليم';
+
+  @override
+  String get placementPrice => 'الثمن';
+
+  @override
+  String get placementPriceInvalid => 'أدخل مبلغًا مثل 2500';
+
+  @override
+  String get placementCurrency => 'العملة';
+
+  @override
+  String get placementGuarantee => 'شروط الضمان';
+
+  @override
+  String get placementDeleteBody =>
+      'يُحذف هذا التسليم من سجل الحيوان، ويبقى المشتري في جهات اتصالك. لا يمكن التراجع عن ذلك.';
+
+  @override
+  String get buyerAdd => 'مشتَرٍ جديد';
+
+  @override
+  String get buyerAddTitle => 'إضافة مشتَرٍ';
+
+  @override
+  String get buyerEditTitle => 'تعديل المشتري';
+
+  @override
+  String get buyerPhone => 'الهاتف';
+
+  @override
+  String get buyerEmail => 'البريد الإلكتروني';
+
+  @override
+  String get buyerCountryCode => 'رمز البلد';
 
   @override
   String reminderHeadsUpBody(String what, String dueDay) {

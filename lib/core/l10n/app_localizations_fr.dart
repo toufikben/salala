@@ -143,6 +143,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get recordsSymptoms => 'Symptômes';
 
   @override
+  String get recordsPlacements => 'Placements';
+
+  @override
   String get recordsEmpty => 'Rien d\'enregistré.';
 
   @override
@@ -591,6 +594,58 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get symptomDeleteBody =>
       'Le symptôme est retiré de l\'historique de cet animal. Action irréversible.';
+
+  @override
+  String get placementAdd => 'Ajouter un placement';
+
+  @override
+  String get placementAddTitle => 'Enregistrer un placement';
+
+  @override
+  String get placementEditTitle => 'Modifier le placement';
+
+  @override
+  String get placementBuyer => 'Acquéreur';
+
+  @override
+  String get placementNoBuyer => 'Acquéreur non enregistré';
+
+  @override
+  String get placementDate => 'Placé le';
+
+  @override
+  String get placementPrice => 'Prix';
+
+  @override
+  String get placementPriceInvalid => 'Saisissez un montant comme 2500';
+
+  @override
+  String get placementCurrency => 'Devise';
+
+  @override
+  String get placementGuarantee => 'Conditions de garantie';
+
+  @override
+  String get placementDeleteBody =>
+      'Le placement est retiré de l\'historique de cet animal. L\'acquéreur reste dans vos contacts. Action irréversible.';
+
+  @override
+  String get buyerAdd => 'Nouvel acquéreur';
+
+  @override
+  String get buyerAddTitle => 'Ajouter un acquéreur';
+
+  @override
+  String get buyerEditTitle => 'Modifier l\'acquéreur';
+
+  @override
+  String get buyerPhone => 'Téléphone';
+
+  @override
+  String get buyerEmail => 'Courriel';
+
+  @override
+  String get buyerCountryCode => 'Code pays';
 
   @override
   String reminderHeadsUpBody(String what, String dueDay) {

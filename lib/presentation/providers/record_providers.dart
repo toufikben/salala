@@ -2,7 +2,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/l10n/app_localizations.dart';
 import '../../data/models/animal.dart';
+import '../../data/models/buyer.dart';
 import '../../data/models/health_test.dart';
+import '../../data/models/placement.dart';
 import '../../data/models/symptom.dart';
 import '../../data/models/vaccination.dart';
 import '../../data/models/vet_visit.dart';
@@ -123,6 +125,60 @@ Future<void> saveSymptom(WidgetRef ref, Symptom symptom) async {
 Future<void> deleteSymptom(WidgetRef ref, Symptom symptom) async {
   await ref.read(daosProvider).symptoms.delete(symptom.id);
   ref.invalidate(symptomsForAnimalProvider(symptom.animalId));
+}
+
+/// One animal's placements, most recent handover first.
+///
+/// A ledger can hold more than one: an animal bought back and re-homed, or a
+/// row corrected by deleting it and writing it again. The transfer pack reads
+/// the newest one, so the section lists them in the order the pack will print.
+final placementsForAnimalProvider = FutureProvider.autoDispose
+    .family<List<Placement>, String>(
+      (ref, animalId) => ref.read(daosProvider).placements.forAnimal(animalId),
+    );
+
+/// Every buyer this breeder has handed an animal to, in name order.
+///
+/// One list rather than a lookup per placement: a contact list stays short, the
+/// placement form offers it as its choices, and each ledger row has to print the
+/// name beside the day it was written. Creating a buyer invalidates it, which is
+/// what makes a contact typed for one animal show up for the next.
+final buyersProvider = FutureProvider.autoDispose<List<Buyer>>(
+  (ref) => ref.read(daosProvider).buyers.alphabetical(),
+);
+
+Future<Placement> savePlacement(WidgetRef ref, Placement placement) async {
+  final daos = ref.read(daosProvider);
+  if (placement.id.isEmpty) {
+    final created = await daos.placements.create(placement);
+    ref.invalidate(placementsForAnimalProvider(created.animalId));
+    return created;
+  }
+  await daos.placements.update(placement);
+  ref.invalidate(placementsForAnimalProvider(placement.animalId));
+  return placement;
+}
+
+Future<void> deletePlacement(WidgetRef ref, Placement placement) async {
+  await ref.read(daosProvider).placements.delete(placement.id);
+  ref.invalidate(placementsForAnimalProvider(placement.animalId));
+}
+
+/// Writes a contact and returns it as stored, because the placement form that
+/// asked for it has to select the id the dao just assigned.
+///
+/// There is no delete: `placements.buyer_id` is `ON DELETE SET NULL`, so removing
+/// a buyer would quietly blank the buyer block of a document already handed over.
+Future<Buyer> saveBuyer(WidgetRef ref, Buyer buyer) async {
+  final daos = ref.read(daosProvider);
+  if (buyer.id.isNotEmpty) {
+    await daos.buyers.update(buyer);
+    ref.invalidate(buyersProvider);
+    return buyer;
+  }
+  final created = await daos.buyers.create(buyer);
+  ref.invalidate(buyersProvider);
+  return created;
 }
 
 /// The name a reminder notification is filed under.

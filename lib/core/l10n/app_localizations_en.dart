@@ -143,6 +143,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get recordsSymptoms => 'Symptoms';
 
   @override
+  String get recordsPlacements => 'Placements';
+
+  @override
   String get recordsEmpty => 'Nothing recorded yet.';
 
   @override
@@ -590,6 +593,58 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get symptomDeleteBody =>
       'The symptom is removed from this animal\'s history. This cannot be undone.';
+
+  @override
+  String get placementAdd => 'Add placement';
+
+  @override
+  String get placementAddTitle => 'Log a placement';
+
+  @override
+  String get placementEditTitle => 'Edit placement';
+
+  @override
+  String get placementBuyer => 'Buyer';
+
+  @override
+  String get placementNoBuyer => 'Buyer not recorded';
+
+  @override
+  String get placementDate => 'Placed on';
+
+  @override
+  String get placementPrice => 'Price';
+
+  @override
+  String get placementPriceInvalid => 'Enter an amount like 2500';
+
+  @override
+  String get placementCurrency => 'Currency';
+
+  @override
+  String get placementGuarantee => 'Guarantee terms';
+
+  @override
+  String get placementDeleteBody =>
+      'The placement is removed from this animal\'s history. The buyer stays in your contacts. This cannot be undone.';
+
+  @override
+  String get buyerAdd => 'New buyer';
+
+  @override
+  String get buyerAddTitle => 'Add a buyer';
+
+  @override
+  String get buyerEditTitle => 'Edit buyer';
+
+  @override
+  String get buyerPhone => 'Phone';
+
+  @override
+  String get buyerEmail => 'Email';
+
+  @override
+  String get buyerCountryCode => 'Country code';
 
   @override
   String reminderHeadsUpBody(String what, String dueDay) {

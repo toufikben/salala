@@ -62,6 +62,7 @@
   "recordsWeights": "Weights",
   "recordsVisits": "Vet visits",
   "recordsSymptoms": "Symptoms",
+  "recordsPlacements": "Placements",
   "recordsEmpty": "Nothing recorded yet.",
 
   "actionSave": "Save",
@@ -272,6 +273,37 @@
   "symptomOngoing": "Still happening",
   "symptomResolved": "Resolved",
   "symptomDeleteBody": "The symptom is removed from this animal's history. This cannot be undone.",
+
+  "placementAdd": "Add placement",
+  "placementAddTitle": "Log a placement",
+  "@placementAddTitle": {
+    "description": "The animal went to a new home. 'Placement' is the word the roadmap, the transfer pack and the animal's own 'Placed' status use — not 'sale', because a study animal and a gift are placed too."
+  },
+  "placementEditTitle": "Edit placement",
+  "placementBuyer": "Buyer",
+  "@placementBuyer": {
+    "description": "The person the animal went home with. The form's own label; the document keeps its `pdfBuyer` wording."
+  },
+  "placementNoBuyer": "Buyer not recorded",
+  "placementDate": "Placed on",
+  "placementPrice": "Price",
+  "placementPriceInvalid": "Enter an amount like 2500",
+  "placementCurrency": "Currency",
+  "placementGuarantee": "Guarantee terms",
+  "@placementGuarantee": {
+    "description": "What the breeder promised in writing: health guarantee, return clause, neutering condition. Free text, because the promise is theirs to word."
+  },
+  "placementDeleteBody": "The placement is removed from this animal's history. The buyer stays in your contacts. This cannot be undone.",
+
+  "buyerAdd": "New buyer",
+  "buyerAddTitle": "Add a buyer",
+  "buyerEditTitle": "Edit buyer",
+  "buyerPhone": "Phone",
+  "buyerEmail": "Email",
+  "buyerCountryCode": "Country code",
+  "@buyerCountryCode": {
+    "description": "The two-letter code, e.g. MA. A code rather than a country name because a name typed freely would be sorted and spelled differently every time."
+  },
 
   "reminderHeadsUpBody": "Heads up: {what} is due on {dueDay}",
   "@reminderHeadsUpBody": {

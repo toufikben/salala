@@ -45,6 +45,7 @@
   "recordsWeights": "Pesées",
   "recordsVisits": "Visites vétérinaires",
   "recordsSymptoms": "Symptômes",
+  "recordsPlacements": "Placements",
   "recordsEmpty": "Rien d'enregistré.",
 
   "actionSave": "Enregistrer",
@@ -214,6 +215,25 @@
   "symptomOngoing": "Toujours en cours",
   "symptomResolved": "Résolu",
   "symptomDeleteBody": "Le symptôme est retiré de l'historique de cet animal. Action irréversible.",
+
+  "placementAdd": "Ajouter un placement",
+  "placementAddTitle": "Enregistrer un placement",
+  "placementEditTitle": "Modifier le placement",
+  "placementBuyer": "Acquéreur",
+  "placementNoBuyer": "Acquéreur non enregistré",
+  "placementDate": "Placé le",
+  "placementPrice": "Prix",
+  "placementPriceInvalid": "Saisissez un montant comme 2500",
+  "placementCurrency": "Devise",
+  "placementGuarantee": "Conditions de garantie",
+  "placementDeleteBody": "Le placement est retiré de l'historique de cet animal. L'acquéreur reste dans vos contacts. Action irréversible.",
+
+  "buyerAdd": "Nouvel acquéreur",
+  "buyerAddTitle": "Ajouter un acquéreur",
+  "buyerEditTitle": "Modifier l'acquéreur",
+  "buyerPhone": "Téléphone",
+  "buyerEmail": "Courriel",
+  "buyerCountryCode": "Code pays",
 
   "reminderHeadsUpBody": "À noter : {what} arrive à échéance le {dueDay}",
   "@reminderHeadsUpBody": {

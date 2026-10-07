@@ -7,9 +7,12 @@ import '../../core/l10n/app_localizations.dart';
 import '../../core/l10n/enum_labels.dart';
 import '../../core/router/app_router.dart';
 import '../../core/utils/date_utils.dart';
+import '../../core/utils/money.dart';
 import '../../core/utils/weight.dart';
 import '../../data/models/animal.dart';
+import '../../data/models/buyer.dart';
 import '../../data/models/health_test.dart';
+import '../../data/models/placement.dart';
 import '../../data/models/symptom.dart';
 import '../../data/models/vaccination.dart';
 import '../../data/models/vet_visit.dart';
@@ -19,6 +22,7 @@ import '../../services/pack_files.dart';
 import '../providers/app_providers.dart';
 import '../providers/record_providers.dart';
 import '../providers/triage_providers.dart';
+import '../widgets/placement_dialog.dart';
 import '../widgets/symptom_dialog.dart';
 import '../widgets/triage_card.dart';
 
@@ -227,6 +231,7 @@ class AnimalDetailScreen extends ConsumerWidget {
                             ),
                     ),
               ),
+              _PlacementSection(animalId: animal.id),
             ],
           );
         },
@@ -586,6 +591,96 @@ class _WeightTile extends ConsumerWidget {
       ),
     );
     if (confirmed == true) await deleteWeight(ref, entry);
+  }
+}
+
+/// Who each animal went to, and the terms it went to them on.
+///
+/// Its own widget because a placement row needs two lists: this animal's
+/// placements and the contacts they name. Watching both here is what repaints the
+/// section when either is written (D26), it keeps a buyer's name off a query per
+/// row, and by the time the add button is pressed the contacts are already in
+/// hand — so the form opens on a filled dropdown rather than an empty one.
+class _PlacementSection extends ConsumerWidget {
+  const _PlacementSection({required this.animalId});
+
+  final String animalId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final buyers = ref.watch(buyersProvider).value ?? const <Buyer>[];
+
+    return _RecordSection(
+      title: l10n.recordsPlacements,
+      addLabel: l10n.placementAdd,
+      onAdd: () => showPlacementDialog(context, animalId: animalId),
+      body: ref
+          .watch(placementsForAnimalProvider(animalId))
+          .when(
+            loading: () => const _SectionLoading(),
+            error: (error, stack) => _SectionError(
+              onRetry: () =>
+                  ref.invalidate(placementsForAnimalProvider(animalId)),
+            ),
+            data: (placements) => placements.isEmpty
+                ? _SectionEmpty(text: l10n.recordsEmpty)
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: <Widget>[
+                      for (final placement in placements)
+                        _PlacementTile(
+                          placement: placement,
+                          buyer: buyerById(buyers, placement.buyerId),
+                        ),
+                    ],
+                  ),
+          ),
+    );
+  }
+}
+
+/// One handover. The buyer leads the row because that is the name a breeder
+/// scans the ledger for; the day, the money and the guarantee are the detail.
+class _PlacementTile extends StatelessWidget {
+  const _PlacementTile({required this.placement, this.buyer});
+
+  final Placement placement;
+  final Buyer? buyer;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final currency = placement.currency;
+    final price = placement.price;
+    final guarantee = placement.guaranteeTerms;
+    // Digits stay Latin and the line stays ungrouped (D21); the order of the
+    // amount and its code is left to the bidi algorithm, which is how a weigh-in
+    // row already reads `18.50 كغ` on an Arabic phone.
+    final amount = price == null
+        ? null
+        : (currency == null || currency.isEmpty)
+        ? formatPrice(price)
+        : '${formatPrice(price)} $currency';
+    final details = <String>[
+      if (placement.placedDate != null)
+        formatDay(context, placement.placedDate),
+      if (amount != null) amount,
+      if (guarantee != null && guarantee.isNotEmpty) guarantee,
+    ];
+
+    return ListTile(
+      onTap: () => showPlacementDialog(
+        context,
+        animalId: placement.animalId,
+        existing: placement,
+      ),
+      title: Text(buyer?.name ?? l10n.placementNoBuyer),
+      // A row that has nothing beyond the fact of a placement still has to say
+      // it happened, so the subtitle is absent rather than an empty line.
+      subtitle: details.isEmpty ? null : Text(details.join(' · ')),
+      trailing: const Icon(Icons.chevron_right),
+    );
   }
 }
 

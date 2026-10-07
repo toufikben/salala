@@ -1,5 +1,16 @@
 import 'package:equatable/equatable.dart';
 
+/// The buyer a placement names, looked up in the contact list a screen already
+/// holds. Same shape as `animalById`: a placement whose buyer was deleted reads
+/// as absent rather than crashing, and the caller decides what to show instead.
+Buyer? buyerById(List<Buyer> buyers, String? id) {
+  if (id == null) return null;
+  for (final buyer in buyers) {
+    if (buyer.id == id) return buyer;
+  }
+  return null;
+}
+
 class Buyer extends Equatable {
   const Buyer({
     required this.id,

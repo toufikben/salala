@@ -8,7 +8,9 @@ import 'package:salala/app.dart';
 import 'package:salala/core/utils/triage.dart';
 import 'package:salala/data/db/daos.dart';
 import 'package:salala/data/models/animal.dart';
+import 'package:salala/data/models/buyer.dart';
 import 'package:salala/data/models/health_test.dart';
+import 'package:salala/data/models/placement.dart';
 import 'package:salala/data/models/symptom.dart';
 import 'package:salala/data/models/vaccination.dart';
 import 'package:salala/data/models/vet_visit.dart';
@@ -160,6 +162,8 @@ Future<FakeSecureStorage> pumpSalala(
   List<HealthTest> seedHealthTests = const <HealthTest>[],
   List<VetVisit> seedVisits = const <VetVisit>[],
   List<Symptom> seedSymptoms = const <Symptom>[],
+  List<Buyer> seedBuyers = const <Buyer>[],
+  List<Placement> seedPlacements = const <Placement>[],
 }) async {
   final storage = FakeSecureStorage();
   late Database database;
@@ -220,6 +224,14 @@ Future<FakeSecureStorage> pumpSalala(
     }
     for (final symptom in seedSymptoms) {
       await daos.symptoms.create(symptom, nowMs: nowMs++);
+    }
+    // A buyer before a placement for the same reason: `placements.buyer_id` is a
+    // foreign key, so the contact a seeded handover names has to exist first.
+    for (final buyer in seedBuyers) {
+      await daos.buyers.create(buyer, nowMs: nowMs++);
+    }
+    for (final placement in seedPlacements) {
+      await daos.placements.create(placement, nowMs: nowMs++);
     }
   });
 

@@ -45,6 +45,7 @@
   "recordsWeights": "الأوزان",
   "recordsVisits": "الزيارات البيطرية",
   "recordsSymptoms": "الأعراض",
+  "recordsPlacements": "التسليم",
   "recordsEmpty": "لا يوجد سجل بعد.",
 
   "actionSave": "حفظ",
@@ -214,6 +215,25 @@
   "symptomOngoing": "ما زال مستمرًا",
   "symptomResolved": "زائل",
   "symptomDeleteBody": "يُحذف هذا العَرَض من سجل الحيوان. لا يمكن التراجع عن ذلك.",
+
+  "placementAdd": "تسليم جديد",
+  "placementAddTitle": "تسجيل تسليم",
+  "placementEditTitle": "تعديل التسليم",
+  "placementBuyer": "المشتري",
+  "placementNoBuyer": "المشتري غير مسجَّل",
+  "placementDate": "تاريخ التسليم",
+  "placementPrice": "الثمن",
+  "placementPriceInvalid": "أدخل مبلغًا مثل 2500",
+  "placementCurrency": "العملة",
+  "placementGuarantee": "شروط الضمان",
+  "placementDeleteBody": "يُحذف هذا التسليم من سجل الحيوان، ويبقى المشتري في جهات اتصالك. لا يمكن التراجع عن ذلك.",
+
+  "buyerAdd": "مشتَرٍ جديد",
+  "buyerAddTitle": "إضافة مشتَرٍ",
+  "buyerEditTitle": "تعديل المشتري",
+  "buyerPhone": "الهاتف",
+  "buyerEmail": "البريد الإلكتروني",
+  "buyerCountryCode": "رمز البلد",
 
   "reminderHeadsUpBody": "تنبيه: {what} مستحق في {dueDay}",
   "@reminderHeadsUpBody": {
