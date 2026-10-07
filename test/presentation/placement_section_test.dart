@@ -64,11 +64,8 @@ String _rowDetails({
   required int placed,
   String? amount,
   String? guarantee,
-}) => <String>[
-  formatDayFor(localeTag, placed),
-  if (amount != null) amount,
-  if (guarantee != null) guarantee,
-].join(' · ');
+}) =>
+    <String>[formatDayFor(localeTag, placed), ?amount, ?guarantee].join(' · ');
 
 void _usePhoneViewport(WidgetTester tester) {
   tester.view.physicalSize = const Size(1080, 2400);

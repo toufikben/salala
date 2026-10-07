@@ -665,7 +665,7 @@ class _PlacementTile extends StatelessWidget {
     final details = <String>[
       if (placement.placedDate != null)
         formatDay(context, placement.placedDate),
-      if (amount != null) amount,
+      ?amount,
       if (guarantee != null && guarantee.isNotEmpty) guarantee,
     ];
 

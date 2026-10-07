@@ -5,6 +5,7 @@
 /// not what a rate says it is worth today. So no `intl` number format is involved
 /// anywhere, which is also what keeps an Arabic ledger printing `2500` rather than
 /// `٢٥٠٠` (D21).
+library;
 
 /// Typed money in, a stored amount out.
 ///
