@@ -1115,6 +1115,66 @@ scroll is the reason a breeder with real numbers stops trusting an offline app.
   a real screen at thumb's reach, so it is listed with the device pass rather than
   shipped on the strength of a test.
 
+## Stage 3i — What three peer reviews found while the phone was busy *(CI green — 347 tests, runs `37825878144` then `37827035463`; device check queued with 3b/3c/3d/3e/3f/3g/3h)*
+
+The device stayed in another app for the whole window, so 3b–3h got reviewed by
+reading instead of by thumb: three parallel reviews over the shipped batch, every
+finding that is pure logic fixed and put in front of CI, and every finding that
+needs a screen in front of someone left on the device list with its name on it.
+
+- **The search ranked by its ladder, and the ladder had rungs missing**
+  (`07c1379`, **D30** rewritten). A name substring used to *tie* with an exact
+  registration; a chip match used to win only if its field came first in the
+  loop; `œ` was missing from the fold. Now: whole rungs, best of the two numbers,
+  and `queryFilters` answers "is anything actually being asked" once — a query
+  that normalises to nothing (the space a keyboard inserts) leaves the herd and
+  its agenda alone, and a real query drops the two sections and shows one flat
+  ranked list instead of cutting its own ranking in half.
+- **Three sentences the printed page got wrong** (`0aab90a`). A zero price is not
+  a price, and a restored pack can carry one; an empty phone or email field took a
+  label with nothing after it onto the buyer's document; and the weigh-in column
+  was headed with the *form's* label — "Weight (kg)" — over rows that print grams.
+- **A regression my own fix caused, and CI caught it** (`07c1379` → `e4d0348`).
+  Run `37782380674` analysed clean and failed 3 of 340: the clear button was
+  showing when nothing was typed and hiding during a real search, because the
+  ternary's branches were left where the old condition was. `37783339052` came
+  back green at 341. The widget tests that tap the X are the reason this was found
+  in a run rather than on the phone.
+- **A day is a date, not 86,400,000 milliseconds** (`57123c0`, recorded as **D31**).
+  Every date a breeder reads off paper is stored at local midnight, so an instant
+  difference said the morning had already gone: the home agenda painted a dose due
+  *today* in red as "1 day overdue", the card's due-soon rule called tomorrow's
+  dose "due in 2 days" every afternoon and said nothing at all about today's, and a
+  certificate whose last day is today read as lapsed from 00:00. One door now —
+  `wholeDaysBetween` — with the gates read as dates too, and a count of zero gets
+  the reminder's own sentence, "X is due today", instead of a number rounded up.
+  Arabic agreement keys on the last two digits, so 102 keeps its dual and 105 its
+  plural instead of reading `105 يومًا` about a shot another row called `5 أيام`.
+- **A pedigree that contradicted itself** (`f5bcab7`). The visited set only ever
+  grew, so a grandsire shared by the dam's and the sire's lines — ordinary
+  line-breeding in a breeding herd — was printed twice and given parents on one
+  side only, as if nobody had recorded his ancestry. The set is now the path being
+  walked, which is what its own comment always said it was for.
+- **6 new tests**, and the fixtures that matter are the ones written at midnight:
+  a due date carrying the clock's own hour cannot catch this class of bug at all,
+  which is why 341 tests were green while three of its sentences were wrong.
+- **What the two CI passes on this batch said.** Run `37825878144` (`57123c0`)
+  came back "No issues found!" at **346 tests**; the five it added are the day
+  counts — this-morning's booster on the agenda and on the card, tomorrow counted
+  as one day from the afternoon, and a certificate read on its own last valid day.
+  Run `37827035463` (`f5bcab7`) came back green at **347**, the one test being the
+  shared grandsire's document, which CI can only prove *finishes*. Both runs built
+  the debug APK; the rolling asset on tag `debug-apk` is now the `f5bcab7` build.
+
+- **Left for the phone, on purpose, with its name on it.** Whether a card should
+  say *which* field matched; the three dialogs that do not handle the keyboard
+  inset; triage rows told apart by a dot's colour alone; the on-screen `0 MAD`
+  beside the PDF's "Not recorded" (making every no-money handover print
+  "Not recorded" is a screen's noise decision, not a bug fix); the Arabic PDF's
+  bidi order on paper; and now also the due-today row, "1 day" for tomorrow, and
+  the pedigree's second branch — a document's text is drawn through glyph ids, so
+  CI can prove the walk finishes but not what the page says.
+
 ## Stage 4 — Distribution
 
 Blocked on the business question in `docs/FEASIBILITY.md` §Payments: a Morocco
