@@ -79,6 +79,11 @@ Future<void> confirmDelete(
   Animal animal,
 ) async {
   final l10n = AppLocalizations.of(context);
+  // Read with the localizations, before the dialog is ever shown. This is a
+  // `BuildContext` read like the line above it, and asking the same question
+  // after an `await` is what `use_build_context_synchronously` exists to catch:
+  // the card can be gone by the time the delete answers.
+  final localeTag = Localizations.localeOf(context).toString();
   final confirmed = await showDialog<bool>(
     context: context,
     builder: (dialogContext) => AlertDialog(
@@ -99,12 +104,11 @@ Future<void> confirmDelete(
 
   if (confirmed != true) return;
 
-  // Read before the awaits: an animal's card can be gone by the time the delete
-  // answers, and a disposed widget's context is not something to ask a question
-  // of afterwards.
+  // The handles the rebuild needs are read before the delete rather than after
+  // it: the card can be gone by then, and a disposed widget's `ref` answers
+  // nothing.
   final scheduler = ref.read(reminderSchedulerProvider);
   final daos = ref.read(daosProvider);
-  final localeTag = Localizations.localeOf(context).toString();
 
   await ref.read(animalsProvider.notifier).delete(animal.id);
 
