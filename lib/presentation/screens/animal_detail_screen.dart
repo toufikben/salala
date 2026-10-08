@@ -231,7 +231,15 @@ class AnimalDetailScreen extends ConsumerWidget {
                             ),
                     ),
               ),
-              _PlacementSection(animalId: animal.id),
+              _PlacementSection(
+                animalId: animal.id,
+                placements: ref.watch(placementsForAnimalProvider(animal.id)),
+                buyers: ref.watch(buyersProvider),
+                onRetry: () {
+                  ref.invalidate(placementsForAnimalProvider(animal.id));
+                  ref.invalidate(buyersProvider);
+                },
+              ),
             ],
           );
         },
@@ -597,45 +605,59 @@ class _WeightTile extends ConsumerWidget {
 /// Who each animal went to, and the terms it went to them on.
 ///
 /// Its own widget because a placement row needs two lists: this animal's
-/// placements and the contacts they name. Watching both here is what repaints the
-/// section when either is written (D26), it keeps a buyer's name off a query per
-/// row, and by the time the add button is pressed the contacts are already in
-/// hand — so the form opens on a filled dropdown rather than an empty one.
-class _PlacementSection extends ConsumerWidget {
-  const _PlacementSection({required this.animalId});
+/// placements and the contacts they name. Both are read by the screen and handed
+/// down rather than watched here, like every other section on this page: a
+/// section this far down a lazy `ListView` does not exist until it is scrolled
+/// to, and a query started at that moment has no real-time window left to answer
+/// in — run `37560315166` lost eight tests that way, each one timing out on a
+/// bar after sqflite had warned that the database was locked for ten seconds.
+/// Reading here also keeps a buyer's name off a query per row, and by the time
+/// the add button is pressed the contacts are already in hand, so the form opens
+/// on a filled dropdown rather than an empty one.
+class _PlacementSection extends StatelessWidget {
+  const _PlacementSection({
+    required this.animalId,
+    required this.placements,
+    required this.buyers,
+    required this.onRetry,
+  });
 
   final String animalId;
+  final AsyncValue<List<Placement>> placements;
+  final AsyncValue<List<Buyer>> buyers;
+  final VoidCallback onRetry;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final buyers = ref.watch(buyersProvider).value ?? const <Buyer>[];
 
     return _RecordSection(
       title: l10n.recordsPlacements,
       addLabel: l10n.placementAdd,
       onAdd: () => showPlacementDialog(context, animalId: animalId),
-      body: ref
-          .watch(placementsForAnimalProvider(animalId))
-          .when(
-            loading: () => const _SectionLoading(),
-            error: (error, stack) => _SectionError(
-              onRetry: () =>
-                  ref.invalidate(placementsForAnimalProvider(animalId)),
-            ),
-            data: (placements) => placements.isEmpty
-                ? _SectionEmpty(text: l10n.recordsEmpty)
-                : Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: <Widget>[
-                      for (final placement in placements)
-                        _PlacementTile(
-                          placement: placement,
-                          buyer: buyerById(buyers, placement.buyerId),
-                        ),
-                    ],
-                  ),
-          ),
+      // A contact list that failed to read is not an empty one: the rows would
+      // say "no buyer" about people who are in the ledger. So the rows wait for
+      // both lists, and one retry covers both reads.
+      body: placements.when(
+        loading: () => const _SectionLoading(),
+        error: (error, stack) => _SectionError(onRetry: onRetry),
+        data: (rows) => buyers.when(
+          loading: () => const _SectionLoading(),
+          error: (error, stack) => _SectionError(onRetry: onRetry),
+          data: (contacts) => rows.isEmpty
+              ? _SectionEmpty(text: l10n.recordsEmpty)
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: <Widget>[
+                    for (final placement in rows)
+                      _PlacementTile(
+                        placement: placement,
+                        buyer: buyerById(contacts, placement.buyerId),
+                      ),
+                  ],
+                ),
+        ),
+      ),
     );
   }
 }
