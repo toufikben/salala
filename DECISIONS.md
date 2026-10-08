@@ -598,4 +598,7 @@ means an edit to `triageDoseOverdue` changes the home screen too. The herd-wide
 query runs on every cold open of the home screen; it is the read
 `VaccinationDao.dueBefore` already makes at launch for the reminder resync, and
 `idx_vaccinations_due` covers it, so the agenda costs the screen one indexed
-range scan rather than a new one.
+range scan rather than a new one. And an animal with something to book is named
+twice on the home screen, by its row and by its card: that is the block working,
+and it is why a test on that screen selects `AnimalCard`'s row rather than counting
+a name.

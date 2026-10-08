@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:salala/data/db/schema.dart';
 import 'package:salala/data/models/animal.dart';
 import 'package:salala/data/models/vaccination.dart';
+import 'package:salala/presentation/widgets/animal_card.dart';
 import 'package:salala/services/data_pack.dart';
 
 import '../helpers/fake_notification_writer.dart';
@@ -229,8 +230,24 @@ void main() {
       await goTo(tester, 'Animals');
       // The whole phone moved, not just the rows the pack added: Atlas was here
       // and the pack says she is not, so she is gone.
-      expect(find.text('Kenza'), findsOneWidget);
-      expect(find.text('Sultan'), findsOneWidget);
+      //
+      // Scoped to the cards: a restored dose due inside a fortnight puts its
+      // animal's name in the agenda above the herd too, so the restored herd is
+      // two rows per animal on this screen, not one.
+      expect(
+        find.descendant(
+          of: find.byType(AnimalCard),
+          matching: find.text('Kenza'),
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(
+          of: find.byType(AnimalCard),
+          matching: find.text('Sultan'),
+        ),
+        findsOneWidget,
+      );
       expect(find.text('Atlas'), findsNothing);
     });
 

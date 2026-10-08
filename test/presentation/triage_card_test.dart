@@ -5,6 +5,8 @@ import 'package:salala/core/utils/triage.dart';
 import 'package:salala/data/models/animal.dart';
 import 'package:salala/data/models/vaccination.dart';
 import 'package:salala/data/models/weight_entry.dart';
+import 'package:salala/presentation/screens/animal_detail_screen.dart';
+import 'package:salala/presentation/widgets/animal_card.dart';
 
 import '../helpers/pump_app.dart';
 
@@ -44,7 +46,11 @@ void _usePhoneViewport(WidgetTester tester) {
 }
 
 Future<void> _openLedger(WidgetTester tester) async {
-  await tester.tap(find.text('Sira'));
+  // The card, not the name: an animal with a dose to book is named twice on the
+  // home screen, once by the agenda above the herd and once by its own card.
+  await tester.tap(
+    find.descendant(of: find.byType(AnimalCard), matching: find.text('Sira')),
+  );
   await settleRealIo(tester);
 }
 
@@ -142,7 +148,16 @@ void main() {
 
     expect(find.text('زيارة بيطرية روتينية'), findsOneWidget);
     // D21: the count of days is Latin even in the Arabic sentence.
-    expect(find.text('Rabies كان مستحقًا منذ 20 يومًا'), findsOneWidget);
+    // Scoped to the ledger, because this sentence is the agenda's too: the card
+    // and the to-do list above the herd describe the same dose in the same words
+    // on purpose (one rule, one wording), and the home route is still in the tree.
+    expect(
+      find.descendant(
+        of: find.byType(AnimalDetailScreen),
+        matching: find.text('Rabies كان مستحقًا منذ 20 يومًا'),
+      ),
+      findsOneWidget,
+    );
   });
 
   testWidgets('the card moves when a record is saved on top of it', (

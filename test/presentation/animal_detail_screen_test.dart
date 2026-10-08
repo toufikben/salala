@@ -8,6 +8,7 @@ import 'package:salala/core/utils/date_utils.dart';
 import 'package:salala/core/utils/reminders.dart';
 import 'package:salala/data/models/weight_entry.dart';
 import 'package:salala/presentation/screens/animal_detail_screen.dart';
+import 'package:salala/presentation/widgets/animal_card.dart';
 
 import '../helpers/fake_notification_writer.dart';
 import '../helpers/pump_app.dart';
@@ -58,7 +59,12 @@ void _usePhoneViewport(WidgetTester tester) {
 }
 
 Future<void> _openNala(WidgetTester tester) async {
-  await tester.tap(find.text('Nala'));
+  // The card, not the name. An animal with a dose to book is named twice on the
+  // home screen — once by the agenda above the herd, once by its own card — so an
+  // unscoped `find.text('Nala')` answers with two rows and `tap()` cannot choose.
+  await tester.tap(
+    find.descendant(of: find.byType(AnimalCard), matching: find.text('Nala')),
+  );
   await settleRealIo(tester);
 }
 
