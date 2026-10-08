@@ -171,7 +171,26 @@ PackRows parsePack(String text) {
     throw PackReject(PackProblem.missingTable, table);
   }
 
-  return PackRows(exportedAtMs: decoded['exportedAt'] as int?, tables: tables);
+  // The stamp is a nicety — the restore dialog reads the date out loud — but it
+  // arrives from a file someone could have edited, so it is checked rather than
+  // cast. `decoded['exportedAt'] as int?` threw a TypeError straight out of
+  // `parsePack` for a file holding `"exportedAt": "last week"`, which is the one
+  // sentence this function is careful to give instead: a named reason, not a
+  // crash on the breeder's screen.
+  final Object? writtenAt = pack['exportedAt'];
+  if (writtenAt != null && writtenAt is! int && writtenAt is! double) {
+    throw PackReject(PackProblem.notAPack, 'exportedAt');
+  }
+  return PackRows(
+    exportedAtMs: switch (writtenAt) {
+      final int ms => ms,
+      // A whole number a hand-editing tool wrote as `1759000000000.0` still means
+      // the same instant, and JSON has one number type.
+      final double ms => ms.round(),
+      _ => null,
+    },
+    tables: tables,
+  );
 }
 
 /// Tables that entered the schema after version 1, with the version that added

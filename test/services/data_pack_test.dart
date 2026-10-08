@@ -323,6 +323,38 @@ void main() {
       );
     });
 
+    test('a stamp that is not a number is named, not thrown on', () async {
+      final db = await openTestDatabase();
+      await seed(db);
+      // Every table is present and genuine, so the only thing wrong with the file
+      // is the date the restore dialog reads out loud. Reading that key with
+      // `as int?` threw a TypeError out of `parsePack`, which is the one thing
+      // this file is careful never to do: hand the breeder a named reason rather
+      // than a crash, for a file someone re-typed in a text editor.
+      final Object? whole = jsonDecode(encodePack(await packFrom(db)));
+      (whole! as Map<String, Object?>)['exportedAt'] = 'last week';
+
+      expect(
+        () => parsePack(jsonEncode(whole)),
+        throwsA(
+          isA<PackReject>()
+              .having((e) => e.problem, 'problem', PackProblem.notAPack)
+              .having((e) => e.detail, 'detail', 'exportedAt'),
+        ),
+      );
+    });
+
+    test('a stamp written as a decimal is the same instant', () async {
+      final db = await openTestDatabase();
+      await seed(db);
+      // JSON has one number type, and a tool that re-wrote the whole number as
+      // `1759000000000.0` means that exact millisecond — not a damaged file.
+      final Object? whole = jsonDecode(encodePack(await packFrom(db)));
+      (whole! as Map<String, Object?>)['exportedAt'] = 1759000000000.0;
+
+      expect(parsePack(jsonEncode(whole)).exportedAtMs, 1759000000000);
+    });
+
     test('a pack from a newer app is refused instead of half-read', () async {
       final db = await openTestDatabase();
       await seed(db);
@@ -377,6 +409,37 @@ void main() {
           ),
         ),
       );
+    });
+
+    test('a pack older than a table forgives that table alone', () async {
+      final db = await openTestDatabase();
+      await seed(db);
+      // `symptoms` is the first table this app grew rather than shipped with, so
+      // a version 1 backup never held it. The rule that pins that is private to
+      // the reader, so the test asks the reader itself: a file stamped with the
+      // current schema and missing a table is damaged (the test above), while the
+      // same file stamped one schema back is an honest backup of a ledger that
+      // had no symptoms in it yet. Restoring it fills every table it did carry
+      // and leaves the newer one empty rather than refusing the breeder's only
+      // backup.
+      final pack = await packFrom(db);
+      final rows = tableRows(pack)..remove('symptoms');
+
+      final parsed = parsePack(
+        encodePack(<String, Object?>{
+          ...pack,
+          'schemaVersion': 1,
+          'rows': rows,
+        }),
+      );
+
+      expect(parsed.countOf('symptoms'), 0);
+      expect(parsed.countOf('animals'), 2);
+
+      final target = await openTestDatabase();
+      await restorePack(target, parsed);
+      expect(await target.query('symptoms'), isEmpty);
+      expect(await target.query('animals'), hasLength(2));
     });
 
     test('a table this app does not have stops the restore', () async {
