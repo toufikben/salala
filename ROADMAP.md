@@ -1303,7 +1303,110 @@ real, and all three are now fixed. Recorded as **D35**.
   status is now polled from `--json status` and the count read with a plain
   `grep -E "tests passed"`.
 
-## Stage 4 — Distribution
+## Stage 3l — What a mutation check found, and two things that could not be proven until they were *(CI green — 378 tests at `37846832448`, whose APK step failed on the runner's own NDK download rather than on this diff; 381 at `37847665813` and 382 at `37848791309`, both with the APK; device check queued with 3b–3k)*
+
+Three batches, all of them written while the phone was busy with another app.
+
+- **`enable()` had the keystore order backwards for a caller nobody tests.**
+  `change()` reaches `enable()` with an old digest already stored, so writing the
+  new salt *before* the new digest meant a refusal in between left the old digest
+  sitting over a salt it was never hashed with: `isLocked()` reads the digest
+  alone, so the unlock screen opened, and `verify()` had nothing to hash the PIN
+  against and answered no to every PIN the breeder could type. The records stay on
+  the phone and become unreachable, and the only way out is a restore. Now the
+  digest comes off first, and the cost is stated the other way: a refused change
+  can cost the lock instead of keeping it, and a lock that fell off can be put
+  back on while a lock no PIN opens cannot.
+- **Two assertions that could not fail.** `expect(notifications.written, isEmpty)`
+  and `expect(notifications.cleared, isEmpty)` were written against a fake that
+  appends to its log *before* it throws, so the lists the tests read were never
+  the ones the refusal touched. Both now assert the exact call list
+  (`['clear', 'clear', 'write']`, `['clear']`) — which is the only shape of this
+  evidence that says anything at all.
+- **A third absence that was vacuous in a different way.** The whelping test looked
+  for puppy names on the herd tab, whose list is a lazy `ListView` with breeding
+  stock grouped first: a name below the fold is absent from the tree whether or
+  not it exists in the database. It counts `AnimalCard`s instead, and the success
+  test two above it is what makes the number mean something.
+- **The language switch used to change the app before asking the phone.**
+  `LocaleController.select` set the state and then wrote the settings row, so a
+  refused write left the app in Arabic for the afternoon and English the next
+  morning with no sentence between them. It stores first; the tile now says the
+  phone would not keep the language. Paired tests: the same taps, one with
+  `refuseWritesTo('user_settings')`, and the whole app changing is the positive
+  control for the whole app not changing.
+- **Nothing before `runApp` was handled.** A database that would not open meant a
+  silent exit — no frame, no message, records still on the phone and nothing
+  saying so. `main()` now catches, logs, and shows `StartupFailureScreen`, which
+  reads no database and so cannot fail the same way twice.
+- **A pack was ten separate reads.** `packFrom` queried its ten tables one
+  statement at a time, so a herd that changed mid-export produced a file holding a
+  dose under an animal the pack never saw — and `restorePack`'s foreign key
+  refuses the whole file, which is the worst way for a backup to fail. The reads
+  now happen inside one transaction, and a test queues an animal plus its dose
+  among them. **That test was not evidence until it was shown to fail:** it
+  asserts a both-or-neither property, which also holds if the two inserts happen
+  to land after every read. So `check/pack-snapshot-bites` put `packFrom` back to
+  ten reads with the same suite on top of it and ran it: **`37851190261` —
+  "397 tests passed, 1 failed", and the one is
+  `a pack built while the herd changes is one moment, not two`, with
+  `Expected: <false> Actual: <true>`** — the dose arrived in a pack whose animal
+  list never saw it. The race is real on the shipped runner, the transaction is
+  load-bearing, and the branch exists only to say so; it is not for merging.
+- **One review claim checked and rejected:** `litter_form_screen.dart`'s
+  `firstWhere` on the dam. The field has a validator, and no herd mutation can
+  happen above a pushed form route, so there is no path to the exception. Left
+  alone, and said so in the commit.
+
+## Stage 3m — Two date pairs the ledger cannot hold *(CI green — 398 tests at `37850981556`, APK from the same run; device check queued with 3b–3l)*
+
+- **What is refused, and why only these two.** A whelping before the mating it
+  came from, a weaning before the litter was born, and a booster due before the
+  dose that earned it. Nothing else: a missing date is not a contradiction, and
+  two dates on one day are imprecise rather than impossible, because the picker
+  is a day picker and a mating recorded on the whelping day is a Tuesday evening
+  remembered badly, not a calf born backwards. The pairs are refused because the
+  ledger is *read back through* them — a litter's PDF prints the mating and the
+  whelping side by side, every puppy's birthday is the whelping date, and a due
+  date in the past never clears, so it sits in the agenda as overdue forever and
+  trains the breeder to ignore the one screen built to be looked at.
+- **The rules are pure functions in `date_utils`, and the forms ask before
+  writing.** Day-compared, so the hour a row was stored at is not part of the
+  answer (the same invariant D31 and D32 already hold). The litter refusal names
+  which pair broke and `_refuseDates` switches on the enum, so a third rule added
+  later has to be answered rather than inheriting a sentence.
+- **`refuseUpdatesOf` — a seam the suite was missing.** Every refusal test until
+  now installed a trigger on INSERT. An edit goes through `db.update`, so it would
+  have sailed past that seam, and a test asserting "the database's sentence did
+  not appear" on an edit path would have been vacuous. The dose tests now seed an
+  impossible row through the shipped dao, open it in edit mode, and run against a
+  trigger on UPDATE: the impossible pair answers with the date sentence and no
+  database sentence, the legal pair answers with the database sentence and no date
+  sentence. One field apart, and the difference is the evidence.
+- **The first test in this repo that drives the date dialog.** The litter form has
+  no edit mode and no way of learning a day except through the picker, so its
+  wiring could only be reached by opening it: tap the tile, switch the dialog to
+  input mode, type, OK. That mode parses `mm/dd/yyyy` because
+  `MaterialLocalizations.parseCompactDate` splits the text on `/` with that order
+  written down as an assumption (material_localizations.dart:904), and
+  `MaterialLocalizationEn.dateHelpText` — the locale a test runner gets — says
+  `mm/dd/yyyy` too. **The hint and the parser disagree in this app's own two
+  other languages**: `ar` shows `yyyy/mm/dd` and `fr` shows `jj/mm/aaaa`, both of
+  which that parser rejects. Recorded as phone-check debt, not fixed here: the
+  dialog is Flutter's, the calendar mode (the one a thumb uses by default) is
+  unaffected, and no CI run can type into a locale it is not running.
+- **What is NOT covered, stated.** The calendar mode of the dialog is never driven
+  by any test in this repo — every one of these paths goes through the typed
+  field, so a phone is still the only evidence that tapping a day works on a real
+  ColorOS keyboard. A death date before a birth date is not refused anywhere:
+  `deathDate` is displayed on the animal's ledger and has no editing UI at all, so
+  there is no screen to refuse it from and it is left deferred rather than
+  half-built behind a stub.
+- **Counting, honestly:** 11 new unit cases (day boundaries, the stored hour, each
+  null combination, which sentence wins when both pairs are broken) and 5 new
+  widget tests. 382 → 398 at `37850981556`.
+
+
 
 Blocked on the business question in `docs/FEASIBILITY.md` §Payments: a Morocco
 resident developer cannot receive Play money directly. Options ranked there.

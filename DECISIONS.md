@@ -972,3 +972,69 @@ and the success test above it is what proves three registered puppies are drawn 
 three cards — so two cards after a refusal is the ledger read back through the
 screen rather than a scroll position.
 
+
+## D36 — Two dates that cannot both have happened are refused by the form, before the row exists
+
+`litterDateProblem` and `doseDatesContradict` in `core/utils/date_utils.dart`
+answer one question each, and the two forms ask them before touching SQLite. The
+pairs are: a whelping before the mating it came from, a weaning before the litter
+was born, and a booster due before the dose that earned it.
+
+**Why refuse at all, when nothing here is impossible to type.** Because the ledger
+is read back through these pairs, and what they distort is not the row but the
+arithmetic around it. Every puppy's `birthDate` is copied from the whelping date at
+registration, so a whelping that predates its mating makes the herd's ages wrong
+one generation down; a litter's PDF prints the mating and the whelping side by side
+on a document a buyer reads; and a next-due date behind the dose that earned it
+never clears, so it sits in the agenda as overdue forever — which is precisely how
+an agenda stops being looked at. The whelping is the sharper case: a litter has no
+editing screen, so the row a breeder saves is the row they live with.
+
+**Day-compared, not instant-compared.** D31 and D32 already decided a date in this
+app is a date, not 86,400,000 milliseconds, and a rule written on the raw
+milliseconds would disagree with the rest of the app on any day the clock moves —
+Morocco steps between UTC+1 and UTC+0 for Ramadan. A whelping at 00:01 and a mating
+at 23:30 of the same day are one day on paper, so the pair is legal and stays legal
+however the rows were stamped. Same-day is legal for the same reason: the picker is
+a day picker, and a mating recorded on the whelping day is a Tuesday evening
+remembered badly, not a calf born backwards. Nulls are legal: the form makes all
+three dates optional, so "no mating recorded" is the common case rather than an edge
+one, and with nothing between them the outer two dates say nothing at all.
+
+**Considered and rejected: a CHECK constraint on the tables.** It would hold the
+rule where the row lives, and it would break the one place the app has to stay
+permissive. `restorePack` inserts a whole file inside one transaction, so a single
+pair that a phone's picker could not have produced — a hand-edited file, a pack
+from a build before this rule, a breeder's own correction in a text editor — would
+refuse the *entire* restore, with a rejection that names no field. That is the
+wrong shape of failure for a backup: the app's job on restore is to bring the herd
+back, and its job on save is to keep a new mistake out. Also a CHECK written in
+milliseconds would encode the instant rule D31 rejected, and a CHECK cannot say
+which date to fix; the sentence on the screen can.
+
+**Considered and rejected: putting it in the dao.** The dao is the seam four
+screens share with a restore path, and the restore path must stay permissive for
+the reason above. The forms are where a date is chosen and where the breeder is.
+
+**What is and is not covered.** 11 unit cases on the two rules (day boundaries,
+the hour a row was stored at, every null combination, which sentence wins when both
+pairs are broken) and 5 widget tests. Three of those drive the litter form, which
+has no edit mode: the only way in is the date dialog, so this is the first test in
+the repo to open it, switch it to its input mode, and type. Two drive the dose form
+through a seeded impossible row in edit mode, against a new `refuseUpdatesOf`
+trigger — INSERT-only refusals would not have touched an edit path at all, and the
+"the database's sentence did not appear" half of that pair is only evidence because
+the legal-pair test beside it shows the same trigger does refuse that save.
+
+**Not covered, and why.** The dialog's *calendar* mode — the one a thumb uses by
+default — is still untouched by any test here, because its cells are numbered by
+whatever month the run falls in; typing goes through the input mode, whose parser
+`MaterialLocalizations.parseCompactDate` writes down as `mm/dd/yyyy` regardless of
+locale. That is also a live finding rather than a test limitation: `ar` shows
+`yyyy/mm/dd` and `fr` shows `jj/mm/aaaa` in the same field, so an Arabic or French
+breeder using the typed mode is shown an order the parser rejects. Nothing in CI
+can type into a locale it is not running, so this is phone-check debt and is
+recorded as such. A death date before a birth date is not refused anywhere:
+`deathDate` is displayed on the animal's ledger and has no editing UI, so there is
+no screen to refuse it from, and it is left deferred rather than stubbed behind a
+field nobody can set.
