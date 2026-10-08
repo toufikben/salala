@@ -666,6 +666,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pdfTitle => 'Health and lineage record';
 
   @override
+  String get pdfLitterTitle => 'Whelping record';
+
+  @override
   String pdfGenerated(String day) {
     return 'Generated on $day';
   }

@@ -1300,6 +1300,12 @@ abstract class AppLocalizations {
   /// **'Health and lineage record'**
   String get pdfTitle;
 
+  /// No description provided for @pdfLitterTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Whelping record'**
+  String get pdfLitterTitle;
+
   /// No description provided for @pdfGenerated.
   ///
   /// In en, this message translates to:

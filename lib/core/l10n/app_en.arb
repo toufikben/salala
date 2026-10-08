@@ -323,6 +323,7 @@
   "pdfAction": "PDF pack",
   "pdfFailed": "The PDF could not be made",
   "pdfTitle": "Health and lineage record",
+  "pdfLitterTitle": "Whelping record",
   "pdfGenerated": "Generated on {day}",
   "@pdfGenerated": {
     "placeholders": { "day": { "type": "String" } }

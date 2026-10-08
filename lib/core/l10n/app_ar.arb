@@ -252,6 +252,7 @@
   "pdfAction": "ملف PDF",
   "pdfFailed": "تعذّر إنشاء ملف PDF",
   "pdfTitle": "السجل الصحي والنسب",
+  "pdfLitterTitle": "سجل ولادة الجراء",
   "pdfGenerated": "أُنشئ في {day}",
   "pdfPedigree": "النسب",
   "pdfLitters": "ولادات هذا الحيوان",

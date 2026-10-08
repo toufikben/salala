@@ -669,6 +669,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get pdfTitle => 'السجل الصحي والنسب';
 
   @override
+  String get pdfLitterTitle => 'سجل ولادة الجراء';
+
+  @override
   String pdfGenerated(String day) {
     return 'أُنشئ في $day';
   }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -8,6 +9,9 @@ import '../../core/utils/date_utils.dart';
 import '../../core/utils/gestation.dart';
 import '../../data/models/animal.dart';
 import '../../data/models/litter.dart';
+import '../../services/litter_pdf.dart';
+import '../../services/pack_files.dart';
+import '../../services/pdf_layout.dart';
 import '../providers/app_providers.dart';
 import '../widgets/animal_card.dart';
 import '../widgets/salala_nav_bar.dart';
@@ -126,6 +130,12 @@ class LitterDetailScreen extends ConsumerWidget {
         actions: <Widget>[
           if (litter != null)
             IconButton(
+              tooltip: l10n.pdfAction,
+              icon: const Icon(Icons.picture_as_pdf_outlined),
+              onPressed: () => _shareLitterPdf(context, ref, litter),
+            ),
+          if (litter != null)
+            IconButton(
               tooltip: l10n.actionDelete,
               icon: const Icon(Icons.delete_outline),
               onPressed: () => _confirmDelete(context, ref, litter),
@@ -199,6 +209,36 @@ class LitterDetailScreen extends ConsumerWidget {
         },
       ),
     );
+  }
+}
+
+/// Writes the whelping record for this litter and hands it to the share sheet.
+///
+/// Same shape as the animal's pack, including reading the font on each tap — the
+/// litter page is opened a few times a year, not on the way past.
+Future<void> _shareLitterPdf(
+  BuildContext context,
+  WidgetRef ref,
+  Litter litter,
+) async {
+  final l10n = AppLocalizations.of(context);
+  final messenger = ScaffoldMessenger.of(context);
+
+  try {
+    final baseFont = await rootBundle.load(pdfFontAsset);
+    final bytes = await litterPackPdf(
+      ref.read(daosProvider),
+      litterId: litter.id,
+      l10n: l10n,
+      baseFont: baseFont,
+    );
+    final name = await ref
+        .read(packFilesProvider)
+        .shareBytes(pdfFileName(litter.name, DateTime.now()), bytes);
+    messenger.showSnackBar(SnackBar(content: Text(l10n.packShared(name))));
+  } catch (error) {
+    debugPrint('Litter PDF failed: $error');
+    messenger.showSnackBar(SnackBar(content: Text(l10n.pdfFailed)));
   }
 }
 

@@ -252,6 +252,7 @@
   "pdfAction": "Fiche PDF",
   "pdfFailed": "Le PDF n'a pas pu être créé",
   "pdfTitle": "Fiche sanitaire et généalogique",
+  "pdfLitterTitle": "Registre de portée",
   "pdfGenerated": "Généré le {day}",
   "pdfPedigree": "Généalogie",
   "pdfLitters": "Portées de cet animal",

@@ -667,6 +667,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get pdfTitle => 'Fiche sanitaire et généalogique';
 
   @override
+  String get pdfLitterTitle => 'Registre de portée';
+
+  @override
   String pdfGenerated(String day) {
     return 'Généré le $day';
   }
