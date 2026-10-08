@@ -29,14 +29,17 @@ class _PinGateScreenState extends ConsumerState<PinGateScreen> {
     if (pin.isEmpty || _busy) return;
     setState(() => _busy = true);
 
-    final ok = await ref.read(appLockProvider).verify(pin);
+    // The flag comes back down whatever the keystore answers, an error included:
+    // `_busy` doubles as the button's disable switch, so leaving it set by a call
+    // that threw would have locked the breeder out behind a spinner with the field
+    // still begging for a PIN.
+    final ok = await ref.read(appLockProvider).verify(pin).whenComplete(() {
+      if (mounted) setState(() => _busy = false);
+    });
 
     if (!mounted) return;
     _controller.clear();
-    setState(() {
-      _busy = false;
-      _wrong = !ok;
-    });
+    setState(() => _wrong = !ok);
     if (ok) ref.read(lockGateProvider.notifier).unlock();
   }
 

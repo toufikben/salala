@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:salala/services/app_lock_service.dart';
 
@@ -32,8 +34,32 @@ void main() {
 
     test('the raw PIN never reaches storage', () async {
       await lock.enable('2481');
-      expect(storage.values.values.every((v) => !v.contains('2481')), isTrue);
-      expect(storage.values.length, 2, reason: 'one salt, one digest');
+      // The values' shapes are checked instead of scanning them for the PIN's
+      // digits: a digest is 64 hex characters, and about one in a thousand of
+      // them contain any given four of them, which is how this assertion failed
+      // on a run whose only change was documentation (CI 37828225501). Two keys,
+      // a 16-byte salt and a 64-character hex digest cannot hold a typed PIN.
+      expect(
+        storage.values.keys,
+        unorderedEquals(<String>['app_lock_salt', 'app_lock_digest']),
+      );
+      expect(base64Decode(storage.values['app_lock_salt']!), hasLength(16));
+      expect(
+        storage.values['app_lock_digest']!,
+        matches(RegExp(r'^[0-9a-f]{64}$')),
+      );
+    });
+
+    test('a salt that cannot be decoded answers no, not a crash', () async {
+      await lock.enable('2481');
+      // A keystore value that came back half-written is not a salt, and
+      // `base64Decode` throws on one. The screen asked a yes-or-no question, so
+      // that is the only shape the answer may take: an exception here used to
+      // reach the unlock screen and leave it unable to take another PIN.
+      storage.values['app_lock_salt'] = '!!!!';
+
+      expect(await lock.verify('2481'), isFalse);
+      expect(await lock.isLocked(), isTrue);
     });
 
     test(

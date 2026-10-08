@@ -48,7 +48,17 @@ class AppLockService {
     final storedSalt = await _storage.read(key: _saltKey);
     final storedDigest = await _storage.read(key: _digestKey);
     if (storedSalt == null || storedDigest == null) return false;
-    final candidate = _digest(base64Decode(storedSalt), pin.trim());
+    final List<int> salt;
+    try {
+      salt = base64Decode(storedSalt);
+    } on FormatException {
+      // A salt the storage hands back in a shape that cannot be decoded matches
+      // no PIN at all, so the honest answer is "no". Throwing here would have
+      // reached the unlock screen as an exception instead of an answer, and that
+      // screen had no way to recover from one (see its `_submit`).
+      return false;
+    }
+    final candidate = _digest(salt, pin.trim());
     return _constantTimeEquals(candidate, storedDigest);
   }
 
