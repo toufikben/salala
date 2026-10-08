@@ -858,8 +858,16 @@ ledger unreliable, because the app's state and the breeder's belief diverge.
 `refuseRecordDelete(context, error)` is the single place the sentence and the log
 line live. Two assertions carry the meaning beyond the text: the animal card's
 test requires that the launch's three writer calls are *all* it ever saw (no
-`clearAll` for a surviving animal), and the dose test requires an empty writer log
-(no cancel for a row that was never removed).
+`clearAll` for a surviving animal), and the dose test launches with its alarm
+already booked, then requires that a refused delete leaves the writer's log
+exactly as the launch left it — a kept alarm is only evidence when there was an
+alarm there to keep.
+
+**Amended the same day, because the first version of these tests proved less
+than they claimed.** No test in D33 or D34 could fail against the buggy shape: the
+alarm step was never made to fail, so one `try` around the row and the alarm would
+have passed every assertion in the batch. `FakeNotificationWriter` now has
+`writeFailure` and `clearFailure`, and D35 records what they are for.
 
 **Cost, stated — and one candidate fix that was measured and rejected.** The
 obvious repair for a surviving orphan alarm is a launch resync that clears the
@@ -874,3 +882,53 @@ the app can take that alarm out except an animal-level delete or a restore, whic
 do clear wholesale. Same asymmetry already recorded for the save path — an alarm
 that failed to be *booked* is healed by the next launch, an alarm that failed to be
 *cancelled* is not.
+
+## D35 — A keystore call that stops halfway may not leave a lock nobody can open
+
+**Date:** 2026-10-08. **Status:** in force.
+
+Three parallel reviews of the D33/D34 batch, then each finding checked against the
+source before it was believed (one was not: see the rejected claim in Stage 3j).
+These three were real.
+
+**1. `disable()` deleted the salt first.** `isLocked()` reads the digest alone, and
+`verify()` can only answer no once the salt is gone — so a keystore that refused
+the *second* delete left a digest with no salt behind it. The unlock screen opens,
+every PIN is answered "no", `change()` cannot be reached without a PIN, and the
+records are on the phone and unreachable except by a restore. The digest goes first
+now, so the worst a halfway refusal leaves is the salt of a lock that no longer
+exists: nothing reads it, and the app opens unlocked. `enable()`'s salt-then-digest
+order is the same rule seen from the other side and was left alone — a digest
+written before its salt would be that same dead end, reached by a write instead of
+a delete.
+
+**2. The Settings switch awaited both calls with no handler.** The exception ended
+the async `onChanged` mid-flight, the switch snapped back, and nothing said why: a
+breeder reads a broken tile and taps again. It now catches, logs, and says
+`lockChangeFailed` ("The phone would not change the app lock.").
+
+**3. The herd and litter controllers awaited their re-read *inside* the mutation.**
+`create`, `edit`, `delete` and `register` all ended with `await refresh()`, and
+every caller catches around those methods to say "nothing was written" — which is
+true only of the statement before the re-read. A list that refused to refresh was
+therefore reported as a write that failed, on a row already stored: the breeder
+adds the animal again, or registers the same whelping twice, because
+`createWithPuppies` had already committed. The re-reads are now logged rather than
+thrown, in the same shape as D33's alarm. The public `refresh()` keeps throwing —
+the retry buttons and the post-restore reload want the failure.
+
+**Considered and rejected: making the switch honest by re-reading `isLocked()`
+inside the catch.** It would report the true state after a halfway `disable()`, but
+that read goes through the same keystore that just refused, so it can throw from
+inside the handler's error path. A stale switch until the next launch is a display
+nit; an unhandled exception in the error path is the bug being fixed.
+
+**What is and is not covered.** Findings 1 and 2 have tests: the digest-without-a-salt
+dead end is asserted as its own case, a refused second delete is shown leaving the
+app open, and a widget test taps the switch on a keystore that refuses and reads the
+sentence back. Finding 3 has none and cannot have one: refusing a `SELECT` is not
+something a trigger does, and no CI run here can make a read fail after a write
+succeeded. It is also not something the phone can show — it needs a database that
+answers yes to a write and no to the next read. It ships on the argument, which is
+the same argument D33 already accepted for the alarm step.
+

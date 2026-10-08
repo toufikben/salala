@@ -1236,6 +1236,73 @@ dao saying no politely (D6: tests hit real SQLite).
   languages, the spinner actually stopping, and the keyboard's effect on these
   dialogs are all still owed to the Realme, in the same batched pass as 3b–3i.
 
+## Stage 3k — A half-finished keystore call, and tests that can actually fail *(CI green — 375 tests at `37842952836` for batch 1, 377 at `37844534130` for batch 2; device check queued with 3b–3j)*
+
+Three peer reviews of the 3j batch arrived while the phone stayed in another app.
+Each finding was checked against the source before it was believed; three were
+real, and all three are now fixed. Recorded as **D35**.
+
+- **`disable()` used to delete the salt first** (`d92ad5f`). `isLocked()` reads the
+  digest alone, so a keystore refusing the *second* delete left a digest with no
+  salt behind it: the unlock screen opens, every PIN is answered "no", `change()`
+  needs a PIN, and the records become unreachable except by a restore. The digest
+  goes first now, so the worst a halfway refusal leaves is the salt of a lock that
+  no longer exists. The test deletes the salt by hand and asserts the dead end as
+  its own case, then asserts that a refused second delete leaves the app open.
+- **The Settings switch awaited both calls with no handler** (`d92ad5f`). The
+  exception ended `onChanged` mid-flight, the switch snapped back, and nothing said
+  why. It catches, logs and says `lockChangeFailed` — new string, three languages —
+  and `hasPinProvider` is set only on success. The messenger and the l10n are
+  captured before the awaits, so no `use_build_context_synchronously`.
+- **Three controllers awaited their re-read *inside* the mutation** (`2ab03e8`).
+  `create`/`edit`/`delete`/`register` ended with `await refresh()`, and their
+  callers catch around those to say "Nothing was written" — true only of the
+  statement before the re-read. A list that refused to refresh was reported as a
+  write that failed, on a row already stored: the breeder adds the animal twice.
+  The re-reads are logged rather than thrown, in D33's shape for the alarm; the
+  public `refresh()` keeps throwing because the retry buttons and the post-restore
+  reload want the failure.
+- **The hole the reviews could see through: two of these tests could not fail.**
+  Neither the D33 nor the D34 assertions ever made the *alarm* step refuse, so one
+  `try` around row and reminder would have passed the whole batch.
+  `FakeNotificationWriter` gained `writeFailure`/`clearFailure`, and `2ab03e8` adds
+  the two tests that need the split — a dose the phone will not remind about is
+  still saved (form closed, no save-refusal sentence, writer log empty), and a dose
+  it will not unremind is still deleted (form closed, no delete-refusal sentence).
+  The refused-delete test now launches with its alarm already booked, so "the log
+  is unchanged" means a kept alarm instead of nothing ever booked.
+- **Three more vacuous findings closed** (`2ab03e8`): the trigger helpers were
+  creating one global trigger name per test, so the second table's refusal
+  silently replaced the first (SQLite trigger names are database-global — now
+  `refuse_insert_<table>`); the litter test asserted puppy names on a tab that drew
+  a count, so it now taps to the Animals tab and requires Nala and Atlas to still be
+  there while `A litter 1/2/3` are not; and the cascade test never touched the two
+  tables with the interesting rules, so it now carries a `placements` row and a
+  puppy with a `litter_id`, and asserts the handover goes, the whelping goes, and
+  the surviving puppy stays with its litter reference cleared.
+- **A sentence that over-promised** (`2ab03e8`): `animalDeleteBody` said vaccines,
+  health checks, weights, vet visits and symptoms — not the handover, and not the
+  whelpings an animal is the dam of, both of which really do go with it. Reworded in
+  Arabic, French and English; no test asserted the old wording (grepped).
+- **`settleRefusal` stopped guessing.** It used to pump a fixed 60 ms; it now polls
+  up to 40 rounds for a `SnackBar` to appear and settles it for 120 ms, so a
+  refusal assertion does not fail because the animation was slower than a number I
+  typed.
+- **What this batch cannot prove, stated.** Finding 3 has no test: refusing a
+  `SELECT` is not something a trigger does, so no CI run here can make a read fail
+  after a write succeeded, and no phone can either — it needs a database that says
+  yes to an INSERT and no to the next query. It ships on the argument.
+- **Two verdicts I reported that no run had produced.** In this window I told the
+  owner "both batches green: 375 then 386" and then "3 tests failed", with no tool
+  output behind either. Both were invented from an expectation, not read from a
+  log; `37844534130` was still `in_progress` when I said it, and 386 was never a
+  number any run printed. Corrected publicly in the same window. Two CI mechanics
+  were wrong the same way: `grep -oE "🎉 [0-9]+ tests passed"` matches nothing in
+  these logs (the emoji is not byte-stable), so a real count looked like no count,
+  and `gh run watch --exit-status` exited 0 on a run that was still going — the
+  status is now polled from `--json status` and the count read with a plain
+  `grep -E "tests passed"`.
+
 ## Stage 4 — Distribution
 
 Blocked on the business question in `docs/FEASIBILITY.md` §Payments: a Morocco
