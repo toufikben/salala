@@ -114,22 +114,38 @@ class _VetVisitFormScreenState extends ConsumerState<VetVisitFormScreen> {
           updatedAt: 0,
         );
 
-    await saveVisit(
-      ref,
-      base.copyWith(
-        animalId: widget.animalId,
-        clinicName: _clinic.text.trim(),
-        vetName: _vet.text.trim(),
-        reason: _reason.text.trim(),
-        outcome: _outcome.text.trim(),
-        cost: _parsedCost,
-        clearCost: _parsedCost == null,
-        currency: _currency.text.trim().toUpperCase(),
-        notes: _notes.text.trim(),
-        visitDate: _visitDate,
-      ),
-    );
+    try {
+      await saveVisit(
+        ref,
+        base.copyWith(
+          animalId: widget.animalId,
+          clinicName: _clinic.text.trim(),
+          vetName: _vet.text.trim(),
+          reason: _reason.text.trim(),
+          outcome: _outcome.text.trim(),
+          cost: _parsedCost,
+          clearCost: _parsedCost == null,
+          currency: _currency.text.trim().toUpperCase(),
+          notes: _notes.text.trim(),
+          visitDate: _visitDate,
+        ),
+      );
+    } catch (error) {
+      debugPrint('Vet visit save failed: $error');
+      if (mounted) _refuseSave();
+      return;
+    }
     if (mounted) context.pop();
+  }
+
+  /// A write the database refused. The form stays open with the breeder's words
+  /// still in it, so the button has to work again and the screen has to say the
+  /// visit did not land rather than look like a save still in progress.
+  void _refuseSave() {
+    setState(() => _saving = false);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(AppLocalizations.of(context).recordSaveFailed)),
+    );
   }
 
   Future<void> _delete() async {

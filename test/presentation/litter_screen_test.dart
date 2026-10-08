@@ -151,4 +151,52 @@ void main() {
     expect(find.text('A litter 3'), findsOneWidget);
     expect(find.text('Breeding stock'), findsOneWidget);
   });
+
+  testWidgets(
+    'a whelping the database refuses is refused whole, and the form stays open',
+    (tester) async {
+      await pumpSalala(
+        tester,
+        seed: <Animal>[
+          _stock(name: 'Nala', sex: Sex.female),
+          _stock(name: 'Atlas', sex: Sex.male),
+        ],
+        beforeLaunch: refuseWritesTo('litters'),
+      );
+      await _openLittersTab(tester);
+
+      await tester.tap(find.widgetWithText(FloatingActionButton, 'New litter'));
+      await tester.pumpAndSettle();
+
+      await tester.enterText(
+        find.widgetWithText(TextFormField, 'Litter name'),
+        'A litter',
+      );
+      await _pickFrom(
+        tester,
+        find.byType(DropdownButtonFormField<String>),
+        'Nala',
+      );
+      await _pickFrom(tester, find.byType(DropdownButtonFormField<int>), '3');
+
+      await tapSaveAndGetAnswer(tester);
+
+      expectRefusedWrite(
+        tester,
+        stillOnScreen: find.byType(LitterFormScreen),
+        label: 'Litter name',
+        text: 'A litter',
+      );
+
+      // And the sentence is the truth: the litter is written before its puppies
+      // inside one transaction, so a refusal on that first row means three
+      // animals named "A litter 1..3" were never created either. Back on the tab,
+      // the whelping is not there and neither is a single puppy.
+      await tester.tap(find.widgetWithText(TextButton, 'Cancel'));
+      await settleRealIo(tester);
+
+      expect(find.text('A litter'), findsNothing);
+      expect(find.text('A litter 1'), findsNothing);
+    },
+  );
 }

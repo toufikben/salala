@@ -131,13 +131,29 @@ class _AnimalFormScreenState extends ConsumerState<AnimalFormScreen> {
       clearBirthDate: _birthDate == null,
     );
 
-    if (widget.mode == AnimalFormMode.edit) {
-      await controller.edit(draft);
-    } else {
-      await controller.create(draft);
+    try {
+      if (widget.mode == AnimalFormMode.edit) {
+        await controller.edit(draft);
+      } else {
+        await controller.create(draft);
+      }
+    } catch (error) {
+      debugPrint('Animal save failed: $error');
+      if (mounted) _refuseSave();
+      return;
     }
 
     if (mounted) context.pop();
+  }
+
+  /// A write the database refused. The form stays open with the breeder's words
+  /// still in it, so the button has to work again and the screen has to say the
+  /// animal did not land rather than look like a save still in progress.
+  void _refuseSave() {
+    setState(() => _saving = false);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(AppLocalizations.of(context).recordSaveFailed)),
+    );
   }
 
   @override

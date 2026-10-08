@@ -94,8 +94,28 @@ class _LitterFormScreenState extends ConsumerState<LitterFormScreen> {
         ),
     ];
 
-    await ref.read(littersProvider.notifier).register(litter, puppies);
+    try {
+      await ref.read(littersProvider.notifier).register(litter, puppies);
+    } catch (error) {
+      // The litter and its puppies land or do not land together — that is the
+      // provider's transaction, not this screen's — so a refusal here means
+      // nothing was written and the form is the place to try again.
+      debugPrint('Litter registration failed: $error');
+      if (mounted) _refuseSave();
+      return;
+    }
+
     if (mounted) context.pop();
+  }
+
+  /// A write the database refused. The form stays open with the breeder's words
+  /// still in it, so the button has to work again and the screen has to say the
+  /// litter did not land rather than look like a registration still running.
+  void _refuseSave() {
+    setState(() => _saving = false);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(AppLocalizations.of(context).recordSaveFailed)),
+    );
   }
 
   @override

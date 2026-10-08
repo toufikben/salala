@@ -101,6 +101,41 @@ void main() {
     expect(find.text('Nala'), findsOneWidget);
   });
 
+  testWidgets(
+    'an animal the database refuses keeps the form open and the button live',
+    (tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 2.625;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      // The herd stays empty on purpose: the animal being typed is the first row
+      // the database turns down, so nothing else on the screen can be what the
+      // breeder is looking at.
+      await pumpSalala(tester, beforeLaunch: refuseWritesTo('animals'));
+      await tester.tap(find.widgetWithText(FilledButton, 'Add animal'));
+      await tester.pumpAndSettle();
+
+      await tester.enterText(
+        find.widgetWithText(TextFormField, 'Name'),
+        'Nala',
+      );
+      await tester.enterText(
+        find.widgetWithText(TextFormField, 'Species'),
+        'dog',
+      );
+
+      await tapSaveAndGetAnswer(tester);
+
+      expectRefusedWrite(
+        tester,
+        stillOnScreen: find.byType(AnimalFormScreen),
+        label: 'Name',
+        text: 'Nala',
+      );
+    },
+  );
+
   testWidgets('a locked app opens on the PIN gate, not the herd', (
     tester,
   ) async {

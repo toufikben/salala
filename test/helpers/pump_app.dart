@@ -263,3 +263,67 @@ Future<FakeSecureStorage> pumpSalala(
   await settleRealIo(tester);
   return storage;
 }
+
+/// A `beforeLaunch` hook that makes every insert into [table] fail the way a
+/// real database fails it, so a write path is exercised against a genuine
+/// refusal instead of a faked dao (D6). Installed after the seeds, which still
+/// land; reads stay honest, so the screen around the form behaves normally.
+Future<void> Function(Database) refuseWritesTo(String table) => (db) async {
+  await db.execute(
+    'CREATE TRIGGER refuse_row BEFORE INSERT ON $table '
+    "BEGIN SELECT RAISE(ABORT, 'the ledger is full'); END",
+  );
+};
+
+/// Taps a form's Save and waits for SQLite to answer, without the full launch
+/// settle: the refusal these tests want arrives late, and `settleRealIo`'s
+/// pumping outlives the snackbar it has to be read from.
+Future<void> tapSaveAndGetAnswer(WidgetTester tester) async {
+  final save = find.widgetWithText(FilledButton, 'Save');
+  await tester.ensureVisible(save);
+  await tester.pumpAndSettle();
+  await tester.tap(save);
+  await tester.runAsync(
+    () => Future<void>.delayed(const Duration(milliseconds: 60)),
+  );
+  await tester.pump();
+  await tester.pump(const Duration(milliseconds: 120));
+}
+
+/// The whole evidence that a refused write stayed the screen's: the sentence, the
+/// screen still open with the typed word in its field, and a Save button that
+/// answers a tap again. [stillOnScreen] is that screen's own type rather than a
+/// caption, because half these forms are titled with the same words as the button
+/// that opened them. [label] is the field [text] was typed into, and
+/// [notifications] the writer that must not have been handed an alarm for a row
+/// that was never written.
+void expectRefusedWrite(
+  WidgetTester tester, {
+  required Finder stillOnScreen,
+  required String label,
+  required String text,
+  FakeNotificationWriter? notifications,
+}) {
+  expect(
+    find.text('This could not be saved. Nothing was written.'),
+    findsOneWidget,
+    reason: 'a refused write has to say so, not sit on a spinner',
+  );
+  expect(stillOnScreen, findsOneWidget);
+  expect(
+    tester
+        .widget<FilledButton>(find.widgetWithText(FilledButton, 'Save'))
+        .onPressed,
+    isNotNull,
+  );
+  expect(
+    tester
+        .widget<TextFormField>(find.widgetWithText(TextFormField, label))
+        .controller!
+        .text,
+    text,
+  );
+  if (notifications != null) {
+    expect(notifications.log, isEmpty);
+  }
+}

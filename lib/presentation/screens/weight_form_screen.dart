@@ -60,17 +60,33 @@ class _WeightFormScreenState extends ConsumerState<WeightFormScreen> {
     if (grams == null) return;
     setState(() => _saving = true);
 
-    await saveWeight(
-      ref,
-      WeightEntry(
-        id: '',
-        animalId: widget.animalId,
-        weightGrams: grams,
-        measuredAt: _measuredAt,
-        note: _note.text.trim(),
-      ),
-    );
+    try {
+      await saveWeight(
+        ref,
+        WeightEntry(
+          id: '',
+          animalId: widget.animalId,
+          weightGrams: grams,
+          measuredAt: _measuredAt,
+          note: _note.text.trim(),
+        ),
+      );
+    } catch (error) {
+      debugPrint('Weigh-in save failed: $error');
+      if (mounted) _refuseSave();
+      return;
+    }
     if (mounted) context.pop();
+  }
+
+  /// A write the database refused. The form stays open with the breeder's words
+  /// still in it, so the button has to work again and the screen has to say the
+  /// weigh-in did not land rather than look like a save still in progress.
+  void _refuseSave() {
+    setState(() => _saving = false);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(AppLocalizations.of(context).recordSaveFailed)),
+    );
   }
 
   @override
