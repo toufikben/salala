@@ -1045,6 +1045,7 @@ void main() {
       );
       expect(find.byType(WeightFormScreen), findsOneWidget);
 
+      await dismissRefusals(tester);
       await typeDateIntoPicker(
         tester,
         scope: WeightFormScreen,
@@ -1097,6 +1098,7 @@ void main() {
             'SQLite itself says when a row does reach it',
       );
 
+      await dismissRefusals(tester);
       await typeDateIntoPicker(
         tester,
         scope: VaccinationFormScreen,
@@ -1141,6 +1143,7 @@ void main() {
       reason: 'see the dose test above: same trigger kind, same pairing',
     );
 
+    await dismissRefusals(tester);
     await typeDateIntoPicker(
       tester,
       scope: HealthTestFormScreen,
@@ -1193,6 +1196,7 @@ void main() {
         reason: 'see the dose test above: same trigger kind, same pairing',
       );
 
+      await dismissRefusals(tester);
       await typeDateIntoPicker(
         tester,
         scope: VetVisitFormScreen,

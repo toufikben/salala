@@ -382,6 +382,7 @@ void main() {
       );
       expect(find.byType(SymptomDialog), findsOneWidget);
 
+      await dismissRefusals(tester);
       await typeDateIntoPicker(
         tester,
         scope: AlertDialog,

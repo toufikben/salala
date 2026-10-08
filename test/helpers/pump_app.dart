@@ -460,3 +460,24 @@ String usDay(int ms) {
   String two(int value) => value.toString().padLeft(2, '0');
   return '${two(day.month)}/${two(day.day)}/${day.year}';
 }
+
+/// Wait out a refusal sentence already on screen, between two phases of one test.
+///
+/// `ScaffoldMessenger` shows one snackbar at a time and queues the next, so a
+/// form refused twice displays the *first* reason while the second is still
+/// waiting. That makes a two-phase test — refuse the impossible, then fix it and
+/// try again — assert against a sentence from the phase before it, and
+/// [settleRefusal] cannot tell the difference: it answers as soon as any
+/// `SnackBar` exists. CI proved this rather than left it to be reasoned about:
+/// the six birth-date tests all passed their first half, SQLite refused their
+/// second half as the log shows, and every one of them failed on the sentence
+/// that had not been displayed yet.
+Future<void> dismissRefusals(WidgetTester tester) async {
+  for (var round = 0; round < 10; round++) {
+    if (find.byType(SnackBar).evaluate().isEmpty) return;
+    // Four seconds is what the shipped app waits before dismissing a snackbar;
+    // the fake clock only spends that time when a test asks for it.
+    await tester.pump(const Duration(seconds: 4));
+    await tester.pumpAndSettle();
+  }
+}

@@ -510,6 +510,7 @@ void main() {
           'day below shows the trigger does bite',
     );
     expect(find.byType(PlacementDialog), findsOneWidget);
+    await dismissRefusals(tester);
     await typeDateIntoPicker(
       tester,
       scope: AlertDialog,
