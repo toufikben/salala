@@ -112,23 +112,59 @@ class _HealthTestFormScreenState extends ConsumerState<HealthTestFormScreen> {
           updatedAt: 0,
         );
 
-    final saved = await saveHealthTest(
-      ref,
-      base.copyWith(
-        animalId: widget.animalId,
-        testType: _testType.text.trim(),
-        result: _result.text.trim(),
-        testingBody: _testingBody.text.trim(),
-        certificateNo: _certificateNo.text.trim(),
-        verifiedBy: _verifiedBy.text.trim(),
-        notes: _notes.text.trim(),
-        testDate: _testDate,
-        validUntil: _validUntil,
-        clearValidUntil: _validUntil == null,
-      ),
-    );
-    await _syncReminder(saved);
+    final saved = await _write(base);
+    // The form keeps the breeder's words and the button works again: a record the
+    // database refused is the screen's to leave open.
+    if (saved == null) return;
+
+    try {
+      await _syncReminder(saved);
+    } catch (error) {
+      // The record is written, and the ledger is the durable copy of a reminder:
+      // the next launch rebuilds the alarm from it (see `reminderHorizonDays`).
+      // A phone that refuses an alarm is not a save that failed, so the form
+      // still closes on a record that is really there.
+      debugPrint('Reminder after a test save failed: $error');
+    }
     if (mounted) context.pop();
+  }
+
+  /// The write on its own, so the screen can tell a refused row from a refused
+  /// alarm. Returns nothing when the database said no, having already reset the
+  /// button and said so: `_saving` is that button's disable switch, and leaving it
+  /// set on a failure would have frozen the form on a record that is not there.
+  Future<HealthTest?> _write(HealthTest base) async {
+    try {
+      return await saveHealthTest(
+        ref,
+        base.copyWith(
+          animalId: widget.animalId,
+          testType: _testType.text.trim(),
+          result: _result.text.trim(),
+          testingBody: _testingBody.text.trim(),
+          certificateNo: _certificateNo.text.trim(),
+          verifiedBy: _verifiedBy.text.trim(),
+          notes: _notes.text.trim(),
+          testDate: _testDate,
+          validUntil: _validUntil,
+          clearValidUntil: _validUntil == null,
+        ),
+      );
+    } catch (error) {
+      debugPrint('Health test save failed: $error');
+      if (mounted) _refuseSave();
+      return null;
+    }
+  }
+
+  /// A write the database refused. The form stays open with the breeder's words
+  /// still in it, so the button has to work again and the screen has to say the
+  /// record did not land rather than look like a save still in progress.
+  void _refuseSave() {
+    setState(() => _saving = false);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(AppLocalizations.of(context).recordSaveFailed)),
+    );
   }
 
   /// A screening is worth a reminder only while its certificate has an expiry:

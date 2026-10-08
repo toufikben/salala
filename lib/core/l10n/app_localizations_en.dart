@@ -401,6 +401,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get recordDeleteTitle => 'Delete this record?';
 
   @override
+  String get recordSaveFailed =>
+      'This could not be saved. Nothing was written.';
+
+  @override
   String get vaccinationAdd => 'Add vaccination';
 
   @override

@@ -790,6 +790,12 @@ abstract class AppLocalizations {
   /// **'Delete this record?'**
   String get recordDeleteTitle;
 
+  /// No description provided for @recordSaveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'This could not be saved. Nothing was written.'**
+  String get recordSaveFailed;
+
   /// No description provided for @vaccinationAdd.
   ///
   /// In en, this message translates to:

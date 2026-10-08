@@ -128,9 +128,46 @@ class _VaccinationFormScreenState extends ConsumerState<VaccinationFormScreen> {
       clearNextDueDate: _nextDue == null,
     );
 
-    final saved = await saveVaccination(ref, draft);
-    await _syncReminder(saved);
+    final saved = await _write(draft);
+    // The form's own words are still in the fields, and the button is live again:
+    // a dose that did not land is the screen's to keep open.
+    if (saved == null) return;
+
+    try {
+      await _syncReminder(saved);
+    } catch (error) {
+      // The dose is written, and the ledger is the durable copy of a reminder:
+      // the next launch rebuilds the alarm from it (see `reminderHorizonDays`).
+      // A phone that refuses an alarm is not a save that failed, so this closes
+      // the form anyway rather than sitting on a wedged button.
+      debugPrint('Reminder after a dose save failed: $error');
+    }
     if (mounted) context.pop();
+  }
+
+  /// The write on its own, so the screen can tell a refused row from a refused
+  /// alarm. Returns nothing when the database said no, having already reset the
+  /// button and said so: `_saving` is that button's disable switch, and leaving
+  /// it set on a failure would have frozen the form on a dose that is not in the
+  /// ledger.
+  Future<Vaccination?> _write(Vaccination draft) async {
+    try {
+      return await saveVaccination(ref, draft);
+    } catch (error) {
+      debugPrint('Vaccination save failed: $error');
+      if (mounted) _refuseSave();
+      return null;
+    }
+  }
+
+  /// A write the database refused. The form stays open with the breeder's words
+  /// still in it, so the button has to work again and the screen has to say the
+  /// dose did not land rather than look like a save still in progress.
+  void _refuseSave() {
+    setState(() => _saving = false);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(AppLocalizations.of(context).recordSaveFailed)),
+    );
   }
 
   /// Hands this dose's due date to the operating system.

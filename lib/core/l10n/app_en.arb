@@ -190,6 +190,7 @@
   "animalSire": "Sire",
   "valueUnknown": "Not recorded",
   "recordDeleteTitle": "Delete this record?",
+  "recordSaveFailed": "This could not be saved. Nothing was written.",
 
   "vaccinationAdd": "Add vaccination",
   "vaccinationAddTitle": "Log a vaccination",

@@ -153,6 +153,7 @@
   "animalSire": "Père",
   "valueUnknown": "Non enregistré",
   "recordDeleteTitle": "Supprimer cet enregistrement ?",
+  "recordSaveFailed": "Enregistrement impossible. Rien n'a été écrit.",
 
   "vaccinationAdd": "Ajouter une vaccination",
   "vaccinationAddTitle": "Enregistrer une vaccination",

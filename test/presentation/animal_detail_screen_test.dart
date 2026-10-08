@@ -9,6 +9,7 @@ import 'package:salala/core/utils/reminders.dart';
 import 'package:salala/data/models/weight_entry.dart';
 import 'package:salala/presentation/screens/animal_detail_screen.dart';
 import 'package:salala/presentation/widgets/animal_card.dart';
+import 'package:sqflite/sqflite.dart';
 
 import '../helpers/fake_notification_writer.dart';
 import '../helpers/pump_app.dart';
@@ -634,6 +635,114 @@ void main() {
     await _scrollTo(tester, find.text('عرج'));
     expect(find.text('عرج'), findsOneWidget);
   });
+
+  testWidgets(
+    'a dose the database refuses keeps the form open and the button live',
+    (tester) async {
+      _usePhoneViewport(tester);
+      final notifications = FakeNotificationWriter();
+      await pumpSalala(
+        tester,
+        notifications: notifications,
+        seed: <Animal>[_nala()],
+        beforeLaunch: _refuseWritesTo('vaccinations'),
+      );
+      await _openNala(tester);
+
+      await _tap(tester, find.widgetWithText(TextButton, 'Add vaccination'));
+      await tester.enterText(
+        find.widgetWithText(TextFormField, 'Vaccine'),
+        'DHPP',
+      );
+
+      await _tapSave(tester);
+
+      expect(
+        find.text('This could not be saved. Nothing was written.'),
+        findsOneWidget,
+      );
+      // The route did not pop, the field still holds the breeder's word, and the
+      // button is not a spinner: a dose SQLite refused stays the form's to keep
+      // open, rather than freezing on a save that will never answer.
+      expect(find.text('Log a vaccination'), findsOneWidget);
+      expect(_fieldText(tester, 'Vaccine'), 'DHPP');
+      expect(
+        tester
+            .widget<FilledButton>(find.widgetWithText(FilledButton, 'Save'))
+            .onPressed,
+        isNotNull,
+      );
+      // The alarm is booked once the row exists, so a refused write owes none.
+      expect(notifications.log, isEmpty);
+    },
+  );
+
+  testWidgets(
+    'a screening the database refuses keeps the form open and the button live',
+    (tester) async {
+      _usePhoneViewport(tester);
+      final notifications = FakeNotificationWriter();
+      await pumpSalala(
+        tester,
+        notifications: notifications,
+        seed: <Animal>[_nala()],
+        beforeLaunch: _refuseWritesTo('health_tests'),
+      );
+      await _openNala(tester);
+      await _scrollTo(tester, find.text('Health tests'));
+
+      await _tap(tester, find.widgetWithText(TextButton, 'Add test'));
+      await tester.enterText(
+        find.widgetWithText(TextFormField, 'Screening'),
+        'Echocardiography',
+      );
+      await tester.enterText(
+        find.widgetWithText(TextFormField, 'Result'),
+        'Normal',
+      );
+
+      await _tapSave(tester);
+
+      expect(
+        find.text('This could not be saved. Nothing was written.'),
+        findsOneWidget,
+      );
+      expect(find.text('Log a health test'), findsOneWidget);
+      expect(_fieldText(tester, 'Screening'), 'Echocardiography');
+      expect(
+        tester
+            .widget<FilledButton>(find.widgetWithText(FilledButton, 'Save'))
+            .onPressed,
+        isNotNull,
+      );
+      expect(notifications.log, isEmpty);
+    },
+  );
+}
+
+/// A trigger that makes every insert into [table] fail the way a real database
+/// fails it, so a form is exercised against a genuine refusal rather than a
+/// faked dao. Installed after the seeds, which still land.
+Future<void> Function(Database) _refuseWritesTo(String table) => (db) async {
+  await db.execute(
+    'CREATE TRIGGER refuse_row BEFORE INSERT ON $table '
+    "BEGIN SELECT RAISE(ABORT, 'the ledger is full'); END",
+  );
+};
+
+/// Taps Save and waits for the database to answer, without the full launch
+/// settle: the failure this proves arrives late, and `settleRealIo`'s pumping
+/// outlives the snackbar it has to be read from.
+Future<void> _tapSave(WidgetTester tester) async {
+  final save = find.widgetWithText(FilledButton, 'Save');
+  await tester.ensureVisible(save);
+  await tester.pumpAndSettle();
+  await tester.tap(save);
+  await tester.runAsync(
+    () => Future<void>.delayed(const Duration(milliseconds: 60)),
+  );
+  await tester.pump();
+  await tester.pump(const Duration(milliseconds: 120));
 }
 
 /// A screening dated `tested` days ago, optionally expiring `validUntil` days

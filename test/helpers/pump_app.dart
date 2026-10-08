@@ -164,6 +164,12 @@ Future<FakeSecureStorage> pumpSalala(
   List<Symptom> seedSymptoms = const <Symptom>[],
   List<Buyer> seedBuyers = const <Buyer>[],
   List<Placement> seedPlacements = const <Placement>[],
+  // A database the test wants bent before the first frame, after the seeds have
+  // landed. The write path is otherwise the shipped one, so the only way to hand
+  // a screen a genuine `the database said no` is to make SQLite say it: a test
+  // that wants to prove a form survives a refused insert installs a trigger here
+  // rather than faking a dao.
+  Future<void> Function(Database db)? beforeLaunch,
 }) async {
   final storage = FakeSecureStorage();
   late Database database;
@@ -233,6 +239,7 @@ Future<FakeSecureStorage> pumpSalala(
     for (final placement in seedPlacements) {
       await daos.placements.create(placement, nowMs: nowMs++);
     }
+    if (beforeLaunch != null) await beforeLaunch(database);
   });
 
   await tester.pumpWidget(

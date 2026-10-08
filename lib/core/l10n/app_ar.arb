@@ -153,6 +153,7 @@
   "animalSire": "الأب",
   "valueUnknown": "غير مسجّل",
   "recordDeleteTitle": "حذف هذا السجل؟",
+  "recordSaveFailed": "لم يُحفظ هذا السجل. لم يُكتب شيء.",
 
   "vaccinationAdd": "تطعيم جديد",
   "vaccinationAddTitle": "تسجيل تطعيم",
