@@ -278,8 +278,19 @@ Future<void> Function(Database) refuseWritesTo(String table) => (db) async {
 /// Taps a form's Save and waits for SQLite to answer, without the full launch
 /// settle: the refusal these tests want arrives late, and `settleRealIo`'s
 /// pumping outlives the snackbar it has to be read from.
-Future<void> tapSaveAndGetAnswer(WidgetTester tester) async {
-  final save = find.widgetWithText(FilledButton, 'Save');
+///
+/// [dialogTitle] scopes the button to one alert, because a handover form can
+/// have a contact form open on top of it and both end in a Save button.
+Future<void> tapSaveAndGetAnswer(
+  WidgetTester tester, {
+  String? dialogTitle,
+}) async {
+  final save = dialogTitle == null
+      ? find.widgetWithText(FilledButton, 'Save')
+      : find.descendant(
+          of: find.widgetWithText(AlertDialog, dialogTitle),
+          matching: find.widgetWithText(FilledButton, 'Save'),
+        );
   await tester.ensureVisible(save);
   await tester.pumpAndSettle();
   await tester.tap(save);
@@ -302,6 +313,7 @@ void expectRefusedWrite(
   required Finder stillOnScreen,
   required String label,
   required String text,
+  String? dialogTitle,
   FakeNotificationWriter? notifications,
 }) {
   expect(
@@ -312,13 +324,27 @@ void expectRefusedWrite(
   expect(stillOnScreen, findsOneWidget);
   expect(
     tester
-        .widget<FilledButton>(find.widgetWithText(FilledButton, 'Save'))
+        .widget<FilledButton>(
+          dialogTitle == null
+              ? find.widgetWithText(FilledButton, 'Save')
+              : find.descendant(
+                  of: find.widgetWithText(AlertDialog, dialogTitle),
+                  matching: find.widgetWithText(FilledButton, 'Save'),
+                ),
+        )
         .onPressed,
     isNotNull,
   );
   expect(
     tester
-        .widget<TextFormField>(find.widgetWithText(TextFormField, label))
+        .widget<TextFormField>(
+          dialogTitle == null
+              ? find.widgetWithText(TextFormField, label)
+              : find.descendant(
+                  of: find.widgetWithText(AlertDialog, dialogTitle),
+                  matching: find.widgetWithText(TextFormField, label),
+                ),
+        )
         .controller!
         .text,
     text,

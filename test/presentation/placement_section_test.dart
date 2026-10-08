@@ -398,4 +398,72 @@ void main() {
     expect(RegExp('[0-9]').hasMatch(rendered), isTrue);
     expect(rendered.contains('2500 MAD'), isTrue);
   });
+
+  testWidgets(
+    'a handover the database refuses keeps the dialog open and the button live',
+    (tester) async {
+      _usePhoneViewport(tester);
+      await pumpSalala(
+        tester,
+        seed: <Animal>[_animal(_nalaId, 'Nala')],
+        beforeLaunch: refuseWritesTo('placements'),
+      );
+      await _openAnimal(tester, 'Nala');
+      await _scrollTo(tester, find.text('Placements'));
+
+      await _tap(tester, find.widgetWithText(TextButton, 'Add placement'));
+      await tester.enterText(
+        find.widgetWithText(TextFormField, 'Price'),
+        '2500',
+      );
+
+      await tapSaveAndGetAnswer(tester, dialogTitle: 'Log a placement');
+
+      expectRefusedWrite(
+        tester,
+        stillOnScreen: find.widgetWithText(AlertDialog, 'Log a placement'),
+        label: 'Price',
+        text: '2500',
+        dialogTitle: 'Log a placement',
+      );
+    },
+  );
+
+  testWidgets(
+    'a contact the database refuses leaves both dialogs holding their words',
+    (tester) async {
+      _usePhoneViewport(tester);
+      await pumpSalala(
+        tester,
+        seed: <Animal>[_animal(_nalaId, 'Nala')],
+        beforeLaunch: refuseWritesTo('buyers'),
+      );
+      await _openAnimal(tester, 'Nala');
+      await _scrollTo(tester, find.text('Placements'));
+
+      await _tap(tester, find.widgetWithText(TextButton, 'Add placement'));
+      await _tap(tester, find.byTooltip('New buyer'));
+      await tester.enterText(
+        find.widgetWithText(TextFormField, 'Name'),
+        'Aicha',
+      );
+
+      await tapSaveAndGetAnswer(tester, dialogTitle: 'Add a buyer');
+
+      expectRefusedWrite(
+        tester,
+        stillOnScreen: find.widgetWithText(AlertDialog, 'Add a buyer'),
+        label: 'Name',
+        text: 'Aicha',
+        dialogTitle: 'Add a buyer',
+      );
+      // And the handover it was opened from is still there underneath, with no
+      // buyer selected: a contact that did not reach the ledger cannot be the
+      // name printed on a placement document.
+      expect(
+        find.widgetWithText(AlertDialog, 'Log a placement'),
+        findsOneWidget,
+      );
+    },
+  );
 }

@@ -116,8 +116,24 @@ class _SymptomDialogState extends ConsumerState<SymptomDialog> {
               clearNote: note.isEmpty,
             );
 
-    await saveSymptom(ref, symptom);
+    try {
+      await saveSymptom(ref, symptom);
+    } catch (error) {
+      debugPrint('Symptom save failed: $error');
+      if (mounted) _refuseSave();
+      return;
+    }
     if (mounted) Navigator.of(context).pop();
+  }
+
+  /// A write the database refused. The dialog holds the sighting as typed and the
+  /// Save button answers a tap again, so the row that would have changed the
+  /// triage card at the top of the ledger can be tried once more.
+  void _refuseSave() {
+    setState(() => _saving = false);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(AppLocalizations.of(context).recordSaveFailed)),
+    );
   }
 
   Future<void> _delete() async {

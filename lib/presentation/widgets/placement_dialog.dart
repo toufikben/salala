@@ -158,8 +158,24 @@ class _PlacementDialogState extends ConsumerState<PlacementDialog> {
       updatedAt: existing?.updatedAt ?? 0,
     );
 
-    await savePlacement(ref, placement);
+    try {
+      await savePlacement(ref, placement);
+    } catch (error) {
+      debugPrint('Placement save failed: $error');
+      if (mounted) _refuseSave();
+      return;
+    }
     if (mounted) Navigator.of(context).pop();
+  }
+
+  /// A write the database refused. The dialog stays open with the handover as
+  /// typed, because the alternative is a button that stopped answering over a
+  /// placement that never reached the ledger.
+  void _refuseSave() {
+    setState(() => _saving = false);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(AppLocalizations.of(context).recordSaveFailed)),
+    );
   }
 
   Future<void> _delete() async {

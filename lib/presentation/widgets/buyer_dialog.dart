@@ -72,19 +72,46 @@ class _BuyerDialogState extends ConsumerState<BuyerDialog> {
     setState(() => _saving = true);
 
     final existing = widget.existing;
-    final saved = await saveBuyer(
-      ref,
-      Buyer(
-        id: existing?.id ?? '',
-        name: _name.text.trim(),
-        phone: _trimmed(_phone),
-        email: _trimmed(_email),
-        countryCode: _trimmed(_country)?.toUpperCase(),
-        createdAt: existing?.createdAt ?? 0,
-        updatedAt: existing?.updatedAt ?? 0,
-      ),
-    );
+    final saved = await _write(existing);
+    if (saved == null) return;
     if (mounted) Navigator.of(context).pop(saved);
+  }
+
+  /// The write on its own, so the dialog can tell a refused row from a saved
+  /// contact: `_saving` is the Save button's disable switch, and leaving it set
+  /// after a refusal would have frozen the dialog on a buyer who is not in the
+  /// ledger. Returns nothing when the database said no, having already put the
+  /// button back and said so.
+  Future<Buyer?> _write(Buyer? existing) async {
+    try {
+      return await saveBuyer(
+        ref,
+        Buyer(
+          id: existing?.id ?? '',
+          name: _name.text.trim(),
+          phone: _trimmed(_phone),
+          email: _trimmed(_email),
+          countryCode: _trimmed(_country)?.toUpperCase(),
+          createdAt: existing?.createdAt ?? 0,
+          updatedAt: existing?.updatedAt ?? 0,
+        ),
+      );
+    } catch (error) {
+      debugPrint('Buyer save failed: $error');
+      if (mounted) _refuseSave();
+      return null;
+    }
+  }
+
+  /// A write the database refused. The dialog keeps the contact as typed, the Save
+  /// button answers a tap again, and the breeder hears that nothing landed — a
+  /// handover document that names a buyer who is not in the ledger is the one
+  /// thing this dialog must not quietly produce.
+  void _refuseSave() {
+    setState(() => _saving = false);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(AppLocalizations.of(context).recordSaveFailed)),
+    );
   }
 
   @override

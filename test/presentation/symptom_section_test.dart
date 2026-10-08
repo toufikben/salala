@@ -4,6 +4,7 @@ import 'package:salala/core/utils/date_utils.dart';
 import 'package:salala/data/models/animal.dart';
 import 'package:salala/data/models/symptom.dart';
 import 'package:salala/presentation/screens/animal_detail_screen.dart';
+import 'package:salala/presentation/widgets/symptom_dialog.dart';
 
 import '../helpers/pump_app.dart';
 
@@ -274,4 +275,34 @@ void main() {
       findsOneWidget,
     );
   });
+
+  testWidgets(
+    'a symptom the database refuses keeps the dialog open and the button live',
+    (tester) async {
+      _usePhoneViewport(tester);
+      await pumpSalala(
+        tester,
+        seed: <Animal>[_nala()],
+        beforeLaunch: refuseWritesTo('symptoms'),
+      );
+      await _openNala(tester);
+      await _scrollTo(tester, find.text('Symptoms'));
+
+      await _tap(tester, find.widgetWithText(TextButton, 'Add symptom'));
+      await tester.enterText(
+        find.widgetWithText(TextFormField, 'Symptom'),
+        'Vomiting',
+      );
+
+      await tapSaveAndGetAnswer(tester, dialogTitle: 'Log a symptom');
+
+      expectRefusedWrite(
+        tester,
+        stillOnScreen: find.byType(SymptomDialog),
+        label: 'Symptom',
+        text: 'Vomiting',
+        dialogTitle: 'Log a symptom',
+      );
+    },
+  );
 }
