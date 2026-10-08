@@ -7,6 +7,7 @@ import '../../core/utils/date_utils.dart';
 import '../../data/models/symptom.dart';
 import '../providers/record_providers.dart';
 import 'date_tile.dart';
+import 'record_refusal.dart';
 
 /// Opens the same dialog for a new sighting and for correcting an old one.
 Future<void> showSymptomDialog(
@@ -158,7 +159,12 @@ class _SymptomDialogState extends ConsumerState<SymptomDialog> {
       ),
     );
     if (confirmed != true || !mounted) return;
-    await deleteSymptom(ref, existing);
+    try {
+      await deleteSymptom(ref, existing);
+    } catch (error) {
+      if (mounted) refuseRecordDelete(context, error);
+      return;
+    }
     if (mounted) Navigator.of(context).pop();
   }
 

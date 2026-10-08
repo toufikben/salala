@@ -191,6 +191,7 @@
   "valueUnknown": "Not recorded",
   "recordDeleteTitle": "Delete this record?",
   "recordSaveFailed": "This could not be saved. Nothing was written.",
+  "recordDeleteFailed": "This could not be deleted. The record is still there.",
 
   "vaccinationAdd": "Add vaccination",
   "vaccinationAddTitle": "Log a vaccination",

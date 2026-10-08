@@ -407,6 +407,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get recordSaveFailed => 'لم يُحفظ هذا السجل. لم يُكتب شيء.';
 
   @override
+  String get recordDeleteFailed => 'لم يُحذف هذا السجل. هو ما زال في مكانه.';
+
+  @override
   String get vaccinationAdd => 'تطعيم جديد';
 
   @override

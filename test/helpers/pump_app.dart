@@ -275,6 +275,16 @@ Future<void> Function(Database) refuseWritesTo(String table) => (db) async {
   );
 };
 
+/// A `beforeLaunch` hook that makes every delete from [table] fail, for the
+/// screens that have to hold a record they could not remove. Same seam as
+/// [refuseWritesTo] and the same reason: a real SQLite refusal, not a fake dao.
+Future<void> Function(Database) refuseDeletesOf(String table) => (db) async {
+  await db.execute(
+    'CREATE TRIGGER refuse_row_delete BEFORE DELETE ON $table '
+    "BEGIN SELECT RAISE(ABORT, 'the ledger is full'); END",
+  );
+};
+
 /// Taps a form's Save and waits for SQLite to answer, without the full launch
 /// settle: the refusal these tests want arrives late, and `settleRealIo`'s
 /// pumping outlives the snackbar it has to be read from.
@@ -294,11 +304,7 @@ Future<void> tapSaveAndGetAnswer(
   await tester.ensureVisible(save);
   await tester.pumpAndSettle();
   await tester.tap(save);
-  await tester.runAsync(
-    () => Future<void>.delayed(const Duration(milliseconds: 60)),
-  );
-  await tester.pump();
-  await tester.pump(const Duration(milliseconds: 120));
+  await settleRefusal(tester);
 }
 
 /// The whole evidence that a refused write stayed the screen's: the sentence, the
@@ -352,4 +358,16 @@ void expectRefusedWrite(
   if (notifications != null) {
     expect(notifications.log, isEmpty);
   }
+}
+
+/// The short wait a refusal has to be read from: long enough for SQLite to
+/// answer, short enough that the snackbar it answered with is still on screen.
+/// [tapSaveAndGetAnswer] ends with this, and a delete that goes through a
+/// confirm dialog uses it on its own.
+Future<void> settleRefusal(WidgetTester tester) async {
+  await tester.runAsync(
+    () => Future<void>.delayed(const Duration(milliseconds: 60)),
+  );
+  await tester.pump();
+  await tester.pump(const Duration(milliseconds: 120));
 }

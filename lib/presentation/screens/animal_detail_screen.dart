@@ -24,6 +24,7 @@ import '../providers/app_providers.dart';
 import '../providers/record_providers.dart';
 import '../providers/triage_providers.dart';
 import '../widgets/placement_dialog.dart';
+import '../widgets/record_refusal.dart';
 import '../widgets/symptom_dialog.dart';
 import '../widgets/triage_card.dart';
 
@@ -599,7 +600,12 @@ class _WeightTile extends ConsumerWidget {
         ],
       ),
     );
-    if (confirmed == true) await deleteWeight(ref, entry);
+    if (confirmed != true) return;
+    try {
+      await deleteWeight(ref, entry);
+    } catch (error) {
+      if (context.mounted) refuseRecordDelete(context, error);
+    }
   }
 }
 

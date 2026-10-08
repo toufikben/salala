@@ -9,6 +9,7 @@ import '../../data/models/placement.dart';
 import '../providers/record_providers.dart';
 import 'buyer_dialog.dart';
 import 'date_tile.dart';
+import 'record_refusal.dart';
 
 /// Opens the same form for a new handover and for correcting an old one.
 Future<void> showPlacementDialog(
@@ -200,7 +201,12 @@ class _PlacementDialogState extends ConsumerState<PlacementDialog> {
       ),
     );
     if (confirmed != true || !mounted) return;
-    await deletePlacement(ref, existing);
+    try {
+      await deletePlacement(ref, existing);
+    } catch (error) {
+      if (mounted) refuseRecordDelete(context, error);
+      return;
+    }
     if (mounted) Navigator.of(context).pop();
   }
 

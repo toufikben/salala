@@ -8,6 +8,7 @@ import '../../core/utils/money.dart';
 import '../../data/models/vet_visit.dart';
 import '../providers/record_providers.dart';
 import '../widgets/date_tile.dart';
+import '../widgets/record_refusal.dart';
 
 /// A consultation: who saw the animal, why, and what came of it.
 ///
@@ -170,7 +171,12 @@ class _VetVisitFormScreenState extends ConsumerState<VetVisitFormScreen> {
       ),
     );
     if (confirmed != true) return;
-    await deleteVisit(ref, visit);
+    try {
+      await deleteVisit(ref, visit);
+    } catch (error) {
+      if (mounted) refuseRecordDelete(context, error);
+      return;
+    }
     if (mounted) context.pop();
   }
 

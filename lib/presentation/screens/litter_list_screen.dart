@@ -14,6 +14,7 @@ import '../../services/pack_files.dart';
 import '../../services/pdf_layout.dart';
 import '../providers/app_providers.dart';
 import '../widgets/animal_card.dart';
+import '../widgets/record_refusal.dart';
 import '../widgets/salala_nav_bar.dart';
 
 class LitterListScreen extends ConsumerWidget {
@@ -266,10 +267,14 @@ Future<void> _confirmDelete(
     ),
   );
 
-  if (confirmed == true) {
+  if (confirmed != true) return;
+  try {
     await ref.read(littersProvider.notifier).delete(litter.id);
-    if (context.mounted) context.pop();
+  } catch (error) {
+    if (context.mounted) refuseRecordDelete(context, error);
+    return;
   }
+  if (context.mounted) context.pop();
 }
 
 class _EmptyBody extends StatelessWidget {

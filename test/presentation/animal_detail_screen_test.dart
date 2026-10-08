@@ -675,6 +675,49 @@ void main() {
   );
 
   testWidgets(
+    'a dose the database refuses to delete keeps its row and its alarm',
+    (tester) async {
+      _usePhoneViewport(tester);
+      final notifications = FakeNotificationWriter();
+      await pumpSalala(
+        tester,
+        notifications: notifications,
+        seed: <Animal>[_nala()],
+        seedVaccinations: <Vaccination>[
+          _dose(name: 'DHPP', administered: _daysAgo(30)),
+        ],
+        beforeLaunch: refuseDeletesOf('vaccinations'),
+      );
+      await _openNala(tester);
+      await _scrollTo(tester, find.text('DHPP'));
+
+      await _tap(tester, find.text('DHPP'));
+      await _tap(tester, find.byIcon(Icons.delete_outline));
+      await tester.tap(find.widgetWithText(FilledButton, 'Delete'));
+      await settleRefusal(tester);
+
+      // The form stayed open on a dose that is still in the ledger, and nothing
+      // was handed to the alarm manager: a row that survived keeps its reminder,
+      // which is the half of this path a silent failure would have got wrong.
+      expect(
+        find.text('This could not be deleted. The record is still there.'),
+        findsOneWidget,
+      );
+      expect(find.byType(VaccinationFormScreen), findsOneWidget);
+      expect(
+        tester
+            .widget<TextFormField>(
+              find.widgetWithText(TextFormField, 'Vaccine'),
+            )
+            .controller!
+            .text,
+        'DHPP',
+      );
+      expect(notifications.log, isEmpty);
+    },
+  );
+
+  testWidgets(
     'a screening the database refuses keeps the form open and the button live',
     (tester) async {
       _usePhoneViewport(tester);

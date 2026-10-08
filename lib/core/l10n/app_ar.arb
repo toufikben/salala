@@ -154,6 +154,7 @@
   "valueUnknown": "غير مسجّل",
   "recordDeleteTitle": "حذف هذا السجل؟",
   "recordSaveFailed": "لم يُحفظ هذا السجل. لم يُكتب شيء.",
+  "recordDeleteFailed": "لم يُحذف هذا السجل. هو ما زال في مكانه.",
 
   "vaccinationAdd": "تطعيم جديد",
   "vaccinationAddTitle": "تسجيل تطعيم",

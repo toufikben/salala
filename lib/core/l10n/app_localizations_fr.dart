@@ -406,6 +406,10 @@ class AppLocalizationsFr extends AppLocalizations {
       'Enregistrement impossible. Rien n\'a été écrit.';
 
   @override
+  String get recordDeleteFailed =>
+      'Suppression impossible. Cet enregistrement est toujours là.';
+
+  @override
   String get vaccinationAdd => 'Ajouter une vaccination';
 
   @override

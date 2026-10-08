@@ -8,6 +8,7 @@ import '../../data/models/health_test.dart';
 import '../providers/app_providers.dart';
 import '../providers/record_providers.dart';
 import '../widgets/date_tile.dart';
+import '../widgets/record_refusal.dart';
 
 /// A screening result — hips, eyes, hearing, a cardiac echo — with the certificate
 /// number a buyer will one day be shown.
@@ -206,8 +207,20 @@ class _HealthTestFormScreenState extends ConsumerState<HealthTestFormScreen> {
       ),
     );
     if (confirmed != true) return;
-    await deleteHealthTest(ref, test);
-    await ref.read(reminderSchedulerProvider).cancel(test.id);
+    try {
+      await deleteHealthTest(ref, test);
+    } catch (error) {
+      if (mounted) refuseRecordDelete(context, error);
+      return;
+    }
+    // Same split as the dose form: the row is out of the ledger now, and a
+    // failed cancel is neither retryable here nor repairable by the launch
+    // resync, which only re-books records the ledger still names.
+    try {
+      await ref.read(reminderSchedulerProvider).cancel(test.id);
+    } catch (error) {
+      debugPrint('Alarm cancel after a screening delete failed: $error');
+    }
     if (mounted) context.pop();
   }
 

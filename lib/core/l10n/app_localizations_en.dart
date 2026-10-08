@@ -405,6 +405,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'This could not be saved. Nothing was written.';
 
   @override
+  String get recordDeleteFailed =>
+      'This could not be deleted. The record is still there.';
+
+  @override
   String get vaccinationAdd => 'Add vaccination';
 
   @override

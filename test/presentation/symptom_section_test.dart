@@ -305,4 +305,35 @@ void main() {
       );
     },
   );
+
+  testWidgets(
+    'a symptom the database refuses to delete stays in the ledger and says so',
+    (tester) async {
+      _usePhoneViewport(tester);
+      await pumpSalala(
+        tester,
+        seed: <Animal>[_nala()],
+        seedSymptoms: <Symptom>[_sighting(observedAt: _seenOn)],
+        beforeLaunch: refuseDeletesOf('symptoms'),
+      );
+      await _openNala(tester);
+      await _scrollTo(tester, find.text('Vomiting'));
+
+      await _tap(tester, find.text('Vomiting'));
+      await _tap(tester, find.widgetWithText(TextButton, 'Delete'));
+      await tester.tap(find.widgetWithText(FilledButton, 'Delete'));
+      await settleRefusal(tester);
+
+      // The confirmation is gone, the edit dialog is still open over the row it
+      // could not remove, and the triage card still alarms: an `ongoing` sighting
+      // the ledger still holds is still a sign the breeder has to act on. A
+      // Delete that answered with silence would have said the opposite.
+      expect(
+        find.text('This could not be deleted. The record is still there.'),
+        findsOneWidget,
+      );
+      expect(find.byType(SymptomDialog), findsOneWidget);
+      expect(find.text('Act now'), findsOneWidget);
+    },
+  );
 }

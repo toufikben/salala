@@ -9,6 +9,7 @@ import '../../core/utils/date_utils.dart';
 import '../../data/models/animal.dart';
 import '../../services/reminder_resync.dart';
 import '../providers/app_providers.dart';
+import 'record_refusal.dart';
 
 class AnimalCard extends ConsumerWidget {
   const AnimalCard({super.key, required this.animal});
@@ -110,7 +111,15 @@ Future<void> confirmDelete(
   final scheduler = ref.read(reminderSchedulerProvider);
   final daos = ref.read(daosProvider);
 
-  await ref.read(animalsProvider.notifier).delete(animal.id);
+  try {
+    await ref.read(animalsProvider.notifier).delete(animal.id);
+  } catch (error) {
+    // The animal is still in the ledger, so its alarms stay booked and none of
+    // the rebuild below runs. Saying so out loud is the point: a card that did
+    // nothing after a confirmed delete reads as an animal that is gone.
+    if (context.mounted) refuseRecordDelete(context, error);
+    return;
+  }
 
   // The doses and screenings that went with the animal are what the phone's
   // alarms were booked off, and no row left on this device names them: a reminder

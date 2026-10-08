@@ -8,6 +8,7 @@ import '../../data/models/vaccination.dart';
 import '../providers/app_providers.dart';
 import '../providers/record_providers.dart';
 import '../widgets/date_tile.dart';
+import '../widgets/record_refusal.dart';
 
 /// One dose: what was given, when, and when the next one is due.
 ///
@@ -212,8 +213,21 @@ class _VaccinationFormScreenState extends ConsumerState<VaccinationFormScreen> {
       ),
     );
     if (confirmed != true) return;
-    await deleteVaccination(ref, dose);
-    await ref.read(reminderSchedulerProvider).cancel(dose.id);
+    try {
+      await deleteVaccination(ref, dose);
+    } catch (error) {
+      if (mounted) refuseRecordDelete(context, error);
+      return;
+    }
+    // The row is out of the ledger now, so a failed cancel is not something this
+    // screen can undo by retrying, and the launch resync cannot repair it either
+    // — that only re-books records the ledger still names. Logged, and the
+    // screen closes on a dose that really is gone.
+    try {
+      await ref.read(reminderSchedulerProvider).cancel(dose.id);
+    } catch (error) {
+      debugPrint('Alarm cancel after a dose delete failed: $error');
+    }
     if (mounted) context.pop();
   }
 
