@@ -295,6 +295,86 @@ void main() {
     );
   });
 
+  testWidgets('a dose the phone will not remind about is still saved', (
+    tester,
+  ) async {
+    _usePhoneViewport(tester);
+    final notifications = FakeNotificationWriter()
+      ..writeFailure = StateError('the notifier channel is closed');
+    await pumpSalala(
+      tester,
+      notifications: notifications,
+      seed: <Animal>[_nala()],
+      seedVaccinations: <Vaccination>[
+        _dose(
+          name: 'Distemper',
+          administered: _daysAgo(10),
+          nextDue: _daysAhead(20),
+        ),
+      ],
+    );
+    await _openNala(tester);
+
+    await _tap(tester, find.text('Distemper'));
+    await _save(tester);
+    // The two clears a replace always makes, then the write the phone refused.
+    await waitForSchedulerCalls(tester, notifications, 2);
+    await settleRealIo(tester);
+    await settleRealIo(tester);
+
+    // This is D33 seen from the other side: the dose was written by the
+    // statement before the alarm, so a refused alarm is not a refused save. One
+    // `try` around both would be sitting here on "nothing was written" over a
+    // dose that is in the ledger — and the breeder would save it a second time.
+    expect(find.byType(VaccinationFormScreen), findsNothing);
+    expect(
+      find.text('This could not be saved. Nothing was written.'),
+      findsNothing,
+    );
+    expect(notifications.written, isEmpty);
+    expect(find.text('Distemper'), findsOneWidget);
+  });
+
+  testWidgets('a dose the phone will not unremind is still deleted', (
+    tester,
+  ) async {
+    _usePhoneViewport(tester);
+    final notifications = FakeNotificationWriter()
+      ..clearFailure = StateError('the notifier channel is closed');
+    await pumpSalala(
+      tester,
+      notifications: notifications,
+      seed: <Animal>[_nala()],
+      seedVaccinations: <Vaccination>[
+        _dose(
+          name: 'Lepto',
+          administered: _daysAgo(3),
+          nextDue: _daysAhead(45),
+        ),
+      ],
+    );
+    await _openNala(tester);
+
+    await _tap(tester, find.text('Lepto'));
+    await _tap(tester, find.byIcon(Icons.delete_outline));
+    await tester.tap(find.widgetWithText(FilledButton, 'Delete'));
+    await waitForSchedulerCalls(tester, notifications, 1);
+    await settleRealIo(tester);
+    await settleRealIo(tester);
+
+    // D34's other half: the row left on the statement before this one, so the
+    // cancel the phone refused cannot be undone by retrying and is not a delete
+    // that failed. A single `try` would hold the form open, on a dose that has
+    // already gone, telling the breeder it is still there.
+    expect(find.byType(VaccinationFormScreen), findsNothing);
+    expect(
+      find.text('This could not be deleted. The record is still there.'),
+      findsNothing,
+    );
+    expect(find.text('Lepto'), findsNothing);
+    expect(notifications.cleared, isEmpty);
+  });
+
   testWidgets('a dose whose due date passed is badged overdue', (tester) async {
     _usePhoneViewport(tester);
     await pumpSalala(
@@ -682,12 +762,24 @@ void main() {
       await pumpSalala(
         tester,
         notifications: notifications,
+        resyncOnLaunch: true,
         seed: <Animal>[_nala()],
         seedVaccinations: <Vaccination>[
-          _dose(name: 'DHPP', administered: _daysAgo(30)),
+          _dose(
+            name: 'DHPP',
+            administered: _daysAgo(30),
+            nextDue: _daysAhead(20),
+          ),
         ],
         beforeLaunch: refuseDeletesOf('vaccinations'),
       );
+      // The launch booked this dose's due morning, so there is an alarm in the
+      // phone for the refused delete to leave alone. On a dose with no due date
+      // the log would read empty whatever the code did.
+      await waitForSchedulerCalls(tester, notifications, _callsFor(1));
+      expect(notifications.written, hasLength(1));
+      final booked = notifications.log.length;
+
       await _openNala(tester);
       await _scrollTo(tester, find.text('DHPP'));
 
@@ -713,7 +805,8 @@ void main() {
             .text,
         'DHPP',
       );
-      expect(notifications.log, isEmpty);
+      expect(notifications.log, hasLength(booked));
+      expect(notifications.written, hasLength(1));
     },
   );
 

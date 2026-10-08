@@ -33,6 +33,13 @@ class FakeNotificationWriter implements NotificationWriter {
   /// alarms are cleared before new ones are written.
   final List<String> log = <String>[];
 
+  /// Set to make [write] or [clear] throw, standing in for the phone refusing the
+  /// alarm itself. The row it belongs to is already written by then, and nothing
+  /// else in the test can say whether the screen knows the difference — which is
+  /// exactly the difference D33 and D34 are made of.
+  Object? writeFailure;
+  Object? clearFailure;
+
   @override
   Future<void> initialise() async {}
 
@@ -45,6 +52,8 @@ class FakeNotificationWriter implements NotificationWriter {
     required AndroidScheduleMode mode,
   }) async {
     log.add('write');
+    final failure = writeFailure;
+    if (failure != null) throw failure;
     written.add(
       WrittenAlarm(id: id, title: title, body: body, at: at, mode: mode),
     );
@@ -53,6 +62,8 @@ class FakeNotificationWriter implements NotificationWriter {
   @override
   Future<void> clear(int id) async {
     log.add('clear');
+    final failure = clearFailure;
+    if (failure != null) throw failure;
     cleared.add(id);
   }
 

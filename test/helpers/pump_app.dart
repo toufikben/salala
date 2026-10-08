@@ -360,14 +360,27 @@ void expectRefusedWrite(
   }
 }
 
-/// The short wait a refusal has to be read from: long enough for SQLite to
-/// answer, short enough that the snackbar it answered with is still on screen.
-/// [tapSaveAndGetAnswer] ends with this, and a delete that goes through a
-/// confirm dialog uses it on its own.
+/// The wait a refusal has to be read from: as long as SQLite takes to answer,
+/// and no longer — the snackbar it answered with dismisses four seconds after it
+/// appears, on the fake clock this helper does not run forward.
+///
+/// It polls for the snackbar rather than sleeping a fixed 60 ms, because that
+/// number was a guess about a runner's speed: on a loaded CI machine the write
+/// can still be in flight when the assertions run, and a refusal that arrives
+/// late looks exactly like a refusal that never happened.
 Future<void> settleRefusal(WidgetTester tester) async {
-  await tester.runAsync(
-    () => Future<void>.delayed(const Duration(milliseconds: 60)),
-  );
+  for (var round = 0; round < 40; round++) {
+    await tester.pump();
+    if (find.byType(SnackBar).evaluate().isNotEmpty) {
+      // One frame of the entry animation, so the sentence is where it will be
+      // when a test reads it back, not half-slid in from the bottom.
+      await tester.pump(const Duration(milliseconds: 120));
+      return;
+    }
+    await tester.runAsync(
+      () => Future<void>.delayed(const Duration(milliseconds: 25)),
+    );
+  }
   await tester.pump();
   await tester.pump(const Duration(milliseconds: 120));
 }

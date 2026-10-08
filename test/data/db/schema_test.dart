@@ -113,11 +113,48 @@ void main() {
         'updated_at': 1,
       });
 
+      // The two the delete dialog's copy left out until this test said so: a
+      // handover recorded for this animal, and a whelping it is the dam of. One
+      // of that whelping's puppies is inserted too, because what happens to *it*
+      // is the part nobody would guess — the whelping row goes, the young stay in
+      // the herd with their litter link cleared.
+      await db.insert('placements', <String, Object?>{
+        'id': 'p1',
+        'animal_id': 'a1',
+        'placed_date': 1,
+        'price': 900.0,
+        'currency': 'MAD',
+        'created_at': 1,
+        'updated_at': 1,
+      });
+      await db.insert('litters', <String, Object?>{
+        'id': 'l1',
+        'name': 'Zida 2026',
+        'dam_id': 'a1',
+        'whelping_date': 1,
+        'created_at': 1,
+        'updated_at': 1,
+      });
+      await db.insert('animals', <String, Object?>{
+        'id': 'a2',
+        'name': 'Zida pup',
+        'species': 'dog',
+        'litter_id': 'l1',
+        'created_at': 1,
+        'updated_at': 1,
+      });
+
       await db.delete('animals', where: 'id = ?', whereArgs: <Object?>['a1']);
 
       expect(await _count(db, 'vaccinations'), 0);
       expect(await _count(db, 'weight_entries'), 0);
       expect(await _count(db, 'symptoms'), 0);
+      expect(await _count(db, 'placements'), 0);
+      expect(await _count(db, 'litters'), 0);
+      final survivors = await db.query('animals');
+      expect(survivors, hasLength(1));
+      expect(survivors.single['id'], 'a2');
+      expect(survivors.single['litter_id'], isNull);
     });
 
     test('deleting a sire clears the reference instead of the puppy', () async {

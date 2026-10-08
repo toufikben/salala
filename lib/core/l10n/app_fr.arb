@@ -36,7 +36,7 @@
   "animalAddTitle": "Ajouter un animal",
   "animalEditTitle": "Modifier l'animal",
   "animalDeleteTitle": "Supprimer {name} ?",
-  "animalDeleteBody": "Ses vaccins, tests de santé, pesées, visites et symptômes seront supprimés aussi. Action irréversible.",
+  "animalDeleteBody": "Ses vaccins, tests de santé, pesées, visites et symptômes seront supprimés aussi, ainsi que la cession enregistrée et les portées dont cet animal est la mère. Action irréversible.",
   "animalNameRequired": "Le nom est obligatoire",
   "animalSpeciesRequired": "Choisissez une espèce",
 

@@ -106,7 +106,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get animalDeleteBody =>
-      'Its vaccinations, health tests, weights, visits and symptoms are deleted too. This cannot be undone.';
+      'Its vaccinations, health tests, weights, visits and symptoms are deleted too, with any handover recorded for it and, if it is a dam, its whelpings. This cannot be undone.';
 
   @override
   String get animalNameRequired => 'A name is required';

@@ -191,12 +191,24 @@ void main() {
       // And the sentence is the truth: the litter is written before its puppies
       // inside one transaction, so a refusal on that first row means three
       // animals named "A litter 1..3" were never created either. Back on the tab,
-      // the whelping is not there and neither is a single puppy.
+      // the whelping is not there — and the whelping tab only counts puppies, so
+      // their names are looked for where an animal's name is actually drawn: the
+      // herd list, which is where a transaction that had run would have left
+      // three more cards.
       await tester.tap(find.widgetWithText(OutlinedButton, 'Cancel'));
       await settleRealIo(tester);
 
       expect(find.text('A litter'), findsNothing);
+
+      await tester.tap(find.widgetWithText(NavigationDestination, 'Animals'));
+      await settleRealIo(tester);
+      // The two animals this test seeded: the proof the herd list is on screen
+      // and does name its animals, so the three absences below mean something.
+      expect(find.text('Nala'), findsWidgets);
+      expect(find.text('Atlas'), findsWidgets);
       expect(find.text('A litter 1'), findsNothing);
+      expect(find.text('A litter 2'), findsNothing);
+      expect(find.text('A litter 3'), findsNothing);
     },
   );
 }
