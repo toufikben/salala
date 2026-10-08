@@ -79,3 +79,14 @@ int wholeDaysBetween(int fromMs, int toMs) {
   final b = DateTime(to.year, to.month, to.day).millisecondsSinceEpoch;
   return ((b - a) / 86400000).round();
 }
+
+/// [day] moved by whole calendar days, in either direction.
+///
+/// The other way to write this is `day.add(Duration(days: n))`, and that counts
+/// *hours*: on a day the clock shortens or lengthens — Morocco steps between
+/// UTC+1 and UTC+0 for Ramadan — 720 hours lands on the day before or after the
+/// one a breeder would point at on a paper calendar. D31 says a due date is a
+/// date, so a reminder booked thirty days ahead of one, and the horizon a launch
+/// rebuilds alarms out of, are both counted here off the day number.
+DateTime shiftDays(DateTime day, int days) =>
+    DateTime(day.year, day.month, day.day + days);

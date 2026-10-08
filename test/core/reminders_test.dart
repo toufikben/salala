@@ -29,6 +29,21 @@ void main() {
       expect(remindersFor(recordId: 'abc', dueMs: null, now: _now), isEmpty);
     });
 
+    test('the month ahead counts days on a calendar, not hours on a clock', () {
+      // Thirty days before 2 January is 3 December, whatever hour the row was
+      // stored at and whatever the month's length: D31 makes a due date a date,
+      // so the heads-up has to land on the date a breeder would count back to.
+      // A subtraction of 720 hours instead drifts a day wherever the zone
+      // shortens or lengthens a day — which Morocco does for Ramadan.
+      final reminders = remindersFor(
+        recordId: 'abc',
+        dueMs: _day(2027, 1, 2),
+        now: _now,
+      );
+
+      expect(reminders.first.at, DateTime(2026, 12, 3, reminderHour));
+    });
+
     test('the month ahead is dropped once it has passed', () {
       final reminders = remindersFor(
         recordId: 'abc',

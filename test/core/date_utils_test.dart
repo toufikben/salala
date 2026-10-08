@@ -39,4 +39,26 @@ void main() {
     expect(formatDayFor('ar', null), '');
     expect(formatDayFor('en', null), '');
   });
+
+  group('shiftDays', () {
+    test('a month boundary lands where a calendar points', () {
+      expect(shiftDays(DateTime(2027, 1, 2), -30), DateTime(2026, 12, 3));
+      expect(shiftDays(DateTime(2026, 12, 31), 1), DateTime(2027, 1, 1));
+    });
+
+    test('the hour a row was stored at is not part of the count', () {
+      // D31: a due date is a date. Counting back from 23:30 has to reach the same
+      // day as counting back from 08:00, or a reminder's morning would be built
+      // off whichever hour the write happened to carry.
+      expect(
+        shiftDays(DateTime(2027, 1, 2, 23, 30), -30),
+        DateTime(2026, 12, 3),
+      );
+    });
+
+    test('February is counted in the year the row belongs to', () {
+      expect(shiftDays(DateTime(2026, 3, 1), -1), DateTime(2026, 2, 28));
+      expect(shiftDays(DateTime(2024, 3, 1), -1), DateTime(2024, 2, 29));
+    });
+  });
 }

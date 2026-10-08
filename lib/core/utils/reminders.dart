@@ -65,7 +65,7 @@ List<Reminder> remindersFor({
     Reminder(
       recordId: recordId,
       kind: ReminderKind.headsUp,
-      at: morning(due.subtract(const Duration(days: reminderLeadDays))),
+      at: morning(shiftDays(due, -reminderLeadDays)),
     ),
     Reminder(recordId: recordId, kind: ReminderKind.dueToday, at: morning(due)),
   ].where((reminder) => reminder.at.isAfter(from)).toList();

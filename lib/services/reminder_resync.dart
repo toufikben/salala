@@ -83,7 +83,7 @@ Future<int> resyncReminders(
   DateTime? now,
 }) async {
   final from = now ?? DateTime.now();
-  final cutoff = msFromDay(from.add(const Duration(days: reminderHorizonDays)));
+  final cutoff = msFromDay(shiftDays(from, reminderHorizonDays));
 
   final doses = await daos.vaccinations.dueBefore(cutoff);
   final screenings = await daos.healthTests.expiringBy(cutoff);
