@@ -757,3 +757,77 @@ would drift by an hour and move a due date into the wrong week. The count is
 local, not UTC, so a pack restored on a phone in another timezone recomputes every
 age from *its* midnight — true of every date this app stores, and a consequence of
 the pack format (D22) rather than of this decision.
+
+## D32 — A day *offset* is a date too, not a duration
+
+**Date:** 2026-10-08. **Status:** in force, extending D31.
+
+Adding days to a date is `shiftDays(day, n)` — `DateTime(y, m, d + n)` — in
+`lib/core/utils/date_utils.dart`, never `date.add(Duration(days: n))`. D31 made
+the *counts* a breeder reads into date arithmetic; this is the same rule applied
+to the two places that build a date *from* a count, and there are no others: the
+grep for `Duration(days:` under `lib/` returns exactly these two call sites.
+
+**Why.** `Duration` counts hours, and a day in Morocco is not always 24 of them.
+The clock went from UTC+1 to UTC+0 for Ramadan without a DST rule to announce it,
+so a span crossing that boundary is 23 or 25 hours, and "30 days ahead" is then
+29 or 31 days on the calendar — which for the launch resync is the difference
+between booking a dose and leaving it for the following month, and for a
+reminder's lead week is an alarm on the wrong morning. The app already assumes
+calendars, not clocks, everywhere a human reads a date; a rule that holds for the
+numbers on screen and not for the ones behind them would be the kind of half-fix
+that reads as done.
+
+**How to apply.** Any new "that many days from this date" calls `shiftDays`, and
+takes a date rather than an instant — the hour a `DateTime` carries is dropped,
+which is the point. The reminder's own `morning(...)` and `msFromDay(...)` put the
+wall-clock back on afterwards. Tests for the arithmetic live in
+`test/core/date_utils_test.dart` (month end, year end, `23:30`, Feb 28 either side
+of a leap day); a test of the *rule* rather than the arithmetic lives beside the
+reminder that uses it.
+
+**Cost, stated.** On CI the runner is UTC and has no transition, so no test in the
+suite can tell the old hours-based arithmetic from the new calendar arithmetic —
+the change is proved by the `shiftDays` unit tests and by the shape of the code,
+not by a red-to-green on the reminder itself. Stating that is the price of not
+claiming a fix CI cannot see.
+
+## D33 — A write the database refused belongs to the form
+
+**Date:** 2026-10-08. **Status:** in force.
+
+A save has two answers and they are not the same event. The row is the ledger's;
+the alarm is a phone's courtesy that follows it. So the write and the reminder are
+awaited on separate paths: if SQLite refuses the row, the form stays open, the
+fields keep what the breeder typed, the button works again and the screen says
+"nothing was written" (`recordSaveFailed`); if the row lands and the alarm is
+refused, the form closes and the failure is logged, because the next launch
+rebuilds that alarm from the ledger (D28, `reminderHorizonDays`).
+
+**Why.** Each form kept its own `_saving` flag as the save button's disable switch,
+and one `try` around both awaits meant a refused write left that flag set forever:
+the screen sat on a spinner over a record that did not exist, with the breeder's
+words still in the fields and no way to try again and no sentence saying what
+happened. A save that cannot be retried is worse than a save that fails, because
+it spends the one thing the form has — the typed text — and keeps nothing. The
+same shape governs the keystore: `AppLockService.verify` answers "no" to a salt it
+cannot decode rather than throwing, and `PinGateScreen._submit` puts `_busy` down
+whatever the answer is, because a lock screen that stops answering taps is a door
+with no handle.
+
+**How to apply.** Every write path resets its own busy flag on every outcome and
+distinguishes "the database said no" from "the phone said no". The seven forms and
+dialogs that still share one `try` — animal, litter, vet visit, weight, buyer,
+placement, symptom — are on the queue with this rule's name on them. The refusal is
+tested against a real database, not a fake dao (D6): `pumpSalala` takes a
+`beforeLaunch` hook, and a test uses it to install a `BEFORE INSERT … RAISE(ABORT)`
+trigger so the insert genuinely fails while reads stay honest. Keep the wait after
+such a tap short and explicit — the full `settleRealIo` outlives the snackbar it
+has to be read from.
+
+**Cost, stated.** A snackbar is not a screenshot: CI can prove the button is live,
+the route did not pop and the field still holds its text, but the sentence itself
+is one the phone has to be looked at for — and a rejected write is a path nobody
+will hit on a healthy device, so it will not show up in a happy-path device pass.
+Recording it as a decision is what keeps the next reviewer from "simplifying" the
+two awaits back into one `try`.
