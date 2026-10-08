@@ -858,9 +858,13 @@ as "no buyer" instead of an error. Recorded as **D27**.
   addition. It owes: a buyer and a placement recorded, the PDF's buyer block read
   page by page in Arabic and English, a price in Latin digits, agenda rows for an
   overdue dose — and then the removal of the test data already left in the real
-  ledger.
+  ledger. Prepared on 2026-10-08: the APK from the green run is downloaded, and the
+  phone's database was pulled and read first (143,360 bytes, one animal — "Nala",
+  test residue from the earlier stage, so the reinstall that wipes it costs nothing
+  real). The pass has not run: another app was being checked on the phone when the
+  device was reached, so no input was sent and nothing was uninstalled.
 
-## Stage 3d — The herd agenda *(CI red — 262 passed, 3 failed, run `37763789650`; fix pushed with 3e)*
+## Stage 3d — The herd agenda *(CI green — 278 tests, run `37766939856`; device check queued with 3b/3c/3e)*
 
 Every screen so far answers "what does *this* animal need?". The question a
 breeder starts the day with — what is overdue, and what is due in the next two
@@ -927,8 +931,15 @@ same name on one list is a real breeder's problem, and the agenda's answer is a
 row that opens the ledger it belongs to; the fix belongs in the finders, which were
 only ever unique by luck of the seed having nothing due.
 
+Those three went green with 3e: `37766939856` on `172622c` — Analyze "No issues
+found!", **278 tests passed**, the debug APK built and uploaded. Between the two
+runs `37766250554` failed in Analyze on one new warning of my own (`unnecessary_non_null_assertion`
+at `lib/services/animal_pdf.dart:287`), so its test job never started and no APK
+was produced — the country line now binds `case final String country` instead of
+asserting twice.
 
-## Stage 3e — The four defects found while writing 3c *(pushed, CI pending)*
+
+## Stage 3e — The four defects found while writing 3c *(CI green — 278 tests, run `37766939856`)*
 
 All small, all in the export path, and all of them in the one document the other
 person keeps.
