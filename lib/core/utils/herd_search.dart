@@ -93,10 +93,7 @@ int _score(Animal animal, String query) {
 
   final registration = animal.registrationNo;
   final microchip = animal.microchipId;
-  for (final String field in <String>[
-    if (registration != null) registration,
-    if (microchip != null) microchip,
-  ]) {
+  for (final String field in <String>[?registration, ?microchip]) {
     final value = normalizeForSearch(field);
     if (value == query) return 3;
     if (value.contains(query)) return 2;
