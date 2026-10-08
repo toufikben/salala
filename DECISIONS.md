@@ -633,11 +633,13 @@ built after the reads, which is why `formatDayFor` sits beside `formatDay`
 money go through the two helpers above so a missing value is always the app's own
 word, never a blank the reader has to interpret.
 
-**Cost, stated.** The animal's own pack still builds most of its tables inline — it
-grew section by section and forty tests are pinned to that shape, so this stage
-moved its furniture and its two gap helpers out, and left its rows where they are.
-Two shapes for one kind of document is real debt, and the rule for paying it down is
-to move a row builder the first time a second document needs its words. The row
-functions also take l10n and a locale tag everywhere, which is more parameters than
-a screen would pass, and the fixtures exist twice: once as text in
-`test/core/litter_rows_test.dart`, once as rows in `test/services/litter_pdf_test.dart`.
+**Cost, stated.** The animal's own pack used to build most of its tables inline — it
+grew section by section and forty tests were pinned to that shape. Two shapes for
+one kind of document is real debt, and it was paid down in the same batch it was
+named: those rows are now `core/utils/animal_rows.dart`, tested as text, and
+`animal_pdf.dart` only reads and arranges. What stays inside a service is stated
+rather than hidden — the pedigree, whose lines *are* its nesting, and the growth
+chart, which is a picture and not a sentence. The row functions also take l10n and
+a locale tag everywhere, which is more parameters than a screen would pass, and the
+fixtures exist twice: once as text in `test/core/litter_rows_test.dart` and
+`test/core/animal_rows_test.dart`, once as rows in `test/services/litter_pdf_test.dart`.

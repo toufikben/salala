@@ -853,20 +853,20 @@ as "no buyer" instead of an error. Recorded as **D27**.
 
 ### Queued next, in order
 
-- **One batched device pass** for 3b, 3c, 3d, 3e **and 3f** together: the rule
+- **One batched device pass** for 3b, 3c, 3d, 3e, **3f and 3g** together: the rule
   the owner
   set is that the phone is checked after a suitable batch, not after every small
   addition. It owes: a buyer and a placement recorded, the PDF's buyer block read
   page by page in Arabic and English, a price in Latin digits, agenda rows for an
   overdue dose, the new whelping record opened as a page with its tables read
-  against the ledger — and then the removal of the test data already left in the real
+  against the ledger, and the buyer's pack read once more now that its wording is asserted in code rather than on paper — and then the removal of the test data already left in the real
   ledger. Prepared on 2026-10-08: the APK from the green run is downloaded, and the
   phone's database was pulled and read first (143,360 bytes, one animal — "Nala",
   test residue from the earlier stage, so the reinstall that wipes it costs nothing
   real). The pass has not run: another app was being checked on the phone when the
   device was reached, so no input was sent and nothing was uninstalled.
 
-## Stage 3d — The herd agenda *(CI green — 278 tests, run `37766939856`; device check queued with 3b/3c/3e/3f)*
+## Stage 3d — The herd agenda *(CI green — 278 tests, run `37766939856`; device check queued with 3b/3c/3e/3f/3g)*
 
 Every screen so far answers "what does *this* animal need?". The question a
 breeder starts the day with — what is overdue, and what is due in the next two
@@ -979,7 +979,7 @@ person keeps.
   embedded font's glyph ids, so the words are the phone's job.
 
 
-## Stage 3f — The whelping record: one document for a whole litter *(pushed, CI pending)*
+## Stage 3f — The whelping record: one document for a whole litter *(CI green — 296 tests, run `37771774006`; device check queued with 3b/3c/3d/3e/3g)*
 
 Every page in the app answers for one animal. A whelping is one event with a dozen
 rows in it, and the breeder's question at the box — who is missing their first
@@ -1014,6 +1014,53 @@ shot, who went home with whom — was a lap of the phone.
   twelve-puppy litter), 3 in `test/core/money_test.dart` for the shared currency
   helper. What none of them can prove is still the same thing the phone owns: that
   the page reads correctly on paper.
+
+### The verdict, and what the first attempt cost
+
+Run `3777104006` on `7cf7457` stopped in Analyze with **21 issues, every one of
+them mine**: `litter_rows.dart` reached the models as `../models/` when they live in
+`data/models/`, which left every type it names undefined; `litter_pdf.dart` pinned
+`litter` to a non-null `Litter` while `findById` can return null, so its own
+deleted-row check was dead code, and the spread in front of `pdfFacts` asked one
+widget to be a list. `b953d65` fixed all twenty-one and run `37771774006` came back
+**Analyze "No issues found!", 296 tests passed, APK built** — 278 before the stage,
+plus the 18 it added. The lesson is not that the failure happened but where it
+happened: none of those 21 needed a phone, and the analyzer is free.
+
+## Stage 3g — The buyer's document, said apart from its page *(CI green — 310 tests, run `37772547239`; device check queued with 3b/3c/3d/3e/3f)*
+
+D29 named a debt in the same breath as the rule: the whelping record got its words
+as testable strings and the animal's pack did not. That meant the four wording
+defects of Stage 3e — the handover that printed the previous family, the price
+written as `2500.00 `, the country that never reached the page — were each found by
+a human holding paper, when a test could have held the same line.
+
+- **`core/utils/animal_rows.dart`** decides what the animal's pack says:
+  `animalFacts` (identity lines, with the death date printed only when there is
+  one — a live animal shown as dead is the worst line this document could carry),
+  `vaccinationRows`, `screeningRows`, `weighInRows`, `visitRows`, `symptomRows`,
+  `breedingRows` (which names which side of the pedigree a litter was on, because a
+  sire's value on paper is exactly the litters he got), and `placementFacts` for the
+  handover block. `services/animal_pdf.dart` is left doing reads and layout.
+- **Two documents, two names for a job that looks the same.** The litter page's
+  `doseRows` prints the puppy's name first because a whole litter shares one table;
+  this file's `vaccinationRows` has no name to print and does not pretend to. The
+  difference is written on both functions rather than left for whoever imports the
+  wrong one to discover.
+- **14 new tests** in `test/core/animal_rows_test.dart`, every one over strings:
+  the identity order and its gaps, the death line absent for a living animal and in
+  place for a dead one, a dose whose missing booster date prints as the app's own
+  word rather than a blank, grams that stay grams (`430 g`) beside a kilogram that
+  is `12.40 kg`, a visit with no reason, a symptom still ongoing next to one
+  resolved, `2500 MAD` against `250.5` with no code, the deleted buyer who is still
+  a handover, a blank country code that gets no line at all, six empty tables for an
+  animal with nothing recorded, and Arabic rows that keep Latin digits (D21). Run
+  `37772547239` on `a277cc1`: **Analyze "No issues found!", 310 tests passed, APK
+  built.** The commit message over that change said 15 tests; the file has 14
+  `test(` calls, and the run's number is the one that counts.
+- **What the phone still owns has not moved**: whether the page these words land on
+  reads correctly on paper, in both directions, with the growth curve in the right
+  place.
 
 ## Stage 4 — Distribution
 

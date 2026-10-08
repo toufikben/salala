@@ -184,6 +184,12 @@ last one needs a device:
 - `core/utils/litter_rows.dart` decides what those tables say, as plain strings,
   apart from any page. That split exists because a PDF cannot be read back in a
   test: the words are CI-checkable here and only the layout is checked as bytes.
+- `core/utils/animal_rows.dart` does the same for the buyer's document: the identity
+  lines, one row per dose, screening, weigh-in, visit and symptom, the litters with
+  which side of the pedigree each was on, and the handover block with its buyer,
+  country, day and price. `services/animal_pdf.dart` is left doing only reads and
+  layout, and says what stays inside it — the pedigree, whose lines are its
+  nesting, and the growth curve, which is a picture (D29).
 
 Photos are deliberately not in a pack: `photo_path` is a path on *this* phone, so
 copying it would ship a broken reference — the PDF pack is where an image belongs.
