@@ -101,14 +101,14 @@ class _AnimalListScreenState extends ConsumerState<AnimalListScreen> {
                 isDense: true,
                 prefixIcon: const Icon(Icons.search),
                 suffixIcon: filtering
-                    ? null
-                    : IconButton(
+                    ? IconButton(
                         icon: const Icon(Icons.close),
                         onPressed: () {
                           _search.clear();
                           setState(() => _query = '');
                         },
-                      ),
+                      )
+                    : null,
               ),
             ),
           ),
