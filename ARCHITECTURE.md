@@ -111,6 +111,11 @@ the dependency graph and CI has no generation step.
   the first caller of a launch. It is a provider rather than widget state
   because the nav bar moves with `go` and rebuilds the animal list on every
   return (D15), which would otherwise rebuild the alarms on every tab switch.
+- Searching the herd is *not* state. The typed text lives in the animal list
+  screen's own `setState`, and `core/utils/herd_search.dart` filters the list the
+  screen already watches — no query, no debounce, no second source of truth for
+  one herd (D30). A provider would outlive the screen and reopen home on a word
+  typed days ago.
 
 ## Reminders
 
@@ -270,7 +275,8 @@ distinct in-memory names fail with error 14.
   orphan rejection, migration gap throws) and per-DAO behaviour.
 - `test/services/` — PIN hashing/gate against an in-memory fake secure storage
   whose `read/write/delete` signatures match the plugin exactly.
-- `test/presentation/` — list states, grouping, form validation and save, the
+- `test/presentation/` — list states, grouping, the search box narrowing the same
+  list, form validation and save, the
   lock redirect, and Arabic RTL measured off the rendered `Directionality`.
 
 Widget tests keep the real database but cannot simply `await` it: sqflite answers

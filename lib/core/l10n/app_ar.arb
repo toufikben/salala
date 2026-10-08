@@ -10,7 +10,7 @@
   "homeAddAnimal": "إضافة حيوان",
   "homeBreedingStock": "حيوانات التربية",
   "homeAllAnimals": "كل الحيوانات",
-  "homeSearchHint": "ابحث بالاسم أو الرقم أو الشريحة",
+  "homeSearchHint": "ابحث بالاسم أو الرقم أو الشريحة أو الملاحظة",
   "homeNoMatches": "لا نتيجة تطابق « {query} »",
   "@homeNoMatches": {
     "placeholders": {

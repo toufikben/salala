@@ -38,7 +38,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get homeAllAnimals => 'Tous les animaux';
 
   @override
-  String get homeSearchHint => 'Rechercher par nom, numéro ou puce';
+  String get homeSearchHint => 'Rechercher par nom, numéro, puce ou note';
 
   @override
   String homeNoMatches(String query) {

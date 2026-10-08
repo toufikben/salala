@@ -157,7 +157,7 @@ abstract class AppLocalizations {
   /// No description provided for @homeSearchHint.
   ///
   /// In en, this message translates to:
-  /// **'Search by name, number or chip'**
+  /// **'Search by name, number, chip or note'**
   String get homeSearchHint;
 
   /// No description provided for @homeNoMatches.

@@ -13,7 +13,7 @@
   "homeAddAnimal": "Add animal",
   "homeBreedingStock": "Breeding stock",
   "homeAllAnimals": "All animals",
-  "homeSearchHint": "Search by name, number or chip",
+  "homeSearchHint": "Search by name, number, chip or note",
   "homeNoMatches": "Nothing matches “{query}”",
   "@homeNoMatches": {
     "placeholders": {

@@ -10,7 +10,7 @@
   "homeAddAnimal": "Ajouter un animal",
   "homeBreedingStock": "Reproduction",
   "homeAllAnimals": "Tous les animaux",
-  "homeSearchHint": "Rechercher par nom, numéro ou puce",
+  "homeSearchHint": "Rechercher par nom, numéro, puce ou note",
   "homeNoMatches": "Aucun résultat pour « {query} »",
   "@homeNoMatches": {
     "placeholders": {

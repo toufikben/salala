@@ -14,6 +14,7 @@ Animal _animal(
   String? breed,
   String? registrationNo,
   String? microchipId,
+  String? notes,
 }) => Animal(
   id: id,
   name: name,
@@ -23,6 +24,7 @@ Animal _animal(
   breed: breed,
   registrationNo: registrationNo,
   microchipId: microchipId,
+  notes: notes,
   createdAt: 1740000000000,
   updatedAt: 1740000000000,
 );
@@ -112,6 +114,27 @@ void main() {
 
       expect(searchHerd(herd, 'MA-2024-118').single.id, 'a-2');
       expect(searchHerd(herd, 'سلوقي').single.id, 'a-1');
+    });
+
+    test('the animal remembered by what was written about it is found', () {
+      final herd = <Animal>[
+        _animal('a-1', 'Zida'),
+        _animal('a-2', 'Nala', notes: 'limping on the left fore'),
+      ];
+
+      expect(searchHerd(herd, 'limping').single.id, 'a-2');
+    });
+
+    test('a note answers, but below the field that is about the animal', () {
+      final herd = <Animal>[
+        _animal('a-1', 'Zida', notes: 'Referred for a rabies booster'),
+        _animal('a-2', 'Nala', registrationNo: 'RAB-2024'),
+      ];
+
+      expect(searchHerd(herd, 'rab').map((Animal a) => a.id), <String>[
+        'a-2',
+        'a-1',
+      ]);
     });
 
     test('a query nothing answers comes back empty', () {

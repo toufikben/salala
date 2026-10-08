@@ -642,4 +642,60 @@ rather than hidden — the pedigree, whose lines *are* its nesting, and the grow
 chart, which is a picture and not a sentence. The row functions also take l10n and
 a locale tag everywhere, which is more parameters than a screen would pass, and the
 fixtures exist twice: once as text in `test/core/litter_rows_test.dart` and
-`test/core/animal_rows_test.dart`, once as rows in `test/services/litter_pdf_test.dart`.
+`test/core/animal_rows_test.dart`, once as rows in `test/services/litter_pdf_test.dart`.
+
+## D30 — The home screen filters the herd it already has
+
+**Date:** 2026-10-08. **Status:** in force.
+
+Searching the herd is a pure function over the list the screen is already showing:
+`core/utils/herd_search.dart` normalises both sides, scores each animal, and
+returns the matches strongest-first, ties keeping the order the list was in. The
+screen holds the typed text as its own state and calls that function in `build`.
+There is no search query, no debounce, and no second list of animals.
+
+**Why.** A card list answers "what do I own?" in the order the database happens to
+return it, and at a hundred animals that is the scroll which makes a breeder stop
+trusting an offline app. The alternative — `LIKE` per keystroke — puts a database
+read inside a lazy `ListView`, which is the shape D27 exists to forbid, and makes
+two sources of truth for one herd: the rows SQLite found and the rows the widget
+kept. The read the screen already made *is* the whole herd, so filtering it costs
+nothing and cannot disagree with anything. Normalisation is the other half of the
+decision, and the reason the rules are not SQL: a phone keyboard writes أ where the
+ledger wrote ا, an accent is typed or not typed depending on whose phone it is, and
+the digits of a microchip come off a sticker with spaces and dashes in them. SQLite
+folds none of that, and a search that misses "أسود" because the query was typed
+"اسود" is indistinguishable, on screen, from a herd that does not contain the dog.
+The first run of these tests proved the point twice over: `ى`, `ی` and `ي` print
+almost identically in a source file, one of the three was missing from the fold
+table, and the test that should have said so was itself written with the wrong
+shape in it. Anything in this file's tests that has to tell look-alike letters
+apart is written as a code point for that reason.
+
+**How to apply.** `normalizeForSearch` is idempotent, so a caller may normalise a
+stored field once rather than once per keystroke and hope. A field becomes
+searchable by adding it to `_score` with a strength and pinning it in
+`test/core/herd_search_test.dart`; the widget never learns about it. The order is
+name exact, name prefix, then a name substring tied with an exact registration or
+chip, then a partial number, then breed — a name is what someone types, while a
+number is what settles which dog is on the table, and a partial number is also how
+two animals answer a query that was one digit. The comparator carries the original
+index because `List.sort` is not stable, and cards that rearrange two equal matches
+between keystrokes look broken even when the set is right. An empty query returns
+the list untouched, and the herd agenda (D28) is hidden while a query is up: it
+answers for the herd, and above two filtered cards it would read as a to-do list
+about them.
+
+**Cost, stated.** This works because the herd is already in memory, and it stops
+working at the size where that stops being true — a few thousand animals, when the
+list itself becomes the problem before the search does. At that point the fold
+tables move into a DAO that normalises, and the screen keeps its shape; the scoring
+stays where it is. The query is the screen's own state, so leaving home and coming
+back shows the whole herd again rather than a word typed days ago. Dropping
+punctuation makes "984-2" and "9842" the same search, which is what a sticker asks
+for and also why a mistyped digit can bring up two animals. The search covers name,
+registration, chip, breed and the animal's own note, because a note sits on the row
+that is already in memory and costs nothing to read. What it does not reach is the
+symptom log: "the one that limped" finds the dog only if somebody also wrote that in
+its notes, and a record that lives in another table would be a second read inside a
+screen that deliberately has one (D27).

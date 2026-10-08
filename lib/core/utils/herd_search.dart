@@ -89,7 +89,9 @@ String normalizeForSearch(String text) {
 /// registration or microchip hit is a different kind of answer — usually the one
 /// that settles which dog is on the table — but a partial match on a number is
 /// also how two animals come up when the query was one digit, so the exact form of
-/// it sorts above the substring.
+/// it sorts above the substring. Below all of that comes what the breeder *wrote
+/// down about* the animal rather than what the animal is: a breed, or the note that
+/// says "limping on the left fore" and is the only reason anyone is searching.
 int _score(Animal animal, String query) {
   final name = normalizeForSearch(animal.name);
   if (name == query) return 5;
@@ -104,8 +106,9 @@ int _score(Animal animal, String query) {
     if (value.contains(query)) return 2;
   }
 
-  final breed = animal.breed;
-  if (breed != null && normalizeForSearch(breed).contains(query)) return 1;
+  for (final String? field in <String?>[animal.breed, animal.notes]) {
+    if (normalizeForSearch(field ?? '').contains(query)) return 1;
+  }
 
   return 0;
 }
