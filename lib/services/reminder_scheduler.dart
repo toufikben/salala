@@ -25,6 +25,9 @@ abstract class NotificationWriter {
   });
 
   Future<void> clear(int id);
+
+  /// Takes every notification this app has booked out of the phone.
+  Future<void> clearAll();
 }
 
 /// [NotificationWriter] over `flutter_local_notifications`, the only place in
@@ -78,6 +81,9 @@ class PluginNotifications implements NotificationWriter {
 
   @override
   Future<void> clear(int id) => _plugin.cancel(id: id);
+
+  @override
+  Future<void> clearAll() => _plugin.cancelAll();
 }
 
 /// Turns a record's due date into whatever alarms the operating system should be
@@ -132,6 +138,19 @@ class ReminderScheduler {
       await _writer.clear(notificationIdFor(recordId, kind));
     }
   }
+
+  /// Takes every alarm this app holds out of the phone, for the moments when
+  /// records do not change but *vanish*.
+  ///
+  /// [cancel] works off a record id, which is enough when one row is edited or
+  /// deleted: the screen still holds the id. It is not enough when the rows the
+  /// alarms were booked from are gone as a group — an animal deleted with its
+  /// ledger under it, or a restore that replaced the whole herd — because
+  /// nothing in the database names those alarms any more, and a message at nine
+  /// in the morning about a dose of an animal that no longer exists is noise a
+  /// breeder cannot act on. So the wholesale paths empty the phone and let the
+  /// rebuild that follows re-book exactly what is left.
+  Future<void> clearEverything() => _writer.clearAll();
 
   String _body(
     Reminder reminder, {

@@ -55,4 +55,12 @@ class FakeNotificationWriter implements NotificationWriter {
     log.add('clear');
     cleared.add(id);
   }
+
+  @override
+  Future<void> clearAll() async {
+    log.add('clearAll');
+    // `cleared` stays untouched on purpose: it records ids the app named, and a
+    // clear-all is the path where the app has no rows left to name.
+    written.clear();
+  }
 }

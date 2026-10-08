@@ -7,6 +7,7 @@ import '../../core/l10n/enum_labels.dart';
 import '../../core/router/app_router.dart';
 import '../../core/utils/date_utils.dart';
 import '../../data/models/animal.dart';
+import '../../services/reminder_resync.dart';
 import '../providers/app_providers.dart';
 
 class AnimalCard extends ConsumerWidget {
@@ -96,7 +97,34 @@ Future<void> confirmDelete(
     ),
   );
 
-  if (confirmed == true) {
-    await ref.read(animalsProvider.notifier).delete(animal.id);
+  if (confirmed != true) return;
+
+  // Read before the awaits: an animal's card can be gone by the time the delete
+  // answers, and a disposed widget's context is not something to ask a question
+  // of afterwards.
+  final scheduler = ref.read(reminderSchedulerProvider);
+  final daos = ref.read(daosProvider);
+  final localeTag = Localizations.localeOf(context).toString();
+
+  await ref.read(animalsProvider.notifier).delete(animal.id);
+
+  // The doses and screenings that went with the animal are what the phone's
+  // alarms were booked off, and no row left on this device names them: a reminder
+  // would still arrive for a dose of an animal the herd no longer has. So the
+  // alarms are emptied and rebuilt from what is actually left, which is the same
+  // pair of steps a launch and a restore run.
+  try {
+    await scheduler.clearEverything();
+    await resyncReminders(
+      scheduler,
+      daos: daos,
+      l10n: l10n,
+      dueDayText: (ms) => formatDayFor(localeTag, ms),
+    );
+  } catch (error) {
+    // The animal is out of the ledger, and that is the part that was asked for.
+    // A phone that refuses its alarms is reported, not passed off as a failed
+    // delete — the same line the restore takes.
+    debugPrint('Reminder rebuild after an animal delete failed: $error');
   }
 }

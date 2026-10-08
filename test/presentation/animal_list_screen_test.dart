@@ -218,5 +218,37 @@ void main() {
       expect(notifications.log, hasLength(3));
       expect(notifications.written, hasLength(1));
     });
+
+    testWidgets('deleting the animal takes its alarms out of the phone', (
+      tester,
+    ) async {
+      final notifications = FakeNotificationWriter();
+      await pumpSalala(
+        tester,
+        notifications: notifications,
+        resyncOnLaunch: true,
+        seed: <Animal>[nala()],
+        seedVaccinations: <Vaccination>[doseDueInDays(20)],
+      );
+      await waitForSchedulerCalls(tester, notifications, 3);
+      expect(notifications.written, hasLength(1));
+
+      // The card's own menu and its own confirm dialog: the delete the breeder
+      // aims at is the one under test, not a DAO called behind the widget tree.
+      await tester.tap(find.byIcon(Icons.more_vert));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Delete'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.widgetWithText(FilledButton, 'Delete'));
+      await waitForSchedulerCalls(tester, notifications, 4);
+
+      // Cancelling by id was never going to work here: the rows those alarms were
+      // booked from are gone with the animal, so nothing on the phone still names
+      // them. The clear-all is what stops a dose of a dead animal's ledger from
+      // waking the breeder at nine in the morning.
+      expect(notifications.log.last, 'clearAll');
+      expect(notifications.written, isEmpty);
+      expect(find.text('Nala'), findsNothing);
+    });
   });
 }

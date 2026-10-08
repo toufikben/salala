@@ -169,5 +169,19 @@ void main() {
         notificationIdFor('0f1e2d3c-4b5a', ReminderKind.dueToday),
       ]);
     });
+
+    test('the wholesale clear empties the phone without naming a record', () async {
+      await book(recordId: '0f1e2d3c-4b5a', dueMs: dueInSixtyDays());
+      writer.log.clear();
+      writer.cleared.clear();
+
+      await scheduler.clearEverything();
+
+      // One call, no ids: the paths that use it have no rows left to read an id
+      // off, which is exactly why `cancel` could not do this job.
+      expect(writer.log, <String>['clearAll']);
+      expect(writer.cleared, isEmpty);
+      expect(writer.written, isEmpty);
+    });
   });
 }

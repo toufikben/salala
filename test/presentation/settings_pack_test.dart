@@ -276,8 +276,16 @@ void main() {
       // booked off the rows that used to be here. Nobody pressed save, so nothing
       // else would have told the phone to stop waking for Atlas and start waking
       // for Kenza.
-      await waitForSchedulerCalls(tester, notifications, 3);
+      await waitForSchedulerCalls(tester, notifications, 4);
 
+      // The emptying comes first: the herd that used to be on this phone may not
+      // be in the pack at all, and its alarms have no row left to cancel them by.
+      expect(notifications.log, <String>[
+        'clearAll',
+        'clear',
+        'clear',
+        'write',
+      ]);
       expect(notifications.written, hasLength(1));
       expect(notifications.written.single.title, 'Kenza');
       expect(notifications.written.single.body, contains('Rabies'));

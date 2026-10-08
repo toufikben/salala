@@ -259,8 +259,14 @@ Future<void> _importPack(BuildContext context, WidgetRef ref) async {
   // rows that used to be here — the lists on screen and the alarms booked off
   // them — and nothing on screen would tell the breeder that either moved.
   try {
+    final scheduler = ref.read(reminderSchedulerProvider);
+    // The alarms the rows that used to be here booked are not in the new ledger,
+    // and nothing on this phone names them any more: a dose of an animal the pack
+    // did not carry would still wake the breeder at nine in the morning. So the
+    // phone is emptied first, and the rebuild books only what is now on it.
+    await scheduler.clearEverything();
     await resyncReminders(
-      ref.read(reminderSchedulerProvider),
+      scheduler,
       daos: ref.read(daosProvider),
       l10n: l10n,
       dueDayText: (ms) => formatDayFor(localeTag, ms),
