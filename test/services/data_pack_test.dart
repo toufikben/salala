@@ -182,6 +182,57 @@ void main() {
       expect(tableRows(pack)['user_settings'], hasLength(1));
     });
 
+    test('a pack built while the herd changes is one moment, not two', () async {
+      final db = await openTestDatabase();
+      await seed(db);
+
+      // Started, deliberately not awaited. The ten reads are ten round trips
+      // through SQLite's queue, and the two inserts below queue themselves
+      // among them — which is what a breeder tapping Export and then adding an
+      // animal with its first dose actually does to the file.
+      final building = packFrom(db, exportedAtMs: 1760000000000);
+      await db.insert('animals', <String, Object?>{
+        'id': 'a-late',
+        'name': 'Late',
+        'species': 'dog',
+        'sex': 'male',
+        'created_at': 1750000000000,
+        'updated_at': 1750000000000,
+      });
+      await db.insert('vaccinations', <String, Object?>{
+        'id': 'v-late',
+        'animal_id': 'a-late',
+        'vaccine_name': 'Rabies',
+        'date_administered': 1750000000000,
+        'created_at': 1750000000000,
+        'updated_at': 1750000000000,
+      });
+      final pack = await building;
+
+      final animalIds = <String>{
+        for (final row in tableRows(pack)['animals']!) row['id']! as String,
+      };
+      final doseAnimals = <String>{
+        for (final row in tableRows(pack)['vaccinations']!)
+          if (row['animal_id'] != null) row['animal_id']! as String,
+      };
+
+      // Either the animal is in the file with its dose, or it is not in the file
+      // at all. The third answer is the one that ruins a backup: a dose under an
+      // animal the pack never read, which `restorePack` then refuses on the
+      // foreign key — so the restore the breeder needs fails on the file they
+      // trusted.
+      expect(
+        doseAnimals.contains('a-late'),
+        animalIds.contains('a-late'),
+        reason: 'the pack mixed two moments: $animalIds / $doseAnimals',
+      );
+      // And the snapshot is not simply empty: what was there before the export
+      // started is still in it.
+      expect(animalIds, containsAll(<String>['a-dam', 'a-pup']));
+      expect(doseAnimals, contains('a-pup'));
+    });
+
     test('counts reach the screen before anything is written', () async {
       final db = await openTestDatabase();
       await seed(db);
