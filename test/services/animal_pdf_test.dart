@@ -362,6 +362,60 @@ void main() {
     expectPdf(bytes);
   });
 
+  // The pedigree is the one section a test cannot read back — the text is drawn
+  // through the embedded font's glyph ids — so what CI can prove of an inbred
+  // line is that the walk finishes and a real document comes out. Whether the
+  // shared grandsire now has his own parents under *both* branches is a page in
+  // the device pass.
+  test('a shared grandsire is a pedigree that still finishes', () async {
+    final db = await openTestDatabase();
+    final daos = Daos(db);
+    Future<void> add(
+      String id,
+      String name,
+      Sex sex, {
+      String? damId,
+      String? sireId,
+    }) => daos.animals.create(
+      Animal(
+        id: id,
+        name: name,
+        species: 'dog',
+        sex: sex,
+        status: AnimalStatus.active,
+        damId: damId,
+        sireId: sireId,
+        createdAt: 1740000000000,
+        updatedAt: 1740000000000,
+      ),
+    );
+    // Both of the puppy's parents come from the same two dogs — the ordinary
+    // line-breeding a breeding ledger holds, and the case a visited set used to
+    // print with one branch of the family left unfinished.
+    await add('g-sire', 'Groom', Sex.male);
+    await add('g-dam', 'Grace', Sex.female);
+    await add('p-dam', 'Mila', Sex.female, damId: 'g-dam', sireId: 'g-sire');
+    await add('p-sire', 'Nasir', Sex.male, damId: 'g-dam', sireId: 'g-sire');
+    await add(
+      'a-inbred',
+      'Sulayman',
+      Sex.male,
+      damId: 'p-dam',
+      sireId: 'p-sire',
+    );
+
+    final l10n = await AppLocalizations.delegate.load(const Locale('en'));
+    expectPdf(
+      await animalPackPdf(
+        daos,
+        animalId: 'a-inbred',
+        l10n: l10n,
+        baseFont: shippedFont(),
+        now: DateTime.utc(2026, 10, 5),
+      ),
+    );
+  });
+
   test('every handover the animal has is on the document, not only one', () async {
     // A puppy bought back and re-homed leaves two placements. The one whose day
     // was never written sorts *last* under `placed_date DESC` (pinned in

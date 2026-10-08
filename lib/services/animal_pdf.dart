@@ -223,8 +223,13 @@ pw.Widget? _growthChart(Animal animal, List<WeightEntry> weighIns) {
 /// comes from the layout rather than from spaces a bidi pass would move.
 ///
 /// Three generations and no further: past that the page would be asserting
-/// ancestry nobody recorded. [seen] stops a ledger that names an animal as its
-/// own ancestor from being walked for ever.
+/// ancestry nobody recorded. [seen] is the line currently being walked, not every
+/// animal already printed: a grandsire shared by the dam's and the sire's lines is
+/// ordinary in a breeding herd, and a set that only ever grew printed him twice
+/// while giving him parents on one side only — the second branch stopped as if
+/// nobody had recorded his ancestry, which the first branch contradicts on the
+/// same page. Removing on the way out still stops a ledger that names an animal as
+/// its own ancestor from being walked for ever.
 Future<List<pw.Widget>> _ancestry(
   AppLocalizations l10n,
   Daos daos,
@@ -243,9 +248,14 @@ Future<List<pw.Widget>> _ancestry(
     final parent = await daos.animals.findById(id);
     if (parent == null) continue;
 
-    final above = seen.add(parent.id)
-        ? await _ancestry(l10n, daos, parent, generation + 1, seen)
-        : const <pw.Widget>[];
+    final List<pw.Widget> above;
+    if (seen.contains(parent.id)) {
+      above = const <pw.Widget>[];
+    } else {
+      seen.add(parent.id);
+      above = await _ancestry(l10n, daos, parent, generation + 1, seen);
+      seen.remove(parent.id);
+    }
     rows.add(
       pw.Column(
         crossAxisAlignment: pw.CrossAxisAlignment.start,

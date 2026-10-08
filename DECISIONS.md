@@ -753,7 +753,7 @@ this morning; the log prints the hour beside the date, so the count and the reco
 can still be checked against each other. The division is rounded, not floored, and
 that is what makes Morocco's clock shifts survivable: two local midnights either
 side of a 23- or 25-hour day still count as one day, where an instant difference
-would drift by an hour and move a due date into the wrong week. The day count is
-still local, not UTC, so a pack restored on a phone in another timezone recomputes
-ages from *its* midnight — true of every date in this app, and stated in D22's
-restore rather than fixed here.
+would drift by an hour and move a due date into the wrong week. The count is
+local, not UTC, so a pack restored on a phone in another timezone recomputes every
+age from *its* midnight — true of every date this app stores, and a consequence of
+the pack format (D22) rather than of this decision.
