@@ -15,12 +15,32 @@ library;
 
 import '../../data/models/animal.dart';
 
-/// Tashkeel and the marks that change a word's sound but nobody types them from
-/// memory: fathatan, dammata, kasrata, sukun, shadda, madda above, hamza below,
-/// the dagger alef, and tatweel.
+/// The marks that change how a word is written but nobody types them from
+/// memory: tashkeel (fathatan, dammata, kasrata, sukun, shadda, madda above,
+/// hamza below), the dagger alef, and tatweel — the kashida a justified Arabic
+/// line stretches with, which arrives in a name pasted from anywhere a line was
+/// justified.
 final RegExp _arabicMarks = RegExp(
   '[\u0610-\u061A\u064B-\u065F\u0670\u06D6-\u06ED\u0640]',
 );
+
+/// The digits a keyboard set to Arabic numerals writes into a field the ledger
+/// holds in Latin ones.
+///
+/// The app prints Latin digits everywhere by its own rule (D21), but a rule
+/// about what *this* app paints is not a rule about what the keys next to it
+/// produce: a phone configured for Arabic-Indic numerals offers `٠١٢` on the
+/// number row, and a breeder reading a certificate aloud types straight from
+/// what they see. Without this fold, `٢٥٠` is a letter-and-digit string that
+/// matches nothing, and the search answers "no result" about a dog that is
+/// standing in the ledger.
+final RegExp _otherDigits = RegExp('[\u0660-\u0669\u06F0-\u06F9]');
+
+String _foldDigit(Match match) {
+  final int code = match[0]!.codeUnitAt(0);
+  final int zero = code >= 0x06F0 ? 0x06F0 : 0x0660;
+  return String.fromCharCode(0x30 + code - zero);
+}
 
 /// The letters an Arabic keyboard offers in more than one shape, folded to the
 /// one shape a breeder searches with.
@@ -64,16 +84,24 @@ const Map<String, String> _latinForms = <String, String>{
   'ù': 'u',
   'û': 'u',
   'ü': 'u',
+  'œ': 'oe',
   'ç': 'c',
   'ñ': 'n',
 };
 
 /// Lower-case, marks and letter-shapes folded, punctuation gone.
 ///
-/// Idempotent, which is what lets a caller normalise a stored field once per
-/// animal rather than once per keystroke and hope.
+/// Idempotent: normalising twice changes nothing after the first pass, which is
+/// what makes a query and a stored field comparable at all. It is called once
+/// per field per keystroke rather than cached per animal, and that is the
+/// honest cost of keeping this file free of state — a herd of a few hundred
+/// short strings is cheaper than a cache that has to be invalidated every time
+/// a card is edited.
 String normalizeForSearch(String text) {
-  var out = text.toLowerCase().replaceAll(_arabicMarks, '');
+  var out = text
+      .toLowerCase()
+      .replaceAll(_arabicMarks, '')
+      .replaceAllMapped(_otherDigits, _foldDigit);
   for (final MapEntry<String, String> fold in _arabicForms.entries) {
     out = out.replaceAll(fold.key, fold.value);
   }
@@ -83,28 +111,43 @@ String normalizeForSearch(String text) {
   return out.replaceAll(_notLetterDigit, '');
 }
 
+/// Whether [rawQuery] asks for anything at all.
+///
+/// The two are not the same question: a keyboard that auto-inserts a space, or
+/// a dash typed ahead of a number nobody stored with one, normalises to nothing
+/// and matches every animal. A screen that hid the herd's agenda on
+/// `rawQuery.isNotEmpty` would then be quietly dropping a block above a list it
+/// had not filtered — so both halves of the screen ask this instead.
+bool queryFilters(String rawQuery) => normalizeForSearch(rawQuery).isNotEmpty;
+
 /// How strong a match is: high enough to sort, and nothing more.
 ///
-/// The name is what a breeder types, so a name hit outranks everything else; a
-/// registration or microchip hit is a different kind of answer — usually the one
-/// that settles which dog is on the table — but a partial match on a number is
-/// also how two animals come up when the query was one digit, so the exact form of
-/// it sorts above the substring. Below all of that comes what the breeder *wrote
-/// down about* the animal rather than what the animal is: a breed, or the note that
-/// says "limping on the left fore" and is the only reason anyone is searching.
+/// The ladder is the doc comment above it, and the rungs are a whole number
+/// apart so that no two kinds of answer can tie: the name is what a breeder
+/// types, so *any* name hit outranks *any* number hit, and a number outranks
+/// what was written about the animal. A registration or microchip hit is a
+/// different kind of answer — usually the one that settles which dog is on the
+/// table — but a partial match on a number is also how two animals come up when
+/// the query was one digit, so the exact form of it sorts above the substring.
 int _score(Animal animal, String query) {
   final name = normalizeForSearch(animal.name);
-  if (name == query) return 5;
-  if (name.startsWith(query)) return 4;
-  if (name.contains(query)) return 3;
+  if (name == query) return 6;
+  if (name.startsWith(query)) return 5;
+  if (name.contains(query)) return 4;
 
   final registration = animal.registrationNo;
   final microchip = animal.microchipId;
+  // The best of the two numbers, not the first one that answered: a dog can be
+  // registered `MA-118` and chipped `118`, and returning from inside the loop
+  // on the registration's partial hit would hide the fact that the chip is an
+  // exact one.
+  var byNumber = 0;
   for (final String field in <String>[?registration, ?microchip]) {
     final value = normalizeForSearch(field);
     if (value == query) return 3;
-    if (value.contains(query)) return 2;
+    if (value.contains(query)) byNumber = 2;
   }
+  if (byNumber != 0) return byNumber;
 
   for (final String? field in <String?>[animal.breed, animal.notes]) {
     if (normalizeForSearch(field ?? '').contains(query)) return 1;

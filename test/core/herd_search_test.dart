@@ -68,9 +68,41 @@ void main() {
       expect(normalizeForSearch('984 221-330 / A'), '984221330a');
     });
 
+    test('the digits an Arabic numeral keyboard writes find a Latin number', () {
+      // D21 is a rule about what this app paints, not about which keys the
+      // phone next to it offers. A breeder reading a certificate aloud types the
+      // shape they see, and before this fold `٢٥٠` matched nothing in a ledger
+      // that held `ATL-2500` — the same no-answer a missing dog looks like.
+      expect(normalizeForSearch('٢٥٠'), '250');
+      expect(normalizeForSearch('۰۱۲'), '012'); // Persian extended forms
+      final herd = <Animal>[
+        _animal('a-1', 'Zida'),
+        _animal('a-2', 'Nala', registrationNo: 'ATL-2500'),
+      ];
+
+      expect(searchHerd(herd, '٢٥٠').single.id, 'a-2');
+    });
+
+    test('the French ligature is two letters, not an unknown one', () {
+      expect(normalizeForSearch('cœur'), 'coeur');
+    });
+
     test('normalising twice changes nothing after the first pass', () {
       final once = normalizeForSearch('سُلَيْطَة 984-A');
       expect(normalizeForSearch(once), once);
+    });
+  });
+
+  group('what counts as a query at all', () {
+    test('text that normalises to nothing asks for nothing', () {
+      // A keyboard that auto-inserts a space, or a dash typed ahead of a number
+      // nobody stored with one: the list does not change, so the screen must not
+      // behave as if it had.
+      expect(queryFilters(''), isFalse);
+      expect(queryFilters('   '), isFalse);
+      expect(queryFilters(' — '), isFalse);
+      expect(queryFilters('a'), isTrue);
+      expect(queryFilters('ش'), isTrue);
     });
   });
 
@@ -169,6 +201,43 @@ void main() {
 
       expect(searchHerd(herd, 'nine').first.id, 'a-1');
     });
+
+    test(
+      'a name that merely contains the query still beats the number typed in '
+      'full',
+      () {
+        // The ladder in `herd_search.dart` says any name hit outranks any
+        // number hit. It only says that if the rungs are a whole step apart:
+        // when a name substring and an exact registration both scored 3, the
+        // dog whose number was typed in full lost to whichever row the database
+        // happened to return first.
+        final herd = <Animal>[
+          _animal('a-1', 'Sirin', registrationNo: 'Zid'),
+          _animal('a-2', 'Azida'),
+        ];
+
+        expect(searchHerd(herd, 'zid').first.id, 'a-2');
+      },
+    );
+
+    test(
+      'the exact chip is not hidden behind the registration that only contains '
+      'the digits',
+      () {
+        // Both numbers belong to the same animal, so the loop that reads them
+        // has to keep the best answer rather than take the first one that
+        // answered at all.
+        final herd = <Animal>[
+          _animal('a-1', 'Zida', registrationNo: 'MA-1180'),
+          _animal('a-2', 'Nala', registrationNo: 'MA-118', microchipId: '118'),
+        ];
+
+        expect(searchHerd(herd, '118').map((Animal a) => a.id), <String>[
+          'a-2',
+          'a-1',
+        ]);
+      },
+    );
 
     test(
       'the exact number comes before the number that merely contains it',

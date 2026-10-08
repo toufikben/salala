@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:salala/data/models/animal.dart';
 import 'package:salala/data/models/vaccination.dart';
+import 'package:salala/presentation/widgets/animal_card.dart';
 
 import '../helpers/pump_app.dart';
 
@@ -80,10 +81,38 @@ void main() {
 
     expect(find.text('Zeus'), findsOneWidget);
     expect(find.text('Bella'), findsNothing);
-    // The group that emptied loses its header too, rather than standing over an
-    // empty stretch of list.
-    expect(find.text('Breeding stock'), findsOneWidget);
+    // The sections give shape to everything a breeder owns. A search asked a
+    // different question, so the answer is one ranked list with no header over
+    // it — a breeding block printed first would otherwise outrank the match
+    // strength that `searchHerd` had just computed.
+    expect(find.text('Breeding stock'), findsNothing);
     expect(find.text('All animals'), findsNothing);
+  });
+
+  testWidgets('a search keeps the order the matches were ranked in', (
+    tester,
+  ) async {
+    _usePhoneViewport(tester);
+    await pumpSalala(
+      tester,
+      seed: <Animal>[
+        // The weaker match is the breeding animal on purpose: the herd view puts
+        // that block first, and a search must not.
+        _animal('a-1', name: 'Zidane', breeding: true),
+        _animal('a-2', name: 'Zid'),
+      ],
+    );
+
+    await tester.enterText(_searchField, 'zid');
+    await tester.pump();
+
+    expect(
+      tester
+          .widgetList<AnimalCard>(find.byType(AnimalCard))
+          .map((AnimalCard card) => card.animal.name)
+          .toList(),
+      <String>['Zid', 'Zidane'],
+    );
   });
 
   testWidgets('a chip typed from a sticker finds the dog', (tester) async {
@@ -155,6 +184,33 @@ void main() {
     await tester.tap(find.byIcon(Icons.close));
     await tester.pump();
     expect(find.text('Vaccinations to book'), findsOneWidget);
+  });
+
+  testWidgets('a space is not a search: the herd and its agenda both stay', (
+    tester,
+  ) async {
+    _usePhoneViewport(tester);
+    await pumpSalala(
+      tester,
+      seed: <Animal>[
+        _animal(_nalaId, name: 'Nala'),
+        _animal('a-2', name: 'Bella'),
+      ],
+      seedVaccinations: <Vaccination>[_overdueDose()],
+    );
+
+    expect(find.text('Vaccinations to book'), findsOneWidget);
+
+    // A keyboard that puts a space after a word, or a dash typed before a
+    // number: nothing normalises out of it, so the list is the whole herd — and
+    // a herd nobody filtered has no business losing the block above it.
+    await tester.enterText(_searchField, ' ');
+    await tester.pump();
+
+    expect(find.text('Vaccinations to book'), findsOneWidget);
+    expect(find.text('Nala'), findsWidgets);
+    expect(find.text('Bella'), findsOneWidget);
+    expect(find.byIcon(Icons.close), findsNothing);
   });
 
   testWidgets('Arabic: the hamza a keyboard chose does not hide the dog', (

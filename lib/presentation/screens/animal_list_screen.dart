@@ -75,11 +75,13 @@ class _AnimalListScreenState extends ConsumerState<AnimalListScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final animals = ref.watch(animalsProvider);
-    // Read here, once per rebuild: the field and the list below are filtered by
-    // the same value, so a `setState` that changed one would have to be caught by
-    // the other anyway, and a widget that read the controller itself would be a
-    // second source of truth for the same text.
+    // Read here, once per rebuild: the field, the list under it and the agenda
+    // all answer to one decision about the typed text, and `queryFilters` is the
+    // only place that makes it. The raw text is what the list is handed, because
+    // the filter normalises it again for matching and the no-match message has to
+    // print back what was actually typed.
     final String query = _query;
+    final bool filtering = queryFilters(query);
 
     return Scaffold(
       appBar: AppBar(
@@ -98,7 +100,7 @@ class _AnimalListScreenState extends ConsumerState<AnimalListScreen> {
                 hintText: l10n.homeSearchHint,
                 isDense: true,
                 prefixIcon: const Icon(Icons.search),
-                suffixIcon: query.isEmpty
+                suffixIcon: filtering
                     ? null
                     : IconButton(
                         icon: const Icon(Icons.close),
@@ -138,7 +140,14 @@ class _AnimalListScreenState extends ConsumerState<AnimalListScreen> {
             // The agenda answers for the herd (D28), not for the matches, and
             // showing the whole herd's to-do list above a filtered handful of
             // cards reads as if those animals were the ones with the doses due.
-            showAgenda: query.isEmpty,
+            showAgenda: !filtering,
+            // The two sections exist to give shape to everything a breeder owns.
+            // A search is not asking that question — it asked which one, and the
+            // answer has an order. Splitting the matches by breeding stock would
+            // put a dog that matched on a word in its note above the dog whose
+            // name was typed in full, because the breeding block is printed
+            // first whatever the ranking said.
+            grouped: !filtering,
             agenda: ref.watch(agendaDosesProvider),
             onAgendaRetry: () => ref.invalidate(agendaDosesProvider),
           );
@@ -158,18 +167,30 @@ class _AnimalGroups extends StatelessWidget {
   const _AnimalGroups({
     required this.animals,
     required this.showAgenda,
+    required this.grouped,
     required this.agenda,
     required this.onAgendaRetry,
   });
 
   final List<Animal> animals;
   final bool showAgenda;
+  final bool grouped;
   final AsyncValue<List<Vaccination>> agenda;
   final VoidCallback onAgendaRetry;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+
+    if (!grouped) {
+      return ListView(
+        padding: const EdgeInsets.fromLTRB(8, 8, 8, 96),
+        children: <Widget>[
+          for (final animal in animals) AnimalCard(animal: animal),
+        ],
+      );
+    }
+
     final breeding = animals.where((a) => a.isBreedingStock).toList();
     final others = animals.where((a) => !a.isBreedingStock).toList();
 
