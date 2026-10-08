@@ -172,6 +172,7 @@
 
   "weightAdd": "وزن جديد",
   "weightKg": "الوزن (كغ)",
+  "weightColumn": "الوزن",
   "weightRequired": "أدخل الوزن",
   "weightInvalid": "أدخل وزناً مثل 4.2",
   "weightMeasuredOn": "تاريخ الوزن",

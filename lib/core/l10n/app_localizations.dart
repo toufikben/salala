@@ -892,6 +892,12 @@ abstract class AppLocalizations {
   /// **'Weight (kg)'**
   String get weightKg;
 
+  /// Column heading in a printed document, where each row carries its own unit (430 g, 12.40 kg), so no unit belongs in the heading.
+  ///
+  /// In en, this message translates to:
+  /// **'Weight'**
+  String get weightColumn;
+
   /// No description provided for @weightRequired.
   ///
   /// In en, this message translates to:

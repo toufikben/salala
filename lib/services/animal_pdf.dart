@@ -115,7 +115,11 @@ Future<Uint8List> animalPackPdf(
     ...pdfTable(
       l10n,
       l10n.recordsWeights,
-      <String>[l10n.weightMeasuredOn, l10n.weightKg],
+      // Not `weightKg`: that is the form's label, and the form asks for
+      // kilograms. These rows print grams under it — a 430-gram puppy in a
+      // column headed "Weight (kg)" is the document contradicting itself, and
+      // the whelping record heads the same column with no unit at all.
+      <String>[l10n.weightMeasuredOn, l10n.weightColumn],
       weighInRows(l10n, localeTag, weighIns),
       trailing: chart == null
           ? const <pw.Widget>[]

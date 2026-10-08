@@ -39,12 +39,17 @@ String formatPrice(double price) {
 /// in a currency nobody named, and the usual `2500 MAD`. An absent currency is
 /// left off rather than printed as a trailing space, because a reader cannot tell
 /// a missing code from a missing amount on paper.
+///
+/// A zero is nothing written down. The form cannot produce one (`parsePrice`
+/// refuses it), but a transfer pack restored from a file can carry whatever
+/// number the file had, and a page that reads `Price 0` tells the buyer the dog
+/// was free when the honest sentence is that nobody recorded a price.
 String formatPriceWithCurrency(
   double? amount,
   String? currency, {
   required String unknown,
 }) {
-  if (amount == null) return unknown;
+  if (amount == null || amount <= 0) return unknown;
   final price = formatPrice(amount);
   if (currency == null || currency.isEmpty) return price;
   return '$price $currency';

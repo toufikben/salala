@@ -172,6 +172,7 @@
 
   "weightAdd": "Ajouter un poids",
   "weightKg": "Poids (kg)",
+  "weightColumn": "Poids",
   "weightRequired": "Saisissez le poids",
   "weightInvalid": "Saisissez un poids comme 4,2",
   "weightMeasuredOn": "Mesuré le",

@@ -464,6 +464,41 @@ void main() {
       // reads as a typo in the code.
       expect(facts.last.$2, '250.5');
     });
+
+    test('an empty contact field gets no line, and a zero is not a price', () async {
+      // Both arrive through a restored pack rather than the form: the form
+      // refuses an empty phone and `parsePrice` refuses 0. A printed page has
+      // to be right about the file it was given, though — a label over a blank
+      // reads as a redaction, and `Price 0` tells the buyer the dog was free
+      // when nobody recorded anything.
+      final l10n = await messages('en');
+      final placement = Placement(
+        id: 'p-1',
+        animalId: 'a-1',
+        buyerId: 'b-1',
+        price: 0,
+        currency: 'MAD',
+        createdAt: _day,
+        updatedAt: _day,
+      );
+      final buyer = Buyer(
+        id: 'b-1',
+        name: 'Nadia Sabri',
+        phone: '',
+        email: '',
+        createdAt: _day,
+        updatedAt: _day,
+      );
+
+      final facts = placementFacts(l10n, 'en', placement, buyer);
+
+      expect(facts.map(((String, String) fact) => fact.$1).toList(), <String>[
+        l10n.pdfBuyer,
+        l10n.pdfPlacedOn,
+        l10n.pdfPrice,
+      ]);
+      expect(facts.last.$2, l10n.valueUnknown);
+    });
   });
 
   test('the Arabic document keeps Latin digits and Arabic words', () async {

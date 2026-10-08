@@ -209,6 +209,10 @@
 
   "weightAdd": "Add weight",
   "weightKg": "Weight (kg)",
+  "weightColumn": "Weight",
+  "@weightColumn": {
+    "description": "Column heading in a printed document, where each row carries its own unit (430 g, 12.40 kg), so no unit belongs in the heading."
+  },
   "weightRequired": "Enter the weight",
   "weightInvalid": "Enter a weight like 4.2",
   "weightMeasuredOn": "Measured on",

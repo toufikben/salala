@@ -455,6 +455,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get weightKg => 'Poids (kg)';
 
   @override
+  String get weightColumn => 'Poids';
+
+  @override
   String get weightRequired => 'Saisissez le poids';
 
   @override

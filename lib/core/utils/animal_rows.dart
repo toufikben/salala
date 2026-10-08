@@ -176,8 +176,14 @@ List<(String, String)> placementFacts(
   Buyer? buyer,
 ) => <(String, String)>[
   (l10n.pdfBuyer, buyer?.name ?? l10n.valueUnknown),
-  if (buyer?.phone != null) (l10n.pdfPhone, buyer!.phone!),
-  if (buyer?.email != null) (l10n.pdfEmail, buyer!.email!),
+  // A contact line that cannot be filled gets no line at all — the same rule the
+  // country and the guarantee follow, and the one these two were missing: a buyer
+  // whose email arrived as the empty string from a restored pack printed its
+  // label over a blank.
+  if (buyer?.phone case final String phone when phone.isNotEmpty)
+    (l10n.pdfPhone, phone),
+  if (buyer?.email case final String email when email.isNotEmpty)
+    (l10n.pdfEmail, email),
   // Where the family is. A health guarantee is enforced against a person at an
   // address, and this line is the only trace of either in the document.
   if (buyer?.countryCode case final String country when country.isNotEmpty)

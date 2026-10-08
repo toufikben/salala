@@ -457,6 +457,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get weightKg => 'الوزن (كغ)';
 
   @override
+  String get weightColumn => 'الوزن';
+
+  @override
   String get weightRequired => 'أدخل الوزن';
 
   @override

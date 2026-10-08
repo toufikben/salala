@@ -102,6 +102,18 @@ void main() {
         formatPriceWithCurrency(null, 'MAD', unknown: 'Not recorded'),
         'Not recorded',
       );
+      // The test's name promised this and the code only held half of it. A zero
+      // cannot be typed (`parsePrice` refuses it) but it can come back in a
+      // restored pack, and a page that reads `Price 0 MAD` says the dog was
+      // free.
+      expect(
+        formatPriceWithCurrency(0, 'MAD', unknown: 'Not recorded'),
+        'Not recorded',
+      );
+      expect(
+        formatPriceWithCurrency(-2500, 'MAD', unknown: 'Not recorded'),
+        'Not recorded',
+      );
     });
   });
 }
