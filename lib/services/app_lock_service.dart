@@ -39,6 +39,15 @@ class AppLockService {
     if (normalized.length < 4) {
       throw const AppLockException('pin_too_short');
     }
+    // Same rule as `disable`, seen from the other side, and it only matters
+    // because of `change()`: this method is reached while an old digest is still
+    // on the phone. Writing a new salt over it and then failing to write the
+    // digest would leave that old digest behind a salt that cannot reproduce it —
+    // the dead end `disable` was reordered away from. Taking the digest off first
+    // means every halfway point here leaves a salt nothing reads, so the worst a
+    // refusing keystore can cause is a lock that came off. That can be put back
+    // on; a lock no PIN opens cannot.
+    await _storage.delete(key: _digestKey);
     final salt = _randomSalt();
     await _storage.write(key: _saltKey, value: base64Encode(salt));
     await _storage.write(key: _digestKey, value: _digest(salt, normalized));
@@ -77,10 +86,6 @@ class AppLockService {
   /// matches, and the only way back into the records is a restore. Deleting the
   /// digest first leaves the opposite residue, a salt nothing reads, and the app
   /// simply opens unlocked.
-  ///
-  /// `enable` keeps its salt-then-digest order for the same reason seen from the
-  /// other side: writing the digest last means a failure there leaves the app
-  /// unlocked rather than locked with no salt to check a PIN against.
   Future<void> disable() async {
     await _storage.delete(key: _digestKey);
     await _storage.delete(key: _saltKey);

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:salala/data/models/animal.dart';
 import 'package:salala/presentation/screens/litter_form_screen.dart';
+import 'package:salala/presentation/widgets/animal_card.dart';
 
 import '../helpers/pump_app.dart';
 
@@ -202,10 +203,14 @@ void main() {
 
       await tester.tap(find.widgetWithText(NavigationDestination, 'Animals'));
       await settleRealIo(tester);
-      // The two animals this test seeded: the proof the herd list is on screen
-      // and does name its animals, so the three absences below mean something.
+      // The two animals this test seeded, and the whole herd counted: the two
+      // names alone would only prove the top of the list built, while a puppy
+      // lands below them. The success test above is what makes this number mean
+      // something — the same tab draws `A litter 1/2/3` as three cards when the
+      // whelping is registered, so two cards here is the ledger read back.
       expect(find.text('Nala'), findsWidgets);
       expect(find.text('Atlas'), findsWidgets);
+      expect(find.byType(AnimalCard), findsNWidgets(2));
       expect(find.text('A litter 1'), findsNothing);
       expect(find.text('A litter 2'), findsNothing);
       expect(find.text('A litter 3'), findsNothing);

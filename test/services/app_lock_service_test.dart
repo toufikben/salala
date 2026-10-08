@@ -105,7 +105,9 @@ void main() {
       // halfway: `isLocked()` reads the digest alone, so the unlock screen
       // opens, and `verify()` has no salt to hash against, so it answers no to
       // every PIN the breeder can type. The records are still on the phone and
-      // unreachable — the only way out is a restore.
+      // unreachable — the only way out is a restore. The salt is removed by hand
+      // because no order of the current code can produce it any more: this case
+      // names the dead end so the ordering above has something to be for.
       storage.values.remove('app_lock_salt');
 
       expect(await lock.isLocked(), isTrue);
@@ -132,14 +134,36 @@ void main() {
     );
 
     test('a PIN the keystore refuses to finish leaves the app open', () async {
-      // The mirror image, which is why `enable` writes the salt first: a digest
-      // stored without its salt would be the dead end above, reached by a
-      // halfway write instead of a halfway delete.
+      // The write side of the same rule: the digest is taken off before the salt
+      // goes in, so a halfway write can only leave a salt nothing reads. This
+      // case starts unlocked, where both orders agree — the next test is the one
+      // that can tell them apart.
       storage.writeRefused.add('app_lock_digest');
 
       await expectLater(lock.enable('2481'), throwsStateError);
 
       expect(await lock.isLocked(), isFalse);
     });
+
+    test(
+      'a PIN change the phone refuses mid-way does not brick the lock',
+      () async {
+        // `change()` reaches `enable` with an old digest still on the phone, which
+        // is the one place salt-then-digest was ever dangerous: the salt gets
+        // rewritten, the digest write is refused, and the old digest is left behind
+        // a salt that cannot reproduce it. The dead end above, reached by a halfway
+        // write instead of a halfway delete — and this test fails against it.
+        await lock.enable('2481');
+        expect(await lock.verify('2481'), isTrue);
+        storage.writeRefused.add('app_lock_digest');
+
+        await expectLater(lock.change('2481', '1357'), throwsStateError);
+
+        expect(await lock.isLocked(), isFalse);
+        expect(await lock.verify('2481'), isFalse);
+        expect(await lock.verify('1357'), isFalse);
+        expect(storage.values.keys, unorderedEquals(<String>['app_lock_salt']));
+      },
+    );
   });
 }

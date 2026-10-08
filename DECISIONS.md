@@ -861,7 +861,10 @@ test requires that the launch's three writer calls are *all* it ever saw (no
 `clearAll` for a surviving animal), and the dose test launches with its alarm
 already booked, then requires that a refused delete leaves the writer's log
 exactly as the launch left it — a kept alarm is only evidence when there was an
-alarm there to keep.
+alarm there to keep. What that line guards is the *order* of the two calls (an app
+that cancelled before it deleted would fail it), not this decision's shape: in the
+one-`try` build the delete throws and no cancel is ever reached, so the log is
+unchanged there too. D35's point 2 is where the discriminating tests live.
 
 **Amended the same day, because the first version of these tests proved less
 than they claimed.** No test in D33 or D34 could fail against the buggy shape: the
@@ -931,4 +934,41 @@ something a trigger does, and no CI run here can make a read fail after a write
 succeeded. It is also not something the phone can show — it needs a database that
 answers yes to a write and no to the next read. It ships on the argument, which is
 the same argument D33 already accepted for the alarm step.
+
+**Amended the same day, by a mutation check of these tests.** Asking of each new
+test "would it fail if the bug were put back?" found three things, and all three
+are now fixed in code as well as here.
+
+1. **`enable()`'s order was not safe, and the comment on it was false.** Writing
+   the salt first only protects a phone that has no lock yet: `change()` reaches
+   `enable()` with an old digest still stored, so new salt in, digest write
+   refused, and the old digest sits behind a salt that cannot reproduce it —
+   finding 1's dead end reached by a write instead of a delete. `enable()` now
+   takes the digest off first, so every halfway point leaves a salt nothing reads
+   and the app opens. The cost is stated rather than hidden: a refused change can
+   cost the lock instead of keeping it, and a lock that fell off can be put back
+   on while a lock no PIN opens cannot. `change()` has no caller in `lib/` today
+   (the Settings switch turns the lock on and off and never re-keys it), so this
+   fixes the rule where it lives rather than a screen that does not exist. The new
+   test arms a refusal in the middle of a change and requires the app to be open
+   rather than locked-and-unopenable; it fails against the order it replaces.
+2. **Two headline assertions could not fail.** `written isEmpty` and `cleared
+   isEmpty` said nothing, because the fake logs the attempt before it throws — a
+   build that never called the alarm at all would have passed them. Both tests now
+   assert the exact call list (`clear, clear, write` for a dose the phone would
+   not remind about, a single `clear` for a delete it would not unremind), so the
+   swallowed refusal is itself on the record.
+3. **Two claims in this decision were stronger than the tests behind them.** The
+   digest-without-a-salt case removes the salt by hand, so it *names* the dead end
+   rather than guarding the ordering; and the strengthened refused-delete test
+   holds in the one-`try` shape too, because there the delete throws before any
+   cancel is reached — what it guards is the order of the two calls, not D34. The
+   tests that bite D33 and D34 are the pair in point 2.
+
+The same check found the herd side of the whelping refusal asserting puppy names
+against a lazily built list whose two seeded animals sit in the breeding-stock
+block *above* where a puppy would land. It now counts the animal cards themselves,
+and the success test above it is what proves three registered puppies are drawn as
+three cards — so two cards after a refusal is the ledger read back through the
+screen rather than a scroll position.
 

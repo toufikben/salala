@@ -331,6 +331,11 @@ void main() {
       find.text('This could not be saved. Nothing was written.'),
       findsNothing,
     );
+    // Not merely "no alarm was written" — the fake records the attempt before it
+    // throws, so `written` alone would stay empty even if the form never reached
+    // the alarm at all. These three calls are the proof it tried and swallowed
+    // the refusal: a dose that landed, an alarm the phone would not take.
+    expect(notifications.log, <String>['clear', 'clear', 'write']);
     expect(notifications.written, isEmpty);
     expect(find.text('Distemper'), findsOneWidget);
   });
@@ -372,6 +377,9 @@ void main() {
       findsNothing,
     );
     expect(find.text('Lepto'), findsNothing);
+    // The row went first, so the cancel the phone refused is the only call this
+    // screen ever made — and it refused on the first of the two.
+    expect(notifications.log, <String>['clear']);
     expect(notifications.cleared, isEmpty);
   });
 
