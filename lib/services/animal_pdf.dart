@@ -4,19 +4,13 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
 import '../core/l10n/app_localizations.dart';
-import '../core/l10n/enum_labels.dart';
+import '../core/utils/animal_rows.dart';
 import '../core/utils/date_utils.dart';
-import '../core/utils/money.dart';
-import '../core/utils/weight.dart';
 import '../data/db/daos.dart';
 import '../data/models/animal.dart';
 import '../data/models/buyer.dart';
-import '../data/models/health_test.dart';
 import '../data/models/litter.dart';
 import '../data/models/placement.dart';
-import '../data/models/symptom.dart';
-import '../data/models/vaccination.dart';
-import '../data/models/vet_visit.dart';
 import '../data/models/weight_entry.dart';
 import 'pdf_layout.dart';
 
@@ -33,6 +27,11 @@ const double _dayMs = 86400000.0;
 /// document ends with [AppLocalizations.pdfDisclaimer] instead of a signature
 /// line. The app verified none of it, and a stamp of approval over unverified
 /// health data is how a guarantee becomes a dispute.
+///
+/// What each row says is decided in `animal_rows.dart`, apart from this page
+/// (D29); this file only reads and arranges. The pedigree is the exception: its
+/// lines are built here because the indent comes from the nesting, and unwinding
+/// it into strings first would lose the generations it exists to show.
 ///
 /// All reads happen before the page is described: the document's `build`
 /// callback is synchronous, so a section that needed the database would have to
@@ -66,28 +65,23 @@ Future<Uint8List> animalPackPdf(
   final weighIns = await daos.weights.forAnimal(animal.id);
   final sightings = await daos.symptoms.forAnimal(animal.id);
 
-  final litters = await _everyLitterOf(daos, animal.id);
-  final litterRows = <List<String>>[];
-  for (final Litter litter in litters) {
-    final puppies = await daos.animals.findOffspring(litter.id);
-    litterRows.add(<String>[
-      litter.name,
-      // Which side of the pedigree this animal stood on, because a sire's value
-      // on paper is exactly the litters he got.
-      litter.damId == animal.id ? l10n.animalDam : l10n.animalSire,
-      formatDayOrUnknown(l10n, localeTag, litter.whelpingDate),
-      '${puppies.length}',
-    ]);
+  // A puppy count per litter is one query per litter, which is what the document
+  // needs and the row builder must not be doing.
+  final outcomes = <LitterOutcome>[];
+  for (final Litter litter in await _everyLitterOf(daos, animal.id)) {
+    outcomes.add(
+      LitterOutcome(
+        litter: litter,
+        puppies: (await daos.animals.findOffspring(litter.id)).length,
+      ),
+    );
   }
 
   final pedigree = await _ancestry(l10n, daos, animal, 1, <String>{animal.id});
 
-  // Every handover, not the newest one. `forAnimal` orders by `placed_date DESC`,
-  // and SQLite puts a null last in a descending sort, so reading only `first`
-  // dropped a handover whose date the breeder had not written yet — the one
-  // document that should say who has the dog now was saying it about the previous
-  // family instead. The contacts they name come from one read, not a query per
-  // row, in the order the app lists people in.
+  // Every handover, not the newest one — see [placementFacts]. The names they
+  // come from one read, not a query per row, in the order the app lists people
+  // in.
   final placements = await daos.placements.forAnimal(animal.id);
   final buyers = placements.isEmpty
       ? const <Buyer>[]
@@ -101,132 +95,61 @@ Future<Uint8List> animalPackPdf(
       kind: l10n.pdfTitle,
       generatedLine: l10n.pdfGenerated(formatDayFor(localeTag, generatedAt)),
     ),
-    pdfFacts(<(String, String)>[
-      (l10n.animalSpecies, animal.species),
-      (l10n.animalBreed, animal.breed ?? l10n.valueUnknown),
-      (l10n.animalSex, sexLabel(l10n, animal.sex)),
-      (l10n.animalStatus, statusLabel(l10n, animal.status)),
-      (
-        l10n.animalBirthDate,
-        formatDayOrUnknown(l10n, localeTag, animal.birthDate),
-      ),
-      if (animal.deathDate != null)
-        (
-          l10n.animalDeathDate,
-          formatDayOrUnknown(l10n, localeTag, animal.deathDate),
-        ),
-      (l10n.animalColor, animal.color ?? l10n.valueUnknown),
-      (l10n.animalRegistrationNo, animal.registrationNo ?? l10n.valueUnknown),
-      (l10n.animalRegistry, animal.registry ?? l10n.valueUnknown),
-      (l10n.animalMicrochip, animal.microchipId ?? l10n.valueUnknown),
-    ]),
+    pdfFacts(animalFacts(l10n, localeTag, animal)),
     ...pdfSection(
       l10n.pdfPedigree,
       pedigree.isEmpty ? <pw.Widget>[pw.Text(l10n.valueUnknown)] : pedigree,
     ),
-    ...pdfTable(
-      l10n,
-      l10n.recordsVaccinations,
-      <String>[
-        l10n.vaccinationName,
-        l10n.vaccinationGiven,
-        l10n.vaccinationNextDue,
-        l10n.vaccinationVet,
-      ],
-      <List<String>>[
-        for (final Vaccination dose in doses)
-          <String>[
-            dose.vaccineName,
-            formatDayOrUnknown(l10n, localeTag, dose.dateAdministered),
-            formatDayOrUnknown(l10n, localeTag, dose.nextDueDate),
-            dose.vetName ?? l10n.valueUnknown,
-          ],
-      ],
-    ),
-    ...pdfTable(
-      l10n,
-      l10n.recordsHealthTests,
-      <String>[
-        l10n.healthTestType,
-        l10n.healthTestResult,
-        l10n.healthTestDate,
-        l10n.healthTestValidUntil,
-      ],
-      <List<String>>[
-        for (final HealthTest test in screenings)
-          <String>[
-            test.testType,
-            test.result,
-            formatDayOrUnknown(l10n, localeTag, test.testDate),
-            formatDayOrUnknown(l10n, localeTag, test.validUntil),
-          ],
-      ],
-    ),
+    ...pdfTable(l10n, l10n.recordsVaccinations, <String>[
+      l10n.vaccinationName,
+      l10n.vaccinationGiven,
+      l10n.vaccinationNextDue,
+      l10n.vaccinationVet,
+    ], vaccinationRows(l10n, localeTag, doses)),
+    ...pdfTable(l10n, l10n.recordsHealthTests, <String>[
+      l10n.healthTestType,
+      l10n.healthTestResult,
+      l10n.healthTestDate,
+      l10n.healthTestValidUntil,
+    ], screeningRows(l10n, localeTag, screenings)),
     ...pdfTable(
       l10n,
       l10n.recordsWeights,
       <String>[l10n.weightMeasuredOn, l10n.weightKg],
-      <List<String>>[
-        for (final WeightEntry entry in weighIns)
-          <String>[
-            formatDayOrUnknown(l10n, localeTag, entry.measuredAt),
-            formatWeight(entry.weightGrams, kg: l10n.unitKg, g: l10n.unitGrams),
-          ],
-      ],
+      weighInRows(l10n, localeTag, weighIns),
       trailing: chart == null
           ? const <pw.Widget>[]
           : <pw.Widget>[pw.SizedBox(height: 8), chart],
     ),
-    ...pdfTable(
-      l10n,
-      l10n.recordsVisits,
-      <String>[l10n.visitDate, l10n.visitReason, l10n.visitOutcome],
-      <List<String>>[
-        for (final VetVisit visit in visits)
-          <String>[
-            formatDayOrUnknown(l10n, localeTag, visit.visitDate),
-            visit.reason ?? l10n.visitNoReason,
-            visit.outcome ?? l10n.valueUnknown,
-          ],
-      ],
-    ),
-    // What the breeder saw, in the buyer's document too: a symptom is the least
-    // verifiable line in this record and the one most likely to be left out of a
-    // paper summary, so it gets a table rather than a sentence in the notes.
-    ...pdfTable(
-      l10n,
-      l10n.recordsSymptoms,
-      <String>[
-        l10n.symptomName,
-        l10n.symptomObservedOn,
-        l10n.symptomSeverity,
-        l10n.symptomState,
-        l10n.animalNotes,
-      ],
-      <List<String>>[
-        for (final Symptom symptom in sightings)
-          <String>[
-            symptom.label,
-            formatDayOrUnknown(l10n, localeTag, symptom.observedAt),
-            severityLabel(l10n, symptom.severity),
-            symptom.ongoing ? l10n.symptomOngoing : l10n.symptomResolved,
-            symptom.note ?? l10n.valueUnknown,
-          ],
-      ],
-    ),
+    ...pdfTable(l10n, l10n.recordsVisits, <String>[
+      l10n.visitDate,
+      l10n.visitReason,
+      l10n.visitOutcome,
+    ], visitRows(l10n, localeTag, visits)),
+    ...pdfTable(l10n, l10n.recordsSymptoms, <String>[
+      l10n.symptomName,
+      l10n.symptomObservedOn,
+      l10n.symptomSeverity,
+      l10n.symptomState,
+      l10n.animalNotes,
+    ], symptomRows(l10n, localeTag, sightings)),
     ...pdfTable(l10n, l10n.pdfLitters, <String>[
       l10n.litterName,
       l10n.animalSex,
       l10n.litterWhelpingDate,
       l10n.pdfPuppies,
-    ], litterRows),
-    for (final placement in placements)
-      ..._placementBlock(
-        l10n,
-        localeTag,
-        placement,
-        buyerById(buyers, placement.buyerId),
-      ),
+    ], breedingRows(l10n, localeTag, animal.id, outcomes)),
+    for (final Placement placement in placements)
+      ...pdfSection(l10n.pdfPlacement, <pw.Widget>[
+        pdfFacts(
+          placementFacts(
+            l10n,
+            localeTag,
+            placement,
+            buyerById(buyers, placement.buyerId),
+          ),
+        ),
+      ]),
     if (animal.notes != null && animal.notes!.isNotEmpty)
       ...pdfSection(l10n.animalNotes, <pw.Widget>[pw.Text(animal.notes!)]),
     pw.SizedBox(height: 18),
@@ -251,43 +174,6 @@ Future<Uint8List> animalPackPdf(
 
   return document.save();
 }
-
-/// What one family took home, and who they are.
-///
-/// Its own function because a handover is now printed for *every* placement the
-/// animal has, and the buyer behind it has to be looked up once rather than once
-/// per line.
-List<pw.Widget> _placementBlock(
-  AppLocalizations l10n,
-  String localeTag,
-  Placement placement,
-  Buyer? buyer,
-) => pdfSection(l10n.pdfPlacement, <pw.Widget>[
-  pdfFacts(<(String, String)>[
-    (l10n.pdfBuyer, buyer?.name ?? l10n.valueUnknown),
-    if (buyer?.phone != null) (l10n.pdfPhone, buyer!.phone!),
-    if (buyer?.email != null) (l10n.pdfEmail, buyer!.email!),
-    // Where the family is. A health guarantee is enforced against a person at an
-    // address, and this line is the only trace of either in the document.
-    if (buyer?.countryCode case final String country when country.isNotEmpty)
-      (l10n.buyerCountryCode, country),
-    (
-      l10n.pdfPlacedOn,
-      formatDayOrUnknown(l10n, localeTag, placement.placedDate),
-    ),
-    (
-      l10n.pdfPrice,
-      formatPriceWithCurrency(
-        placement.price,
-        placement.currency,
-        unknown: l10n.valueUnknown,
-      ),
-    ),
-    if (placement.guaranteeTerms != null &&
-        placement.guaranteeTerms!.isNotEmpty)
-      (l10n.pdfGuarantee, placement.guaranteeTerms!),
-  ]),
-]);
 
 /// Weight against age — the one curve a puppy's owner reads off a list of
 /// numbers. Left out rather than drawn on an invented axis: without a birth date
