@@ -872,6 +872,37 @@ as "no buyer" instead of an error. Recorded as **D27**.
   real). The pass has not run: another app was being checked on the phone when the
   device was reached, so no input was sent and nothing was uninstalled.
 
+- **The same pass owes 3i through 3m too**, and these are facts a widget test
+  structurally cannot produce:
+  - **The app lock against a real keystore.** CI proves the digest ordering and the
+    refused-`change()` path; only a device proves the hardware-backed key exists,
+    survives an app kill, and clears on uninstall. A lock that silently never
+    engages on the phone is worse than no lock, because the breeder believes the
+    herd is private.
+  - **Every refusal sentence on a real keyboard, in Arabic and French** — the
+    lengthened delete sentence, the two litter date sentences, and the dose-due
+    sentence. A snackbar that truncates mid-word at a 6-inch width, or that
+    overflows and shows the ellipsis Flutter inserts, is a fact about the rendering
+    pipeline on this device, not about the string.
+  - **The language menu actually switching and persisting**, including whether the
+    restart lands on the chosen language rather than the system one.
+  - **The startup-failure screen.** CI can only build it with an injected throw; the
+    real question — what a corrupt or unreadable database file looks like on Android
+    and whether the screen is reachable and readable — needs a device with a file
+    system.
+  - **The date dialog's two modes, and its hint.** The new litter and dose tests
+    drive the *input* mode by tapping the pencil icon and typing, so the app now has
+    CI coverage for the path Flutter's own `parseCompactDate` handles — and that
+    parser hard-assumes `mm/dd/yyyy`, while this app's Arabic build shows the hint
+    `yyyy/mm/dd` and the French build `jj/mm/aaaa`. On a device with the Moroccan
+    Arabic keyboard, whether a breeder typing what the hint says gets the date they
+    typed is the open question, and it must be answered by watching the real thing,
+    not by reading Flutter's source again. The *calendar* mode is never driven in CI
+    at all; its month grid, year list, and swipe behaviour under Arabic RTL are
+    device-only evidence.
+  - Then the deletion of every row the pass created, and proof the herd is empty
+    again in both languages (`90-empty-en.png`, `91-empty-ar.png`).
+
 ## Stage 3d — The herd agenda *(CI green — 278 tests, run `37766939856`; device check queued with 3b/3c/3e/3f/3g)*
 
 Every screen so far answers "what does *this* animal need?". The question a
