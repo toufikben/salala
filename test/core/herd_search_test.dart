@@ -38,9 +38,16 @@ void main() {
       },
     );
 
-    test('the rounded square and the alef-maqsura fold too', () {
-      expect(normalizeForSearch('حمزة'), normalizeForSearch('حمزه'));
-      expect(normalizeForSearch('بنى'), normalizeForSearch('بنی'));
+    test('the rounded square and the two neighbours of a plain yeh fold too', () {
+      // Code points rather than literals, because `ى`, `ی` and `ي` are three
+      // shapes this test has to tell apart and a source file cannot show which
+      // one was actually typed. CI found the difference the hard way: the second
+      // of these is what a Persian-layout keyboard writes, and it was passing
+      // through unfolded, so a query in that shape missed the animal the ledger
+      // already had.
+      expect(normalizeForSearch('حم\u0629'), 'حم\u0647');
+      expect(normalizeForSearch('بن\u0649'), 'بن\u064A');
+      expect(normalizeForSearch('بن\u06CC'), 'بن\u064A');
     });
 
     test('a name typed with vowel marks matches the name without them', () {

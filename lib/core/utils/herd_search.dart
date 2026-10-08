@@ -24,6 +24,10 @@ final RegExp _arabicMarks = RegExp(
 
 /// The letters an Arabic keyboard offers in more than one shape, folded to the
 /// one shape a breeder searches with.
+///
+/// The last two are the same sound written by a different layout, and a ledger
+/// can hold either: `ى` is what the Arabic keyboard offers where `ي` was already
+/// typed, and `ی` arrives from the Persian layout a name can reach the phone on.
 const Map<String, String> _arabicForms = <String, String>{
   '\u0622': '\u0627', // آ → ا
   '\u0623': '\u0627', // أ → ا
@@ -32,6 +36,7 @@ const Map<String, String> _arabicForms = <String, String>{
   '\u0626': '\u064A', // ئ → ي
   '\u0629': '\u0647', // ة → ه
   '\u0649': '\u064A', // ى → ي
+  '\u06CC': '\u064A', // ی → ي
 };
 
 /// Anything that is neither a letter nor a digit, for the fields that are read off
