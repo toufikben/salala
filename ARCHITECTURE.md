@@ -172,6 +172,18 @@ last one needs a device:
   `MultiPage`'s `build` callback is synchronous and cannot await a database.
   The font it embeds and the compile-time switch that makes Arabic legible in it
   are D24.
+- `services/pdf_layout.dart` is that document's page furniture, shared: masthead,
+  section, table, facts grid, row, footer and the font asset constant. Two
+  documents restating a font size or the sentence for an empty section is a defect
+  someone finds on paper (D29).
+- `services/litter_pdf.dart` is the whelping record — one page for a whole litter:
+  the mating and its dates, the puppies with their newest weigh-in, every dose the
+  litter has had, and who took which puppy home. It is the record of an event
+  rather than of an animal, which is why it is not a second call to
+  `animal_pdf.dart`.
+- `core/utils/litter_rows.dart` decides what those tables say, as plain strings,
+  apart from any page. That split exists because a PDF cannot be read back in a
+  test: the words are CI-checkable here and only the layout is checked as bytes.
 
 Photos are deliberately not in a pack: `photo_path` is a path on *this* phone, so
 copying it would ship a broken reference — the PDF pack is where an image belongs.

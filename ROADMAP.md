@@ -853,18 +853,20 @@ as "no buyer" instead of an error. Recorded as **D27**.
 
 ### Queued next, in order
 
-- **One batched device pass** for 3b, 3c, 3d and 3e together — the rule the owner
+- **One batched device pass** for 3b, 3c, 3d, 3e **and 3f** together: the rule
+  the owner
   set is that the phone is checked after a suitable batch, not after every small
   addition. It owes: a buyer and a placement recorded, the PDF's buyer block read
   page by page in Arabic and English, a price in Latin digits, agenda rows for an
-  overdue dose — and then the removal of the test data already left in the real
+  overdue dose, the new whelping record opened as a page with its tables read
+  against the ledger — and then the removal of the test data already left in the real
   ledger. Prepared on 2026-10-08: the APK from the green run is downloaded, and the
   phone's database was pulled and read first (143,360 bytes, one animal — "Nala",
   test residue from the earlier stage, so the reinstall that wipes it costs nothing
   real). The pass has not run: another app was being checked on the phone when the
   device was reached, so no input was sent and nothing was uninstalled.
 
-## Stage 3d — The herd agenda *(CI green — 278 tests, run `37766939856`; device check queued with 3b/3c/3e)*
+## Stage 3d — The herd agenda *(CI green — 278 tests, run `37766939856`; device check queued with 3b/3c/3e/3f)*
 
 Every screen so far answers "what does *this* animal need?". The question a
 breeder starts the day with — what is overdue, and what is due in the next two
@@ -976,6 +978,42 @@ person keeps.
   can prove is still only the shape of the document: the text is drawn through the
   embedded font's glyph ids, so the words are the phone's job.
 
+
+## Stage 3f — The whelping record: one document for a whole litter *(pushed, CI pending)*
+
+Every page in the app answers for one animal. A whelping is one event with a dozen
+rows in it, and the breeder's question at the box — who is missing their first
+shot, who went home with whom — was a lap of the phone.
+
+- **`services/litter_pdf.dart`** writes it: the mating and its three dates, the
+  puppies with sex, birth day, status and newest weigh-in, every dose the litter
+  has had as one row per dose, and every handover with its buyer, day and price.
+  A round given to four puppies is four rows with the same vaccine on the same
+  day, and the name that is *not* there is the point of the table.
+- **The words live apart from the page** (new decision **D29**).
+  `core/utils/litter_rows.dart` turns rows into strings and is tested as text;
+  `services/pdf_layout.dart` holds the furniture both documents share — masthead,
+  section, table, facts, row, footer, the font constant — so neither can print an
+  empty section a different way from the other. The two gaps every record has got
+  one helper each: `formatDayOrUnknown`, `formatPriceWithCurrency`.
+- **It is the animal's pack that found the debt.** Pulling the furniture out left
+  `animal_pdf.dart` shorter and its own tables still inline; the first row builder
+  moves over when a third document needs its words, and that is written down as a
+  cost rather than smoothed over.
+- **One action on the litter's page**, next to delete, sharing the animal pack's
+  shape: font read on tap, bytes to the share sheet, one snackbar, nothing that
+  interrupts the ledger.
+- 18 new tests: 10 in `test/core/litter_rows_test.dart` for the words (the parents
+  and dates in order, a missing sire named as missing rather than blank, the
+  newest weigh-in only, a puppy with no weigh-in, one row per dose with the puppy
+  first, the skipped puppy absent by construction, money printed as `2500 MAD` and
+  as `250.5` with no code, a handover whose buyer was deleted, an empty litter, and
+  Arabic rows keeping Latin digits), 5 in `test/services/litter_pdf_test.dart` for
+  the document (a full whelping, a litter registered before any puppy, the Arabic
+  page, an id that answers to nothing refused rather than printed blank, and a
+  twelve-puppy litter), 3 in `test/core/money_test.dart` for the shared currency
+  helper. What none of them can prove is still the same thing the phone owns: that
+  the page reads correctly on paper.
 
 ## Stage 4 — Distribution
 

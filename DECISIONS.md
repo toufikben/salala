@@ -602,3 +602,42 @@ range scan rather than a new one. And an animal with something to book is named
 twice on the home screen, by its row and by its card: that is the block working,
 and it is why a test on that screen selects `AnimalCard`'s row rather than counting
 a name.
+
+## D29 — A document's words are chosen apart from its page
+
+**Decision.** The PDF services lay out; they do not decide what a line says. The
+text goes through two shared halves: the page furniture in
+`lib/services/pdf_layout.dart` (masthead, section, table, facts, row, footer, and
+the font asset constant) and the rows themselves in a pure function beside the
+model they describe — `lib/core/utils/litter_rows.dart` for the whelping record.
+The two gaps every record has are also shared: `formatDayOrUnknown` in
+`core/utils/date_utils.dart` and `formatPriceWithCurrency` in
+`core/utils/money.dart`.
+
+**Why.** This app has two verifiers: GitHub CI and one phone. A PDF cannot be read
+back by either from the repository — `pdf` draws through the embedded font's glyph
+ids, so a test over the bytes can prove only that a document came out. That made
+every wording bug in Stage 3e (the handover that printed the previous family, the
+price written as `2500.00 `, the country that never reached the page) a device
+discovery, and the device is the scarcest thing here. Strings chosen apart from the
+page are strings CI can assert. The shared furniture is the same argument in
+layout form: two documents that answer "nothing recorded" differently, or disagree
+about what an empty table prints, produce paper that reads as two products.
+
+**How to apply.** A new document calls `pdfMasthead`, `pdfSection`, `pdfTable`,
+`pdfFacts`, `pdfFooter` and takes `pdfFontAsset` — it does not restate a font size,
+a border or the sentence for an empty section. Its rows come from a pure function
+that takes `AppLocalizations` and a locale tag (never a `BuildContext`: the page is
+built after the reads, which is why `formatDayFor` sits beside `formatDay`
+), and that function is tested as text before any bytes exist. Dates and
+money go through the two helpers above so a missing value is always the app's own
+word, never a blank the reader has to interpret.
+
+**Cost, stated.** The animal's own pack still builds most of its tables inline — it
+grew section by section and forty tests are pinned to that shape, so this stage
+moved its furniture and its two gap helpers out, and left its rows where they are.
+Two shapes for one kind of document is real debt, and the rule for paying it down is
+to move a row builder the first time a second document needs its words. The row
+functions also take l10n and a locale tag everywhere, which is more parameters than
+a screen would pass, and the fixtures exist twice: once as text in
+`test/core/litter_rows_test.dart`, once as rows in `test/services/litter_pdf_test.dart`.
