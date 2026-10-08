@@ -192,7 +192,7 @@ void main() {
       // inside one transaction, so a refusal on that first row means three
       // animals named "A litter 1..3" were never created either. Back on the tab,
       // the whelping is not there and neither is a single puppy.
-      await tester.tap(find.widgetWithText(TextButton, 'Cancel'));
+      await tester.tap(find.widgetWithText(OutlinedButton, 'Cancel'));
       await settleRealIo(tester);
 
       expect(find.text('A litter'), findsNothing);
