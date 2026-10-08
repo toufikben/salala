@@ -669,15 +669,15 @@ folds none of that, and a search that misses "أسود" because the query was ty
 The first run of these tests proved the point twice over: `ى`, `ی` and `ي` print
 almost identically in a source file, one of the three was missing from the fold
 table, and the test that should have said so was itself written with the wrong
-shape in it. Anything in this file's tests that has to tell look-alike letters
-apart is written as a code point for that reason.
+shape in it. Anything in `test/core/herd_search_test.dart` that has to tell
+look-alike letters apart is written as a code point for that reason.
 
 **How to apply.** `normalizeForSearch` is idempotent, so a caller may normalise a
 stored field once rather than once per keystroke and hope. A field becomes
 searchable by adding it to `_score` with a strength and pinning it in
 `test/core/herd_search_test.dart`; the widget never learns about it. The order is
 name exact, name prefix, then a name substring tied with an exact registration or
-chip, then a partial number, then breed — a name is what someone types, while a
+chip, then a partial number, then breed or note — a name is what someone types, while a
 number is what settles which dog is on the table, and a partial number is also how
 two animals answer a query that was one digit. The comparator carries the original
 index because `List.sort` is not stable, and cards that rearrange two equal matches

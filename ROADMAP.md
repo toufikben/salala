@@ -853,13 +853,19 @@ as "no buyer" instead of an error. Recorded as **D27**.
 
 ### Queued next, in order
 
-- **One batched device pass** for 3b, 3c, 3d, 3e, **3f and 3g** together: the rule
+- **One batched device pass** for 3b, 3c, 3d, 3e, **3f, 3g and 3h** together: the rule
   the owner
   set is that the phone is checked after a suitable batch, not after every small
   addition. It owes: a buyer and a placement recorded, the PDF's buyer block read
   page by page in Arabic and English, a price in Latin digits, agenda rows for an
   overdue dose, the new whelping record opened as a page with its tables read
-  against the ledger, and the buyer's pack read once more now that its wording is asserted in code rather than on paper — and then the removal of the test data already left in the real
+  against the ledger, the buyer's pack read once more now that its wording is
+  asserted in code rather than on paper, and the search box typed into on the real
+  keyboard — that a Moroccan Arabic layout actually writes the shapes the fold table
+  expects is a fact about keyboards, and CI can only prove what the app does with
+  whatever arrives. Whether the box, the hint and the filtered list survive a
+  software keyboard covering half of a 6-inch screen is the same kind of fact, and
+  then the removal of the test data already left in the real
   ledger. Prepared on 2026-10-08: the APK from the green run is downloaded, and the
   phone's database was pulled and read first (143,360 bytes, one animal — "Nala",
   test residue from the earlier stage, so the reinstall that wipes it costs nothing
@@ -1061,6 +1067,53 @@ a human holding paper, when a test could have held the same line.
 - **What the phone still owns has not moved**: whether the page these words land on
   reads correctly on paper, in both directions, with the growth curve in the right
   place.
+
+## Stage 3h — Finding one animal in a hundred, by anything remembered *(CI green — 333 tests, run `37777369063`; device check queued with 3b/3c/3d/3e/3f/3g)*
+
+A card list answers "what do I own?" in the order the database returns it. It does
+not answer "which one was the limping one, microchip 984…", and a hundred-long
+scroll is the reason a breeder with real numbers stops trusting an offline app.
+
+- **A box on the home screen, and no new query.** `core/utils/herd_search.dart`
+  filters the list `animalsProvider` already returned: no `LIKE` per keystroke,
+  because a search that ran its own read would be a database call inside a lazy
+  `ListView` (D27) and would make two herds — the rows SQLite found and the rows the
+  widget kept. Recorded as **D30**.
+- **Normalisation is the whole design.** Tashkeel and tatweel go; أ آ إ become ا, ؤ
+  becomes و, ئ and ی become ي, ة becomes ه, ى becomes ي; Latin accents fold to their
+  letter rather than being deleted (deleting them turns "Zoé" into "zo" and loses
+  the animal); spaces and dashes go, because a chip is read off a sticker. The
+  result is idempotent, so a stored field can be normalised once.
+- **Ranking, not relevance.** Name exact, name prefix, then a name substring tied
+  with an exact number, then a partial number, then breed or note. Ties keep the
+  order the list was in, and the comparator carries the original index for that
+  reason — `List.sort` is not stable, and cards that swap between keystrokes look
+  broken even when the set is right.
+- **The herd's agenda goes quiet during a search** (D28). It answers for the herd;
+  above two filtered cards it would read as a to-do list about them. The corner
+  "Add animal" button stays: "nothing matches" beside it is the app's whole answer
+  to a dog nobody registered yet.
+- **23 new tests** — 18 over the rules in `test/core/herd_search_test.dart`, 5 over
+  the box in `test/presentation/herd_search_screen_test.dart`, including the Arabic
+  one that has to be typed on a phone to mean anything.
+- **What the three CI passes on this stage said.** Run `37775340717` stopped in the
+  analyzer with two infos — a null check written where the language has a null-aware
+  element — and no test ran at all. Run `37775707046` analysed clean, then failed one
+  case out of 331, and the case was real: ى (U+0649), ی (U+06CC) and ي (U+064A) are
+  three shapes that print almost identically in a source file, the Persian one was
+  missing from the fold table, and the test written to catch that had the wrong shape
+  in its own literal. Run `37776506873` came back green at 331 after the fold and
+  after every look-alike letter in that file became a code point, and `37777369063`
+  green at 333 after the note search.
+
+- **One finding the phone pass has to judge, not this stage.** A card shows a name,
+  its breed line and its birth date. When the search answered on a chip number or a
+  note, the card that comes back therefore shows neither of the two things that
+  matched, and the breeder has to open it to check they were not handed the wrong
+  dog. Whether the matched reason belongs *on* the card while a query is up — and in
+  which of the three languages it fits beside a 15-digit chip — is a judgement about
+  a real screen at thumb's reach, so it is listed with the device pass rather than
+  shipped on the strength of a test.
 
 ## Stage 4 — Distribution
 
