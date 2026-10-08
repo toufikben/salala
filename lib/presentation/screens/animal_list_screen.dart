@@ -7,6 +7,7 @@ import '../../core/l10n/triage_labels.dart';
 import '../../core/router/app_router.dart';
 import '../../core/utils/agenda.dart';
 import '../../core/utils/date_utils.dart';
+import '../../core/utils/herd_search.dart';
 import '../../data/models/animal.dart';
 import '../../data/models/vaccination.dart';
 import '../../services/reminder_resync.dart';
@@ -23,12 +24,31 @@ class AnimalListScreen extends ConsumerStatefulWidget {
 }
 
 class _AnimalListScreenState extends ConsumerState<AnimalListScreen> {
+  /// What is in the search box, kept here and nowhere else.
+  ///
+  /// The herd is already in memory for the list, so a query filters that list
+  /// instead of asking the database for a second one — the same reason the agenda
+  /// is passed down as a value (D27). It stays in the screen rather than a
+  /// provider because leaving the screen and coming back should show the whole
+  /// herd again, not the last word typed three days ago.
+  String _query = '';
+
+  /// Owns the typed text so the clear button can empty the box as well as the
+  /// list below it.
+  final TextEditingController _search = TextEditingController();
+
   @override
   void initState() {
     super.initState();
     // After the frame, not inside it: the rebuild talks to the platform, and
     // the ledger must not wait on an alarm manager to show a breeder their dogs.
     WidgetsBinding.instance.addPostFrameCallback((_) => _resyncReminders());
+  }
+
+  @override
+  void dispose() {
+    _search.dispose();
+    super.dispose();
   }
 
   Future<void> _resyncReminders() async {
@@ -55,13 +75,48 @@ class _AnimalListScreenState extends ConsumerState<AnimalListScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final animals = ref.watch(animalsProvider);
+    // Read here, once per rebuild: the field and the list below are filtered by
+    // the same value, so a `setState` that changed one would have to be caught by
+    // the other anyway, and a widget that read the controller itself would be a
+    // second source of truth for the same text.
+    final String query = _query;
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.navAnimals)),
+      appBar: AppBar(
+        title: Text(l10n.navAnimals),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(56),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+            child: TextField(
+              controller: _search,
+              // Nothing to navigate to: the answer is the list already on screen,
+              // so the keyboard's own button only closes itself.
+              textInputAction: TextInputAction.done,
+              onChanged: (value) => setState(() => _query = value),
+              decoration: InputDecoration(
+                hintText: l10n.homeSearchHint,
+                isDense: true,
+                prefixIcon: const Icon(Icons.search),
+                suffixIcon: query.isEmpty
+                    ? null
+                    : IconButton(
+                        icon: const Icon(Icons.close),
+                        onPressed: () {
+                          _search.clear();
+                          setState(() => _query = '');
+                        },
+                      ),
+              ),
+            ),
+          ),
+        ),
+      ),
       bottomNavigationBar: const SalalaNavBar(index: 0),
       // The empty herd carries its own "Add animal" button in the middle of the
       // screen; a second affordance for the same action at the thumb corner only
-      // competes with it.
+      // competes with it. During a search there is no such middle button, and
+      // "nothing matches" plus this FAB is the app saying: register that one.
       floatingActionButton: (animals.value?.isNotEmpty ?? false)
           ? FloatingActionButton.extended(
               onPressed: () => context.push(AppPaths.newAnimal),
@@ -74,13 +129,20 @@ class _AnimalListScreenState extends ConsumerState<AnimalListScreen> {
         error: (error, stack) => _ErrorBody(
           onRetry: () => ref.read(animalsProvider.notifier).refresh(),
         ),
-        data: (list) => list.isEmpty
-            ? const _EmptyBody()
-            : _AnimalGroups(
-                animals: list,
-                agenda: ref.watch(agendaDosesProvider),
-                onAgendaRetry: () => ref.invalidate(agendaDosesProvider),
-              ),
+        data: (list) {
+          if (list.isEmpty) return const _EmptyBody();
+          final matches = searchHerd(list, query);
+          if (matches.isEmpty) return _NoMatches(query: query);
+          return _AnimalGroups(
+            animals: matches,
+            // The agenda answers for the herd (D28), not for the matches, and
+            // showing the whole herd's to-do list above a filtered handful of
+            // cards reads as if those animals were the ones with the doses due.
+            showAgenda: query.isEmpty,
+            agenda: ref.watch(agendaDosesProvider),
+            onAgendaRetry: () => ref.invalidate(agendaDosesProvider),
+          );
+        },
       ),
     );
   }
@@ -95,11 +157,13 @@ class _AnimalListScreenState extends ConsumerState<AnimalListScreen> {
 class _AnimalGroups extends StatelessWidget {
   const _AnimalGroups({
     required this.animals,
+    required this.showAgenda,
     required this.agenda,
     required this.onAgendaRetry,
   });
 
   final List<Animal> animals;
+  final bool showAgenda;
   final AsyncValue<List<Vaccination>> agenda;
   final VoidCallback onAgendaRetry;
 
@@ -112,7 +176,8 @@ class _AnimalGroups extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.fromLTRB(8, 8, 8, 96),
       children: <Widget>[
-        _HerdAgenda(animals: animals, agenda: agenda, onRetry: onAgendaRetry),
+        if (showAgenda)
+          _HerdAgenda(animals: animals, agenda: agenda, onRetry: onAgendaRetry),
         if (breeding.isNotEmpty) ...<Widget>[
           _SectionHeader(l10n.homeBreedingStock),
           for (final animal in breeding) AnimalCard(animal: animal),
@@ -244,6 +309,39 @@ class _SectionHeader extends StatelessWidget {
     padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
     child: Text(title, style: Theme.of(context).textTheme.titleSmall),
   );
+}
+
+/// Nothing in the herd answers that query.
+///
+/// The word is printed back: "no results" on its own cannot be told apart from a
+/// typo the breeder has already forgotten typing, and the letter an Arabic
+/// keyboard put in the wrong place is invisible until it is quoted.
+class _NoMatches extends StatelessWidget {
+  const _NoMatches({required this.query});
+
+  final String query;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Icon(
+              Icons.search_off,
+              size: 48,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            const SizedBox(height: 16),
+            Text(l10n.homeNoMatches(query), textAlign: TextAlign.center),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 class _EmptyBody extends StatelessWidget {

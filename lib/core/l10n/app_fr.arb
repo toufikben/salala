@@ -10,6 +10,15 @@
   "homeAddAnimal": "Ajouter un animal",
   "homeBreedingStock": "Reproduction",
   "homeAllAnimals": "Tous les animaux",
+  "homeSearchHint": "Rechercher par nom, numéro ou puce",
+  "homeNoMatches": "Aucun résultat pour « {query} »",
+  "@homeNoMatches": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
   "homeAnimalCount": "{count, plural, =0{Aucun animal} =1{1 animal} other{{count} animaux}}",
 
   "animalName": "Nom",

@@ -154,6 +154,18 @@ abstract class AppLocalizations {
   /// **'All animals'**
   String get homeAllAnimals;
 
+  /// No description provided for @homeSearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search by name, number or chip'**
+  String get homeSearchHint;
+
+  /// No description provided for @homeNoMatches.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing matches “{query}”'**
+  String homeNoMatches(String query);
+
   /// No description provided for @homeAnimalCount.
   ///
   /// In en, this message translates to:

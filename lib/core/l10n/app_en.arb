@@ -13,6 +13,15 @@
   "homeAddAnimal": "Add animal",
   "homeBreedingStock": "Breeding stock",
   "homeAllAnimals": "All animals",
+  "homeSearchHint": "Search by name, number or chip",
+  "homeNoMatches": "Nothing matches “{query}”",
+  "@homeNoMatches": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
   "homeAnimalCount": "{count, plural, =0{No animals} =1{1 animal} other{{count} animals}}",
   "@homeAnimalCount": {
     "placeholders": {

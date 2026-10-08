@@ -38,6 +38,14 @@ class AppLocalizationsFr extends AppLocalizations {
   String get homeAllAnimals => 'Tous les animaux';
 
   @override
+  String get homeSearchHint => 'Rechercher par nom, numéro ou puce';
+
+  @override
+  String homeNoMatches(String query) {
+    return 'Aucun résultat pour « $query »';
+  }
+
+  @override
   String homeAnimalCount(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

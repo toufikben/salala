@@ -10,6 +10,15 @@
   "homeAddAnimal": "إضافة حيوان",
   "homeBreedingStock": "حيوانات التربية",
   "homeAllAnimals": "كل الحيوانات",
+  "homeSearchHint": "ابحث بالاسم أو الرقم أو الشريحة",
+  "homeNoMatches": "لا نتيجة تطابق « {query} »",
+  "@homeNoMatches": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
   "homeAnimalCount": "{count, plural, =0{لا توجد حيوانات} =1{حيوان واحد} =2{حيوانان} few{{count} حيوانات} many{{count} حيوانًا} other{{count} حيوان}}",
 
   "animalName": "الاسم",
