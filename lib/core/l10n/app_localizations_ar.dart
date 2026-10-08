@@ -430,6 +430,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get recordDeleteFailed => 'لم يُحذف هذا السجل. هو ما زال في مكانه.';
 
   @override
+  String get recordDateBeforeBirth =>
+      'هذا التاريخ يسبق تاريخ ميلاد هذا الحيوان.';
+
+  @override
   String get vaccinationAdd => 'تطعيم جديد';
 
   @override

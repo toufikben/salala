@@ -838,6 +838,12 @@ abstract class AppLocalizations {
   /// **'This could not be deleted. The record is still there.'**
   String get recordDeleteFailed;
 
+  /// No description provided for @recordDateBeforeBirth.
+  ///
+  /// In en, this message translates to:
+  /// **'This date is before this animal was born.'**
+  String get recordDateBeforeBirth;
+
   /// No description provided for @vaccinationAdd.
   ///
   /// In en, this message translates to:

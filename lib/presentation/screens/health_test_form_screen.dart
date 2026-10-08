@@ -99,6 +99,14 @@ class _HealthTestFormScreenState extends ConsumerState<HealthTestFormScreen> {
 
   Future<void> _save() async {
     if (!_formKey.currentState!.validate() || _saving) return;
+    if (refuseRecordBeforeBirth(
+      context,
+      ref,
+      animalId: widget.animalId,
+      recordMs: _testDate,
+    )) {
+      return;
+    }
     setState(() => _saving = true);
 
     final base =

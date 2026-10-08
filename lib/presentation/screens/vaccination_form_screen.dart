@@ -103,6 +103,14 @@ class _VaccinationFormScreenState extends ConsumerState<VaccinationFormScreen> {
 
   Future<void> _save() async {
     if (!_formKey.currentState!.validate() || _saving) return;
+    if (refuseRecordBeforeBirth(
+      context,
+      ref,
+      animalId: widget.animalId,
+      recordMs: _administered,
+    )) {
+      return;
+    }
     if (doseDatesContradict(
       administeredMs: _administered,
       nextDueMs: _nextDue,

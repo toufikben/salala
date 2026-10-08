@@ -91,6 +91,14 @@ class _SymptomDialogState extends ConsumerState<SymptomDialog> {
 
   Future<void> _save() async {
     if (!_formKey.currentState!.validate() || _saving) return;
+    if (refuseRecordBeforeBirth(
+      context,
+      ref,
+      animalId: widget.animalId,
+      recordMs: _observedAt,
+    )) {
+      return;
+    }
     setState(() => _saving = true);
 
     final existing = widget.existing;

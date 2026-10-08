@@ -161,6 +161,7 @@
   "recordDeleteTitle": "حذف هذا السجل؟",
   "recordSaveFailed": "لم يُحفظ هذا السجل. لم يُكتب شيء.",
   "recordDeleteFailed": "لم يُحذف هذا السجل. هو ما زال في مكانه.",
+  "recordDateBeforeBirth": "هذا التاريخ يسبق تاريخ ميلاد هذا الحيوان.",
 
   "vaccinationAdd": "تطعيم جديد",
   "vaccinationAddTitle": "تسجيل تطعيم",

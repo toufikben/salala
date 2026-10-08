@@ -17,6 +17,7 @@ import 'package:salala/data/models/vet_visit.dart';
 import 'package:salala/data/models/weight_entry.dart';
 import 'package:salala/presentation/providers/app_providers.dart';
 import 'package:salala/presentation/providers/triage_providers.dart';
+import 'package:salala/presentation/widgets/date_tile.dart';
 import 'package:salala/services/app_lock_service.dart';
 import 'package:salala/services/reminder_scheduler.dart';
 import 'package:sqflite/sqflite.dart';
@@ -394,4 +395,68 @@ Future<void> settleRefusal(WidgetTester tester) async {
   }
   await tester.pump();
   await tester.pump(const Duration(milliseconds: 120));
+}
+
+/// A date typed into the picker rather than tapped on its calendar.
+///
+/// Any test that cares what a form does with a date has to go through this
+/// dialog: the calendar's cells are numbered by whatever month the run falls in,
+/// so tapping a day cannot express "the third of January" on a machine whose
+/// today is unknown. The dialog's input mode can. It parses `mm/dd/yyyy`,
+/// because `MaterialLocalizations.parseCompactDate`
+/// (material_localizations.dart:904) splits the text on `/` with that order
+/// written down as an assumption, and a widget test's locale is `en_US`, where
+/// the help text above the field says the same thing. Both halves of that pair
+/// matter — the app's Arabic and French builds show a different order than the
+/// parser accepts, which is the phone's to check and not this runner's.
+///
+/// [scope] is the screen or dialog that owns the tile. A form with three dates
+/// needs the tile's index; a test that leaves the scope out finds whichever
+/// `DateTile` the widget tree happens to expose first, which is not the one it
+/// means to set.
+Future<void> typeDateIntoPicker(
+  WidgetTester tester, {
+  required Type scope,
+  required int tile,
+  required String usDay,
+}) async {
+  final field = find
+      .descendant(of: find.byType(scope), matching: find.byType(DateTile))
+      .at(tile);
+  await tester.ensureVisible(field);
+  await tester.pumpAndSettle();
+  await tester.tap(field);
+  await tester.pumpAndSettle();
+  await tester.tap(
+    find.descendant(
+      of: find.byType(DatePickerDialog),
+      matching: find.byIcon(Icons.edit_outlined),
+    ),
+  );
+  await tester.pumpAndSettle();
+  await tester.enterText(
+    find.descendant(
+      of: find.byType(DatePickerDialog),
+      matching: find.byType(TextFormField),
+    ),
+    usDay,
+  );
+  await tester.pumpAndSettle();
+  await tester.tap(
+    find.descendant(
+      of: find.byType(DatePickerDialog),
+      matching: find.widgetWithText(TextButton, 'OK'),
+    ),
+  );
+  await tester.pumpAndSettle();
+}
+
+/// The same day in the order the picker's input mode parses.
+///
+/// Written from a timestamp instead of typed as a literal, so a test that means
+/// "sixteen months before the run's today" stays true on a runner in 2031.
+String usDay(int ms) {
+  final day = DateTime.fromMillisecondsSinceEpoch(ms);
+  String two(int value) => value.toString().padLeft(2, '0');
+  return '${two(day.month)}/${two(day.day)}/${day.year}';
 }

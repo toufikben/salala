@@ -434,6 +434,10 @@ class AppLocalizationsFr extends AppLocalizations {
       'Suppression impossible. Cet enregistrement est toujours là.';
 
   @override
+  String get recordDateBeforeBirth =>
+      'Cette date est antérieure à la naissance de cet animal.';
+
+  @override
   String get vaccinationAdd => 'Ajouter une vaccination';
 
   @override

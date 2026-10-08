@@ -3,7 +3,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:salala/data/models/animal.dart';
 import 'package:salala/presentation/screens/litter_form_screen.dart';
 import 'package:salala/presentation/widgets/animal_card.dart';
-import 'package:salala/presentation/widgets/date_tile.dart';
 
 import '../helpers/pump_app.dart';
 
@@ -42,57 +41,6 @@ Future<void> _pickFrom(WidgetTester tester, Finder field, String option) async {
   await tester.ensureVisible(item);
   await tester.pumpAndSettle();
   await tester.tap(item);
-  await tester.pumpAndSettle();
-}
-
-/// A date typed into the picker rather than tapped on its calendar.
-///
-/// The litter form has three dates and no other way of learning one, so a test
-/// about what it does with them has to go through the dialog. The calendar's
-/// cells are numbered by whatever month the run falls in, so this uses the
-/// dialog's input mode instead: it parses `mm/dd/yyyy`, because
-/// `MaterialLocalizations.parseCompactDate` (material_localizations.dart:904)
-/// splits the text on `/` with that order written down as an assumption, and a
-/// widget test's locale is `en_US`, where the help text above the field says the
-/// same thing. Both halves of that pair matter — the app's Arabic and French
-/// builds show a different order than the parser accepts, which is the phone's
-/// to check, not this runner's.
-Future<void> _typeDate(
-  WidgetTester tester, {
-  required int tile,
-  required String usDay,
-}) async {
-  final field = find
-      .descendant(
-        of: find.byType(LitterFormScreen),
-        matching: find.byType(DateTile),
-      )
-      .at(tile);
-  await tester.ensureVisible(field);
-  await tester.pumpAndSettle();
-  await tester.tap(field);
-  await tester.pumpAndSettle();
-  await tester.tap(
-    find.descendant(
-      of: find.byType(DatePickerDialog),
-      matching: find.byIcon(Icons.edit_outlined),
-    ),
-  );
-  await tester.pumpAndSettle();
-  await tester.enterText(
-    find.descendant(
-      of: find.byType(DatePickerDialog),
-      matching: find.byType(TextFormField),
-    ),
-    usDay,
-  );
-  await tester.pumpAndSettle();
-  await tester.tap(
-    find.descendant(
-      of: find.byType(DatePickerDialog),
-      matching: find.widgetWithText(TextButton, 'OK'),
-    ),
-  );
   await tester.pumpAndSettle();
 }
 
@@ -291,8 +239,18 @@ void main() {
       );
       await _openLittersTab(tester);
       await _fillAroundDates(tester);
-      await _typeDate(tester, tile: 0, usDay: '06/01/2026');
-      await _typeDate(tester, tile: 1, usDay: '01/01/2026');
+      await typeDateIntoPicker(
+        tester,
+        scope: LitterFormScreen,
+        tile: 0,
+        usDay: '06/01/2026',
+      );
+      await typeDateIntoPicker(
+        tester,
+        scope: LitterFormScreen,
+        tile: 1,
+        usDay: '01/01/2026',
+      );
 
       await tapSaveAndGetAnswer(tester);
 
@@ -343,9 +301,24 @@ void main() {
       );
       await _openLittersTab(tester);
       await _fillAroundDates(tester);
-      await _typeDate(tester, tile: 0, usDay: '01/01/2026');
-      await _typeDate(tester, tile: 1, usDay: '03/01/2026');
-      await _typeDate(tester, tile: 2, usDay: '01/01/2026');
+      await typeDateIntoPicker(
+        tester,
+        scope: LitterFormScreen,
+        tile: 0,
+        usDay: '01/01/2026',
+      );
+      await typeDateIntoPicker(
+        tester,
+        scope: LitterFormScreen,
+        tile: 1,
+        usDay: '03/01/2026',
+      );
+      await typeDateIntoPicker(
+        tester,
+        scope: LitterFormScreen,
+        tile: 2,
+        usDay: '01/01/2026',
+      );
 
       await tapSaveAndGetAnswer(tester);
 
@@ -374,9 +347,24 @@ void main() {
     );
     await _openLittersTab(tester);
     await _fillAroundDates(tester);
-    await _typeDate(tester, tile: 0, usDay: '01/01/2026');
-    await _typeDate(tester, tile: 1, usDay: '03/01/2026');
-    await _typeDate(tester, tile: 2, usDay: '05/01/2026');
+    await typeDateIntoPicker(
+      tester,
+      scope: LitterFormScreen,
+      tile: 0,
+      usDay: '01/01/2026',
+    );
+    await typeDateIntoPicker(
+      tester,
+      scope: LitterFormScreen,
+      tile: 1,
+      usDay: '03/01/2026',
+    );
+    await typeDateIntoPicker(
+      tester,
+      scope: LitterFormScreen,
+      tile: 2,
+      usDay: '05/01/2026',
+    );
 
     final save = find.widgetWithText(FilledButton, 'Save');
     await tester.ensureVisible(save);

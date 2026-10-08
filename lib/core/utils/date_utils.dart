@@ -97,13 +97,12 @@ enum LitterDateProblem { none, whelpingBeforeMating, weaningBeforeWhelping }
 /// Which story a whelping's dates tell, if any that cannot have happened: a
 /// birth before the mating it came from, or a weaning before the litter was born.
 ///
-/// These are the only date pairs the app refuses, and they are refused because
-/// the ledger is read back through them: a litter's PDF prints the mating and
-/// the whelping side by side, and every puppy's birthday is the whelping date,
-/// so a slipped pair does not sit unnoticed — it becomes the herd's age
-/// arithmetic. A missing date is not a contradiction, and two dates on the same
-/// day are not one either: the picker is a day picker, and a mating recorded on
-/// the whelping day is imprecise rather than impossible.
+/// Refused because the ledger is read back through them: a litter's PDF prints
+/// the mating and the whelping side by side, and every puppy's birthday is the
+/// whelping date, so a slipped pair does not sit unnoticed — it becomes the
+/// herd's age arithmetic. A missing date is not a contradiction, and two dates
+/// on the same day are not one either: the picker is a day picker, and a mating
+/// recorded on the whelping day is imprecise rather than impossible.
 LitterDateProblem litterDateProblem({
   required int? matingDateMs,
   required int? whelpingDateMs,
@@ -127,6 +126,28 @@ bool doseDatesContradict({
   required int? administeredMs,
   required int? nextDueMs,
 }) => _isDayBefore(nextDueMs, administeredMs);
+
+/// A dated fact about one animal, stamped before that animal existed.
+///
+/// Every date in this app is picked from a window measured back from today —
+/// five years for a weigh-in, fifteen for a symptom, a test, a visit — and the
+/// window has to be that wide, because a breeder moving a paper ledger in needs
+/// to reach 2011. So the picker can land on a day before the animal was born,
+/// and nothing else notices: the triage rules read the *age* of a sign, so a
+/// symptom dated three years back keeps a vomiting puppy off the alarm; a
+/// weigh-in dated before birth plots growth on days that never happened; a dose
+/// dated there books its booster against an animal that was not alive. The
+/// failure is a mistyped year, and the year is the field a mistype lands on
+/// hardest because it is the one the picker scrolls rather than taps.
+///
+/// Checked at the form and not in the dao for the reason **D36** gives for the
+/// litter pair: the transfer pack restore writes these same rows through the
+/// same dao, and it has to stay permissive — a pack from a paper ledger can
+/// legitimately carry a birth date the breeder is still correcting, and a
+/// restore that refuses the whole transaction naming no field is the failure
+/// D36 was written to avoid.
+bool recordPrecedesBirth({required int? recordMs, required int? birthMs}) =>
+    _isDayBefore(recordMs, birthMs);
 
 bool _isDayBefore(int? earlierMs, int? laterMs) {
   if (earlierMs == null || laterMs == null) return false;

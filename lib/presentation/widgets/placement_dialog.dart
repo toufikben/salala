@@ -126,6 +126,14 @@ class _PlacementDialogState extends ConsumerState<PlacementDialog> {
 
   Future<void> _save() async {
     if (!_formKey.currentState!.validate() || _saving) return;
+    if (refuseRecordBeforeBirth(
+      context,
+      ref,
+      animalId: widget.animalId,
+      recordMs: _placedDate,
+    )) {
+      return;
+    }
     setState(() => _saving = true);
 
     final existing = widget.existing;

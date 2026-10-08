@@ -336,4 +336,70 @@ void main() {
       expect(find.text('Act now'), findsOneWidget);
     },
   );
+
+  testWidgets(
+    'a sighting dated before the animal was born is refused, and the same '
+    'dialog on a day after the birth does reach the ledger',
+    (tester) async {
+      _usePhoneViewport(tester);
+      // Relative to the run's today on both sides: the sighting has to sit
+      // inside the picker's fifteen-year window and still be before the birth,
+      // and a fixed pair of dates stops satisfying both as the years pass.
+      await pumpSalala(
+        tester,
+        seed: <Animal>[_nala().copyWith(birthDate: _daysAgo(400))],
+        beforeLaunch: refuseWritesTo('symptoms'),
+      );
+      await _openNala(tester);
+      await _scrollTo(tester, find.text('Symptoms'));
+
+      await _tap(tester, find.widgetWithText(TextButton, 'Add symptom'));
+      await tester.enterText(
+        find.widgetWithText(TextFormField, 'Symptom'),
+        'Vomiting',
+      );
+      await typeDateIntoPicker(
+        tester,
+        scope: AlertDialog,
+        tile: 0,
+        usDay: usDay(_daysAgo(500)),
+      );
+
+      await tapSaveAndGetAnswer(tester, dialogTitle: 'Log a symptom');
+
+      expect(
+        find.text('This date is before this animal was born.'),
+        findsOneWidget,
+      );
+      expect(
+        find.text('This could not be saved. Nothing was written.'),
+        findsNothing,
+        reason:
+            'the insert trigger is what makes this absence mean anything: a '
+            'sign dated five hundred days back would move the triage card, so '
+            'the sentence has to be the form refusing, not SQLite — and the '
+            'legal day below shows the trigger is live',
+      );
+      expect(find.byType(SymptomDialog), findsOneWidget);
+
+      await typeDateIntoPicker(
+        tester,
+        scope: AlertDialog,
+        tile: 0,
+        usDay: usDay(_daysAgo(300)),
+      );
+      await tapSaveAndGetAnswer(tester, dialogTitle: 'Log a symptom');
+
+      expectRefusedWrite(
+        tester,
+        stillOnScreen: find.byType(SymptomDialog),
+        label: 'Symptom',
+        text: 'Vomiting',
+        dialogTitle: 'Log a symptom',
+      );
+    },
+  );
 }
+
+int _daysAgo(int days) =>
+    DateTime.now().subtract(Duration(days: days)).millisecondsSinceEpoch;

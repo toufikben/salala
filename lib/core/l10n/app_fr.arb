@@ -161,6 +161,7 @@
   "recordDeleteTitle": "Supprimer cet enregistrement ?",
   "recordSaveFailed": "Enregistrement impossible. Rien n'a été écrit.",
   "recordDeleteFailed": "Suppression impossible. Cet enregistrement est toujours là.",
+  "recordDateBeforeBirth": "Cette date est antérieure à la naissance de cet animal.",
 
   "vaccinationAdd": "Ajouter une vaccination",
   "vaccinationAddTitle": "Enregistrer une vaccination",

@@ -431,6 +431,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'This could not be deleted. The record is still there.';
 
   @override
+  String get recordDateBeforeBirth =>
+      'This date is before this animal was born.';
+
+  @override
   String get vaccinationAdd => 'Add vaccination';
 
   @override

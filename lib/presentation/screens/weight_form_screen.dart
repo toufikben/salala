@@ -8,6 +8,7 @@ import '../../core/utils/weight.dart';
 import '../../data/models/weight_entry.dart';
 import '../providers/record_providers.dart';
 import '../widgets/date_tile.dart';
+import '../widgets/record_refusal.dart';
 
 /// A weigh-in. Grams are stored, kilograms are typed — the box accepts the
 /// number off the scale and converts, because a breeder never weighs a puppy in
@@ -58,6 +59,14 @@ class _WeightFormScreenState extends ConsumerState<WeightFormScreen> {
     if (!_formKey.currentState!.validate() || _saving) return;
     final grams = parseWeightToGrams(_weight.text);
     if (grams == null) return;
+    if (refuseRecordBeforeBirth(
+      context,
+      ref,
+      animalId: widget.animalId,
+      recordMs: _measuredAt,
+    )) {
+      return;
+    }
     setState(() => _saving = true);
 
     try {

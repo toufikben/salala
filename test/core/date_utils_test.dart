@@ -205,4 +205,83 @@ void main() {
       );
     });
   });
+
+  group('recordPrecedesBirth', () {
+    int day(int year, int month, int dayOfMonth, {int hour = 0}) =>
+        DateTime(year, month, dayOfMonth, hour).millisecondsSinceEpoch;
+
+    test('a record dated before the animal was born is refused', () {
+      expect(
+        recordPrecedesBirth(
+          recordMs: day(2026, 3, 1),
+          birthMs: day(2026, 5, 1),
+        ),
+        isTrue,
+      );
+    });
+
+    test('the day of the birth itself is a legal day to record on', () {
+      expect(
+        recordPrecedesBirth(
+          recordMs: day(2026, 5, 1),
+          birthMs: day(2026, 5, 1),
+        ),
+        isFalse,
+        reason:
+            'a puppy weighed on the day it was born is a fact, and the '
+            'weigh-in has to be recordable',
+      );
+    });
+
+    test('the day after the birth is legal', () {
+      expect(
+        recordPrecedesBirth(
+          recordMs: day(2026, 5, 2),
+          birthMs: day(2026, 5, 1),
+        ),
+        isFalse,
+      );
+    });
+
+    test('an animal with no birth date refuses nothing', () {
+      expect(
+        recordPrecedesBirth(recordMs: day(2011, 1, 1), birthMs: null),
+        isFalse,
+        reason:
+            'the birth date is the breeder\'s not-yet-known fact, and a record '
+            'cannot be refused against an absence',
+      );
+    });
+
+    test('a record with no date refuses nothing', () {
+      expect(
+        recordPrecedesBirth(recordMs: null, birthMs: day(2026, 5, 1)),
+        isFalse,
+      );
+    });
+
+    test('a late hour on the birth day does not make a record earlier', () {
+      expect(
+        recordPrecedesBirth(
+          recordMs: day(2026, 5, 1, hour: 23),
+          birthMs: day(2026, 5, 1, hour: 1),
+        ),
+        isFalse,
+        reason:
+            'the same D31/D32 rule as the litter pair: a day is a date, not '
+            '86,400,000 ms, so a record made late in the evening of the day an '
+            'animal was born is on the day it was born',
+      );
+    });
+
+    test('a year boundary is a day before, not an hour difference', () {
+      expect(
+        recordPrecedesBirth(
+          recordMs: day(2025, 12, 31, hour: 23),
+          birthMs: day(2026, 1, 1, hour: 1),
+        ),
+        isTrue,
+      );
+    });
+  });
 }

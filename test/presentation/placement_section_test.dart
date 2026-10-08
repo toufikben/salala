@@ -5,6 +5,7 @@ import 'package:salala/data/models/animal.dart';
 import 'package:salala/data/models/buyer.dart';
 import 'package:salala/data/models/placement.dart';
 import 'package:salala/presentation/screens/animal_detail_screen.dart';
+import 'package:salala/presentation/widgets/placement_dialog.dart';
 
 import '../helpers/pump_app.dart';
 
@@ -466,4 +467,66 @@ void main() {
       );
     },
   );
+
+  testWidgets('a handover dated before the animal was born is refused, and the same '
+      'dialog on a day after the birth does reach the ledger', (tester) async {
+    _usePhoneViewport(tester);
+    // Both dates come off the run's own today: a handover can be booked a year
+    // ahead and reached fifteen years back, so the only pair that stays legal
+    // on a runner in another year is a relative one.
+    await pumpSalala(
+      tester,
+      seed: <Animal>[
+        _animal(_nalaId, 'Nala').copyWith(birthDate: _daysAgo(400)),
+      ],
+      seedBuyers: <Buyer>[_aicha()],
+      beforeLaunch: refuseWritesTo('placements'),
+    );
+    await _openAnimal(tester, 'Nala');
+    await _scrollTo(tester, find.text('Placements'));
+
+    await _tap(tester, find.widgetWithText(TextButton, 'Add placement'));
+    await tester.enterText(find.widgetWithText(TextFormField, 'Price'), '2500');
+    await typeDateIntoPicker(
+      tester,
+      scope: AlertDialog,
+      tile: 0,
+      usDay: usDay(_daysAgo(500)),
+    );
+
+    await tapSaveAndGetAnswer(tester, dialogTitle: 'Log a placement');
+
+    expect(
+      find.text('This date is before this animal was born.'),
+      findsOneWidget,
+    );
+    expect(
+      find.text('This could not be saved. Nothing was written.'),
+      findsNothing,
+      reason:
+          'the trigger is what turns this absence into evidence: a handover '
+          'that did reach SQLite with these dates would have been refused by '
+          'the database and answered with that other sentence, and the legal '
+          'day below shows the trigger does bite',
+    );
+    expect(find.byType(PlacementDialog), findsOneWidget);
+    await typeDateIntoPicker(
+      tester,
+      scope: AlertDialog,
+      tile: 0,
+      usDay: usDay(_daysAgo(300)),
+    );
+    await tapSaveAndGetAnswer(tester, dialogTitle: 'Log a placement');
+
+    expectRefusedWrite(
+      tester,
+      stillOnScreen: find.byType(PlacementDialog),
+      label: 'Price',
+      text: '2500',
+      dialogTitle: 'Log a placement',
+    );
+  });
 }
+
+int _daysAgo(int days) =>
+    DateTime.now().subtract(Duration(days: days)).millisecondsSinceEpoch;

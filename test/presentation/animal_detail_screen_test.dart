@@ -993,6 +993,222 @@ void main() {
       );
     },
   );
+
+  // The four tests below are the same rule at four different forms, and each one
+  // is a pair inside itself: it refuses the impossible day, then the very same
+  // form accepts a legal one and the trigger it is sitting on bites. Without that
+  // second half the first half proves nothing — an absent sentence about the
+  // database is also what a test with no trigger looks like.
+  //
+  // Every date here is said relative to the run's own today, because a fixed
+  // "12 May 2024" birthday stops being reachable by a five-year picker window as
+  // the years pass, and a test that only works this decade is a test waiting to
+  // fail for a reason that has nothing to do with the app.
+
+  testWidgets(
+    'a weigh-in dated before the animal was born is refused, and the same form '
+    'on a day after the birth does reach the ledger',
+    (tester) async {
+      _usePhoneViewport(tester);
+      await pumpSalala(
+        tester,
+        seed: <Animal>[_nala().copyWith(birthDate: _daysAgo(400))],
+        beforeLaunch: refuseWritesTo('weight_entries'),
+      );
+      await _openNala(tester);
+      await _scrollTo(tester, find.widgetWithText(TextButton, 'Add weight'));
+      await _tap(tester, find.widgetWithText(TextButton, 'Add weight'));
+      await tester.enterText(
+        find.widgetWithText(TextFormField, 'Weight (kg)'),
+        '1.8',
+      );
+      await typeDateIntoPicker(
+        tester,
+        scope: WeightFormScreen,
+        tile: 0,
+        usDay: usDay(_daysAgo(500)),
+      );
+
+      await tapSaveAndGetAnswer(tester);
+
+      expect(
+        find.text('This date is before this animal was born.'),
+        findsOneWidget,
+      );
+      expect(
+        find.text('This could not be saved. Nothing was written.'),
+        findsNothing,
+        reason:
+            'a weigh-in is append-only, so the insert trigger is the whole of '
+            'the evidence that nothing was written — and the legal day at the '
+            'end of this test is what shows that trigger is live',
+      );
+      expect(find.byType(WeightFormScreen), findsOneWidget);
+
+      await typeDateIntoPicker(
+        tester,
+        scope: WeightFormScreen,
+        tile: 0,
+        usDay: usDay(_daysAgo(300)),
+      );
+      await tapSaveAndGetAnswer(tester);
+
+      expectRefusedWrite(
+        tester,
+        stillOnScreen: find.byType(WeightFormScreen),
+        label: 'Weight (kg)',
+        text: '1.8',
+      );
+    },
+  );
+
+  testWidgets(
+    'a dose on a row that predates the animal is refused on the edit, and the '
+    'same edit with a legal day does reach the ledger',
+    (tester) async {
+      _usePhoneViewport(tester);
+      await pumpSalala(
+        tester,
+        seed: <Animal>[_nala().copyWith(birthDate: _daysAgo(1000))],
+        seedVaccinations: <Vaccination>[
+          // A row the write path lets exist: it came in with a pack, or with a
+          // build from before this rule. Opening it to fix the vaccine name is
+          // how a breeder finds out the day is wrong.
+          _dose(name: 'DHPP', administered: _daysAgo(1200)),
+        ],
+        beforeLaunch: refuseUpdatesOf('vaccinations'),
+      );
+      await _openNala(tester);
+      await _scrollTo(tester, find.text('DHPP'));
+      await _tap(tester, find.text('DHPP'));
+
+      await tapSaveAndGetAnswer(tester);
+
+      expect(
+        find.text('This date is before this animal was born.'),
+        findsOneWidget,
+      );
+      expect(
+        find.text('This could not be saved. Nothing was written.'),
+        findsNothing,
+        reason:
+            'the dose is edited with an UPDATE, not an INSERT, which is why '
+            'this test installs the update trigger: the sentence below is what '
+            'SQLite itself says when a row does reach it',
+      );
+
+      await typeDateIntoPicker(
+        tester,
+        scope: VaccinationFormScreen,
+        tile: 0,
+        usDay: usDay(_daysAgo(900)),
+      );
+      await tapSaveAndGetAnswer(tester);
+
+      expectRefusedWrite(
+        tester,
+        stillOnScreen: find.byType(VaccinationFormScreen),
+        label: 'Vaccine',
+        text: 'DHPP',
+      );
+    },
+  );
+
+  testWidgets('a screening dated before the animal was born is refused on the edit, and a '
+      'legal day on the same screening is SQLite\'s to refuse', (tester) async {
+    _usePhoneViewport(tester);
+    await pumpSalala(
+      tester,
+      seed: <Animal>[_nala().copyWith(birthDate: _daysAgo(1000))],
+      seedHealthTests: <HealthTest>[
+        _screening('OFA hips', result: 'Good', tested: 1200),
+      ],
+      beforeLaunch: refuseUpdatesOf('health_tests'),
+    );
+    await _openNala(tester);
+    await _scrollTo(tester, find.text('OFA hips'));
+    await _tap(tester, find.text('OFA hips'));
+
+    await tapSaveAndGetAnswer(tester);
+
+    expect(
+      find.text('This date is before this animal was born.'),
+      findsOneWidget,
+    );
+    expect(
+      find.text('This could not be saved. Nothing was written.'),
+      findsNothing,
+      reason: 'see the dose test above: same trigger kind, same pairing',
+    );
+
+    await typeDateIntoPicker(
+      tester,
+      scope: HealthTestFormScreen,
+      tile: 0,
+      usDay: usDay(_daysAgo(900)),
+    );
+    await tapSaveAndGetAnswer(tester);
+
+    expectRefusedWrite(
+      tester,
+      stillOnScreen: find.byType(HealthTestFormScreen),
+      label: 'Screening',
+      text: 'OFA hips',
+    );
+  });
+
+  testWidgets(
+    'a visit dated before the animal was born is refused on the edit, and a '
+    'legal day on the same visit is SQLite\'s to refuse',
+    (tester) async {
+      _usePhoneViewport(tester);
+      await pumpSalala(
+        tester,
+        seed: <Animal>[_nala().copyWith(birthDate: _daysAgo(1000))],
+        seedVisits: <VetVisit>[
+          VetVisit(
+            id: '',
+            animalId: _nalaId,
+            visitDate: _daysAgo(1200),
+            clinicName: 'Atlas Veterinary',
+            createdAt: 0,
+            updatedAt: 0,
+          ),
+        ],
+        beforeLaunch: refuseUpdatesOf('vet_visits'),
+      );
+      await _openNala(tester);
+      await _scrollTo(tester, find.text('Atlas Veterinary'));
+      await _tap(tester, find.text('Atlas Veterinary'));
+
+      await tapSaveAndGetAnswer(tester);
+
+      expect(
+        find.text('This date is before this animal was born.'),
+        findsOneWidget,
+      );
+      expect(
+        find.text('This could not be saved. Nothing was written.'),
+        findsNothing,
+        reason: 'see the dose test above: same trigger kind, same pairing',
+      );
+
+      await typeDateIntoPicker(
+        tester,
+        scope: VetVisitFormScreen,
+        tile: 0,
+        usDay: usDay(_daysAgo(900)),
+      );
+      await tapSaveAndGetAnswer(tester);
+
+      expectRefusedWrite(
+        tester,
+        stillOnScreen: find.byType(VetVisitFormScreen),
+        label: 'Clinic',
+        text: 'Atlas Veterinary',
+      );
+    },
+  );
 }
 
 /// A screening dated `tested` days ago, optionally expiring `validUntil` days
