@@ -383,20 +383,18 @@ void main() {
         updatedAt: 1740000000000,
       ),
     );
-    for (final (id, name, country) in <(String, String, String?)>[
-      ('b-first', 'Hakim Ouali', null),
-      ('b-second', 'Nadia Sabri', 'MA'),
-    ]) {
-      await daos.buyers.create(
-        Buyer(
-          id: id,
-          name: name,
-          countryCode: country,
-          createdAt: 1749000000000,
-          updatedAt: 1749000000000,
-        ),
-      );
-    }
+    Future<void> buyer(String id, String name, {String? country}) =>
+        daos.buyers.create(
+          Buyer(
+            id: id,
+            name: name,
+            countryCode: country,
+            createdAt: 1749000000000,
+            updatedAt: 1749000000000,
+          ),
+        );
+    await buyer('b-first', 'Hakim Ouali');
+    await buyer('b-second', 'Nadia Sabri', country: 'MA');
     await daos.placements.create(
       Placement(
         id: 'p-dated',

@@ -283,8 +283,8 @@ List<pw.Widget> _placementBlock(
     if (buyer?.email != null) (l10n.pdfEmail, buyer!.email!),
     // Where the family is. A health guarantee is enforced against a person at an
     // address, and this line is the only trace of either in the document.
-    if (buyer?.countryCode != null && buyer!.countryCode!.isNotEmpty)
-      (l10n.buyerCountryCode, buyer!.countryCode!),
+    if (buyer?.countryCode case final String country when country.isNotEmpty)
+      (l10n.buyerCountryCode, country),
     (l10n.pdfPlacedOn, _day(l10n, localeTag, placement.placedDate)),
     (l10n.pdfPrice, _price(l10n, placement)),
     if (placement.guaranteeTerms != null &&
