@@ -12,7 +12,7 @@ import '../data/models/buyer.dart';
 import '../data/models/litter.dart';
 import 'pdf_layout.dart';
 
-/// The whelping record (Stage 2): one page for a whole litter.
+/// The whelping record: one page for a whole litter.
 ///
 /// The animal's own pack answers "what did this puppy have?". This answers the
 /// question the breeder asks at the whelping box and at the vet's desk instead:
@@ -29,7 +29,7 @@ Future<Uint8List> litterPackPdf(
   required ByteData baseFont,
   DateTime? now,
 }) async {
-  final Litter litter = await daos.litters.findById(litterId);
+  final Litter? litter = await daos.litters.findById(litterId);
   if (litter == null) {
     // The action sits on the litter's own page, so reaching here means the row
     // was deleted while the page was open.
@@ -43,9 +43,10 @@ Future<Uint8List> litterPackPdf(
   final generatedAt = (now ?? DateTime.now()).millisecondsSinceEpoch;
 
   final Animal? dam = await daos.animals.findById(litter.damId);
-  final Animal? sire = litter.sireId == null
+  final String? sireId = litter.sireId;
+  final Animal? sire = sireId == null
       ? null
-      : await daos.animals.findById(litter.sireId);
+      : await daos.animals.findById(sireId);
 
   final puppies = <LitterPuppy>[];
   for (final Animal puppy in await daos.animals.findOffspring(litter.id)) {
@@ -71,7 +72,7 @@ Future<Uint8List> litterPackPdf(
       kind: l10n.pdfLitterTitle,
       generatedLine: l10n.pdfGenerated(formatDayFor(localeTag, generatedAt)),
     ),
-    ...pdfFacts(
+    pdfFacts(
       whelpingFacts(
         l10n,
         localeTag,

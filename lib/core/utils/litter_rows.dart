@@ -7,13 +7,13 @@
 /// labels: everything a breeder would notice as wrong on paper.
 library;
 
+import '../../data/models/animal.dart';
+import '../../data/models/buyer.dart';
+import '../../data/models/placement.dart';
+import '../../data/models/vaccination.dart';
+import '../../data/models/weight_entry.dart';
 import '../l10n/app_localizations.dart';
 import '../l10n/enum_labels.dart';
-import '../models/animal.dart';
-import '../models/buyer.dart';
-import '../models/placement.dart';
-import '../models/vaccination.dart';
-import '../models/weight_entry.dart';
 import 'date_utils.dart';
 import 'money.dart';
 import 'weight.dart';

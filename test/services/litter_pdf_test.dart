@@ -13,7 +13,6 @@ import 'package:salala/data/models/placement.dart';
 import 'package:salala/data/models/vaccination.dart';
 import 'package:salala/data/models/weight_entry.dart';
 import 'package:salala/services/litter_pdf.dart';
-import 'package:salala/services/pdf_layout.dart';
 import 'package:sqflite/sqflite.dart';
 
 import '../helpers/test_db.dart';
