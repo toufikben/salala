@@ -361,6 +361,14 @@ class AppLocalizationsFr extends AppLocalizations {
   String get litterWeaningDate => 'Date du sevrage';
 
   @override
+  String get litterWhelpingBeforeMating =>
+      'La date de mise bas est antérieure à la date d\'accouplement.';
+
+  @override
+  String get litterWeaningBeforeWhelping =>
+      'La date de sevrage est antérieure à la date de mise bas.';
+
+  @override
   String litterExpected(String date) {
     return 'Mise bas prévue : $date';
   }
@@ -449,6 +457,10 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get vaccinationNextDueHint =>
       'Une dose dont la date est dépassée est marquée en retard.';
+
+  @override
+  String get doseDueBeforeAdministered =>
+      'La prochaine dose est due avant la date d\'administration de celle-ci.';
 
   @override
   String get vaccinationOverdue => 'En retard';

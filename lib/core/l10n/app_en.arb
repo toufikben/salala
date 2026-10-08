@@ -158,6 +158,8 @@
   "litterMatingDate": "Mating date",
   "litterWhelpingDate": "Whelping date",
   "litterWeaningDate": "Weaning date",
+  "litterWhelpingBeforeMating": "The whelping date is before the mating date.",
+  "litterWeaningBeforeWhelping": "The weaning date is before the whelping date.",
   "litterExpected": "Expected whelping: {date}",
   "@litterExpected": {
     "placeholders": {
@@ -205,6 +207,7 @@
   "vaccinationGiven": "Given",
   "vaccinationNextDue": "Next due",
   "vaccinationNextDueHint": "A dose whose next-due date has passed is marked overdue.",
+  "doseDueBeforeAdministered": "The next dose is due before this dose was given.",
   "vaccinationOverdue": "Overdue",
   "vaccinationManufacturer": "Manufacturer",
   "vaccinationBatch": "Batch number",

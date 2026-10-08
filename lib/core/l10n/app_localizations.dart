@@ -730,6 +730,18 @@ abstract class AppLocalizations {
   /// **'Weaning date'**
   String get litterWeaningDate;
 
+  /// No description provided for @litterWhelpingBeforeMating.
+  ///
+  /// In en, this message translates to:
+  /// **'The whelping date is before the mating date.'**
+  String get litterWhelpingBeforeMating;
+
+  /// No description provided for @litterWeaningBeforeWhelping.
+  ///
+  /// In en, this message translates to:
+  /// **'The weaning date is before the whelping date.'**
+  String get litterWeaningBeforeWhelping;
+
   /// No description provided for @litterExpected.
   ///
   /// In en, this message translates to:
@@ -873,6 +885,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'A dose whose next-due date has passed is marked overdue.'**
   String get vaccinationNextDueHint;
+
+  /// No description provided for @doseDueBeforeAdministered.
+  ///
+  /// In en, this message translates to:
+  /// **'The next dose is due before this dose was given.'**
+  String get doseDueBeforeAdministered;
 
   /// No description provided for @vaccinationOverdue.
   ///

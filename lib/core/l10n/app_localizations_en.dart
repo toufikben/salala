@@ -358,6 +358,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get litterWeaningDate => 'Weaning date';
 
   @override
+  String get litterWhelpingBeforeMating =>
+      'The whelping date is before the mating date.';
+
+  @override
+  String get litterWeaningBeforeWhelping =>
+      'The weaning date is before the whelping date.';
+
+  @override
   String litterExpected(String date) {
     return 'Expected whelping: $date';
   }
@@ -446,6 +454,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get vaccinationNextDueHint =>
       'A dose whose next-due date has passed is marked overdue.';
+
+  @override
+  String get doseDueBeforeAdministered =>
+      'The next dose is due before this dose was given.';
 
   @override
   String get vaccinationOverdue => 'Overdue';

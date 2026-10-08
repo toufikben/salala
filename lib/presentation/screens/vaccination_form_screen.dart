@@ -103,6 +103,20 @@ class _VaccinationFormScreenState extends ConsumerState<VaccinationFormScreen> {
 
   Future<void> _save() async {
     if (!_formKey.currentState!.validate() || _saving) return;
+    if (doseDatesContradict(
+      administeredMs: _administered,
+      nextDueMs: _nextDue,
+    )) {
+      // Nothing written, so nothing to undo and the button is still live: a due
+      // date behind the dose that earned it never clears, and it would sit in the
+      // herd's agenda as overdue forever.
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AppLocalizations.of(context).doseDueBeforeAdministered),
+        ),
+      );
+      return;
+    }
     setState(() => _saving = true);
 
     final base =

@@ -121,6 +121,8 @@
   "litterMatingDate": "Date de l'accouplement",
   "litterWhelpingDate": "Date de la mise bas",
   "litterWeaningDate": "Date du sevrage",
+  "litterWhelpingBeforeMating": "La date de mise bas est antérieure à la date d'accouplement.",
+  "litterWeaningBeforeWhelping": "La date de sevrage est antérieure à la date de mise bas.",
   "litterExpected": "Mise bas prévue : {date}",
   "@litterExpected": {
     "placeholders": {
@@ -168,6 +170,7 @@
   "vaccinationGiven": "Administré le",
   "vaccinationNextDue": "Prochaine dose",
   "vaccinationNextDueHint": "Une dose dont la date est dépassée est marquée en retard.",
+  "doseDueBeforeAdministered": "La prochaine dose est due avant la date d'administration de celle-ci.",
   "vaccinationOverdue": "En retard",
   "vaccinationManufacturer": "Fabricant",
   "vaccinationBatch": "N° de lot",

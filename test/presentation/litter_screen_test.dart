@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:salala/data/models/animal.dart';
 import 'package:salala/presentation/screens/litter_form_screen.dart';
 import 'package:salala/presentation/widgets/animal_card.dart';
+import 'package:salala/presentation/widgets/date_tile.dart';
 
 import '../helpers/pump_app.dart';
 
@@ -44,10 +45,73 @@ Future<void> _pickFrom(WidgetTester tester, Finder field, String option) async {
   await tester.pumpAndSettle();
 }
 
+/// A date typed into the picker rather than tapped on its calendar.
+///
+/// The litter form has three dates and no other way of learning one, so a test
+/// about what it does with them has to go through the dialog. The calendar's
+/// cells are numbered by whatever month the run falls in, so this uses the
+/// dialog's input mode instead: it parses `mm/dd/yyyy`, because
+/// `MaterialLocalizations.parseCompactDate` (material_localizations.dart:904)
+/// splits the text on `/` with that order written down as an assumption, and a
+/// widget test's locale is `en_US`, where the help text above the field says the
+/// same thing. Both halves of that pair matter — the app's Arabic and French
+/// builds show a different order than the parser accepts, which is the phone's
+/// to check, not this runner's.
+Future<void> _typeDate(
+  WidgetTester tester, {
+  required int tile,
+  required String usDay,
+}) async {
+  final field = find
+      .descendant(
+        of: find.byType(LitterFormScreen),
+        matching: find.byType(DateTile),
+      )
+      .at(tile);
+  await tester.ensureVisible(field);
+  await tester.pumpAndSettle();
+  await tester.tap(field);
+  await tester.pumpAndSettle();
+  await tester.tap(
+    find.descendant(
+      of: find.byType(DatePickerDialog),
+      matching: find.byIcon(Icons.edit_outlined),
+    ),
+  );
+  await tester.pumpAndSettle();
+  await tester.enterText(
+    find.descendant(
+      of: find.byType(DatePickerDialog),
+      matching: find.byType(TextFormField),
+    ),
+    usDay,
+  );
+  await tester.pumpAndSettle();
+  await tester.tap(
+    find.descendant(
+      of: find.byType(DatePickerDialog),
+      matching: find.widgetWithText(TextButton, 'OK'),
+    ),
+  );
+  await tester.pumpAndSettle();
+}
+
+/// The name and the dam and a puppy count, which every one of these tests needs
+/// before it can talk about dates.
+Future<void> _fillAroundDates(WidgetTester tester) async {
+  await tester.tap(find.widgetWithText(FloatingActionButton, 'New litter'));
+  await tester.pumpAndSettle();
+  await tester.enterText(
+    find.widgetWithText(TextFormField, 'Litter name'),
+    'A litter',
+  );
+  await _pickFrom(tester, find.byType(DropdownButtonFormField<String>), 'Nala');
+  await _pickFrom(tester, find.byType(DropdownButtonFormField<int>), '3');
+}
+
 void main() {
   // A tap that misses its widget must fail the test instead of only warning.
   WidgetController.hitTestWarningShouldBeFatal = true;
-
   testWidgets('the litters tab starts empty and offers the guided state', (
     tester,
   ) async {
@@ -216,4 +280,122 @@ void main() {
       expect(find.text('A litter 3'), findsNothing);
     },
   );
+
+  testWidgets(
+    'a whelping dated before its mating is refused before anything is written',
+    (tester) async {
+      _usePhoneViewport(tester);
+      await pumpSalala(
+        tester,
+        seed: <Animal>[_stock(name: 'Nala', sex: Sex.female)],
+      );
+      await _openLittersTab(tester);
+      await _fillAroundDates(tester);
+      await _typeDate(tester, tile: 0, usDay: '06/01/2026');
+      await _typeDate(tester, tile: 1, usDay: '01/01/2026');
+
+      await tapSaveAndGetAnswer(tester);
+
+      expect(
+        find.text('The whelping date is before the mating date.'),
+        findsOneWidget,
+      );
+      expect(
+        find.text('This could not be saved. Nothing was written.'),
+        findsNothing,
+        reason:
+            'the screen has to stop on its own reading of the dates, not on a '
+            'refusal from SQLite — the two sentences mean different things to a '
+            'breeder, and only the first one tells them which field to change',
+      );
+      expect(find.byType(LitterFormScreen), findsOneWidget);
+      expect(
+        tester
+            .widget<TextFormField>(
+              find.widgetWithText(TextFormField, 'Litter name'),
+            )
+            .controller!
+            .text,
+        'A litter',
+      );
+
+      await tester.tap(find.widgetWithText(OutlinedButton, 'Cancel'));
+      await settleRealIo(tester);
+      expect(find.text('No litters yet'), findsOneWidget);
+
+      await tester.tap(find.widgetWithText(NavigationDestination, 'Animals'));
+      await settleRealIo(tester);
+      // Nala and nobody else: the three puppies are made in the same save as the
+      // litter, so a refusal that stopped early has to leave the herd one animal
+      // wide. The control is the last test below — the same taps with the dates
+      // the other way round put four cards here.
+      expect(find.byType(AnimalCard), findsNWidgets(1));
+    },
+  );
+
+  testWidgets(
+    'a weaning dated before its whelping is refused, and named as that',
+    (tester) async {
+      _usePhoneViewport(tester);
+      await pumpSalala(
+        tester,
+        seed: <Animal>[_stock(name: 'Nala', sex: Sex.female)],
+      );
+      await _openLittersTab(tester);
+      await _fillAroundDates(tester);
+      await _typeDate(tester, tile: 0, usDay: '01/01/2026');
+      await _typeDate(tester, tile: 1, usDay: '03/01/2026');
+      await _typeDate(tester, tile: 2, usDay: '01/01/2026');
+
+      await tapSaveAndGetAnswer(tester);
+
+      // The sentence is the one about weaning: two rules that answer with the
+      // same words would leave a breeder hunting for the wrong field, and the
+      // mating above is a legal pair, so a generic refusal would also be a lie.
+      expect(
+        find.text('The weaning date is before the whelping date.'),
+        findsOneWidget,
+      );
+      expect(
+        find.text('The whelping date is before the mating date.'),
+        findsNothing,
+      );
+      expect(find.byType(LitterFormScreen), findsOneWidget);
+    },
+  );
+
+  testWidgets('the same whelping with its dates in order registers', (
+    tester,
+  ) async {
+    _usePhoneViewport(tester);
+    await pumpSalala(
+      tester,
+      seed: <Animal>[_stock(name: 'Nala', sex: Sex.female)],
+    );
+    await _openLittersTab(tester);
+    await _fillAroundDates(tester);
+    await _typeDate(tester, tile: 0, usDay: '01/01/2026');
+    await _typeDate(tester, tile: 1, usDay: '03/01/2026');
+    await _typeDate(tester, tile: 2, usDay: '05/01/2026');
+
+    final save = find.widgetWithText(FilledButton, 'Save');
+    await tester.ensureVisible(save);
+    await tester.pumpAndSettle();
+    await tester.tap(save);
+    await settleRealIo(tester);
+
+    // Nothing is refused here, which is the point: the two tests above changed
+    // one date each and nothing else, so a refusal they could not have avoided
+    // would show up as this litter failing to land.
+    expect(
+      find.text('The whelping date is before the mating date.'),
+      findsNothing,
+    );
+    expect(find.byType(LitterFormScreen), findsNothing);
+    expect(find.text('A litter'), findsOneWidget);
+
+    await tester.tap(find.widgetWithText(NavigationDestination, 'Animals'));
+    await settleRealIo(tester);
+    expect(find.byType(AnimalCard), findsNWidgets(4));
+  });
 }

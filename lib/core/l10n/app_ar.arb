@@ -121,6 +121,8 @@
   "litterMatingDate": "تاريخ التزاوج",
   "litterWhelpingDate": "تاريخ الولادة",
   "litterWeaningDate": "تاريخ الفطام",
+  "litterWhelpingBeforeMating": "تاريخ الولادة يسبق تاريخ التزاوج.",
+  "litterWeaningBeforeWhelping": "تاريخ الفطام يسبق تاريخ الولادة.",
   "litterExpected": "الولادة المتوقعة: {date}",
   "@litterExpected": {
     "placeholders": {
@@ -168,6 +170,7 @@
   "vaccinationGiven": "أُعطي في",
   "vaccinationNextDue": "الجرعة القادمة",
   "vaccinationNextDueHint": "أي جرعة تجاوزت موعدها تُعلَّم بأنها متأخرة.",
+  "doseDueBeforeAdministered": "موعد الجرعة القادمة يسبق تاريخ إعطاء هذه الجرعة.",
   "vaccinationOverdue": "متأخر",
   "vaccinationManufacturer": "الشركة المصنّعة",
   "vaccinationBatch": "رقم الدفعة",

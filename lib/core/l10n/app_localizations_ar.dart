@@ -359,6 +359,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get litterWeaningDate => 'تاريخ الفطام';
 
   @override
+  String get litterWhelpingBeforeMating => 'تاريخ الولادة يسبق تاريخ التزاوج.';
+
+  @override
+  String get litterWeaningBeforeWhelping => 'تاريخ الفطام يسبق تاريخ الولادة.';
+
+  @override
   String litterExpected(String date) {
     return 'الولادة المتوقعة: $date';
   }
@@ -447,6 +453,10 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get vaccinationNextDueHint =>
       'أي جرعة تجاوزت موعدها تُعلَّم بأنها متأخرة.';
+
+  @override
+  String get doseDueBeforeAdministered =>
+      'موعد الجرعة القادمة يسبق تاريخ إعطاء هذه الجرعة.';
 
   @override
   String get vaccinationOverdue => 'متأخر';

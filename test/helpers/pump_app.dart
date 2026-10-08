@@ -285,6 +285,17 @@ Future<void> Function(Database) refuseDeletesOf(String table) => (db) async {
   );
 };
 
+/// A `beforeLaunch` hook that makes every update of [table] fail, for the screens
+/// that reopen a row already in the ledger. [refuseWritesTo] only fires on an
+/// insert, so an edit path that goes through `db.update` would sail past it and
+/// a test would pass on a write that never got refused.
+Future<void> Function(Database) refuseUpdatesOf(String table) => (db) async {
+  await db.execute(
+    'CREATE TRIGGER refuse_update_$table BEFORE UPDATE ON $table '
+    "BEGIN SELECT RAISE(ABORT, 'the ledger is full'); END",
+  );
+};
+
 /// Taps a form's Save and waits for SQLite to answer, without the full launch
 /// settle: the refusal these tests want arrives late, and `settleRealIo`'s
 /// pumping outlives the snackbar it has to be read from.

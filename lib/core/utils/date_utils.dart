@@ -90,3 +90,51 @@ int wholeDaysBetween(int fromMs, int toMs) {
 /// rebuilds alarms out of, are both counted here off the day number.
 DateTime shiftDays(DateTime day, int days) =>
     DateTime(day.year, day.month, day.day + days);
+
+/// Whether a whelping's three dates tell a story that cannot have happened.
+enum LitterDateProblem { none, whelpingBeforeMating, weaningBeforeWhelping }
+
+/// Which story a whelping's dates tell, if any that cannot have happened: a
+/// birth before the mating it came from, or a weaning before the litter was born.
+///
+/// These are the only date pairs the app refuses, and they are refused because
+/// the ledger is read back through them: a litter's PDF prints the mating and
+/// the whelping side by side, and every puppy's birthday is the whelping date,
+/// so a slipped pair does not sit unnoticed — it becomes the herd's age
+/// arithmetic. A missing date is not a contradiction, and two dates on the same
+/// day are not one either: the picker is a day picker, and a mating recorded on
+/// the whelping day is imprecise rather than impossible.
+LitterDateProblem litterDateProblem({
+  required int? matingDateMs,
+  required int? whelpingDateMs,
+  required int? weaningDateMs,
+}) {
+  if (_isDayBefore(whelpingDateMs, matingDateMs)) {
+    return LitterDateProblem.whelpingBeforeMating;
+  }
+  if (_isDayBefore(weaningDateMs, whelpingDateMs)) {
+    return LitterDateProblem.weaningBeforeWhelping;
+  }
+  return LitterDateProblem.none;
+}
+
+/// A booster stamped due before the dose that earned it.
+///
+/// Worth refusing on its own: a due date in the past never clears, so the row
+/// sits in the herd's agenda as overdue forever and trains the breeder to ignore
+/// the agenda — which is the one thing it exists for.
+bool doseDatesContradict({
+  required int? administeredMs,
+  required int? nextDueMs,
+}) => _isDayBefore(nextDueMs, administeredMs);
+
+bool _isDayBefore(int? earlierMs, int? laterMs) {
+  if (earlierMs == null || laterMs == null) return false;
+  final a = dayFromMs(earlierMs)!;
+  final b = dayFromMs(laterMs)!;
+  return DateTime(
+    a.year,
+    a.month,
+    a.day,
+  ).isBefore(DateTime(b.year, b.month, b.day));
+}

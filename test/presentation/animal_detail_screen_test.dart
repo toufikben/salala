@@ -818,6 +818,88 @@ void main() {
     },
   );
 
+  testWidgets('a dose due before the day it was given is refused before the ledger is '
+      'touched', (tester) async {
+    _usePhoneViewport(tester);
+    final notifications = FakeNotificationWriter();
+    await pumpSalala(
+      tester,
+      notifications: notifications,
+      seed: <Animal>[_nala()],
+      seedVaccinations: <Vaccination>[
+        // A row that cannot have happened, written through the shipped dao:
+        // nothing in the write path checks the pair, so this is exactly what a
+        // restored pack or an older build leaves behind. Editing it is the way
+        // a breeder finds out.
+        _dose(name: 'DHPP', administered: _daysAgo(30), nextDue: _daysAgo(60)),
+      ],
+      beforeLaunch: refuseUpdatesOf('vaccinations'),
+    );
+    await _openNala(tester);
+    await _scrollTo(tester, find.text('DHPP'));
+    await _tap(tester, find.text('DHPP'));
+
+    await tapSaveAndGetAnswer(tester);
+
+    expect(
+      find.text('The next dose is due before this dose was given.'),
+      findsOneWidget,
+    );
+    expect(
+      find.text('This could not be saved. Nothing was written.'),
+      findsNothing,
+      reason:
+          'the trigger this test installs is what turns that absence into '
+          'evidence: had the form reached SQLite with these dates, the '
+          'database would have refused and this is the sentence it refused '
+          'with — see the test below for the same refusal on a legal pair',
+    );
+    expect(find.byType(VaccinationFormScreen), findsOneWidget);
+    // No alarm for a dose that was never saved, and none for a due date that
+    // is behind the dose: the form stopped before either half ran.
+    expect(notifications.log, isEmpty);
+  });
+
+  testWidgets('a dose with its dates in order does reach the ledger, and the ledger is '
+      'what answers', (tester) async {
+    _usePhoneViewport(tester);
+    final notifications = FakeNotificationWriter();
+    await pumpSalala(
+      tester,
+      notifications: notifications,
+      seed: <Animal>[_nala()],
+      seedVaccinations: <Vaccination>[
+        _dose(
+          name: 'DHPP',
+          administered: _daysAgo(30),
+          nextDue: _daysAhead(20),
+        ),
+      ],
+      beforeLaunch: refuseUpdatesOf('vaccinations'),
+    );
+    await _openNala(tester);
+    await _scrollTo(tester, find.text('DHPP'));
+    await _tap(tester, find.text('DHPP'));
+
+    await tapSaveAndGetAnswer(tester);
+
+    // One field apart from the test above, and the sentence is the database's
+    // instead: so the refusal above really did stop at the dates, and an edit
+    // of a legal dose still goes through to SQLite and keeps the form open when
+    // SQLite says no.
+    expectRefusedWrite(
+      tester,
+      stillOnScreen: find.byType(VaccinationFormScreen),
+      label: 'Vaccine',
+      text: 'DHPP',
+      notifications: notifications,
+    );
+    expect(
+      find.text('The next dose is due before this dose was given.'),
+      findsNothing,
+    );
+  });
+
   testWidgets(
     'a screening the database refuses keeps the form open and the button live',
     (tester) async {

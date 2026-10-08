@@ -61,4 +61,148 @@ void main() {
       expect(shiftDays(DateTime(2024, 3, 1), -1), DateTime(2024, 2, 29));
     });
   });
+
+  group('litterDateProblem', () {
+    int day(int year, int month, int dayOfMonth, {int hour = 0}) =>
+        DateTime(year, month, dayOfMonth, hour).millisecondsSinceEpoch;
+
+    test('a whelping before the mating it came from is named', () {
+      expect(
+        litterDateProblem(
+          matingDateMs: day(2026, 6, 1),
+          whelpingDateMs: day(2026, 1, 1),
+          weaningDateMs: null,
+        ),
+        LitterDateProblem.whelpingBeforeMating,
+      );
+    });
+
+    test('a weaning before the litter was born is named', () {
+      expect(
+        litterDateProblem(
+          matingDateMs: day(2026, 1, 1),
+          whelpingDateMs: day(2026, 3, 1),
+          weaningDateMs: day(2026, 2, 1),
+        ),
+        LitterDateProblem.weaningBeforeWhelping,
+      );
+    });
+
+    test('the pairs that line up are not a problem', () {
+      expect(
+        litterDateProblem(
+          matingDateMs: day(2026, 1, 1),
+          whelpingDateMs: day(2026, 3, 1),
+          weaningDateMs: day(2026, 5, 1),
+        ),
+        LitterDateProblem.none,
+      );
+    });
+
+    test('a missing date is not a contradiction', () {
+      // The form makes every three optional, so this is the common case rather
+      // than an edge one: a whelping with no mating recorded is a Tuesday
+      // evening remembered, not a story that cannot have happened.
+      expect(
+        litterDateProblem(
+          matingDateMs: null,
+          whelpingDateMs: day(2026, 3, 1),
+          weaningDateMs: null,
+        ),
+        LitterDateProblem.none,
+      );
+      expect(
+        litterDateProblem(
+          matingDateMs: day(2026, 6, 1),
+          whelpingDateMs: null,
+          weaningDateMs: day(2026, 1, 1),
+        ),
+        LitterDateProblem.none,
+        reason:
+            'with no whelping to sit between them, the outer two say nothing',
+      );
+    });
+
+    test('two dates on one day are imprecise, not impossible', () {
+      expect(
+        litterDateProblem(
+          matingDateMs: day(2026, 3, 1),
+          whelpingDateMs: day(2026, 3, 1),
+          weaningDateMs: day(2026, 3, 1),
+        ),
+        LitterDateProblem.none,
+      );
+    });
+
+    test('the hour a row was stored at does not make a day earlier', () {
+      expect(
+        litterDateProblem(
+          matingDateMs: day(2026, 3, 1, hour: 23),
+          whelpingDateMs: day(2026, 3, 1),
+          weaningDateMs: null,
+        ),
+        LitterDateProblem.none,
+      );
+    });
+
+    test('a year boundary is a day before, not a larger number', () {
+      expect(
+        litterDateProblem(
+          matingDateMs: day(2026, 1, 1),
+          whelpingDateMs: day(2025, 12, 31),
+          weaningDateMs: null,
+        ),
+        LitterDateProblem.whelpingBeforeMating,
+      );
+    });
+
+    test('a litter dated backwards at both ends is refused for the first thing', () {
+      // Which sentence a breeder reads decides what they fix first, so the
+      // precedence is a decision rather than an accident of the checks' order.
+      expect(
+        litterDateProblem(
+          matingDateMs: day(2026, 6, 1),
+          whelpingDateMs: day(2026, 1, 1),
+          weaningDateMs: day(2025, 1, 1),
+        ),
+        LitterDateProblem.whelpingBeforeMating,
+      );
+    });
+  });
+
+  group('doseDatesContradict', () {
+    int day(int year, int month, int dayOfMonth) =>
+        DateTime(year, month, dayOfMonth).millisecondsSinceEpoch;
+
+    test('a booster due before the dose that earned it is refused', () {
+      expect(
+        doseDatesContradict(
+          administeredMs: day(2026, 5, 1),
+          nextDueMs: day(2026, 4, 1),
+        ),
+        isTrue,
+      );
+    });
+
+    test('a booster due the same day is not a contradiction', () {
+      expect(
+        doseDatesContradict(
+          administeredMs: day(2026, 5, 1),
+          nextDueMs: day(2026, 5, 1),
+        ),
+        isFalse,
+      );
+    });
+
+    test('a dose with no next date has nothing to contradict', () {
+      expect(
+        doseDatesContradict(administeredMs: day(2026, 5, 1), nextDueMs: null),
+        isFalse,
+      );
+      expect(
+        doseDatesContradict(administeredMs: null, nextDueMs: day(2026, 5, 1)),
+        isFalse,
+      );
+    });
+  });
 }

@@ -60,6 +60,15 @@ class _LitterFormScreenState extends ConsumerState<LitterFormScreen> {
 
   Future<void> _save() async {
     if (!_formKey.currentState!.validate() || _saving) return;
+    final problem = litterDateProblem(
+      matingDateMs: _matingDate,
+      whelpingDateMs: _whelpingDate,
+      weaningDateMs: _weaningDate,
+    );
+    if (problem != LitterDateProblem.none) {
+      _refuseDates(problem);
+      return;
+    }
     final animals = ref.read(animalsProvider).value ?? const <Animal>[];
     final dam = animals.firstWhere((a) => a.id == _damId);
     final name = _name.text.trim();
@@ -116,6 +125,26 @@ class _LitterFormScreenState extends ConsumerState<LitterFormScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(AppLocalizations.of(context).recordSaveFailed)),
     );
+  }
+
+  /// Dates that cannot both have happened. Refused here rather than corrected
+  /// later, because a whelping has no editing screen: the row a breeder saves is
+  /// the row they live with, and every puppy's birthday is copied from the
+  /// whelping date, so a slipped pair becomes the herd's age arithmetic and the
+  /// litter's PDF prints the two dates side by side.
+  void _refuseDates(LitterDateProblem problem) {
+    final l10n = AppLocalizations.of(context);
+    // Exhaustive on purpose: a third rule added to the enum has to be answered
+    // here, rather than falling into whichever sentence this arm happens to be.
+    final message = switch (problem) {
+      LitterDateProblem.whelpingBeforeMating => l10n.litterWhelpingBeforeMating,
+      LitterDateProblem.weaningBeforeWhelping =>
+        l10n.litterWeaningBeforeWhelping,
+      LitterDateProblem.none => null,
+    };
+    if (message == null) return;
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
