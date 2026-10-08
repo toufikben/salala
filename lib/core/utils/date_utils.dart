@@ -1,6 +1,8 @@
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 
+import '../l10n/app_localizations.dart';
+
 /// [formatDay] for work that outlives the widget that started it.
 ///
 /// A launch-time reminder rebuild is still running when its screen can be
@@ -12,6 +14,23 @@ String formatDayFor(String localeTag, int? epochMs) {
     DateFormat.yMMMd(localeTag)
         .format(DateTime.fromMillisecondsSinceEpoch(epochMs)),
   );
+}
+
+/// A date a reader can line up against a paper certificate, or the words for
+/// "never written down".
+///
+/// [formatDayFor] answers an empty string, which is right on a screen where the
+/// row itself carries the missing field and wrong on a printed page: a blank cell
+/// reads as something the app withheld, so the gap in the record has to be named
+/// out loud. Both documents ask, so this lives beside the formatter rather than
+/// inside one of them.
+String formatDayOrUnknown(
+  AppLocalizations l10n,
+  String localeTag,
+  int? epochMs,
+) {
+  final day = formatDayFor(localeTag, epochMs);
+  return day.isEmpty ? l10n.valueUnknown : day;
 }
 
 /// Every digit Salala prints is a Latin one, in every language (D21).

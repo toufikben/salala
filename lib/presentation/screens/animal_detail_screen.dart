@@ -19,6 +19,7 @@ import '../../data/models/vet_visit.dart';
 import '../../data/models/weight_entry.dart';
 import '../../services/animal_pdf.dart';
 import '../../services/pack_files.dart';
+import '../../services/pdf_layout.dart';
 import '../providers/app_providers.dart';
 import '../providers/record_providers.dart';
 import '../providers/triage_providers.dart';

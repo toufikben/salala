@@ -18,15 +18,9 @@ import '../data/models/symptom.dart';
 import '../data/models/vaccination.dart';
 import '../data/models/vet_visit.dart';
 import '../data/models/weight_entry.dart';
+import 'pdf_layout.dart';
 
 const double _dayMs = 86400000.0;
-
-/// The face the document embeds, declared in `pubspec.yaml` as an asset.
-///
-/// Named here because the caller only has to load it: `pdf` draws a glyph the
-/// chosen font lacks as an empty box rather than raising, so a document built
-/// without this file is silently unreadable in Arabic (D24).
-const String pdfFontAsset = 'assets/fonts/Amiri-Regular.ttf';
 
 /// The record a buyer keeps (Stage 2).
 ///
@@ -81,7 +75,7 @@ Future<Uint8List> animalPackPdf(
       // Which side of the pedigree this animal stood on, because a sire's value
       // on paper is exactly the litters he got.
       litter.damId == animal.id ? l10n.animalDam : l10n.animalSire,
-      _day(l10n, localeTag, litter.whelpingDate),
+      formatDayOrUnknown(l10n, localeTag, litter.whelpingDate),
       '${puppies.length}',
     ]);
   }
@@ -102,37 +96,35 @@ Future<Uint8List> animalPackPdf(
   final chart = _growthChart(animal, weighIns);
 
   final body = <pw.Widget>[
-    pw.Text(
-      animal.name,
-      style: const pw.TextStyle(fontSize: 22, fontWeight: pw.FontWeight.bold),
+    ...pdfMasthead(
+      name: animal.name,
+      kind: l10n.pdfTitle,
+      generatedLine: l10n.pdfGenerated(formatDayFor(localeTag, generatedAt)),
     ),
-    pw.Text(
-      l10n.pdfTitle,
-      style: const pw.TextStyle(fontSize: 12, color: PdfColors.grey700),
-    ),
-    pw.Text(
-      l10n.pdfGenerated(formatDayFor(localeTag, generatedAt)),
-      style: const pw.TextStyle(fontSize: 9, color: PdfColors.grey600),
-    ),
-    pw.SizedBox(height: 10),
-    _facts(<(String, String)>[
+    pdfFacts(<(String, String)>[
       (l10n.animalSpecies, animal.species),
       (l10n.animalBreed, animal.breed ?? l10n.valueUnknown),
       (l10n.animalSex, sexLabel(l10n, animal.sex)),
       (l10n.animalStatus, statusLabel(l10n, animal.status)),
-      (l10n.animalBirthDate, _day(l10n, localeTag, animal.birthDate)),
+      (
+        l10n.animalBirthDate,
+        formatDayOrUnknown(l10n, localeTag, animal.birthDate),
+      ),
       if (animal.deathDate != null)
-        (l10n.animalDeathDate, _day(l10n, localeTag, animal.deathDate)),
+        (
+          l10n.animalDeathDate,
+          formatDayOrUnknown(l10n, localeTag, animal.deathDate),
+        ),
       (l10n.animalColor, animal.color ?? l10n.valueUnknown),
       (l10n.animalRegistrationNo, animal.registrationNo ?? l10n.valueUnknown),
       (l10n.animalRegistry, animal.registry ?? l10n.valueUnknown),
       (l10n.animalMicrochip, animal.microchipId ?? l10n.valueUnknown),
     ]),
-    ..._section(
+    ...pdfSection(
       l10n.pdfPedigree,
       pedigree.isEmpty ? <pw.Widget>[pw.Text(l10n.valueUnknown)] : pedigree,
     ),
-    ..._table(
+    ...pdfTable(
       l10n,
       l10n.recordsVaccinations,
       <String>[
@@ -145,13 +137,13 @@ Future<Uint8List> animalPackPdf(
         for (final Vaccination dose in doses)
           <String>[
             dose.vaccineName,
-            _day(l10n, localeTag, dose.dateAdministered),
-            _day(l10n, localeTag, dose.nextDueDate),
+            formatDayOrUnknown(l10n, localeTag, dose.dateAdministered),
+            formatDayOrUnknown(l10n, localeTag, dose.nextDueDate),
             dose.vetName ?? l10n.valueUnknown,
           ],
       ],
     ),
-    ..._table(
+    ...pdfTable(
       l10n,
       l10n.recordsHealthTests,
       <String>[
@@ -165,19 +157,19 @@ Future<Uint8List> animalPackPdf(
           <String>[
             test.testType,
             test.result,
-            _day(l10n, localeTag, test.testDate),
-            _day(l10n, localeTag, test.validUntil),
+            formatDayOrUnknown(l10n, localeTag, test.testDate),
+            formatDayOrUnknown(l10n, localeTag, test.validUntil),
           ],
       ],
     ),
-    ..._table(
+    ...pdfTable(
       l10n,
       l10n.recordsWeights,
       <String>[l10n.weightMeasuredOn, l10n.weightKg],
       <List<String>>[
         for (final WeightEntry entry in weighIns)
           <String>[
-            _day(l10n, localeTag, entry.measuredAt),
+            formatDayOrUnknown(l10n, localeTag, entry.measuredAt),
             formatWeight(entry.weightGrams, kg: l10n.unitKg, g: l10n.unitGrams),
           ],
       ],
@@ -185,14 +177,14 @@ Future<Uint8List> animalPackPdf(
           ? const <pw.Widget>[]
           : <pw.Widget>[pw.SizedBox(height: 8), chart],
     ),
-    ..._table(
+    ...pdfTable(
       l10n,
       l10n.recordsVisits,
       <String>[l10n.visitDate, l10n.visitReason, l10n.visitOutcome],
       <List<String>>[
         for (final VetVisit visit in visits)
           <String>[
-            _day(l10n, localeTag, visit.visitDate),
+            formatDayOrUnknown(l10n, localeTag, visit.visitDate),
             visit.reason ?? l10n.visitNoReason,
             visit.outcome ?? l10n.valueUnknown,
           ],
@@ -201,7 +193,7 @@ Future<Uint8List> animalPackPdf(
     // What the breeder saw, in the buyer's document too: a symptom is the least
     // verifiable line in this record and the one most likely to be left out of a
     // paper summary, so it gets a table rather than a sentence in the notes.
-    ..._table(
+    ...pdfTable(
       l10n,
       l10n.recordsSymptoms,
       <String>[
@@ -215,14 +207,14 @@ Future<Uint8List> animalPackPdf(
         for (final Symptom symptom in sightings)
           <String>[
             symptom.label,
-            _day(l10n, localeTag, symptom.observedAt),
+            formatDayOrUnknown(l10n, localeTag, symptom.observedAt),
             severityLabel(l10n, symptom.severity),
             symptom.ongoing ? l10n.symptomOngoing : l10n.symptomResolved,
             symptom.note ?? l10n.valueUnknown,
           ],
       ],
     ),
-    ..._table(l10n, l10n.pdfLitters, <String>[
+    ...pdfTable(l10n, l10n.pdfLitters, <String>[
       l10n.litterName,
       l10n.animalSex,
       l10n.litterWhelpingDate,
@@ -236,7 +228,7 @@ Future<Uint8List> animalPackPdf(
         buyerById(buyers, placement.buyerId),
       ),
     if (animal.notes != null && animal.notes!.isNotEmpty)
-      ..._section(l10n.animalNotes, <pw.Widget>[pw.Text(animal.notes!)]),
+      ...pdfSection(l10n.animalNotes, <pw.Widget>[pw.Text(animal.notes!)]),
     pw.SizedBox(height: 18),
     pw.Text(
       l10n.pdfDisclaimer,
@@ -252,13 +244,7 @@ Future<Uint8List> animalPackPdf(
       margin: const pw.EdgeInsets.fromLTRB(30, 30, 30, 40),
       textDirection: direction,
       maxPages: 40,
-      footer: (context) => pw.Align(
-        alignment: pw.Alignment.bottomRight,
-        child: pw.Text(
-          animal.name,
-          style: const pw.TextStyle(fontSize: 8, color: PdfColors.grey600),
-        ),
-      ),
+      footer: (context) => pdfFooter(animal.name),
       build: (context) => body,
     ),
   );
@@ -276,8 +262,8 @@ List<pw.Widget> _placementBlock(
   String localeTag,
   Placement placement,
   Buyer? buyer,
-) => _section(l10n.pdfPlacement, <pw.Widget>[
-  _facts(<(String, String)>[
+) => pdfSection(l10n.pdfPlacement, <pw.Widget>[
+  pdfFacts(<(String, String)>[
     (l10n.pdfBuyer, buyer?.name ?? l10n.valueUnknown),
     if (buyer?.phone != null) (l10n.pdfPhone, buyer!.phone!),
     if (buyer?.email != null) (l10n.pdfEmail, buyer!.email!),
@@ -285,89 +271,23 @@ List<pw.Widget> _placementBlock(
     // address, and this line is the only trace of either in the document.
     if (buyer?.countryCode case final String country when country.isNotEmpty)
       (l10n.buyerCountryCode, country),
-    (l10n.pdfPlacedOn, _day(l10n, localeTag, placement.placedDate)),
-    (l10n.pdfPrice, _price(l10n, placement)),
+    (
+      l10n.pdfPlacedOn,
+      formatDayOrUnknown(l10n, localeTag, placement.placedDate),
+    ),
+    (
+      l10n.pdfPrice,
+      formatPriceWithCurrency(
+        placement.price,
+        placement.currency,
+        unknown: l10n.valueUnknown,
+      ),
+    ),
     if (placement.guaranteeTerms != null &&
         placement.guaranteeTerms!.isNotEmpty)
       (l10n.pdfGuarantee, placement.guaranteeTerms!),
   ]),
 ]);
-
-/// Money as the breeder typed it, in the currency written beside it (D21).
-///
-/// `formatPrice` rather than `toStringAsFixed(2)`: a price of 2500 is not a
-/// measurement to four significant figures, and in an Arabic document the two
-/// forms read differently — one is a number the family can quote back, the other
-/// is a lab result. An absent currency is left off rather than printed as a
-/// trailing space.
-String _price(AppLocalizations l10n, Placement placement) {
-  final price = placement.price;
-  if (price == null) return l10n.valueUnknown;
-  final amount = formatPrice(price);
-  final currency = placement.currency;
-  if (currency == null || currency.isEmpty) return amount;
-  return '$amount $currency';
-}
-
-/// Records grouped under a heading, with the heading's own spacing.
-List<pw.Widget> _section(String title, List<pw.Widget> body) => <pw.Widget>[
-  pw.SizedBox(height: 14),
-  pw.Text(
-    title,
-    style: const pw.TextStyle(fontSize: 13, fontWeight: pw.FontWeight.bold),
-  ),
-  pw.SizedBox(height: 4),
-  ...body,
-];
-
-/// Records in a bordered grid, or the sentence that says there are none.
-///
-/// An empty table on a document someone keeps is worse than that sentence: it
-/// reads as a section the app left out, not as a record with nothing in it.
-List<pw.Widget> _table(
-  AppLocalizations l10n,
-  String title,
-  List<String> headings,
-  List<List<String>> rows, {
-  List<pw.Widget> trailing = const <pw.Widget>[],
-}) => _section(title, <pw.Widget>[
-  if (rows.isEmpty)
-    pw.Text(l10n.recordsEmpty)
-  else
-    pw.Table(
-      defaultColumnWidth: const pw.FlexColumnWidth(),
-      border: pw.TableBorder.all(color: PdfColors.grey400, width: 0.5),
-      children: <pw.TableRow>[
-        _row(headings, strong: true),
-        for (final List<String> row in rows) _row(row),
-      ],
-    ),
-  ...trailing,
-]);
-
-/// Label and value in two columns, for the facts that are not a history.
-pw.Widget _facts(List<(String, String)> facts) => pw.Table(
-  defaultColumnWidth: const pw.FlexColumnWidth(2),
-  columnWidths: const <int, pw.TableColumnWidth>{0: pw.FlexColumnWidth(1)},
-  children: <pw.TableRow>[
-    for (final (label, value) in facts) _row(<String>[label, value]),
-  ],
-);
-
-pw.TableRow _row(List<String> cells, {bool strong = false}) => pw.TableRow(
-  children: <pw.Widget>[
-    for (final String cell in cells)
-      pw.Padding(
-        padding: const pw.EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-        child: pw.Text(
-          cell,
-          style: strong
-              ? const pw.TextStyle(fontWeight: pw.FontWeight.bold)
-              : null,
-        ),
-      ),
-  ],
-);
 
 /// Weight against age — the one curve a puppy's owner reads off a list of
 /// numbers. Left out rather than drawn on an invented axis: without a birth date
@@ -467,12 +387,4 @@ Future<List<Litter>> _everyLitterOf(Daos daos, String animalId) async {
           (b.whelpingDate ?? 0).compareTo(a.whelpingDate ?? 0),
     );
   return sorted;
-}
-
-/// A date a breeder can line up against a paper certificate, or the words for
-/// "never written down". A blank cell reads as something the app withheld; the
-/// gap in the record has to be named out loud.
-String _day(AppLocalizations l10n, String localeTag, int? epochMs) {
-  final day = formatDayFor(localeTag, epochMs);
-  return day.isEmpty ? l10n.valueUnknown : day;
 }

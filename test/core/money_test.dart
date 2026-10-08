@@ -73,4 +73,35 @@ void main() {
       expect(formatPrice(parsePrice('250,50')!), '250.5');
     });
   });
+
+  group('formatPriceWithCurrency', () {
+    test('the code goes beside the amount, in Latin digits', () {
+      expect(
+        formatPriceWithCurrency(2500, 'MAD', unknown: 'Not recorded'),
+        '2500 MAD',
+      );
+      expect(
+        formatPriceWithCurrency(250.5, 'MAD', unknown: 'Not recorded'),
+        '250.5 MAD',
+      );
+    });
+
+    test('a price with no currency is not a trailing space', () {
+      expect(
+        formatPriceWithCurrency(2500, null, unknown: 'Not recorded'),
+        '2500',
+      );
+      expect(
+        formatPriceWithCurrency(2500, '', unknown: 'Not recorded'),
+        '2500',
+      );
+    });
+
+    test('nothing written down is the words for that, never zero', () {
+      expect(
+        formatPriceWithCurrency(null, 'MAD', unknown: 'Not recorded'),
+        'Not recorded',
+      );
+    });
+  });
 }

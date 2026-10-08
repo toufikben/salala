@@ -31,3 +31,21 @@ String formatPrice(double price) {
   if (!text.contains('.')) return text;
   return text.replaceAll(RegExp(r'\.?0+$'), '');
 }
+
+/// An amount with the code written beside it, for a document someone keeps.
+///
+/// The animal's transfer pack and the whelping record both have a price column,
+/// and both have to answer the same three cases: nothing written down, an amount
+/// in a currency nobody named, and the usual `2500 MAD`. An absent currency is
+/// left off rather than printed as a trailing space, because a reader cannot tell
+/// a missing code from a missing amount on paper.
+String formatPriceWithCurrency(
+  double? amount,
+  String? currency, {
+  required String unknown,
+}) {
+  if (amount == null) return unknown;
+  final price = formatPrice(amount);
+  if (currency == null || currency.isEmpty) return price;
+  return '$price $currency';
+}
