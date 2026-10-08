@@ -853,14 +853,62 @@ as "no buyer" instead of an error. Recorded as **D27**.
 
 ### Queued next, in order
 
-- **3d — the herd agenda.** The home screen lists animals; "what is overdue, and
-  what is due in the next two weeks, across everything I own?" currently
-  requires opening every animal one by one.
-- **Known defects found while writing 3c**, all in the export path, all small:
+- **The four defects found while writing 3c**, all in the export path, all small:
   the PDF never prints `Buyer.countryCode`; it prices a handover with
   `toStringAsFixed(2)` and a trailing space instead of `formatPrice`; it prints
   only `placements.first`, so a newest handover that carries no date is skipped;
-  and `placement_dialog._save` can drop a buyer created inline.
+  and `placement_dialog._save` can drop a buyer created inline. `money.dart` has
+  no unit test either.
+- **One batched device pass** for 3b, 3c and 3d together — the rule the owner set
+  is that the phone is checked after a suitable batch, not after every small
+  addition. It owes: a buyer and a placement recorded, the PDF's buyer block read
+  page by page in Arabic and English, a price in Latin digits, agenda rows for an
+  overdue dose — and then the removal of the test data already left in the real
+  ledger.
+
+## Stage 3d — The herd agenda *(pushed, CI pending)*
+
+Every screen so far answers "what does *this* animal need?". The question a
+breeder starts the day with — what is overdue, and what is due in the next two
+weeks, across everything I own? — cost one tap per animal card.
+
+- **One block above the herd**, one row per animal, naming that animal's earliest
+  booking, overdue rows first. `lib/core/utils/agenda.dart` is pure and owns every
+  one of those choices — window, null due dates, status filter, one-row rule,
+  sort — so none of them exists twice.
+- **No new SQL and no schema change.** `VaccinationDao.dueBefore`, written for the
+  launch-time reminder resync, already returns exactly the doses up to a horizon,
+  ordered, through `idx_vaccinations_due`. The agenda asks it for
+  `agendaHorizonMs(now)`, and the same function folds the answer, so the query and
+  the rows cannot disagree about how far two weeks reach.
+- **Only animals still in the herd.** A sold, retired or lost dog keeps its
+  records in the ledger and in the pack, and stops generating bookings.
+- **The wording is the triage card's**, not a new translation: `Rabies was due 3
+  days ago` in English, `Rabies كان مستحقًا منذ 3 أيام` in Arabic — the count of
+  days Latin (D21), the Arabic form picked by the same `daysPhrase` the card uses.
+  One dose cannot read two different ways depending on which screen it was met on.
+  New text: one key, `agendaTitle`, in all three locales.
+- **Every dose write re-reads it** — create, update and delete in
+  `record_providers.dart` — and a pack restore asks for it by name, because a
+  restore replaces the whole database while two of the three things derived from
+  those rows (the lists, the alarms) were already being refreshed and the third
+  was not.
+- **The reads are hoisted into the screen's build (D27)**, deliberately: this
+  block sits above a lazy `ListView`'s animal cards, and a query started from
+  inside a child is what cost eight tests last stage.
+- **Nothing renders while the first read is out**, and nothing at all when the
+  herd has no bookings — but a read that *failed* shows its own retry line,
+  because a silently absent to-do list is how a rabies shot stays unscheduled.
+
+18 new tests: `test/core/agenda_test.dart` for the rules (9 of them — window inclusive at day
+14 and out at 15, earliest dose wins, ordering, the three statuses, a dose whose
+animal is gone, floor-for-past and ceiling-for-future day counts, the never-zero
+clamp, and the horizon the query shares with the fold) and
+`test/presentation/herd_agenda_test.dart` for the screen (overdue and upcoming
+rows, the block above the herd, a fortnight-away dose absent, a sold animal off
+the agenda with his card still on the list, row order, the tap that opens the
+right ledger, the Arabic sentence, and the invalidation itself — delete the dose
+through the form and the row must be gone on the way back).
 
 
 ## Stage 4 — Distribution

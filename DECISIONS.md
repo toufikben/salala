@@ -556,3 +556,46 @@ sections, and at herd sizes it is nothing. What the rule does cost is a little
 ceremony in `animal_detail_screen.dart`, where four arguments now travel to
 `_PlacementSection`; and it means a section cannot be dropped into another
 screen without also wiring that screen's reads, which is the point.
+
+## D28 — The home screen answers for the herd, not only for the animals
+
+**Date:** 2026-10-08. **Status:** in force.
+
+The animal list carries one agenda block above the herd: every dose due within
+`agendaWindowDays` (14), *plus* everything already overdue, one row per animal,
+naming that animal's earliest booking, for animals whose status is `active` only.
+Tapping a row opens the ledger it belongs to. The block renders nothing when
+there is nothing to book.
+
+**Why.** Everything before this answered "what does *this* animal need?", and the
+question a breeder actually starts the day with — "what is overdue, and what is
+due in the next fortnight, across everything I own?" — cost one tap per card. The
+paid pack is per animal; the day is per herd, and the herd had no surface. A
+fortnight because it is the span someone can act on: a dose due in March is not
+this week's booking, and a window wide enough to include it turns an agenda into
+the calendar this app does not have. One row per animal because the ledger shows
+the whole history, and the block's value is that nothing needs opening.
+
+**How to apply.** `buildHerdAgenda` in `lib/core/utils/agenda.dart` is pure and
+owns every one of those choices — the window, the null due dates, the status
+filter, one-row-per-animal, the sort — and it is the only place that decides them.
+`agendaDosesProvider` returns the raw rows from `VaccinationDao.dueBefore` rather
+than finished items: the animals have to be folded in as well, and a provider that
+watched `animalsProvider` would rebuild the agenda on any edit to any animal and
+merge two reads that the screen can time on its own (D27). `agendaHorizonMs` is
+shared by the query and the fold so they cannot disagree about the fortnight.
+Any new dose write path invalidates `agendaDosesProvider` next to the family it
+already invalidates — and a restore replaces the whole database, so it asks for
+the agenda by name; `test/presentation/herd_agenda_test.dart` is the enforcement
+for the delete path. Day counts are the triage counts (floor for a date past,
+ceiling clamped to at least one for a date still to come) and the sentences are
+the triage dose messages, so the card on a ledger and the row above the herd never
+say two different things about one dose.
+
+**Cost, stated.** A dose due in three weeks is invisible until day 14 — the agenda
+is a window, not a forecast, and that is deliberate. Reusing the triage wording
+means an edit to `triageDoseOverdue` changes the home screen too. The herd-wide
+query runs on every cold open of the home screen; it is the read
+`VaccinationDao.dueBefore` already makes at launch for the reminder resync, and
+`idx_vaccinations_due` covers it, so the agenda costs the screen one indexed
+range scan rather than a new one.
