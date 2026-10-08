@@ -90,11 +90,19 @@ class LocaleController extends Notifier<Locale?> {
   @override
   Locale? build() => ref.watch(initialLocaleProvider);
 
+  /// Stores the choice first, and only then shows it.
+  ///
+  /// The order is the whole point: setting the state before the write meant a
+  /// phone that refused the row still moved the app into the new language, so
+  /// the breeder saw Arabic for the day and English the morning after, with
+  /// nothing between the two saying the choice had never been kept. This is
+  /// D33's rule applied to a setting — a write that did not land is not a
+  /// change the screen should display.
   Future<void> select(Locale? locale) async {
-    state = locale;
     await ref
         .read(settingsDaoProvider)
         .write(SettingKeys.languageCode, locale?.languageCode ?? 'system');
+    state = locale;
   }
 }
 

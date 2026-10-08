@@ -121,10 +121,22 @@ class _LanguageTileState extends ConsumerState<_LanguageTile> {
       menuChildren: <Widget>[
         for (final code in _codes)
           MenuItemButton(
-            onPressed: () {
-              ref
-                  .read(localeControllerProvider.notifier)
-                  .select(code == 'system' ? null : Locale(code));
+            onPressed: () async {
+              // Captured before the await, and the choice is only shown once the
+              // row is stored — `select` writes first now, so a refusal leaves
+              // the app in the language it was in, and this is the sentence that
+              // says why the tap appeared to do nothing.
+              final messenger = ScaffoldMessenger.of(context);
+              try {
+                await ref
+                    .read(localeControllerProvider.notifier)
+                    .select(code == 'system' ? null : Locale(code));
+              } catch (error) {
+                debugPrint('Language choice refused: $error');
+                messenger.showSnackBar(
+                  SnackBar(content: Text(l10n.languageNotStored)),
+                );
+              }
             },
             child: Text(_endonym(code, l10n)),
           ),

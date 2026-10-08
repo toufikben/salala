@@ -234,6 +234,18 @@ class AppLocalizationsFr extends AppLocalizations {
   String get settingsLanguageSystem => 'Langue du système';
 
   @override
+  String get languageNotStored =>
+      'Le téléphone a refusé d\'enregistrer cette langue.';
+
+  @override
+  String get startupFailedTitle =>
+      'Salala n\'a pas pu ouvrir le registre sur ce téléphone.';
+
+  @override
+  String get startupFailedBody =>
+      'Vos enregistrements sont toujours dans le fichier. Fermez l\'application et rouvrez-la.';
+
+  @override
   String get settingsAbout => 'À propos';
 
   @override

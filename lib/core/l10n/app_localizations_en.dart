@@ -233,6 +233,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsLanguageSystem => 'System default';
 
   @override
+  String get languageNotStored => 'The phone would not keep this language.';
+
+  @override
+  String get startupFailedTitle =>
+      'Salala could not open the ledger on this phone.';
+
+  @override
+  String get startupFailedBody =>
+      'Your records are still in the file. Close the app and open it again.';
+
+  @override
   String get settingsAbout => 'About';
 
   @override

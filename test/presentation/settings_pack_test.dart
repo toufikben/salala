@@ -422,4 +422,48 @@ void main() {
       expect(storage.values['app_lock_digest'], isNull);
     });
   });
+
+  group('the language', () {
+    // The pair exists because the second test's "still English" means nothing
+    // unless the first one shows the same tap does move the app when the phone
+    // accepts the row.
+    testWidgets('a language the phone stored changes the whole app', (
+      tester,
+    ) async {
+      await pumpSalala(tester, seed: <Animal>[animal('Atlas')]);
+      await goTo(tester, 'Settings');
+
+      await tapTile(tester, 'Language');
+      await tester.tap(find.text('العربية'));
+      await settleRealIo(tester);
+      await tester.pumpAndSettle();
+
+      expect(find.text('اللغة'), findsOneWidget);
+    });
+
+    testWidgets('a language the phone will not store is not shown as chosen', (
+      tester,
+    ) async {
+      await pumpSalala(
+        tester,
+        seed: <Animal>[animal('Atlas')],
+        beforeLaunch: refuseWritesTo('user_settings'),
+      );
+      await goTo(tester, 'Settings');
+
+      await tapTile(tester, 'Language');
+      await tester.tap(find.text('العربية'));
+      await settleRefusal(tester);
+
+      expect(
+        find.text('The phone would not keep this language.'),
+        findsOneWidget,
+      );
+      // The choice was never stored, so the screen must not wear it: before this
+      // order the app went Arabic for the session and English the next morning,
+      // with no sentence anywhere between the two to say the tap had failed.
+      expect(find.text('Language'), findsOneWidget);
+      expect(find.text('اللغة'), findsNothing);
+    });
+  });
 }

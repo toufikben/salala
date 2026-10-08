@@ -514,6 +514,24 @@ abstract class AppLocalizations {
   /// **'System default'**
   String get settingsLanguageSystem;
 
+  /// No description provided for @languageNotStored.
+  ///
+  /// In en, this message translates to:
+  /// **'The phone would not keep this language.'**
+  String get languageNotStored;
+
+  /// No description provided for @startupFailedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Salala could not open the ledger on this phone.'**
+  String get startupFailedTitle;
+
+  /// No description provided for @startupFailedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your records are still in the file. Close the app and open it again.'**
+  String get startupFailedBody;
+
   /// No description provided for @settingsAbout.
   ///
   /// In en, this message translates to:

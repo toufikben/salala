@@ -236,6 +236,17 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settingsLanguageSystem => 'لغة النظام';
 
   @override
+  String get languageNotStored => 'رفض الهاتف حفظ هذه اللغة.';
+
+  @override
+  String get startupFailedTitle =>
+      'لم تتمكن سلالة من فتح السجل على هذا الهاتف.';
+
+  @override
+  String get startupFailedBody =>
+      'سجلاتك ما زالت في الملف. أغلق التطبيق وأعد فتحه.';
+
+  @override
   String get settingsAbout => 'حول التطبيق';
 
   @override
