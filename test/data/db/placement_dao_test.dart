@@ -241,8 +241,10 @@ void main() {
 
     test('a handover with no day sorts after the ones that have one', () async {
       // SQLite reads NULL as the smallest value, so `placed_date DESC` puts an
-      // undated row last rather than at the top of the ledger — which is the
-      // order the transfer pack takes too, since it prints the newest one.
+      // undated row last rather than at the top of the ledger. This is the order
+      // the transfer pack prints too, and the reason reading only `first` there
+      // left an undated handover off the buyer's document: the pack now prints
+      // every row, newest dated one first.
       await daos.placements.create(handover(placed: null), nowMs: 1);
       await daos.placements.create(handover(placed: 500), nowMs: 2);
 

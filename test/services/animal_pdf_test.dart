@@ -361,4 +361,76 @@ void main() {
 
     expectPdf(bytes);
   });
+
+  test('every handover the animal has is on the document, not only one', () async {
+    // A puppy bought back and re-homed leaves two placements. The one whose day
+    // was never written sorts *last* under `placed_date DESC` (pinned in
+    // placement_dao_test.dart), so reading only `first` printed the previous
+    // family's name on the paper the current family keeps. Both rows have to be
+    // laid out, and the second buyer's country has to be in there with them.
+    // What this can prove is the shape of the document; the words on it are a
+    // pair of eyes on the phone.
+    final db = await openTestDatabase();
+    final daos = Daos(db);
+    await daos.animals.create(
+      Animal(
+        id: 'a-twice',
+        name: 'Sirin',
+        species: 'dog',
+        sex: Sex.female,
+        status: AnimalStatus.active,
+        createdAt: 1740000000000,
+        updatedAt: 1740000000000,
+      ),
+    );
+    for (final (id, name, country) in <(String, String, String?)>[
+      ('b-first', 'Hakim Ouali', null),
+      ('b-second', 'Nadia Sabri', 'MA'),
+    ]) {
+      await daos.buyers.create(
+        Buyer(
+          id: id,
+          name: name,
+          countryCode: country,
+          createdAt: 1749000000000,
+          updatedAt: 1749000000000,
+        ),
+      );
+    }
+    await daos.placements.create(
+      Placement(
+        id: 'p-dated',
+        animalId: 'a-twice',
+        buyerId: 'b-first',
+        placedDate: 1749000000000,
+        price: 250.5,
+        currency: 'MAD',
+        createdAt: 1749000000000,
+        updatedAt: 1749000000000,
+      ),
+    );
+    // The newest handover, with no day on it yet: the family is named, the pickup
+    // is still being arranged.
+    await daos.placements.create(
+      Placement(
+        id: 'p-undated',
+        animalId: 'a-twice',
+        buyerId: 'b-second',
+        price: 9000,
+        createdAt: 1749000000000,
+        updatedAt: 1749000000000,
+      ),
+    );
+    final l10n = await AppLocalizations.delegate.load(const Locale('en'));
+
+    final bytes = await animalPackPdf(
+      daos,
+      animalId: 'a-twice',
+      l10n: l10n,
+      baseFont: shippedFont(),
+      now: DateTime.utc(2026, 10, 5),
+    );
+
+    expectPdf(bytes);
+  });
 }

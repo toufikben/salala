@@ -6,9 +6,11 @@ import 'package:pdf/widgets.dart' as pw;
 import '../core/l10n/app_localizations.dart';
 import '../core/l10n/enum_labels.dart';
 import '../core/utils/date_utils.dart';
+import '../core/utils/money.dart';
 import '../core/utils/weight.dart';
 import '../data/db/daos.dart';
 import '../data/models/animal.dart';
+import '../data/models/buyer.dart';
 import '../data/models/health_test.dart';
 import '../data/models/litter.dart';
 import '../data/models/placement.dart';
@@ -86,10 +88,16 @@ Future<Uint8List> animalPackPdf(
 
   final pedigree = await _ancestry(l10n, daos, animal, 1, <String>{animal.id});
 
+  // Every handover, not the newest one. `forAnimal` orders by `placed_date DESC`,
+  // and SQLite puts a null last in a descending sort, so reading only `first`
+  // dropped a handover whose date the breeder had not written yet — the one
+  // document that should say who has the dog now was saying it about the previous
+  // family instead. The contacts they name come from one read, not a query per
+  // row, in the order the app lists people in.
   final placements = await daos.placements.forAnimal(animal.id);
-  final Placement? placement = placements.isEmpty ? null : placements.first;
-  final buyerId = placement?.buyerId;
-  final buyer = buyerId == null ? null : await daos.buyers.findById(buyerId);
+  final buyers = placements.isEmpty
+      ? const <Buyer>[]
+      : await daos.buyers.alphabetical();
 
   final chart = _growthChart(animal, weighIns);
 
@@ -220,26 +228,13 @@ Future<Uint8List> animalPackPdf(
       l10n.litterWhelpingDate,
       l10n.pdfPuppies,
     ], litterRows),
-    if (placement != null)
-      ..._section(l10n.pdfPlacement, <pw.Widget>[
-        _facts(<(String, String)>[
-          (l10n.pdfBuyer, buyer?.name ?? l10n.valueUnknown),
-          if (buyer?.phone != null) (l10n.pdfPhone, buyer!.phone!),
-          if (buyer?.email != null) (l10n.pdfEmail, buyer!.email!),
-          (l10n.pdfPlacedOn, _day(l10n, localeTag, placement.placedDate)),
-          (
-            l10n.pdfPrice,
-            placement.price == null
-                ? l10n.valueUnknown
-                : '${placement.price!.toStringAsFixed(2)} '
-                          '${placement.currency ?? ''}'
-                      .trim(),
-          ),
-          if (placement.guaranteeTerms != null &&
-              placement.guaranteeTerms!.isNotEmpty)
-            (l10n.pdfGuarantee, placement.guaranteeTerms!),
-        ]),
-      ]),
+    for (final placement in placements)
+      ..._placementBlock(
+        l10n,
+        localeTag,
+        placement,
+        buyerById(buyers, placement.buyerId),
+      ),
     if (animal.notes != null && animal.notes!.isNotEmpty)
       ..._section(l10n.animalNotes, <pw.Widget>[pw.Text(animal.notes!)]),
     pw.SizedBox(height: 18),
@@ -271,7 +266,50 @@ Future<Uint8List> animalPackPdf(
   return document.save();
 }
 
-/// A heading and whatever is known about one subject.
+/// What one family took home, and who they are.
+///
+/// Its own function because a handover is now printed for *every* placement the
+/// animal has, and the buyer behind it has to be looked up once rather than once
+/// per line.
+List<pw.Widget> _placementBlock(
+  AppLocalizations l10n,
+  String localeTag,
+  Placement placement,
+  Buyer? buyer,
+) => _section(l10n.pdfPlacement, <pw.Widget>[
+  _facts(<(String, String)>[
+    (l10n.pdfBuyer, buyer?.name ?? l10n.valueUnknown),
+    if (buyer?.phone != null) (l10n.pdfPhone, buyer!.phone!),
+    if (buyer?.email != null) (l10n.pdfEmail, buyer!.email!),
+    // Where the family is. A health guarantee is enforced against a person at an
+    // address, and this line is the only trace of either in the document.
+    if (buyer?.countryCode != null && buyer!.countryCode!.isNotEmpty)
+      (l10n.buyerCountryCode, buyer!.countryCode!),
+    (l10n.pdfPlacedOn, _day(l10n, localeTag, placement.placedDate)),
+    (l10n.pdfPrice, _price(l10n, placement)),
+    if (placement.guaranteeTerms != null &&
+        placement.guaranteeTerms!.isNotEmpty)
+      (l10n.pdfGuarantee, placement.guaranteeTerms!),
+  ]),
+]);
+
+/// Money as the breeder typed it, in the currency written beside it (D21).
+///
+/// `formatPrice` rather than `toStringAsFixed(2)`: a price of 2500 is not a
+/// measurement to four significant figures, and in an Arabic document the two
+/// forms read differently — one is a number the family can quote back, the other
+/// is a lab result. An absent currency is left off rather than printed as a
+/// trailing space.
+String _price(AppLocalizations l10n, Placement placement) {
+  final price = placement.price;
+  if (price == null) return l10n.valueUnknown;
+  final amount = formatPrice(price);
+  final currency = placement.currency;
+  if (currency == null || currency.isEmpty) return amount;
+  return '$amount $currency';
+}
+
+/// Records grouped under a heading, with the heading's own spacing.
 List<pw.Widget> _section(String title, List<pw.Widget> body) => <pw.Widget>[
   pw.SizedBox(height: 14),
   pw.Text(

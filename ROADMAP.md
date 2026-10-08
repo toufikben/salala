@@ -853,20 +853,14 @@ as "no buyer" instead of an error. Recorded as **D27**.
 
 ### Queued next, in order
 
-- **The four defects found while writing 3c**, all in the export path, all small:
-  the PDF never prints `Buyer.countryCode`; it prices a handover with
-  `toStringAsFixed(2)` and a trailing space instead of `formatPrice`; it prints
-  only `placements.first`, so a newest handover that carries no date is skipped;
-  and `placement_dialog._save` can drop a buyer created inline. `money.dart` has
-  no unit test either.
-- **One batched device pass** for 3b, 3c and 3d together — the rule the owner set
-  is that the phone is checked after a suitable batch, not after every small
+- **One batched device pass** for 3b, 3c, 3d and 3e together — the rule the owner
+  set is that the phone is checked after a suitable batch, not after every small
   addition. It owes: a buyer and a placement recorded, the PDF's buyer block read
   page by page in Arabic and English, a price in Latin digits, agenda rows for an
   overdue dose — and then the removal of the test data already left in the real
   ledger.
 
-## Stage 3d — The herd agenda *(pushed, CI pending)*
+## Stage 3d — The herd agenda *(CI red — 262 passed, 3 failed, run `37763789650`; fix pushed with 3e)*
 
 Every screen so far answers "what does *this* animal need?". The question a
 breeder starts the day with — what is overdue, and what is due in the next two
@@ -909,6 +903,67 @@ rows, the block above the herd, a fortnight-away dose absent, a sold animal off
 the agenda with his card still on the list, row order, the tap that opens the
 right ledger, the Arabic sentence, and the invalidation itself — delete the dose
 through the form and the row must be gone on the way back).
+
+### The verdict, and the one new fact it collided with
+
+`37763789650` on `4ffcffe` — **262 passed, 3 failed.** Analyze was clean, so the
+APK job was skipped and nothing was installed anywhere.
+
+All three failures were the same thing, and none of them was a broken agenda. An
+animal with something to book is now named **twice** on the home screen — once by
+its agenda row, once by its own card — so three older tests that tapped or counted
+`find.text('Nala')`, `find.text('Sira')`, `find.text('Kenza')` on that screen
+answered with two candidates and `tap()` refused to choose:
+
+- `animal_detail_screen_test.dart` — `_openNala`, used by the whole file.
+- `triage_card_test.dart` — `_openLedger`, and after that the Arabic dose sentence
+  itself, which the agenda prints in the same words as the card (one rule, one
+  wording) while the home route is still in the tree.
+- `settings_pack_test.dart` — the restored herd, which arrives with doses due.
+
+The tests were scoped — to `AnimalCard` for the rows, to `AnimalDetailScreen` for
+the duplicated sentence — rather than the screen changed back. Two animals with the
+same name on one list is a real breeder's problem, and the agenda's answer is a
+row that opens the ledger it belongs to; the fix belongs in the finders, which were
+only ever unique by luck of the seed having nothing due.
+
+
+## Stage 3e — The four defects found while writing 3c *(pushed, CI pending)*
+
+All small, all in the export path, and all of them in the one document the other
+person keeps.
+
+- **The PDF printed only `placements.first`.** `forAnimal` orders by
+  `placed_date DESC`, and SQLite puts a null last in a descending sort — so the
+  newest handover, the one whose day had not been written yet, was exactly the row
+  left off, and the page named the *previous* family as the current one. It prints
+  every handover now. The premise is already pinned by the DAO test `a handover
+  with no day sorts after the ones that have one`; that test's comment still
+  claimed the pack printed one row, so it now says what the pack does.
+- **`Buyer.countryCode` never reached the page.** A guarantee is enforced against a
+  person at an address, and the only trace of either in the document was a name.
+- **Money was printed as a measurement.** `toStringAsFixed(2)` with a trailing
+  space when the currency was blank: `2500.00 `. It goes through `formatPrice`
+  with the code joined only when there is one.
+- **`placement_dialog._save` could drop a buyer created inline.** It checked the
+  chosen id against `buyersProvider`, and `saveBuyer` *invalidates* that list
+  instead of editing it — so the contact written a second ago was not necessarily
+  in the choices yet, and a Save in the same breath wrote a handover with no buyer
+  on it. The dialog holds the buyer it created itself. Asking SQLite was the other
+  shape and was rejected: it puts an `await` before `savePlacement(ref, …)`, the
+  pattern **D7** forbids. The dangling-key guard is kept — an id neither the loaded
+  list nor this dialog answers to is still dropped.
+- **`money.dart` had no test, and its docstring contradicted its code**: it
+  promised `250.50` keeps two decimals and returned `250.5`. The behaviour is what
+  the vet-visit form and `animal_detail_screen_test` already pinned, so the words
+  were corrected, not the number. That made a second copy of the same five lines
+  (`vet_visit_form_screen._formatCost`) redundant — it calls `formatPrice` now.
+- 13 new tests: `test/core/money_test.dart` (12 — the comma, the blank, the zero,
+  the letters, the round trip from typed text to printed text, Latin digits, and
+  the float that is really `0.3`) and one PDF document built from two handovers
+  whose newest has no date and whose second buyer has a country. What the PDF test
+  can prove is still only the shape of the document: the text is drawn through the
+  embedded font's glyph ids, so the words are the phone's job.
 
 
 ## Stage 4 — Distribution

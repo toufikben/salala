@@ -23,8 +23,9 @@ double? parsePrice(String raw) {
 /// An amount as it is said out loud: `2500`, not `2500.00`.
 ///
 /// Trailing zeros make a price read like a measurement, and a breeder types whole
-/// dirhams. Two decimals are kept when there are any, because 250.50 is a real
-/// number on a receipt.
+/// dirhams. They are shaved off the end, so a fee of 250.50 is spoken as `250.5`
+/// — the same words a person writes on a receipt, and the reason this is one
+/// function rather than a rule each screen repeats.
 String formatPrice(double price) {
   final text = price.toStringAsFixed(2);
   if (!text.contains('.')) return text;

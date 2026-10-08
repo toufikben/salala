@@ -50,6 +50,16 @@ class _PlacementDialogState extends ConsumerState<PlacementDialog> {
   late final TextEditingController _guarantee;
   late final TextEditingController _notes;
   late String? _buyerId;
+  // The contact this dialog created itself, held next to its id.
+  //
+  // `saveBuyer` invalidates the list rather than editing it, so the row the DAO
+  // just wrote is not necessarily in the choices yet — that reload needs real
+  // time on the database isolate. A handover saved in the same breath as the
+  // name was typed would otherwise carry no buyer at all, and the buyer's
+  // document is the one place the name has to appear. Checking with SQLite
+  // instead would put an `await` before `savePlacement(ref, …)`, which is the
+  // pattern D7 forbids.
+  Buyer? _createdBuyer;
   late int? _placedDate;
   bool _saving = false;
 
@@ -107,7 +117,10 @@ class _PlacementDialogState extends ConsumerState<PlacementDialog> {
   Future<void> _addBuyer() async {
     final created = await showBuyerDialog(context);
     if (created == null || !mounted) return;
-    setState(() => _buyerId = created.id);
+    setState(() {
+      _buyerId = created.id;
+      _createdBuyer = created;
+    });
   }
 
   Future<void> _save() async {
@@ -116,18 +129,23 @@ class _PlacementDialogState extends ConsumerState<PlacementDialog> {
 
     final existing = widget.existing;
     final buyers = ref.read(buyersProvider).value ?? const <Buyer>[];
+    // The loaded list, or the contact this dialog wrote a moment ago. An id
+    // neither answers to is dropped rather than written, so a buyer deleted
+    // while this form was open still cannot become a dangling foreign key.
+    final known = _createdBuyer != null && _createdBuyer!.id == _buyerId
+        ? _createdBuyer
+        : buyerById(buyers, _buyerId);
     final guarantee = _guarantee.text.trim();
     final notes = _notes.text.trim();
     final currency = _currency.text.trim().toUpperCase();
 
     // Written whole instead of copied: `Placement.copyWith` can blank a price and
     // nothing else, and clearing a buyer or a date is a real edit here. The id
-    // saved is the one the loaded contact list actually offers, so a buyer who
-    // has gone away cannot be written back as a dangling foreign key.
+    // saved is one a row on this phone answers to.
     final placement = Placement(
       id: existing?.id ?? '',
       animalId: widget.animalId,
-      buyerId: buyerById(buyers, _buyerId)?.id,
+      buyerId: known?.id,
       placedDate: _placedDate,
       price: _parsedPrice,
       currency: currency.isEmpty ? null : currency,

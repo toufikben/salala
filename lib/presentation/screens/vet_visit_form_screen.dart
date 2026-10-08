@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/l10n/app_localizations.dart';
 import '../../core/utils/date_utils.dart';
+import '../../core/utils/money.dart';
 import '../../data/models/vet_visit.dart';
 import '../providers/record_providers.dart';
 import '../widgets/date_tile.dart';
@@ -63,17 +64,10 @@ class _VetVisitFormScreenState extends ConsumerState<VetVisitFormScreen> {
     _vet.text = visit.vetName ?? '';
     _reason.text = visit.reason ?? '';
     _outcome.text = visit.outcome ?? '';
-    _cost.text = visit.cost == null ? '' : _formatCost(visit.cost!);
+    _cost.text = visit.cost == null ? '' : formatPrice(visit.cost!);
     _currency.text = visit.currency ?? '';
     _notes.text = visit.notes ?? '';
     _visitDate = visit.visitDate;
-  }
-
-  /// Trailing zeros would make a 250.0 fee read like a measurement.
-  static String _formatCost(double value) {
-    final text = value.toStringAsFixed(2);
-    if (!text.contains('.')) return text;
-    return text.replaceAll(RegExp(r'\.?0+$'), '');
   }
 
   @override
