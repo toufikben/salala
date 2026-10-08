@@ -517,3 +517,42 @@ the bug, and 195 tests would stay green while it did.
 reads the whole herd and litter lists where it once asked for one row by id. At
 the sizes this app's users work at that is nothing; at a herd of thousands it
 would be a query to revisit.
+
+## D27 — A section of a lazy list does not start its own database read
+
+**Date:** 2026-10-07. **Status:** in force.
+
+Every widget that is a child of a scrolling list gets its record lists handed
+down by the screen, watched in the screen's `build`. A section is never allowed
+to call `ref.watch` for a query the first time it scrolls into view.
+
+**Why.** The Placements section added to the animal ledger did exactly that, and
+run `37560315166` lost eight tests to it. Every failure was `pumpAndSettle timed
+out` on the line *after* a scroll, and every one was preceded by sqflite's own
+`Warning database has been locked for 0:00:10.000000`. The mechanism is not
+subtle: `ListView(children: [...])` hands its children to a sliver delegate that
+builds them only as they approach the viewport, so the five older sections' rows
+were simply not on screen yet — but *their* queries had already started, because
+the screen's `build` watches them. The new section was the first one whose query
+lived inside its own `build`, so the read began midway through a scroll, in the
+fake-async zone, where SQLite's other isolate can no longer be given real time to
+answer (`settleRealIo` exists precisely to open that window, and it runs before
+the scroll, not during it). The section was then stuck on a spinner forever, and
+a spinner is an animation that never settles.
+
+**How to apply.** In a screen with a lazy list, `ref.watch` every list its
+sections show, in the screen's `build`, and pass the `AsyncValue` down; a section
+that needs two lists takes two `AsyncValue`s and one retry callback that covers
+both. The rule is not a test concession — the deferred version was also the only
+section on the page that rendered `ref.watch(x).value ?? []`, which turns a
+contact list that failed to read into a page of "no buyer" rows about people who
+are in the ledger. Both halves of that are the same mistake: a section deciding
+its own data state instead of showing what the screen already knows.
+
+**Cost, stated.** The screen reads every list it will show even for the part of
+the page the breeder never scrolls to, so a cold open costs one query per section
+rather than one per section *seen*. That is already true of the five older
+sections, and at herd sizes it is nothing. What the rule does cost is a little
+ceremony in `animal_detail_screen.dart`, where four arguments now travel to
+`_PlacementSection`; and it means a section cannot be dropped into another
+screen without also wiring that screen's reads, which is the point.

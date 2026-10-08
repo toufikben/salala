@@ -722,12 +722,167 @@ dog created on the phone, 90 days old with nothing recorded, produced
 `Act now / No vaccination recorded, at 90 days old` in English and the same
 urgency in Arabic on Nala's ledger.
 
+### Device check — the four pending fixes, on the Realme RMX3910 *(passed, 2026-10-06/07, build `8f14ad6`)*
+
+All four items that were carried as "green on CI, unverified on the phone" are
+now verified on the physical device, with before/after screenshots:
+
+1. **The card follows the ledger.** A weigh-in added on the phone changed the
+   card in place, without leaving the screen: `Keep watching / Weight has
+   fallen 13% since the last weigh-in` (D26 holding on a real write).
+2. **The day count agrees with the number.** `Rabies is due in 1 day` in
+   English, `Rabies مستحق خلال 1 يومًا` in Arabic — the dual/plural forms and
+   the singular both render on the device, not only in `triage_labels_test`.
+3. **The export reaches the sheet.** `تصدير السجلات` opened the system chooser
+   with the pack attached, from `<cacheDir>/salala_out`. The chooser listed real
+   contacts, so the send was cancelled; reaching the sheet is the claim, sending
+   is not.
+4. **D21 holds in the date picker.** With the app in Arabic, Material's own
+   calendar painted Latin digits in the header, the month label and the cells.
+
+Four more things fell out of the same pass, unrequested and now on record:
+
+- The **Build tile in Settings shows the installed commit** (`8f14ad6`), which is
+  what makes any device claim attributable to a specific CI artifact.
+- Exactly **one** `RTC_WAKEUP … 2026-10-07 09:00:00.000` for this package survived
+  a pack restore, and **force-stop removed it while reopening the app rebuilt
+  exactly one** — Stage 1e's re-book-on-launch, proven on the device rather than
+  in a harness.
+- A full **export → delete everything → import** round trip restored the animal,
+  her dose and both weigh-ins, and the card recomputed from the restored rows.
+- The DOB picker report was **not** a header/body disagreement. It was the
+  picker's own `initialDate`: a year back from today, in a header that shows
+  `EEE, d MMM` and therefore no year, so the breeder could not see the year they
+  were saving. Fixed on `05679e5` (one line, matching the five sibling forms that
+  already pass `?? now`). **It has not been re-checked on the phone** — the
+  installed build predates it. It has never had its own CI run either: it rode in
+  the runs for the commits stacked on top of it.
+
+**Tooling correction, because it cost data.** The pull recipe recorded in earlier
+notes — `adb shell "run-as <pkg> cat databases/salala.db" | base64` — encodes
+*locally*, after adb has already rewritten every line ending: the file came back
+131,209 bytes with 176 stray `0x0D` bytes, and restoring it left the app reading
+an empty ledger. Two animals were lost. Encode **on the device** instead:
+`adb shell "run-as <pkg> base64 <path>" | tr -d '\r' | base64 -d`, verified
+byte-exact against a 1,973-byte JSON pack and a 16,475-byte PDF.
+
+Still owed after this pass: the buyer PDF **read page by page** in both languages
+(generation and sharing are proven; no local renderer worked — poppler is absent
+and headless Chrome produced nothing), and the 09:00 **delivery**, which needs
+the phone left untouched overnight and is the owner's call.
+
+## Stage 3b — Symptoms: the breeder's own observation as a record *(CI green — 225 tests, run `37547829324`; device check queued with 3c)*
+
+Stage 3a could only read what the ledger already held. The one fact a breeder
+knows first and a vet records later — *what the animal was doing* — had nowhere
+to go, so a dog that was vomiting could still be scored "nothing to do".
+
+- **Schema v1 → v2, with a real migration.** `symptoms` (label, severity,
+  observed day, `ongoing`, note) joins `dataTables`, so the pack carries it; the
+  migration registry runs `_addSymptoms` for the gap, and
+  `resetMigrationsForTest` now *restores* the production steps instead of
+  clearing them.
+- **Two rules, version 2 of the table.** `severe_symptom` (act now, no
+  threshold: a sighting graded severe and still open is enough on its own) and
+  `symptom_unresolved` (watch, `fromDays: 2`, one line per mild/moderate sign
+  that drags). A severe sign never earns a second, quieter line, and a resolved
+  one stops alarming while the row survives as history.
+- **The card reads it live**: `symptomsForAnimalProvider` is watched inside
+  `triageForAnimalProvider` before the first await, so D26 covers this record
+  type as it covers the other four.
+- **The pack forgives its own history**: a v1 pack missing `symptoms` restores
+  onto a v2 database (the table's schema stamp is known), while a pack that
+  omits a *current-schema* table is still refused.
+- **The PDF gained a symptoms table**, in all three languages.
+
+**CI, stated honestly because this stage went red twice before it went green:**
+
+- `37543350034` on `416ac66` — **216 passed, 3 failed.**
+- `37544019284` on `d5b1d32` — **218 passed, 1 failed.**
+- `37547829324` on `dd4e2a4` — **225 tests passed.** Green.
+
+None of the three failures was a defect in the new code. Two were the same
+thing: the ledger is a lazy `ListView`, the Symptoms section sits *above*
+Vaccinations, so the weights section is no longer built when a test opens an
+animal — `ensureVisible` cannot reach a widget that does not exist, and
+`scrollUntilVisible` ends by resolving its finder to a *single* element, which
+two delete icons cannot be. The third was the pack test pinning `totalRows` at
+12 while the seed grew two symptom rows — the canary in that file's own comment
+doing its job. Recorded here because the usual temptation is to call a red run
+"someone else's test"; the tests were right about the screen they had never seen.
+
+## Stage 3c — Placements: who took the animal home *(CI green — 247 tests, run `37760071802`; device check queued with 3b)*
+
+The paid PDF has printed a buyer block since Stage 2c, reading `placements` and
+`buyers` straight from the database — while nothing in `lib/presentation/` could
+write either table. On a real phone that block was permanently empty, which made
+this the largest proven gap in the app.
+
+- **The section is last in the ledger**, not buried in the animal form: a
+  placement is the record the pack exists for, so it belongs where the handover
+  is actually being written up.
+- **Money is stored exactly as typed**, in the currency named beside it. No rate
+  converts it later and no locale formats it on the way out (D21) — hence
+  `parsePrice` / `formatPrice` in `lib/core/utils/money.dart` printing `2500` and
+  `250.5` rather than running the number through `intl`.
+- **A buyer has no delete, on purpose.** `placements.buyer_id` is
+  `ON DELETE SET NULL`, so removing a contact would silently blank the buyer of a
+  document already handed to a family.
+- **The form opens on a filled dropdown.** `_PlacementSection` watches both the
+  placements and the contacts, so by the time the add button is pressed the
+  contacts are already in hand — no spinner inside a dialog.
+
+**CI, again stated honestly: red twice before green.**
+
+- `37558563412` on `b4a56d7` — the **analyzer** stopped the run on four
+  `--fatal-infos` infos (a top-level doc comment detached from a `library`
+  directive, and three `if (x != null) x` list elements that `?x` says better).
+  The tests never ran.
+- `37560315166` on `f6c434e` — **239 passed, 8 failed.**
+- `37760071802` on `ad81f67` — **247 tests passed**, debug APK built.
+
+The eight failures were not flaky and not the new tests' fault: every one was
+`pumpAndSettle timed out` on the line *after* a scroll, each preceded by sqflite's
+10-second "database lock" warning. The placements section was the only section
+that ran its own `ref.watch` from inside itself, so its query started when the
+lazy `ListView` finally built it — mid-test, after the harness had already
+finished waiting. Moving the two reads into the screen's build and passing
+`AsyncValue`s down fixed that, and it also removed a quieter lie: the deferred
+version read `.value ?? []`, so a failed contact fetch displayed every handover
+as "no buyer" instead of an error. Recorded as **D27**.
+
+### Queued next, in order
+
+- **3d — the herd agenda.** The home screen lists animals; "what is overdue, and
+  what is due in the next two weeks, across everything I own?" currently
+  requires opening every animal one by one.
+- **Known defects found while writing 3c**, all in the export path, all small:
+  the PDF never prints `Buyer.countryCode`; it prices a handover with
+  `toStringAsFixed(2)` and a trailing space instead of `formatPrice`; it prints
+  only `placements.first`, so a newest handover that carries no date is skipped;
+  and `placement_dialog._save` can drop a buyer created inline.
+
+
 ## Stage 4 — Distribution
 
 Blocked on the business question in `docs/FEASIBILITY.md` §Payments: a Morocco
 resident developer cannot receive Play money directly. Options ranked there.
 Whatever is chosen happens **before** the package id and the store listing are
 made permanent, because both are one-way doors.
+
+**The premise of the locked decision is now in question.** The app was designed
+around a one-time purchase through Google Play Billing. `docs/PAYMENT-ROUTE.md`
+(a research note of 2026-10-06, every line labelled CONFIRMED or UNVERIFIED —
+deliberately still untracked, because it is business strategy in a repository
+that is currently public, and the owner has not read it yet) reads
+Google's own supported-locations table as **Morocco: developer registration ✔,
+merchant registration ✘** — which is the half of Play Billing that a paid app
+needs, and it applies identically to in-app purchases and subscriptions. If that
+holds, D8 cannot be executed as written and the monetization shape is a product
+decision, not a billing-library detail. **Nothing in the code depends on it yet**
+— no billing dependency, no purchase screen, no `applicationId` commitment — which
+is exactly why Stage 4 stays blocked instead of half-built. The decision needs the
+owner, with the Google answer sought from Play Console support first.
 
 ## Stage 5 — Later candidates (no commitment yet)
 
