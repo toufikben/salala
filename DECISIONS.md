@@ -831,3 +831,46 @@ is one the phone has to be looked at for — and a rejected write is a path nobo
 will hit on a healthy device, so it will not show up in a happy-path device pass.
 Recording it as a decision is what keeps the next reviewer from "simplifying" the
 two awaits back into one `try`.
+
+## D34 — A delete the database refused keeps its row, and its alarm
+
+**Date:** 2026-10-08. **Status:** in force.
+
+D33's other half, with the opposite sentence. Eight paths asked "Delete this
+record?", were answered yes, and then said nothing at all when SQLite refused the
+delete: the confirm dialog was already gone, the screen stayed, and no string
+appeared — which a breeder reads as a record that has been removed. Now the row
+that survived keeps its screen and hears `recordDeleteFailed` ("This could not be
+deleted. The record is still there."), and nothing is handed to the alarm manager,
+because a dose that is still in the ledger still deserves its reminder. The
+alarm-bearing paths keep the same split as the writes: a dose deleted *around* a
+cancel that fails closes anyway and logs, since the row the breeder asked for is
+really gone.
+
+**Why.** The delete is one statement, and on this schema the children cascade from
+the animal's own `DELETE`, so an aborted statement removes nothing — the herd, the
+rows and the booked alarms are all untouched, which is exactly what the snackbar
+claims. Silence was not a small omission: it is the one failure mode that makes a
+ledger unreliable, because the app's state and the breeder's belief diverge.
+
+**How to apply.** `refuseDeletesOf(table)` is the test seam, the same
+`BEFORE … RAISE(ABORT)` trigger as [refuseWritesTo] but on `DELETE`, and
+`refuseRecordDelete(context, error)` is the single place the sentence and the log
+line live. Two assertions carry the meaning beyond the text: the animal card's
+test requires that the launch's three writer calls are *all* it ever saw (no
+`clearAll` for a surviving animal), and the dose test requires an empty writer log
+(no cancel for a row that was never removed).
+
+**Cost, stated — and one candidate fix that was measured and rejected.** The
+obvious repair for a surviving orphan alarm is a launch resync that clears the
+phone first and re-books from the ledger, which `clearEverything()` makes cheap
+(one `cancelAll` call, not one per record). It is wrong here: reminders are booked
+at save time for whatever is still in the future (`remindersFor` returns both
+mornings whenever they are ahead of now), while `resyncReminders` only reads rows
+due within `reminderHorizonDays` (lead + 15). A clear-all at launch would therefore
+drop the booked alarms of a dose due two months out and never put them back. So the
+orphan stays: a failed cancel after a successful delete is logged, and nothing in
+the app can take that alarm out except an animal-level delete or a restore, which
+do clear wholesale. Same asymmetry already recorded for the save path — an alarm
+that failed to be *booked* is healed by the next launch, an alarm that failed to be
+*cancelled* is not.

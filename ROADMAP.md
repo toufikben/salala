@@ -1175,6 +1175,67 @@ needs a screen in front of someone left on the device list with its name on it.
   the pedigree's second branch — a document's text is drawn through glyph ids, so
   CI can prove the walk finishes but not what the page says.
 
+## Stage 3j — A refused write belongs to the form; a refused delete says the row survived *(CI green — 368 tests at `37836956621` for the writes, 371 at `37838685123` for the deletes; device check queued with 3b/3c/3d/3e/3f/3g/3h/3i)*
+
+The phone stayed in another app for this window too, so the two defects the peer
+review left unverified got fixed against the database instead of against the
+thumb — and each got a test that makes SQLite genuinely refuse, rather than a fake
+dao saying no politely (D6: tests hit real SQLite).
+
+- **Every form now tells the write and the alarm apart** (`28cdb36`, `5cd204a`,
+  `3b59262`, recorded as **D33**). Seven screens kept one `try` around two awaits —
+  the row, then the reminder — and a refused row left the save button's `_saving`
+  flag set: the screen sat on a spinner above a record that had never been written,
+  with the breeder's words still in the fields. Now a refusal resets the flag, keeps
+  the screen open, and says "This could not be saved. Nothing was written."; a row
+  that lands and an alarm that fails closes the screen and logs, because the next
+  launch rebuilds that alarm from the ledger.
+- **The litter's refusal is refused whole** (`5cd204a`). The whelping form writes
+  the litter row first and its puppies inside one transaction, so the sentence is
+  literally true: after a refusal there is no litter *and* no `A litter 1`, `2`, `3`
+  in the herd. That is asserted by tapping Cancel and reading the tab, not by
+  trusting the SQL.
+- **The contact that never landed cannot print on a document** (`3b59262`). The
+  buyer dialog returns its saved object to the handover form, so a refused contact
+  leaves *both* dialogs holding their words — and the Save finder had to be scoped
+  by dialog title, because the two stacked forms end in the same button label and an
+  unscoped tap saves whichever one the tree visits first.
+- **8 delete paths, the opposite sentence** (`e5e8f99`, recorded as **D34**). A
+  refused delete used to be silent: the confirm dialog was gone, the screen stayed,
+  and nothing said whether the record had been removed. Now the row that survived
+  keeps its screen and hears "This could not be deleted. The record is still there."
+  — and it keeps its alarm: the animal test requires that the launch's three writer
+  calls are all the phone ever saw (no `clearAll` for an animal still in the herd),
+  and the dose test requires an empty writer log. Run `37838685123` analysed clean
+  ("No issues found!") and came back **"🎉 371 tests passed"**, the three new ones
+  being exactly those two and the symptom row that refused to go.
+- **One candidate fix measured and rejected**, in the same commit's decision: a
+  launch resync that clears the phone before re-booking would heal an orphan alarm
+  for one `cancelAll` call — but reminders are booked at save for anything still in
+  the future, while the resync only reads rows due within `reminderHorizonDays`, so
+  the clear would silently drop a dose due two months out. The orphan stays, stated
+  rather than papered over.
+- **A review claim that was wrong.** `notificationIdFor` was reported to be able to
+  overflow int32. It cannot: the id is a hash-fold capped at 536,870,911. Rejected,
+  not "fixed" — the code is unchanged and said so here.
+- **What the runs on this batch said**, in order, because two of them had no test
+  count at all. `37833939504` and `37834075206` failed in the *Analyse* step
+  (`--fatal-infos` makes one `info` a red run before a single test executes — my own
+  `Localizations.localeOf(context)` read across an awaited dialog), so 0 tests ran
+  and the batch had no verdict. `37834355041` (`11b0ef2`, the locale read moved above
+  the dialog) came back green at **361 tests**, +14 over 3i. `37835714857` (`5cd204a`)
+  reported **364 passed, 1 failed**: the litter test's last step tapped
+  `TextButton, 'Cancel'` on a form whose Cancel is an `OutlinedButton`.
+  `37836736830` (`3b59262`) reported **367 passed, 1 failed** — the same finder, which
+  is also the proof that the three dialog tests and the scoped Save helper were
+  already green. `37836956621` (`0d2e742`) came back **"🎉 368 tests passed"**.
+- **What CI cannot see, stated.** D32's calendar offsets (`shiftDays` instead of
+  `Duration(days:)`) are not distinguishable by any test on a UTC runner — Morocco's
+  Ramadan UTC+1↔UTC+0 shift is exactly the case that would show it, and CI has no
+  clock that moves. And a snackbar is not a screenshot: the four sentences in three
+  languages, the spinner actually stopping, and the keyboard's effect on these
+  dialogs are all still owed to the Realme, in the same batched pass as 3b–3i.
+
 ## Stage 4 — Distribution
 
 Blocked on the business question in `docs/FEASIBILITY.md` §Payments: a Morocco
