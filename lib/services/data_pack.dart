@@ -76,27 +76,15 @@ class PackRows {
 }
 
 /// Every row of every table, ready to encode.
-///
-/// The ten reads happen inside one transaction because a backup is only worth
-/// what it can be restored to. Read table by table with no transaction and a
-/// herd that changes while the pack is built yields two moments: the animals as
-/// they were, and a dose added a second later under an animal the pack never
-/// saw. That file is worse than no backup — it carries a row pointing at an
-/// animal it does not contain, and [restorePack]'s transaction refuses the whole
-/// thing on the foreign key, so the one restore the breeder ever needs fails on
-/// a file they believed was safe. One snapshot, or nothing.
 Future<Map<String, Object?>> packFrom(Database db, {int? exportedAtMs}) async {
-  final rows = await db.transaction(
-    (Transaction txn) async => <String, Object?>{
-      for (final table in dataTables) table: await txn.query(table),
-    },
-  );
   return <String, Object?>{
     'format': packFormat,
     'formatVersion': packFormatVersion,
     'schemaVersion': schemaVersion,
     'exportedAt': exportedAtMs ?? _nowMs(),
-    'rows': rows,
+    'rows': <String, Object?>{
+      for (final table in dataTables) table: await db.query(table),
+    },
   };
 }
 
