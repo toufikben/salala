@@ -587,10 +587,13 @@ shared by the query and the fold so they cannot disagree about the fortnight.
 Any new dose write path invalidates `agendaDosesProvider` next to the family it
 already invalidates — and a restore replaces the whole database, so it asks for
 the agenda by name; `test/presentation/herd_agenda_test.dart` is the enforcement
-for the delete path. Day counts are the triage counts (floor for a date past,
-ceiling clamped to at least one for a date still to come) and the sentences are
-the triage dose messages, so the card on a ledger and the row above the herd never
-say two different things about one dose.
+for the delete path. Day counts are the triage counts (D31: whole calendar days,
+zero meaning today) and the sentences are the triage dose messages plus the
+reminder's own "is due today", so a dose the two screens do mention is never
+counted two different ways. They are not the same list: the agenda books anything
+past its date, while `dose_overdue` waits out a three-day grace — a shot two days
+late is a row on the home screen and nothing on the card, which is the to-do list
+doing its job and the medical rule not nagging yet.
 
 **Cost, stated.** A dose due in three weeks is invisible until day 14 — the agenda
 is a window, not a forecast, and that is deliberate. Reusing the triage wording
@@ -663,7 +666,9 @@ kept. The read the screen already made *is* the whole herd, so filtering it cost
 nothing and cannot disagree with anything. Normalisation is the other half of the
 decision, and the reason the rules are not SQL: a phone keyboard writes أ where the
 ledger wrote ا, an accent is typed or not typed depending on whose phone it is, and
-the digits of a microchip come off a sticker with spaces and dashes in them. SQLite
+the digits of a microchip come off a sticker with spaces and dashes in them. A phone
+set to Arabic numerals also writes `٢٥٠` into a field the ledger holds as `250`:
+D21 is a rule about what this app paints, not about which keys sit next to it. SQLite
 folds none of that, and a search that misses "أسود" because the query was typed
 "اسود" is indistinguishable, on screen, from a herd that does not contain the dog.
 The first run of these tests proved the point twice over: `ى`, `ی` and `ي` print
@@ -672,19 +677,25 @@ table, and the test that should have said so was itself written with the wrong
 shape in it. Anything in `test/core/herd_search_test.dart` that has to tell
 look-alike letters apart is written as a code point for that reason.
 
-**How to apply.** `normalizeForSearch` is idempotent, so a caller may normalise a
-stored field once rather than once per keystroke and hope. A field becomes
+**How to apply.** `normalizeForSearch` is idempotent, which is what makes a query
+and a stored field comparable at all; it is *not* cached per animal, and the cost
+of that is stated below rather than hidden behind a promise. A field becomes
 searchable by adding it to `_score` with a strength and pinning it in
-`test/core/herd_search_test.dart`; the widget never learns about it. The order is
-name exact, name prefix, then a name substring tied with an exact registration or
-chip, then a partial number, then breed or note — a name is what someone types, while a
-number is what settles which dog is on the table, and a partial number is also how
-two animals answer a query that was one digit. The comparator carries the original
-index because `List.sort` is not stable, and cards that rearrange two equal matches
-between keystrokes look broken even when the set is right. An empty query returns
-the list untouched, and the herd agenda (D28) is hidden while a query is up: it
-answers for the herd, and above two filtered cards it would read as a to-do list
-about them.
+`test/core/herd_search_test.dart`; the widget never learns about it. The ladder has
+whole rungs: name exact, name prefix, name substring, then an exact registration or
+chip (the best of the two numbers, not the first that answered), then a partial
+number, then breed or note. A name is what someone types, so any name hit outranks
+any number hit; a number is what settles which dog is on the table. The comparator
+carries the original index because `List.sort` is not stable, and cards that
+rearrange two equal matches between keystrokes look broken even when the set is
+right. A query that normalises to nothing — the space a keyboard inserts, the dash
+typed before a number nobody stored with one — is answered by `queryFilters`, and
+the screen asks it once: the agenda (D28) is hidden and the sections are dropped
+only when that says something is actually being asked. While it does, the matches
+come back as **one flat ranked list**: the two sections exist to give shape to
+everything a breeder owns, and splitting a search by breeding stock prints a weak
+note hit above the dog whose name was typed in full, which is the ranking thrown
+away.
 
 **Cost, stated.** This works because the herd is already in memory, and it stops
 working at the size where that stops being true — a few thousand animals, when the
@@ -699,3 +710,50 @@ that is already in memory and costs nothing to read. What it does not reach is t
 symptom log: "the one that limped" finds the dog only if somebody also wrote that in
 its notes, and a record that lives in another table would be a second read inside a
 screen that deliberately has one (D27).
+
+## D31 — A day is a date, not 86,400,000 milliseconds
+
+**Date:** 2026-10-08. **Status:** in force.
+
+Every date a breeder reads off paper — a booster's due day, a certificate's last
+valid day, a mated day, a birth day — is stored at **local midnight**, because it
+comes off a day picker (`msFromDay`). So a count of days between two of them is a
+count of *dates*: `wholeDaysBetween(fromMs, toMs)` in
+`lib/core/utils/date_utils.dart`, negative while the first is still ahead, and
+**zero when both fall on today**.
+
+**Why.** Compared as instants against `DateTime.now()`, the elapsed time between
+this morning's midnight and lunchtime is half a day, and each rule rounded that
+half-day its own way. The home agenda painted a dose due today in red as "1 day
+overdue"; the card's `dose_due_soon` called tomorrow's dose "due in 2 days" from
+lunchtime onwards and said nothing at all about today's; `health_test_expired`
+read a certificate whose last day is today as lapsed from 00:00. None of it was
+tested, because every fixture built its due date by adding whole days to a clock
+time: the midnight shape the app actually writes had no test in it anywhere. A day
+count a breeder can disprove with a
+calendar is the most expensive number in an offline ledger — D21 exists for the
+same reason.
+
+**How to apply.** Any new day count calls `wholeDaysBetween` instead of dividing a
+millisecond difference, and the *gates* read as dates too:
+`if (facts.daysSince(until) < 1)` means "the date has not gone past", which is not
+the same test as `until < nowMs`. A count of zero is a sentence, never a number
+rounded up: `dose_due_soon` and the agenda row both branch on `days == 0` into
+`reminderDueBody` ("Rabies is due today", the wording the notification already
+used) before the overdue/soon messages. `LedgerFacts.daysSince` is the only
+day-counting door a rule may use, which is what keeps the card, the agenda and the
+reminder saying one thing about one date (D28). Tests that care about a boundary
+construct the midnight shape on purpose — `_todayMidnight` in
+`test/core/agenda_test.dart` and `test/core/triage_test.dart` — because a fixture
+whose due date carries the clock's own hour cannot catch this class of bug at all.
+
+**Cost, stated.** `daysSince` also reads *timestamps*, so a symptom logged at
+23:00 is "1 day ago" at 01:00, and a puppy born at 23:00 yesterday is one day old
+this morning; the log prints the hour beside the date, so the count and the record
+can still be checked against each other. The division is rounded, not floored, and
+that is what makes Morocco's clock shifts survivable: two local midnights either
+side of a 23- or 25-hour day still count as one day, where an instant difference
+would drift by an hour and move a due date into the wrong week. The day count is
+still local, not UTC, so a pack restored on a phone in another timezone recomputes
+ages from *its* midnight — true of every date in this app, and stated in D22's
+restore rather than fixed here.

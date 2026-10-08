@@ -6,6 +6,7 @@ import '../../data/models/litter.dart';
 import '../../data/models/symptom.dart';
 import '../../data/models/vaccination.dart';
 import '../../data/models/weight_entry.dart';
+import 'date_utils.dart';
 import 'gestation.dart';
 
 /// Where the shipped rule table lives inside the app bundle.
@@ -84,9 +85,14 @@ class LedgerFacts {
   final List<Litter> litters;
   final int nowMs;
 
-  /// Whole days between a stored moment and `nowMs`; negative when that moment
-  /// is still ahead.
-  int daysSince(int ms) => ((nowMs - ms) / _dayMs).floor();
+  /// Whole calendar days between a stored moment and `nowMs`; negative when that
+  /// moment is still ahead.
+  ///
+  /// Counted by date, not by elapsed milliseconds, because the dates come from a
+  /// picker and are stored at local midnight: measured as instants, a certificate
+  /// that lapses this evening read as "expired 0 days ago" from the moment the
+  /// day began.
+  int daysSince(int ms) => wholeDaysBetween(ms, nowMs);
 
   /// Age in days, or -1 when no birth date was recorded. Every rule that reads
   /// an age returns nothing on -1 rather than assuming an animal is grown.
@@ -300,19 +306,25 @@ List<_Hit> _doseOverdue(LedgerFacts facts, Map<String, double> params) {
 }
 
 List<_Hit> _doseDueSoon(LedgerFacts facts, Map<String, double> params) {
-  final horizon = params['withinDays']! * _dayMs;
+  // Counted by date like every other day count here. The due date comes from a
+  // day picker and is stored at that day's midnight, so measuring the
+  // milliseconds between two instants called tomorrow's dose "due in 2 days"
+  // from lunchtime onwards, and dropped a dose due today off the card entirely
+  // while the home agenda was already showing it.
   Vaccination? next;
   for (final dose in facts.doses) {
     final due = dose.nextDueDate;
-    if (due == null || due < facts.nowMs) continue;
-    if (due > facts.nowMs + horizon) continue;
+    if (due == null) continue;
+    final days = -facts.daysSince(due);
+    if (days < 0 || days > params['withinDays']!) continue;
     if (next == null || due < next.nextDueDate!) next = dose;
   }
   if (next == null) return const <_Hit>[];
-  // Ceilings, and never below one: a dose due this instant has no day left to
-  // it, and "due in 0 days" reads like a rounding artifact.
-  final days = ((next.nextDueDate! - facts.nowMs) / _dayMs).ceil();
-  return <_Hit>[_Hit(days: days < 1 ? 1 : days, subject: next.vaccineName)];
+  // Zero is a real answer: the wording for it is a sentence of its own, "is due
+  // today", not a count to round up.
+  return <_Hit>[
+    _Hit(days: -facts.daysSince(next.nextDueDate!), subject: next.vaccineName),
+  ];
 }
 
 /// The last two weigh-ins, older of the pair first, or null when the record
@@ -409,7 +421,9 @@ List<_Hit> _expiredTest(LedgerFacts facts, Map<String, double> params) {
   final hits = <_Hit>[];
   _newestByType(facts.tests).forEach((type, test) {
     final until = test.validUntil;
-    if (until == null || until > facts.nowMs) return;
+    // A certificate whose last day is today is still valid today: the gate is
+    // the date being past, not the midnight that opens it being behind us.
+    if (until == null || facts.daysSince(until) < 1) return;
     hits.add(_Hit(days: facts.daysSince(until), subject: type));
   });
   return hits;

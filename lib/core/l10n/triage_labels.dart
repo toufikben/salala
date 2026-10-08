@@ -24,10 +24,7 @@ String triageMessage(
     _subject(finding),
     _days(l10n, finding),
   ),
-  TriageRuleId.doseDueSoon => l10n.triageDoseDueSoon(
-    _subject(finding),
-    _days(l10n, finding),
-  ),
+  TriageRuleId.doseDueSoon => _dueSoon(l10n, finding),
   TriageRuleId.weightLossPuppy => l10n.triageWeightLossPuppy(_percent(finding)),
   TriageRuleId.weightLoss => l10n.triageWeightLoss(_percent(finding)),
   TriageRuleId.noWeightGainPuppy => l10n.triageNoGainPuppy(
@@ -60,11 +57,17 @@ String triageMessage(
 /// Arabic counts three ways, not two: 2 takes the dual, 3-10 take the plural,
 /// and 1 and 11-99 take the singular. English and French only ever need the
 /// first and the third, and both give them the same two answers.
+///
+/// The agreement is with the last two digits, which is what a dose 105 days
+/// overdue exposed: keyed on the whole number, 102 lost its dual and 105 its
+/// plural, so the card read `105 يومًا` about the same shot another row called
+/// `5 أيام` late.
 String daysPhrase(AppLocalizations l10n, int n) {
   final count = '$n';
   if (l10n.localeName == 'ar') {
-    if (n == 2) return l10n.daysDual(count);
-    if (n >= 3 && n <= 10) return l10n.daysPlural(count);
+    final lastTwo = n % 100;
+    if (lastTwo == 2) return l10n.daysDual(count);
+    if (lastTwo >= 3 && lastTwo <= 10) return l10n.daysPlural(count);
     return l10n.daysSingle(count);
   }
   return n == 1 ? l10n.daysSingle(count) : l10n.daysPlural(count);
@@ -72,6 +75,19 @@ String daysPhrase(AppLocalizations l10n, int n) {
 
 String _days(AppLocalizations l10n, TriageFinding finding) =>
     daysPhrase(l10n, finding.days ?? 0);
+
+/// A dose that has a day left to it reads as a countdown; one whose day is
+/// today reads as the reminder already says it.
+///
+/// The three-way split is what makes the animal's card agree with the home
+/// agenda (D28): both count calendar days, so a booster due this morning is
+/// "due today" in both places, not "0 days" on one and "1 day overdue" on the
+/// other.
+String _dueSoon(AppLocalizations l10n, TriageFinding finding) {
+  final days = finding.days ?? 0;
+  if (days == 0) return l10n.reminderDueBody(_subject(finding));
+  return l10n.triageDoseDueSoon(_subject(finding), daysPhrase(l10n, days));
+}
 
 String _percent(TriageFinding finding) => '${(finding.percent ?? 0).round()}';
 

@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 
 import '../../data/models/animal.dart';
 import '../../data/models/vaccination.dart';
+import 'date_utils.dart';
 
 /// How far ahead the herd agenda looks.
 ///
@@ -37,8 +38,9 @@ class AgendaItem extends Equatable {
   final String vaccineName;
   final int dueMs;
 
-  /// Whole days from now to [dueMs] — or since it, when [overdue]. Never zero:
-  /// a dose due this instant reads as due today, not as a rounding artifact.
+  /// Whole calendar days from today to [dueMs] — or since it, when [overdue].
+  /// Zero means the dose is due *today*, which is a sentence of its own rather
+  /// than a count to round up.
   final int days;
   final bool overdue;
 
@@ -90,22 +92,20 @@ List<AgendaItem> buildHerdAgenda({
   final items = <AgendaItem>[];
   for (final entry in earliest.entries) {
     final due = entry.value.nextDueDate!;
-    final overdue = due < nowMs;
-    // Floor on a date already past, ceiling on one still to come, exactly as the
-    // triage rules count them (triage.dart:89, :314) — a day that has partly
-    // gone by is not a full day late, and a day still to come is not a day that
-    // can be forgotten.
-    final days = overdue
-        ? ((nowMs - due) / _dayMs).floor()
-        : ((due - nowMs) / _dayMs).ceil();
+    // The date is counted, not the milliseconds between the two instants: a
+    // booster due today is stored at this morning's midnight, and an instant
+    // difference called it one day late from 00:01 onwards — on the home screen,
+    // in a row colour-coded "overdue", for a dose the animal's own card refused
+    // to flag.
+    final diff = wholeDaysBetween(due, nowMs);
     items.add(
       AgendaItem(
         animalId: entry.key,
         animalName: inHerd[entry.key]!,
         vaccineName: entry.value.vaccineName,
         dueMs: due,
-        days: days < 1 ? 1 : days,
-        overdue: overdue,
+        days: diff.abs(),
+        overdue: diff > 0,
       ),
     );
   }

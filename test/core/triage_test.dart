@@ -19,6 +19,9 @@ const int _day = 86400000;
 /// millisecond of calendar arithmetic would flip it.
 final int _now = DateTime(2026, 10, 5, 12).millisecondsSinceEpoch;
 
+/// Same day, no hours on it — the shape a day picker writes.
+final int _todayMidnight = DateTime(2026, 10, 5).millisecondsSinceEpoch;
+
 int _ago(int days) => _now - days * _day;
 
 Animal _animal(
@@ -43,13 +46,14 @@ Animal _animal(
 Vaccination _dose({
   String name = 'Rabies',
   int? dueInDays,
+  int? dueMs,
   int? givenDaysAgo = 100,
 }) => Vaccination(
-  id: 'v-$name-${dueInDays ?? 0}',
+  id: 'v-$name-${dueInDays ?? dueMs ?? 0}',
   animalId: 'a',
   vaccineName: name,
   dateAdministered: _ago(givenDaysAgo ?? 0),
-  nextDueDate: dueInDays == null ? null : _now + dueInDays * _day,
+  nextDueDate: dueMs ?? (dueInDays == null ? null : _now + dueInDays * _day),
   createdAt: _ago(100),
   updatedAt: _ago(100),
 );
@@ -66,13 +70,16 @@ HealthTest _test(
   String result, {
   int daysAgo = 30,
   int? validUntilInDays,
+  int? untilMs,
 }) => HealthTest(
   id: 'h-$type-$daysAgo',
   animalId: 'a',
   testType: type,
   result: result,
   testDate: _ago(daysAgo),
-  validUntil: validUntilInDays == null ? null : _now + validUntilInDays * _day,
+  validUntil:
+      untilMs ??
+      (validUntilInDays == null ? null : _now + validUntilInDays * _day),
   createdAt: _ago(daysAgo),
   updatedAt: _ago(daysAgo),
 );
@@ -330,6 +337,35 @@ void main() {
       expect(_finding(findings, TriageRuleId.doseDueSoon), isNull);
     });
 
+    test('a dose due this morning is due today, not a day late', () {
+      // The stored shape: a day picker writes midnight. Measured as an instant
+      // this was already past at lunchtime, so the card went silent on a shot
+      // the home agenda was painting red.
+      final findings = evaluateTriage(
+        _facts(
+          animal: _animal('a', ageDays: 400),
+          doses: <Vaccination>[_dose(name: 'Rabies', dueMs: _todayMidnight)],
+        ),
+        rules,
+      );
+      final finding = _finding(findings, TriageRuleId.doseDueSoon)!;
+      expect(finding.days, 0);
+      expect(_finding(findings, TriageRuleId.doseOverdue), isNull);
+    });
+
+    test('tomorrow counts as one day from the afternoon', () {
+      final findings = evaluateTriage(
+        _facts(
+          animal: _animal('a', ageDays: 400),
+          doses: <Vaccination>[
+            _dose(name: 'Rabies', dueMs: _todayMidnight + _day),
+          ],
+        ),
+        rules,
+      );
+      expect(_finding(findings, TriageRuleId.doseDueSoon)!.days, 1);
+    });
+
     test(
       'a puppy losing weight is an emergency, an adult losing it is not',
       () {
@@ -486,6 +522,35 @@ void main() {
         rules,
       );
       expect(_finding(pet, TriageRuleId.healthTestExpired), isNull);
+    });
+
+    test('a certificate whose last day is today is still valid today', () {
+      // `valid_until` is the last day the paper is good for, and it is stored at
+      // that day's midnight. Compared as an instant, the certificate read as
+      // lapsed from 00:00 of its own final day.
+      final findings = evaluateTriage(
+        _facts(
+          animal: _animal('a', ageDays: 900, breeding: true),
+          doses: <Vaccination>[_dose(dueInDays: 100)],
+          tests: <HealthTest>[
+            _test('Brucellosis', 'Clear', untilMs: _todayMidnight),
+          ],
+        ),
+        rules,
+      );
+      expect(_finding(findings, TriageRuleId.healthTestExpired), isNull);
+
+      final yesterday = evaluateTriage(
+        _facts(
+          animal: _animal('a', ageDays: 900, breeding: true),
+          doses: <Vaccination>[_dose(dueInDays: 100)],
+          tests: <HealthTest>[
+            _test('Brucellosis', 'Clear', untilMs: _todayMidnight - _day),
+          ],
+        ),
+        rules,
+      );
+      expect(_finding(yesterday, TriageRuleId.healthTestExpired)!.days, 1);
     });
 
     test('a sign the breeder graded severe is an emergency on its own', () {

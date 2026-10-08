@@ -22,19 +22,24 @@ void main() {
     expect(daysPhrase(l10n, 3), '3 jours');
   });
 
-  test(
-    'Arabic uses the dual for two and the plural for three to ten',
-    () async {
-      final l10n = await _locale('ar');
-      expect(daysPhrase(l10n, 1), '1 يومًا');
-      expect(daysPhrase(l10n, 2), '2 يومين');
-      expect(daysPhrase(l10n, 3), '3 أيام');
-      expect(daysPhrase(l10n, 10), '10 أيام');
-      expect(daysPhrase(l10n, 11), '11 يومًا');
-      expect(daysPhrase(l10n, 20), '20 يومًا');
-      expect(daysPhrase(l10n, 90), '90 يومًا');
-    },
-  );
+  test('Arabic uses the dual for two and the plural for three to ten', () async {
+    final l10n = await _locale('ar');
+    expect(daysPhrase(l10n, 1), '1 يومًا');
+    expect(daysPhrase(l10n, 2), '2 يومين');
+    expect(daysPhrase(l10n, 3), '3 أيام');
+    expect(daysPhrase(l10n, 10), '10 أيام');
+    expect(daysPhrase(l10n, 11), '11 يومًا');
+    expect(daysPhrase(l10n, 20), '20 يومًا');
+    expect(daysPhrase(l10n, 90), '90 يومًا');
+
+    // The agreement is with the last two digits, not the whole number: a dose
+    // 105 days late is said the way 5 is, and 102 keeps its dual. Keyed on the
+    // whole count, both lost their form and the card read `105 يومًا`.
+    expect(daysPhrase(l10n, 100), '100 يومًا');
+    expect(daysPhrase(l10n, 102), '102 يومين');
+    expect(daysPhrase(l10n, 105), '105 أيام');
+    expect(daysPhrase(l10n, 111), '111 يومًا');
+  });
 
   // D21: every one of the phrases above carries ASCII digits, in every locale.
   test('no day count is rendered through the locale number format', () async {
@@ -75,6 +80,23 @@ void main() {
         ),
       ),
       'Rabies كان مستحقًا منذ 5 أيام',
+    );
+  });
+
+  // The reminder already had a sentence for a dose due today; the card and the
+  // home agenda had a number, and a zero reads as a count gone wrong.
+  test('a dose due today is a sentence, not a count of zero', () async {
+    const finding = TriageFinding(
+      ruleId: TriageRuleId.doseDueSoon,
+      urgency: TriageUrgency.routineVet,
+      days: 0,
+      subject: 'Rabies',
+    );
+    expect(triageMessage(await _locale('en'), finding), 'Rabies is due today');
+    expect(triageMessage(await _locale('ar'), finding), 'Rabies مستحق اليوم');
+    expect(
+      triageMessage(await _locale('fr'), finding),
+      "Rabies arrive à échéance aujourd'hui",
     );
   });
 

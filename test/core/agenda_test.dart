@@ -9,6 +9,9 @@ const int _day = 86400000;
 /// millisecond of calendar arithmetic would flip it.
 final int _now = DateTime(2026, 10, 5, 12).millisecondsSinceEpoch;
 
+/// Same day, no hours on it — the shape a day picker writes.
+final int _todayMidnight = DateTime(2026, 10, 5).millisecondsSinceEpoch;
+
 Animal _animal(String id, {AnimalStatus status = AnimalStatus.active}) =>
     Animal(
       id: id,
@@ -134,7 +137,7 @@ void main() {
     expect(items, isEmpty);
   });
 
-  test('days are counted the way the triage rules count them', () {
+  test('days are counted by date, not by the hours left', () {
     AgendaItem only({required int dueInDays}) => buildHerdAgenda(
       animals: <Animal>[_animal('Nala')],
       doses: <Vaccination>[_dose(animalId: 'Nala', dueInDays: dueInDays)],
@@ -146,8 +149,8 @@ void main() {
     expect(only(dueInDays: 5).days, 5);
     expect(only(dueInDays: 5).overdue, isFalse);
 
-    // Part of a day still to come is a day it can be booked; part of a day
-    // already gone is not yet a day late.
+    // Twelve hours ahead is the next page of the calendar, so it is one day
+    // away — the hours between the two instants are not what a breeder counts.
     final halfAhead = buildHerdAgenda(
       animals: <Animal>[_animal('Nala')],
       doses: <Vaccination>[
@@ -167,7 +170,8 @@ void main() {
     expect(halfAhead.days, 1);
     expect(halfAhead.overdue, isFalse);
 
-    // A dose due this instant reads as today, never as "0 days".
+    // A dose due this instant falls on today, so it is due today: zero is the
+    // answer, and the row has a sentence for it.
     final exactlyNow = buildHerdAgenda(
       animals: <Animal>[_animal('Nala')],
       doses: <Vaccination>[
@@ -183,8 +187,35 @@ void main() {
       ],
       nowMs: _now,
     ).single;
-    expect(exactlyNow.days, 1);
+    expect(exactlyNow.days, 0);
     expect(exactlyNow.overdue, isFalse);
+  });
+
+  test('a booster due this morning is not a day late at lunchtime', () {
+    // The shape the app actually writes: `next_due_date` comes from a day picker
+    // and lands at local midnight. Measured as an instant, this morning's date
+    // was already 12 hours past at noon, and the home screen painted the row in
+    // red as "1 day overdue" beside the animal's own card, which said nothing.
+    AgendaItem atMidnight(int daysAgo) => buildHerdAgenda(
+      animals: <Animal>[_animal('Nala')],
+      doses: <Vaccination>[
+        Vaccination(
+          id: 'midnight-$daysAgo',
+          animalId: 'Nala',
+          vaccineName: 'Rabies',
+          dateAdministered: _now - 100 * _day,
+          nextDueDate: _todayMidnight - daysAgo * _day,
+          createdAt: _now,
+          updatedAt: _now,
+        ),
+      ],
+      nowMs: _now,
+    ).single;
+
+    expect(atMidnight(0).days, 0);
+    expect(atMidnight(0).overdue, isFalse);
+    expect(atMidnight(1).days, 1);
+    expect(atMidnight(1).overdue, isTrue);
   });
 
   test('the horizon the query uses is the horizon the rows use', () {

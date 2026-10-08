@@ -62,3 +62,20 @@ DateTime? dayFromMs(int? epochMs) =>
 
 int msFromDay(DateTime day) =>
     DateTime(day.year, day.month, day.day).millisecondsSinceEpoch;
+
+/// Whole calendar days from [fromMs] to [toMs]: negative when [fromMs] is still
+/// ahead, zero when both instants fall on the same day.
+///
+/// The dates a breeder reads off paper — a due booster, a certificate's validity,
+/// a whelping day — are stored at local midnight, so an *instant* difference says
+/// the morning has already gone by and reports a dose due today as one day late.
+/// Counting the dates rather than the elapsed milliseconds is the same arithmetic
+/// the animal's card and the herd's agenda have to agree on (D28), which is why it
+/// lives here rather than in either of them.
+int wholeDaysBetween(int fromMs, int toMs) {
+  final from = DateTime.fromMillisecondsSinceEpoch(fromMs);
+  final to = DateTime.fromMillisecondsSinceEpoch(toMs);
+  final a = DateTime(from.year, from.month, from.day).millisecondsSinceEpoch;
+  final b = DateTime(to.year, to.month, to.day).millisecondsSinceEpoch;
+  return ((b - a) / 86400000).round();
+}

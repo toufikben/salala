@@ -277,8 +277,12 @@ class _HerdAgenda extends StatelessWidget {
                     : theme.colorScheme.primary,
               ),
               title: Text(item.animalName),
+              // A zero is a day, not a rounding artifact: the dose is due today,
+              // and saying "0 days" would read as a count gone wrong.
               subtitle: Text(
-                item.overdue
+                item.days == 0
+                    ? l10n.reminderDueBody(item.vaccineName)
+                    : item.overdue
                     ? l10n.triageDoseOverdue(
                         item.vaccineName,
                         daysPhrase(l10n, item.days),
