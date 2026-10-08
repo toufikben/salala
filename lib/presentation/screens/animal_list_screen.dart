@@ -3,10 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/l10n/app_localizations.dart';
+import '../../core/l10n/triage_labels.dart';
 import '../../core/router/app_router.dart';
+import '../../core/utils/agenda.dart';
 import '../../core/utils/date_utils.dart';
 import '../../data/models/animal.dart';
+import '../../data/models/vaccination.dart';
 import '../../services/reminder_resync.dart';
+import '../providers/agenda_providers.dart';
 import '../providers/app_providers.dart';
 import '../widgets/animal_card.dart';
 import '../widgets/salala_nav_bar.dart';
@@ -70,16 +74,34 @@ class _AnimalListScreenState extends ConsumerState<AnimalListScreen> {
         error: (error, stack) => _ErrorBody(
           onRetry: () => ref.read(animalsProvider.notifier).refresh(),
         ),
-        data: (list) => list.isEmpty ? const _EmptyBody() : _AnimalGroups(list),
+        data: (list) => list.isEmpty
+            ? const _EmptyBody()
+            : _AnimalGroups(
+                animals: list,
+                agenda: ref.watch(agendaDosesProvider),
+                onAgendaRetry: () => ref.invalidate(agendaDosesProvider),
+              ),
       ),
     );
   }
 }
 
+/// The herd's open bookings, above the animals.
+///
+/// The two reads live in the screen's build and travel down as values (D27): the
+/// home list is a lazy `ListView`, so a block that ran its own query would start
+/// it at the moment the sliver first built the child, in the middle of whatever
+/// the finger or the test was already doing.
 class _AnimalGroups extends StatelessWidget {
-  const _AnimalGroups(this.animals);
+  const _AnimalGroups({
+    required this.animals,
+    required this.agenda,
+    required this.onAgendaRetry,
+  });
 
   final List<Animal> animals;
+  final AsyncValue<List<Vaccination>> agenda;
+  final VoidCallback onAgendaRetry;
 
   @override
   Widget build(BuildContext context) {
@@ -90,6 +112,7 @@ class _AnimalGroups extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.fromLTRB(8, 8, 8, 96),
       children: <Widget>[
+        _HerdAgenda(animals: animals, agenda: agenda, onRetry: onAgendaRetry),
         if (breeding.isNotEmpty) ...<Widget>[
           _SectionHeader(l10n.homeBreedingStock),
           for (final animal in breeding) AnimalCard(animal: animal),
@@ -99,6 +122,114 @@ class _AnimalGroups extends StatelessWidget {
           for (final animal in others) AnimalCard(animal: animal),
         ],
       ],
+    );
+  }
+}
+
+/// Every animal still in the herd that is waiting for a dose, most overdue first.
+///
+/// One line per animal rather than one per dose: the ledger it opens shows the
+/// whole history, and the point of this block is that nothing needs opening.
+/// It is also the only place in the app that answers for the herd at all —
+/// before it, "what is due this fortnight?" meant tapping every card.
+class _HerdAgenda extends StatelessWidget {
+  const _HerdAgenda({
+    required this.animals,
+    required this.agenda,
+    required this.onRetry,
+  });
+
+  final List<Animal> animals;
+  final AsyncValue<List<Vaccination>> agenda;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+
+    // Nothing on screen while the first read is out — an agenda that has not
+    // arrived and a herd with nothing to book look the same for a moment, and a
+    // spinner would shove every animal down while it turned. A read that
+    // *failed* says so instead of going quiet: an absent to-do list is exactly
+    // how a rabies shot stays unscheduled.
+    if (agenda.isLoading && !agenda.hasValue) return const SizedBox.shrink();
+    if (agenda.hasError) return _AgendaFailure(onRetry: onRetry);
+
+    final items = buildHerdAgenda(
+      animals: animals,
+      // Loading-with-a-value and data are the only states left, so the value is
+      // there; `requireValue` rather than `?const []` because reaching for a
+      // default here would turn a broken read back into a silent empty list.
+      doses: agenda.requireValue,
+      nowMs: DateTime.now().toUtc().millisecondsSinceEpoch,
+    );
+    if (items.isEmpty) return const SizedBox.shrink();
+
+    return Card(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+            child: Text(
+              l10n.agendaTitle,
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          for (final item in items)
+            ListTile(
+              dense: true,
+              // Overdue is an icon and a colour, not only a colour — the same
+              // reason the triage card puts a word beside its red.
+              leading: Icon(
+                item.overdue ? Icons.error_outline : Icons.event_outlined,
+                color: item.overdue
+                    ? theme.colorScheme.error
+                    : theme.colorScheme.primary,
+              ),
+              title: Text(item.animalName),
+              subtitle: Text(
+                item.overdue
+                    ? l10n.triageDoseOverdue(
+                        item.vaccineName,
+                        daysPhrase(l10n, item.days),
+                      )
+                    : l10n.triageDoseDueSoon(
+                        item.vaccineName,
+                        daysPhrase(l10n, item.days),
+                      ),
+              ),
+              onTap: () => context.push(AppPaths.animal(item.animalId)),
+            ),
+          const SizedBox(height: 4),
+        ],
+      ),
+    );
+  }
+}
+
+/// The agenda's own failure, kept to one line: the herd below it is still
+/// readable, and a whole screen of "cloud off" for a to-do block would be a worse
+/// lie than the block admitting which read it could not do.
+class _AgendaFailure extends StatelessWidget {
+  const _AgendaFailure({required this.onRetry});
+
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    return Card(
+      child: ListTile(
+        dense: true,
+        leading: Icon(Icons.help_outline, color: theme.colorScheme.error),
+        title: Text(l10n.agendaTitle),
+        trailing: TextButton(onPressed: onRetry, child: Text(l10n.actionRetry)),
+      ),
     );
   }
 }

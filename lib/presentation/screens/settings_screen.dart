@@ -9,6 +9,7 @@ import '../../core/utils/date_utils.dart';
 import '../../services/data_pack.dart';
 import '../../services/pack_files.dart';
 import '../../services/reminder_resync.dart';
+import '../providers/agenda_providers.dart';
 import '../providers/app_providers.dart';
 import '../widgets/pin_dialogs.dart';
 import '../widgets/salala_nav_bar.dart';
@@ -271,6 +272,10 @@ Future<void> _importPack(BuildContext context, WidgetRef ref) async {
   }
   await ref.read(animalsProvider.notifier).refresh();
   await ref.read(littersProvider.notifier).refresh();
+  // The herd agenda on the home screen is the third thing derived from these
+  // rows, and the only one that is a plain read rather than a controller: it has
+  // no `refresh()` to call, so the restore asks for it by name.
+  ref.invalidate(agendaDosesProvider);
   messenger.showSnackBar(
     SnackBar(content: Text(l10n.packRestored(pack.totalRows))),
   );

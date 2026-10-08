@@ -779,6 +779,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get agendaTitle => 'Vaccinations to book';
+
+  @override
   String daysSingle(String n) {
     return '$n day';
   }

@@ -780,6 +780,9 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get agendaTitle => 'Vaccinations à prévoir';
+
+  @override
   String daysSingle(String n) {
     return '$n jour';
   }

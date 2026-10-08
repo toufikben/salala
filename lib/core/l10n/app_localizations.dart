@@ -1474,6 +1474,12 @@ abstract class AppLocalizations {
   /// **'{name} was seen {days} ago and is still happening'**
   String triageSymptomUnresolved(String name, String days);
 
+  /// No description provided for @agendaTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Vaccinations to book'**
+  String get agendaTitle;
+
   /// No description provided for @daysSingle.
   ///
   /// In en, this message translates to:

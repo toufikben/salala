@@ -283,6 +283,8 @@
   "triageSevereSymptom": "{name} enregistré comme sévère et toujours en cours",
   "triageSymptomUnresolved": "{name} constaté il y a {days} et toujours en cours",
 
+  "agendaTitle": "Vaccinations à prévoir",
+
   "daysSingle": "{n} jour",
   "daysDual": "{n} jours",
   "daysPlural": "{n} jours"

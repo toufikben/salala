@@ -405,6 +405,8 @@
     }
   },
 
+  "agendaTitle": "Vaccinations to book",
+
   "daysSingle": "{n} day",
   "@daysSingle": { "placeholders": { "n": { "type": "String" } } },
   "daysDual": "{n} days",

@@ -9,6 +9,7 @@ import '../../data/models/symptom.dart';
 import '../../data/models/vaccination.dart';
 import '../../data/models/vet_visit.dart';
 import '../../data/models/weight_entry.dart';
+import 'agenda_providers.dart';
 import 'app_providers.dart';
 
 /// One animal's vaccination history, newest dose first.
@@ -28,10 +29,16 @@ final weightsForAnimalProvider = FutureProvider.autoDispose
       (ref, animalId) => ref.read(daosProvider).weights.forAnimal(animalId),
     );
 
-/// Writes a dose either way and re-reads only the animal it belongs to.
+/// Writes a dose either way and re-reads the animal it belongs to, plus the herd
+/// agenda the home screen shows.
 ///
 /// The row as it is now stored comes back: an insert only gains its uuid in the
 /// dao, and the caller needs that id to schedule reminders against the dose.
+///
+/// The agenda is invalidated here rather than from the widget that saved, because
+/// a dose is a booking: recording the shot is exactly what takes the animal off
+/// the to-do list, and a screen that forgot to ask for the re-read would leave a
+/// line telling the breeder to book something already booked.
 Future<Vaccination> saveVaccination(
   WidgetRef ref,
   Vaccination vaccination,
@@ -40,16 +47,19 @@ Future<Vaccination> saveVaccination(
   if (vaccination.id.isEmpty) {
     final created = await daos.vaccinations.create(vaccination);
     ref.invalidate(vaccinationsForAnimalProvider(created.animalId));
+    ref.invalidate(agendaDosesProvider);
     return created;
   }
   await daos.vaccinations.update(vaccination);
   ref.invalidate(vaccinationsForAnimalProvider(vaccination.animalId));
+  ref.invalidate(agendaDosesProvider);
   return vaccination;
 }
 
 Future<void> deleteVaccination(WidgetRef ref, Vaccination vaccination) async {
   await ref.read(daosProvider).vaccinations.delete(vaccination.id);
   ref.invalidate(vaccinationsForAnimalProvider(vaccination.animalId));
+  ref.invalidate(agendaDosesProvider);
 }
 
 Future<void> saveWeight(WidgetRef ref, WeightEntry entry) async {

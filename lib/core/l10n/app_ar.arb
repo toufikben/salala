@@ -283,6 +283,8 @@
   "triageSevereSymptom": "{name} سُجِّل بدرجة شديدة وما زال مستمرًا",
   "triageSymptomUnresolved": "ما زال {name} مستمرًا بعد {days} من رصده",
 
+  "agendaTitle": "تلقيحات يجب حجزها",
+
   "daysSingle": "{n} يومًا",
   "daysDual": "{n} يومين",
   "daysPlural": "{n} أيام"

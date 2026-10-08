@@ -782,6 +782,9 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get agendaTitle => 'تلقيحات يجب حجزها';
+
+  @override
   String daysSingle(String n) {
     return '$n يومًا';
   }
