@@ -69,9 +69,21 @@ class AppLockService {
     await enable(newPin);
   }
 
+  /// Removing the lock, in the one order a half-finished call can survive.
+  ///
+  /// The digest is the keyhole: `isLocked()` reads it alone, and `verify()` can
+  /// only ever answer no once the salt is gone. So a delete that stops after the
+  /// first key leaves an undecodable lock — the unlock screen opens, no PIN ever
+  /// matches, and the only way back into the records is a restore. Deleting the
+  /// digest first leaves the opposite residue, a salt nothing reads, and the app
+  /// simply opens unlocked.
+  ///
+  /// `enable` keeps its salt-then-digest order for the same reason seen from the
+  /// other side: writing the digest last means a failure there leaves the app
+  /// unlocked rather than locked with no salt to check a PIN against.
   Future<void> disable() async {
-    await _storage.delete(key: _saltKey);
     await _storage.delete(key: _digestKey);
+    await _storage.delete(key: _saltKey);
   }
 
   static List<int> _randomSalt() {

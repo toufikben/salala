@@ -221,6 +221,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get lockCurrentPin => 'Current PIN';
 
   @override
+  String get lockChangeFailed => 'The phone would not change the app lock.';
+
+  @override
   String get settingsAppLock => 'App lock';
 
   @override

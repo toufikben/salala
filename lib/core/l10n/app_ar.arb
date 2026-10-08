@@ -79,6 +79,7 @@
   "lockEnable": "قفل التطبيق",
   "lockDisable": "إيقاف القفل",
   "lockCurrentPin": "الرمز الحالي",
+  "lockChangeFailed": "رفض الهاتف تغيير قفل التطبيق.",
 
   "settingsAppLock": "قفل التطبيق",
   "settingsLanguage": "اللغة",

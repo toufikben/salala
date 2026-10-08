@@ -221,6 +221,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get lockCurrentPin => 'Code actuel';
 
   @override
+  String get lockChangeFailed =>
+      'Le téléphone a refusé de modifier le verrouillage.';
+
+  @override
   String get settingsAppLock => 'Verrouillage';
 
   @override

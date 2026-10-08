@@ -109,7 +109,7 @@ class AnimalsController extends AsyncNotifier<List<Animal>> {
   Future<Animal> create(Animal animal) async {
     final daos = ref.read(daosProvider);
     final created = await daos.animals.create(animal);
-    await refresh();
+    await _rereadAfter('add');
     return created;
   }
 
@@ -117,17 +117,30 @@ class AnimalsController extends AsyncNotifier<List<Animal>> {
   /// `update()` as an state-modifier method.
   Future<void> edit(Animal animal) async {
     await ref.read(daosProvider).animals.update(animal);
-    await refresh();
+    await _rereadAfter('change');
   }
 
   Future<void> delete(String id) async {
     await ref.read(daosProvider).animals.delete(id);
-    await refresh();
+    await _rereadAfter('delete');
   }
 
   Future<void> refresh() async {
     ref.invalidateSelf();
     await future;
+  }
+
+  /// The herd list is a copy of what the ledger already holds, so a list that
+  /// refuses to re-read is not the write failing. Every caller catches around
+  /// these methods and says "nothing was written" — which is only true of the
+  /// statement before this line. A re-read that throws is logged and the row
+  /// stays put; the list refreshes again the next time the screen reads it.
+  Future<void> _rereadAfter(String what) async {
+    try {
+      await refresh();
+    } catch (error) {
+      debugPrint('Herd re-read after $what failed: $error');
+    }
   }
 }
 
@@ -144,14 +157,14 @@ class LittersController extends AsyncNotifier<List<Litter>> {
   Future<Litter> register(Litter litter, List<Animal> puppies) async {
     final daos = ref.read(daosProvider);
     final created = await daos.litters.createWithPuppies(litter, puppies);
-    await ref.read(animalsProvider.notifier).refresh();
-    await refresh();
+    await ref.read(animalsProvider.notifier)._rereadAfter('a whelping');
+    await _rereadAfter('a whelping');
     return created;
   }
 
   Future<void> edit(Litter litter) async {
     await ref.read(daosProvider).litters.update(litter);
-    await refresh();
+    await _rereadAfter('a whelping change');
   }
 
   /// Deleting a litter unlinks its animals (`litter_id ON DELETE SET NULL`), so
@@ -159,8 +172,20 @@ class LittersController extends AsyncNotifier<List<Litter>> {
   Future<void> delete(String id) async {
     final daos = ref.read(daosProvider);
     await daos.litters.delete(id);
-    await ref.read(animalsProvider.notifier).refresh();
-    await refresh();
+    await ref.read(animalsProvider.notifier)._rereadAfter('a whelping delete');
+    await _rereadAfter('a whelping delete');
+  }
+
+  /// Same rule as the herd list: `createWithPuppies` is one transaction, so by
+  /// the time this runs the whelping and every puppy are already stored. A list
+  /// that will not re-read must not be reported as a refused write, or the
+  /// breeder registers the same litter a second time.
+  Future<void> _rereadAfter(String what) async {
+    try {
+      await refresh();
+    } catch (error) {
+      debugPrint('Litter re-read after $what failed: $error');
+    }
   }
 
   Future<void> refresh() async {

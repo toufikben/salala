@@ -385,4 +385,41 @@ void main() {
       expect(find.text('That file could not be opened'), findsOneWidget);
     });
   });
+
+  group('the app lock', () {
+    testWidgets('a phone that refuses the PIN says so', (tester) async {
+      final storage = await pumpSalala(tester, seed: <Animal>[animal('Atlas')]);
+      await goTo(tester, 'Settings');
+
+      // Refused on the second write, which is the interesting half: the salt is
+      // already in the keystore by then. Before this test the exception simply
+      // ended the tap handler, so the switch snapped back and the breeder read
+      // a broken tile and tapped it again.
+      storage.writeRefused.add('app_lock_digest');
+
+      await tester.tap(find.byType(Switch));
+      await tester.pumpAndSettle();
+      await tester.enterText(
+        find.widgetWithText(TextField, 'Enter your PIN'),
+        '2481',
+      );
+      await tester.enterText(
+        find.widgetWithText(TextField, 'Repeat the PIN'),
+        '2481',
+      );
+      await tester.tap(find.widgetWithText(FilledButton, 'Save'));
+      await settleRefusal(tester);
+
+      expect(
+        find.text('The phone would not change the app lock.'),
+        findsOneWidget,
+      );
+      expect(
+        tester.widget<Switch>(find.byType(Switch)).value,
+        isFalse,
+        reason: 'a lock the phone refused is not a lock the breeder has',
+      );
+      expect(storage.values['app_lock_digest'], isNull);
+    });
+  });
 }

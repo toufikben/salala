@@ -63,16 +63,29 @@ class _AppLockTile extends ConsumerWidget {
       title: Text(l10n.settingsAppLock),
       onChanged: (enable) async {
         final lock = ref.read(appLockProvider);
-        if (enable) {
-          final pin = await showPinSetupDialog(context);
-          if (pin == null) return;
-          await lock.enable(pin);
-          ref.read(hasPinProvider.notifier).set(true);
-        } else {
-          if (!await askCurrentPin(context, ref)) return;
-          await lock.disable();
-          ref.read(hasPinProvider.notifier).set(false);
+        final messenger = ScaffoldMessenger.of(context);
+        try {
+          if (enable) {
+            final pin = await showPinSetupDialog(context);
+            if (pin == null) return;
+            await lock.enable(pin);
+          } else {
+            if (!await askCurrentPin(context, ref)) return;
+            await lock.disable();
+          }
+        } catch (error) {
+          // The keystore said no. Without this the exception leaves the async
+          // handler mid-flight: the switch snaps back and nothing tells the
+          // breeder the phone refused, so they tap a second time and read the
+          // tile as broken. `disable()` removes the digest before the salt, so
+          // a refusal here cannot have left an unlockable lock behind.
+          debugPrint('App lock change refused: $error');
+          messenger.showSnackBar(
+            SnackBar(content: Text(l10n.lockChangeFailed)),
+          );
+          return;
         }
+        ref.read(hasPinProvider.notifier).set(enable);
       },
     );
   }

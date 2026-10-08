@@ -98,5 +98,48 @@ void main() {
       expect(await lock.isLocked(), isFalse);
       expect(storage.values, isEmpty);
     });
+
+    test('a digest with no salt behind it can never be unlocked', () async {
+      await lock.enable('2481');
+      // The residue the old delete order left behind when the keystore refused
+      // halfway: `isLocked()` reads the digest alone, so the unlock screen
+      // opens, and `verify()` has no salt to hash against, so it answers no to
+      // every PIN the breeder can type. The records are still on the phone and
+      // unreachable — the only way out is a restore.
+      storage.values.remove('app_lock_salt');
+
+      expect(await lock.isLocked(), isTrue);
+      expect(await lock.verify('2481'), isFalse);
+      await expectLater(
+        lock.change('2481', '1357'),
+        throwsA(isA<AppLockException>()),
+      );
+    });
+
+    test(
+      'a disable the keystore refuses halfway leaves the app open',
+      () async {
+        await lock.enable('2481');
+        storage.deleteRefused.add('app_lock_salt');
+
+        await expectLater(lock.disable(), throwsStateError);
+
+        // The digest goes first, so the worst a refusal can leave is the salt of a
+        // lock that no longer exists: nothing reads it, and the app opens.
+        expect(await lock.isLocked(), isFalse);
+        expect(storage.values.keys, unorderedEquals(<String>['app_lock_salt']));
+      },
+    );
+
+    test('a PIN the keystore refuses to finish leaves the app open', () async {
+      // The mirror image, which is why `enable` writes the salt first: a digest
+      // stored without its salt would be the dead end above, reached by a
+      // halfway write instead of a halfway delete.
+      storage.writeRefused.add('app_lock_digest');
+
+      await expectLater(lock.enable('2481'), throwsStateError);
+
+      expect(await lock.isLocked(), isFalse);
+    });
   });
 }

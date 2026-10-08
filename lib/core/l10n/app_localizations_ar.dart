@@ -224,6 +224,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get lockCurrentPin => 'الرمز الحالي';
 
   @override
+  String get lockChangeFailed => 'رفض الهاتف تغيير قفل التطبيق.';
+
+  @override
   String get settingsAppLock => 'قفل التطبيق';
 
   @override

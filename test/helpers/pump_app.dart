@@ -270,7 +270,7 @@ Future<FakeSecureStorage> pumpSalala(
 /// land; reads stay honest, so the screen around the form behaves normally.
 Future<void> Function(Database) refuseWritesTo(String table) => (db) async {
   await db.execute(
-    'CREATE TRIGGER refuse_row BEFORE INSERT ON $table '
+    'CREATE TRIGGER refuse_insert_$table BEFORE INSERT ON $table '
     "BEGIN SELECT RAISE(ABORT, 'the ledger is full'); END",
   );
 };
@@ -280,7 +280,7 @@ Future<void> Function(Database) refuseWritesTo(String table) => (db) async {
 /// [refuseWritesTo] and the same reason: a real SQLite refusal, not a fake dao.
 Future<void> Function(Database) refuseDeletesOf(String table) => (db) async {
   await db.execute(
-    'CREATE TRIGGER refuse_row_delete BEFORE DELETE ON $table '
+    'CREATE TRIGGER refuse_delete_$table BEFORE DELETE ON $table '
     "BEGIN SELECT RAISE(ABORT, 'the ledger is full'); END",
   );
 };

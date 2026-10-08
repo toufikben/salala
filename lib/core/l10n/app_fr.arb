@@ -79,6 +79,7 @@
   "lockEnable": "Verrouiller l'application",
   "lockDisable": "Désactiver le verrouillage",
   "lockCurrentPin": "Code actuel",
+  "lockChangeFailed": "Le téléphone a refusé de modifier le verrouillage.",
 
   "settingsAppLock": "Verrouillage",
   "settingsLanguage": "Langue",

@@ -490,6 +490,12 @@ abstract class AppLocalizations {
   /// **'Current PIN'**
   String get lockCurrentPin;
 
+  /// No description provided for @lockChangeFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'The phone would not change the app lock.'**
+  String get lockChangeFailed;
+
   /// No description provided for @settingsAppLock.
   ///
   /// In en, this message translates to:

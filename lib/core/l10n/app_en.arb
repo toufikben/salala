@@ -96,6 +96,7 @@
   "lockEnable": "Lock the app",
   "lockDisable": "Turn the lock off",
   "lockCurrentPin": "Current PIN",
+  "lockChangeFailed": "The phone would not change the app lock.",
 
   "settingsAppLock": "App lock",
   "settingsLanguage": "Language",
