@@ -27,17 +27,27 @@ class ReminderBooking {
   final String dueDay;
 }
 
-/// Every record with a reminder still ahead of it, doses before screenings.
+/// Every record whose alarms are still ahead, for an animal still at home —
+/// doses before screenings.
 ///
-/// A record whose two mornings have both passed is skipped rather than passed
-/// to [ReminderScheduler.replace]: cancelling an alarm that is not there costs
-/// two calls to the platform for nothing, and an overdue dose is already
-/// shouting about itself in the ledger.
+/// [herd] is the animal id → name map *of the animals the phone may wake for*:
+/// built by [resyncReminders] off `AnimalStatus.isAtHome` (D40). A record whose
+/// animal is not in it books nothing, for two different reasons that want the
+/// same answer — the dog was sold or died, so the booking belongs to someone
+/// else or to nobody; or the animal row is simply gone, so the alarm would name
+/// nothing. This is the same rule the home agenda already applies to the same
+/// rows, and the old code broke it: it kept both kinds of record and titled the
+/// message with the app's name, which is a 09:00 notification about a dose
+/// nobody can act on.
+///
+/// A record whose two mornings have both passed is skipped rather than passed to
+/// [ReminderScheduler.replace]: cancelling an alarm that is not there costs two
+/// calls to the platform for nothing, and an overdue dose is already shouting
+/// about itself in the ledger.
 List<ReminderBooking> bookingsFor({
   required List<Vaccination> doses,
   required List<HealthTest> screenings,
-  required Map<String, String> animalNames,
-  required String fallbackTitle,
+  required Map<String, String> herd,
   required String Function(int? ms) dueDayText,
   DateTime? now,
 }) {
@@ -46,6 +56,8 @@ List<ReminderBooking> bookingsFor({
 
   void add(String recordId, String animalId, int? dueMs, String what) {
     if (dueMs == null) return;
+    final name = herd[animalId];
+    if (name == null) return;
     if (remindersFor(recordId: recordId, dueMs: dueMs, now: from).isEmpty) {
       return;
     }
@@ -53,7 +65,7 @@ List<ReminderBooking> bookingsFor({
       ReminderBooking(
         recordId: recordId,
         dueMs: dueMs,
-        title: animalNames[animalId] ?? fallbackTitle,
+        title: name,
         what: what,
         dueDay: dueDayText(dueMs),
       ),
@@ -89,16 +101,16 @@ Future<int> resyncReminders(
   final screenings = await daos.healthTests.expiringBy(cutoff);
   if (doses.isEmpty && screenings.isEmpty) return 0;
 
-  final animalNames = <String, String>{
-    for (final animal in await daos.animals.findAll()) animal.id: animal.name,
+  final herd = <String, String>{
+    for (final animal in await daos.animals.findAll())
+      if (animal.status.isAtHome) animal.id: animal.name,
   };
 
   var rebooked = 0;
   for (final booking in bookingsFor(
     doses: doses,
     screenings: screenings,
-    animalNames: animalNames,
-    fallbackTitle: l10n.appTitle,
+    herd: herd,
     dueDayText: dueDayText,
     now: from,
   )) {

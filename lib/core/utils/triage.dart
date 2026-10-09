@@ -259,9 +259,11 @@ List<TriageRule> parseRules(String source) {
 
 /// The verdict: every enabled rule that fires, worst urgency first.
 List<TriageFinding> evaluateTriage(LedgerFacts facts, List<TriageRule> rules) {
-  // A deceased animal has no next action. Said here rather than in every
-  // predicate, so "nothing applies" stays one rule.
-  if (facts.animal.status == AnimalStatus.deceased) {
+  // An animal that is not at this address has no next step *for this breeder*.
+  // Said here rather than in every predicate, so "nothing applies" stays one rule
+  // — and it is `isAtHome` rather than a check on death alone, because a sold
+  // dog's overdue booster is not this ledger's errand either (D40).
+  if (!facts.animal.status.isAtHome) {
     return const <TriageFinding>[];
   }
 

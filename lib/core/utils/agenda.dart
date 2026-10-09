@@ -71,11 +71,13 @@ List<AgendaItem> buildHerdAgenda({
   required int nowMs,
   int windowDays = agendaWindowDays,
 }) {
-  // An animal that has been sold, retired or lost is not waiting for a dose;
-  // its records stay in the ledger and in the pack, off the to-do list.
+  // An animal that has been sold or lost is not waiting for a dose; its records
+  // stay in the ledger and in the pack, off the to-do list. A retired one is not
+  // off it — she lives here and the shot is still this breeder's booking (D40),
+  // which is why the test is on `isAtHome` and not on a status written here.
   final inHerd = Map<String, String>.fromEntries(
     animals
-        .where((animal) => animal.status == AnimalStatus.active)
+        .where((animal) => animal.status.isAtHome)
         .map((animal) => MapEntry<String, String>(animal.id, animal.name)),
   );
 

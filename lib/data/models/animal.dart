@@ -2,7 +2,29 @@ import 'package:equatable/equatable.dart';
 
 enum Sex { male, female, unknown }
 
-enum AnimalStatus { active, sold, retired, deceased }
+enum AnimalStatus {
+  active,
+  sold,
+  retired,
+  deceased;
+
+  /// Whether this animal is still *at the address*, which is the question that
+  /// decides whether the phone may wake the breeder for it and whether the home
+  /// agenda may list a dose of it (D40).
+  ///
+  /// `retired` counts, because the word is about the breeding plan and not about
+  /// the household: a retired dam sleeps in the house and still needs her annual
+  /// shot, and a reminder that stopped firing because she left the whelping box
+  /// is worse than no reminder — the breeder has no reason to suspect the ledger
+  /// went quiet on purpose. `sold` and `deceased` do not, because the person who
+  /// owes that booking is someone else, or nobody.
+  ///
+  /// One getter rather than three comparisons, so the agenda, the triage card and
+  /// the launch that re-books alarms cannot each guess the same question
+  /// differently — which is exactly what they did before this line existed.
+  bool get isAtHome =>
+      this == AnimalStatus.active || this == AnimalStatus.retired;
+}
 
 Sex sexFromName(String? value) =>
     Sex.values.firstWhere((e) => e.name == value, orElse: () => Sex.unknown);

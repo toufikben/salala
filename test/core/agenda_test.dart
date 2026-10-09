@@ -106,7 +106,11 @@ void main() {
     expect(items.last.overdue, isFalse);
   });
 
-  test('an animal that has left the herd is off the agenda', () {
+  test('the agenda is for the animals still at this address', () {
+    // D40: sold and deceased leave the to-do list, retired does not. The retired
+    // row is the positive control as well as the assertion — without it this test
+    // would pass on a filter that hid every status but `active`, which is what
+    // this file used to do and what the owner decided against.
     final items = buildHerdAgenda(
       animals: <Animal>[
         _animal('Here'),
@@ -121,8 +125,11 @@ void main() {
       nowMs: _now,
     );
 
-    expect(items, hasLength(1));
-    expect(items.single.animalId, 'Here');
+    expect(items, hasLength(2));
+    expect(items.map((item) => item.animalId).toSet(), <String>{
+      'Here',
+      'Retired',
+    });
   });
 
   test('a dose whose animal is not in the herd is dropped', () {

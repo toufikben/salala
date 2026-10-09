@@ -775,15 +775,36 @@ void main() {
       expect(findings, isEmpty);
     });
 
-    test('a deceased animal has no next step, whatever its record holds', () {
-      final findings = evaluateTriage(
-        _facts(
-          animal: _animal('a', ageDays: 90, status: AnimalStatus.deceased),
-          doses: <Vaccination>[_dose(dueInDays: -50)],
+    test('an animal that no longer lives here has no next step', () {
+      // D40. Both halves in one test, because the interesting failure of this
+      // rule is writing it as "not active" and calling the silence correct.
+      final gone = <AnimalStatus>[AnimalStatus.deceased, AnimalStatus.sold];
+      for (final status in gone) {
+        expect(
+          evaluateTriage(
+            _facts(
+              animal: _animal('a', ageDays: 90, status: status),
+              doses: <Vaccination>[_dose(dueInDays: -50)],
+            ),
+            rules,
+          ),
+          isEmpty,
+          reason:
+              '$status: a booster someone else owes is not this card\'s news',
+        );
+      }
+
+      expect(
+        evaluateTriage(
+          _facts(
+            animal: _animal('a', ageDays: 90, status: AnimalStatus.retired),
+            doses: <Vaccination>[_dose(dueInDays: -50)],
+          ),
+          rules,
         ),
-        rules,
+        isNotEmpty,
+        reason: 'retired is out of the whelping box, not out of the house',
       );
-      expect(findings, isEmpty);
     });
 
     test('findings come back worst first', () {

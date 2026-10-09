@@ -76,8 +76,7 @@ void main() {
       final bookings = bookingsFor(
         doses: <Vaccination>[dose(dueMs: dayAhead(1))],
         screenings: const <HealthTest>[],
-        animalNames: const <String, String>{'animal-1': 'Nala'},
-        fallbackTitle: 'Salala',
+        herd: const <String, String>{'animal-1': 'Nala'},
         dueDayText: stampedDay,
         now: noon,
       );
@@ -97,8 +96,7 @@ void main() {
       final bookings = bookingsFor(
         doses: <Vaccination>[dose(dueMs: dayAhead(60))],
         screenings: const <HealthTest>[],
-        animalNames: const <String, String>{'animal-1': 'Nala'},
-        fallbackTitle: 'Salala',
+        herd: const <String, String>{'animal-1': 'Nala'},
         dueDayText: stampedDay,
         now: noon,
       );
@@ -110,8 +108,7 @@ void main() {
       final bookings = bookingsFor(
         doses: <Vaccination>[dose(dueMs: dayAhead(-3))],
         screenings: const <HealthTest>[],
-        animalNames: const <String, String>{'animal-1': 'Nala'},
-        fallbackTitle: 'Salala',
+        herd: const <String, String>{'animal-1': 'Nala'},
         dueDayText: stampedDay,
         now: noon,
       );
@@ -124,16 +121,14 @@ void main() {
       final stillToCome = bookingsFor(
         doses: <Vaccination>[dose(dueMs: dayAhead(0))],
         screenings: const <HealthTest>[],
-        animalNames: const <String, String>{'animal-1': 'Nala'},
-        fallbackTitle: 'Salala',
+        herd: const <String, String>{'animal-1': 'Nala'},
         dueDayText: stampedDay,
         now: eight,
       );
       final alreadyGone = bookingsFor(
         doses: <Vaccination>[dose(dueMs: dayAhead(0))],
         screenings: const <HealthTest>[],
-        animalNames: const <String, String>{'animal-1': 'Nala'},
-        fallbackTitle: 'Salala',
+        herd: const <String, String>{'animal-1': 'Nala'},
         dueDayText: stampedDay,
         now: noon,
       );
@@ -148,8 +143,7 @@ void main() {
         final bookings = bookingsFor(
           doses: <Vaccination>[dose(dueMs: null)],
           screenings: <HealthTest>[screening(untilMs: null)],
-          animalNames: const <String, String>{'animal-1': 'Nala'},
-          fallbackTitle: 'Salala',
+          herd: const <String, String>{'animal-1': 'Nala'},
           dueDayText: stampedDay,
           now: noon,
         );
@@ -162,8 +156,7 @@ void main() {
       final bookings = bookingsFor(
         doses: const <Vaccination>[],
         screenings: <HealthTest>[screening(untilMs: dayAhead(10))],
-        animalNames: const <String, String>{'animal-1': 'Nala'},
-        fallbackTitle: 'Salala',
+        herd: const <String, String>{'animal-1': 'Nala'},
         dueDayText: stampedDay,
         now: noon,
       );
@@ -173,17 +166,36 @@ void main() {
       expect(bookings.single.dueMs, dayAhead(10));
     });
 
-    test('a record whose animal has gone falls back to the app title', () {
+    test('a record outside the herd map books nothing', () {
+      // D40. The map is the whole decision — sold, deceased and gone are the same
+      // absence here, and `resyncReminders` is what turns status into absence.
+      // The old behaviour was the opposite: keep the record and title the message
+      // with the app's name, which the scheduler's own comment calls noise.
       final bookings = bookingsFor(
         doses: <Vaccination>[dose(animalId: 'gone', dueMs: dayAhead(1))],
         screenings: const <HealthTest>[],
-        animalNames: const <String, String>{'animal-1': 'Nala'},
-        fallbackTitle: 'Salala',
+        herd: const <String, String>{'animal-1': 'Nala'},
         dueDayText: stampedDay,
         now: noon,
       );
 
-      expect(bookings.single.title, 'Salala');
+      expect(bookings, isEmpty);
+    });
+
+    test('a name in the herd map is enough to book, whatever the status was', () {
+      // The pair of the test above: the record is not dropped for being about a
+      // retired animal or a renamed one, only for its animal not being at home.
+      // A booking that survived the filter must carry the animal's own name, not
+      // a fallback nobody can act on.
+      final bookings = bookingsFor(
+        doses: <Vaccination>[dose(animalId: 'animal-1', dueMs: dayAhead(1))],
+        screenings: const <HealthTest>[],
+        herd: const <String, String>{'animal-1': 'Nala'},
+        dueDayText: stampedDay,
+        now: noon,
+      );
+
+      expect(bookings.single.title, 'Nala');
     });
   });
 
@@ -244,6 +256,38 @@ void main() {
           updatedAt: 0,
         ),
         nowMs: 3,
+      );
+      return created.id;
+    }
+
+    Future<String> seedAnimal(String name, AnimalStatus status) async {
+      final created = await daos.animals.create(
+        Animal(
+          id: '',
+          name: name,
+          species: 'dog',
+          sex: Sex.female,
+          status: status,
+          createdAt: 0,
+          updatedAt: 0,
+        ),
+        nowMs: 4,
+      );
+      return created.id;
+    }
+
+    Future<String> seedDoseFor(String id, int? dueMs) async {
+      final created = await daos.vaccinations.create(
+        Vaccination(
+          id: '',
+          animalId: id,
+          vaccineName: 'Rabies',
+          dateAdministered: dayAhead(-10),
+          nextDueDate: dueMs,
+          createdAt: 0,
+          updatedAt: 0,
+        ),
+        nowMs: 5,
       );
       return created.id;
     }
@@ -328,6 +372,36 @@ void main() {
       // No clears either: a launch with nothing to say stays silent instead of
       // walking the platform for a record the ledger already shows in red.
       expect(writer.log, isEmpty);
+    });
+
+    test('a launch books the animals at this address and no others', () async {
+      // D40, end to end on real SQLite: the dose rows are identical and only
+      // the status differs, so a booking that appears for the sold dog — or
+      // fails to appear for the retired one — is the filter's own doing.
+      final soldAnimal = await daos.animals.findById(animalId);
+      await daos.animals.update(
+        soldAnimal!.copyWith(status: AnimalStatus.sold),
+        nowMs: 6,
+      );
+      final retiredId = await seedAnimal('Old Girl', AnimalStatus.retired);
+      final retiredDoseId = await seedDoseFor(retiredId, dayAhead(20));
+      final soldDoseId = await seedDoseFor(animalId, dayAhead(20));
+
+      expect(await run(), 1);
+
+      expect(writer.written.map((a) => a.title).toSet(), <String>{'Old Girl'});
+      final booked = writer.written.map((a) => a.id).toSet();
+      expect(
+        booked,
+        contains(notificationIdFor(retiredDoseId, ReminderKind.dueToday)),
+      );
+      for (final kind in ReminderKind.values) {
+        expect(
+          booked,
+          isNot(contains(notificationIdFor(soldDoseId, kind))),
+          reason: 'a sold dog\'s booster is someone else\'s 09:00',
+        );
+      }
     });
   });
 }
