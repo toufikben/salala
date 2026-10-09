@@ -872,7 +872,7 @@ as "no buyer" instead of an error. Recorded as **D27**.
   real). The pass has not run: another app was being checked on the phone when the
   device was reached, so no input was sent and nothing was uninstalled.
 
-- **The same pass owes 3i through 3m too**, and these are facts a widget test
+- **The same pass owes 3i through 3n too**, and these are facts a widget test
   structurally cannot produce:
   - **The app lock against a real keystore.** CI proves the digest ordering and the
     refused-`change()` path; only a device proves the hardware-backed key exists,
@@ -900,6 +900,14 @@ as "no buyer" instead of an error. Recorded as **D27**.
     not by reading Flutter's source again. The *calendar* mode is never driven in CI
     at all; its month grid, year list, and swipe behaviour under Arabic RTL are
     device-only evidence.
+  - **The pre-birth refusal, on all six forms, in Arabic and French.** CI proves each
+    of the six calls the predicate and returns before writing; it cannot prove the
+    sentence fits a 6-inch snackbar in three languages, or that a breeder who picked
+    the date in the dialog sees the refusal before the form closes. Nor that the
+    dialog itself still lets that day be picked: the chosen design bounds no calendar,
+    so the impossible date is tappable on purpose and the save guard is the only thing
+    that catches it.
+
   - Then the deletion of every row the pass created, and proof the herd is empty
     again in both languages (`90-empty-en.png`, `91-empty-ar.png`).
 
@@ -1436,6 +1444,75 @@ Three batches, all of them written while the phone was busy with another app.
 - **Counting, honestly:** 11 new unit cases (day boundaries, the stored hour, each
   null combination, which sentence wins when both pairs are broken) and 5 new
   widget tests. 382 → 398 at `37850981556`.
+
+## Stage 3n — No record may be dated before the animal it belongs to was born *(CI green — 411 tests at `37856022735`, APK from the same run; the first verdict on these six tests was `37855018407`: "405 tests passed, 6 failed"; device check queued with 3b–3m)*
+
+The phone stayed busy, so this batch is another CI-verifiable one: a third date
+rule, six call sites, and one measured defect in the test harness.
+
+- **The rule, and what makes it different from D36's two.** A weigh-in, a dose, a
+  screening, a vet visit, a symptom or a handover stamped before that animal's
+  `birthDate`. D36 refused two dates on one row; this pair lives on two rows, and
+  that is why it is worth a rule of its own rather than a stricter validator: the
+  mistake is invisible inside the record that carries it. A date is only wrong here
+  *relative to a date on another screen*, so nothing in the row will ever look
+  strange to the breeder re-reading it. What breaks is the arithmetic around it —
+  triage prints how long ago a sign was seen, a litter makes each puppy's birthday
+  the whelping date, a dose interval counts from a screening.
+- **One predicate, one sentence, six forms.** `recordPrecedesBirth` went into
+  `date_utils` beside D36's rules, day-compared for the invariant D31/D32 already
+  hold. `refuseRecordBeforeBirth(context, ref, animalId:, recordMs:)` went into
+  `record_refusal.dart`, reads the herd once, shows the sentence and returns whether
+  it refused; each of the six forms calls it immediately after its own validation
+  guard and before `_saving = true`, so nothing is written and the button stays live.
+  Six copies of `ref.read(animalsProvider)` plus six copies of the null handling
+  would drift within a month, and every drift would look correct in isolation.
+- **It says its own sentence, and the reason is the next action.** `recordSaveFailed`
+  means SQLite said no to a record that was fine: press Save again. This means the
+  record is not fine: pressing Save again does exactly nothing. Two different next
+  actions cannot share one sentence — the same split D34 made between a refused write
+  and a refused delete.
+- **A design that looked better and was rejected on a crash.** `firstDate: birthDate`
+  on the six pickers would make the impossible day untypeable, which beats refusing
+  it. It was rejected because `showDatePicker` asserts when `initialDate` falls
+  outside `[firstDate, lastDate]`, and all six forms seed `initialDate` from a stored
+  row (edit mode) or from today — any of which can already sit behind a birth date: a
+  row written before this rule, a pack restored from one (D36 keeps restore
+  permissive on purpose), or the ordinary case of a breeder who registers the
+  whelping after the first weigh-in. Bounds would crash the form on opening for
+  precisely the records the rule exists to catch. A refusal can be bounded later; a
+  crash cannot be un-bounded into a refusal.
+- **The batch's real finding is about the harness, and a run proved it.** The first
+  verdict on these tests was **`37855018407` — "405 tests passed, 6 failed"**, and all
+  six were the second half of my own new pair tests: they asserted the
+  database-refusal sentence and found zero widgets, while the same log shows SQLite
+  *did* refuse that save (`Placement save failed: … the ledger is full`). The write
+  behaved; the assertion did not. `ScaffoldMessenger` shows one snackbar at a time and
+  queues the next, and `settleRefusal` returns as soon as **any** `SnackBar` exists —
+  so phase two settled on phase one's sentence still on screen. This is the exact
+  weakness already sitting on the review list as "exits on any SnackBar from any
+  route"; it was a note argued from source, and a run turned it into a measurement.
+  `dismissRefusals(tester)` now waits out the shipped 4-second display on the fake
+  clock between phases — `pumpAndSettle` cannot do it, because a pending timer is not
+  a scheduled frame. No product code changed in that fix.
+- **What is NOT covered, stated.** The certificate pair (a `validUntil` before its own
+  `testDate`) is the same shape as D36's dose pair, and adding it honestly means
+  generalising `doseDatesContradict` into a named pair rather than bolting a second
+  one-line predicate onto the same idea — queued, not built. A death date before a
+  birth date is still not refused, because `deathDate` has no write path anywhere in
+  `lib/`: modelled, printed, copied into a pack, never set. A mating before the dam's
+  own birth is left with them rather than added as a seventh call site no screen can
+  reach. And the harness fix is a mitigation between phases, not the redesign:
+  `settleRefusal` still cannot tell which sentence it is waiting for.
+- **Counting, honestly:** 7 new unit cases on `recordPrecedesBirth` (a record
+  before the birth refuses; the birth day itself is legal, because a puppy weighed
+  on the day it was born is a real weigh-in; the day after is legal; a null birth
+  refuses nothing; a null record refuses nothing; 23:00 against 01:00 the same day
+  is not earlier; 2025-12-31 23:00 against 2026-01-01 01:00 *is* a day before) and 6
+  new widget tests, each one a pair inside itself: the impossible date answered by
+  the birth sentence with no database sentence, then the dismissed snackbar, a legal
+  date, and the database sentence with no birth sentence. 398 → 411 at
+  `37856022735`, analyze clean in 14.8s.
 
 
 

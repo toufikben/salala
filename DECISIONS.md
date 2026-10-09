@@ -1038,3 +1038,62 @@ recorded as such. A death date before a birth date is not refused anywhere:
 `deathDate` is displayed on the animal's ledger and has no editing UI, so there is
 no screen to refuse it from, and it is left deferred rather than stubbed behind a
 field nobody can set.
+
+## D37 — A record dated before its animal was born is refused at the form, not by the picker
+
+D36 refused two dates on one row that cannot both have happened. This is the pair
+that lives on **two** rows: a weigh-in, a dose, a screening, a visit, a symptom or a
+handover stamped before the animal's `birthDate`.
+
+**Why this rule and not another.** Every age the app shows is subtraction from that
+birth date. Triage prints how long ago a sign was seen, the litter screen makes each
+puppy's birthday the whelping date, a dose interval is measured from a screening. A
+record below the birth date does not read as a wrong day — it reads as an animal that
+was never that age, and it survives every review of the row itself, because the date
+that makes it impossible is on another screen. This is the only date pair in the app
+where the mistake is invisible inside the record that carries it.
+
+**One predicate, one sentence, six call sites.** `recordPrecedesBirth` sits in
+`date_utils` beside D36's rules, day-compared for the invariant D31 and D32 already
+hold. `refuseRecordBeforeBirth` in `record_refusal.dart` reads the herd once, asks
+that predicate against the animal's birth date, shows the sentence and returns whether
+it refused; each form calls it immediately after its own validation guard and returns
+if it says yes. Six forms sharing one rule by copy would drift in a month, and the
+drift would be silent because each copy would still look correct.
+
+**It says its own sentence, on purpose.** `recordSaveFailed` means the database said
+no to a record that was fine — the breeder presses Save again. This one means the
+record is not fine — pressing Save again does nothing. Two different next actions
+cannot share one sentence; the same reasoning that split the delete refusal from the
+write refusal in D34.
+
+**Considered and rejected: `firstDate: birthDate` on the pickers.** Untypeable beats
+refused for a date a breeder is choosing now, and it was the obvious fix. It is not
+safe as the *only* guard. `showDatePicker` asserts when `initialDate` falls outside
+`[firstDate, lastDate]`, and every one of these six forms seeds `initialDate` from a
+stored row (edit mode) or from today, and any of those can already be behind a birth
+date: a row written before this rule existed, a pack restored from one (D36 keeps
+restore permissive on purpose), a breeder who records the whelping after the first
+weigh-in because that is how a litter week actually goes. Bounds would crash the form
+on opening for exactly the records the rule is meant to catch. The refusal catches
+them and can be bounded later; the reverse order is not available.
+
+**Deferred, and what each one needs.** The certificate pair (`validUntil` before the
+test date) is the same shape as D36's dose pair, so the honest addition is to
+generalise `doseDatesContradict` into a named pair rather than bolt a second one-line
+predicate onto the same idea; it is queued, not built. A death date before a birth
+date has no write path anywhere in `lib/` — `deathDate` is modelled, printed and
+copied, never set — so there is no form to refuse from. A mating dated before the
+dam's own birth is left with them rather than added as a seventh call site that no
+screen can reach.
+
+**What the batch measured about the harness, not the app.** Run `37855018407` came
+back "405 tests passed, 6 failed" and all six were the second phase of the new tests:
+the log shows SQLite refusing that legal-date save (`the ledger is full`), so the
+write behaved and the assertion did not. `ScaffoldMessenger` displays one snackbar at
+a time and queues the next, and `settleRefusal` returns as soon as *any* `SnackBar`
+exists — it settled on the previous phase's sentence. That was a review note about a
+theoretical weakness; a run turned it into a measured one. `dismissRefusals` now waits
+out the shipped 4-second display on the fake clock between phases (`pumpAndSettle`
+alone cannot: a pending timer is not a scheduled frame). The redesign — a helper that
+waits for a *specific* sentence — is still open and still queued.
