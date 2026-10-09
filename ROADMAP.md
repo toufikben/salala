@@ -1728,7 +1728,7 @@ says `yyyy/mm/dd` while Flutter's shipped `parseCompactDate` reads `mm/dd/yyyy` 
 else: an upstream behaviour this app inherits, unanswered), and the pre-birth and date
 refusal sentences, of which no dump captured a single snackbar.
 
-## Stage 3r — An alarm that outlived its animal *(the fix the device pass asked for)*
+## Stage 3r — An alarm that outlived its animal *(CI green — 426 tests at `37980578546`, APK from the same run and installed on the phone; the device re-check is owed, the phone was in use)*
 
 The shape is already settled and it is small: when an animal is edited, cancel every dose
 and screening id belonging to it before deciding what to book, then re-book through the same
@@ -1744,6 +1744,41 @@ Alongside it, the two smaller device findings are queued as their own work rathe
 left in prose: a buyer delete path (`BuyerDao` has none, and a contact outliving the herd
 contradicts the privacy promise on the About tile), and day-count labels on the PDF growth
 chart.
+
+**What shipped (`d002d54`), and where it differs from the sketch above.** The paragraph
+above described cancelling *every* id of the edited animal before re-booking. What went in
+is narrower, because the wider version pays two platform calls per record on every edit for
+alarms that were never there: `reconcile()` writes the bookings the herd map still owns and
+cancels only what `staleRecordIds()` names — a record whose animal is out of the map **and**
+whose mornings are still ahead. A record with nothing left to fire is left alone on both
+sides, which is the same rule `bookingsFor` already applied, so the two halves of one walk
+answer with one loop's logic.
+
+Three seams, not one, because the first fix was incomplete in a way only re-reading the
+flow showed:
+
+1. `resyncReminders` (the launch) now reconciles rather than only re-books, so a kill that
+   lands before an edit finishes still heals on the next opening.
+2. `resyncAnimalReminders` runs from the animal form right after a successful edit, and
+   reads the animal's **own** rows rather than the horizon query — the save path books a
+   dose as far ahead as it is dated, while the launch only asks for 45 days, so a launch
+   alone could never see a dog's booster due in month three.
+3. The dose and screening forms ask `reminderAllowedFor(ref, animalId)` before booking and
+   cancel when it says no. Without that question the two halves of this stage cancel each
+   other out: mark a dog Placed, take her alarms back out, then save one more dose for her
+   and have the phone hold it again.
+
+Eleven tests came with it (426 green, `No issues found!` in 12.9s), including the pair the
+house rule asks for on every absence: `saving a screening books its expiry warnings on the
+phone` and `saving a screening for an animal who has left books no alarm`, and a widget
+test that drives the real dropdown — «Placed» on the card, `Edit` on the menu — because the
+DAO cannot answer whether the screen the breeder touches reaches the scheduler.
+
+**Still owed on the device:** the same booking the phone was measured keeping, in the build
+that now removes it. Read both stores first (`shared_prefs/scheduled_notifications.xml` and
+`dumpsys alarm`), book a dose, mark the animal Placed, and confirm the entry is gone — then
+force-stop and reopen, because a booking the plugin re-arms from its own list is the exact
+failure this stage is about.
 
 ## Stage 4 — Distribution
 
