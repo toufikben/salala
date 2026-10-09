@@ -1602,6 +1602,49 @@ the test harness rather than reasoning about it, and then papered over it.
   by `git show <commit>:ROADMAP.md | grep '^## Stage 4'` over the file's history,
   restored here from `15f33b1`. The Stage 4 text itself was never touched.
 
+## Stage 3q — One rule for who lives at this address *(CI green — 415 tests at `37911415223`, APK from the same run; analyze clean in 16.6s; device check queued with 3b–3p, and this stage changes what the phone visibly does)*
+
+The owner's rule, chosen 2026-10-09 and encoded here: the phone may wake a breeder for
+an animal that is still at the address — `active` **or** `retired` — and not for one that
+was sold or died. Three surfaces were answering that question three different ways, each
+read from source rather than inferred:
+
+- **The agenda hid a retired dam.** `buildHerdAgenda` filtered on `status == active`, so
+  her overdue booster was off the to-do list while she slept in the house — the one
+  animal whose shots the breeder still owes, silenced by a word about her breeding plan.
+- **The triage card spoke for a sold dog.** `evaluateTriage` returned nothing only for
+  `deceased`, so a card still said "act now" about a booking that belongs to whoever
+  took the animal home.
+- **The alarms asked nothing at all.** `bookingsFor` had no status filter and the launch
+  resync re-booked every dose and certificate inside the horizon whatever the animal
+  was, titling the message `l10n.appTitle` for any row whose animal was gone. The twelve
+  tests in that file had never set a status, which is how the gap outlived them.
+
+- **What changed shape.** `AnimalStatus.isAtHome` is the single place that decides, and
+  agenda, card and resync now call it. `bookingsFor`'s argument is `herd` instead of
+  `animalNames`, and `fallbackTitle` is gone: a record whose animal is not at home books
+  nothing, whether the row is missing or present-with-a-status — two reasons, one answer,
+  and the same shape the agenda had already settled on. Deleting the fallback is the part
+  that carries the rule; leaving it would have kept a 09:00 notification about a dose
+  nobody can act on.
+- **The tests, and the control each absence rests on.** The agenda's membership test now
+  asserts retired *stays* as well as sold/deceased leaving — the old expectation would
+  have passed a filter that hid retired forever. The card test pairs a retired animal
+  that still fires against sold and deceased silence. `bookingsFor` gains the
+  absence/positive pair, and `resyncReminders` an end-to-end case on real SQLite where
+  the dose rows are identical and only the animal's status differs, so the claim is about
+  the filter and not about the query.
+- **Counting, honestly: 413 → 415.** Three tests were rewritten under new names (the
+  agenda's, the card's, and the fallback-title one, which no longer describes anything
+  the app does) and five appear: the agenda and card rewrites plus `a record outside the
+  herd map books nothing`, `a name in the herd map is enough to book, whatever the status
+  was`, and the end-to-end launch case. Net two, which is what CI counted.
+- **Device debt this stage adds on purpose.** A retired animal's doses reappear on the
+  home agenda, and no dose of a sold or deceased animal may wake the phone any more —
+  both are user-visible and neither is provable in a widget test, so both join the queued
+  phone pass. The alarm half needs the real notification channel: the ledger can be read
+  back here, the phone's booked alarms cannot.
+
 ## Stage 4 — Distribution
 
 Blocked on the business question in `docs/FEASIBILITY.md` §Payments: a Morocco

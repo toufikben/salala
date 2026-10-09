@@ -1177,3 +1177,43 @@ displayed by the time it was asserted. Keying the wait to the name is load-beari
 harness that only *looks* strict is not a harness. (The APK job was gated on `master`
 for the duration of the check, so a branch build could not take the rolling debug APK
 the phone installs from.)
+
+## D40 — Where an animal lives decides who is asked after it
+
+`AnimalStatus.isAtHome` (`active` or `retired`) is the one predicate that answers
+"may this animal still cost this breeder a morning", and three surfaces read it instead
+of asking their own version: `buildHerdAgenda`, `evaluateTriage`, and the launch resync
+that re-books alarms through `bookingsFor`. `bookingsFor` takes `herd` rather than
+`animalNames` and has no `fallbackTitle` — a record whose animal is not in the map books
+nothing.
+
+**Why the owner's word and not a default.** "Retired" in this app is about the breeding
+plan, not the household: a retired dam sleeps in the house and her annual shot is still
+this person's booking, while a sold dog's booster belongs to whoever took her home and a
+dead animal's belongs to nobody. Two of the three surfaces had guessed one way and one
+the other, and no amount of reading the code settles which guess is right — the owner
+chose the rule on 2026-10-09, and the choice is recorded here because it is a product
+rule, not an implementation detail.
+
+**Why one getter rather than three comparisons.** The agenda, the card and the alarms are
+built in different files and run at different moments (a screen build, a triage pass, a
+launch). Any one of them may be changed without the others in view, and each silent
+divergence shows up as a notification the breeder cannot explain — the ledger looks quiet
+on purpose, or the phone shouts about a dog they sold. The cost of agreement is one line
+in the enum the three of them already import.
+
+**Why the fallback title was deleted rather than kept.** `title: animalNames[id] ??
+fallbackTitle` booked an alarm for a record whose animal the herd map did not contain,
+with the app's own name as the subject. That is a 09:00 notification that says
+"Salala" and names nothing the breeder can act on. The argument in the scheduler's own
+comment has always been that a reminder for a gone animal is worse than no reminder; once
+the herd map is filtered by where the animal lives, the same `null` lookup means two
+things — sold or died, or the row is simply gone — and both want the same answer, so the
+missing name became the reason to book nothing instead of the reason to be vague.
+
+**What this changes on the phone, and what it does not.** A retired animal's overdue
+doses appear on the home agenda again; a sold or deceased animal's doses stop being
+booked as notifications, and its card stops saying "act now". Records themselves are
+untouched — the ledger, the JSON pack and the PDF keep every row whatever the status,
+because the transfer pack is precisely where a buyer reads a sold animal's history. The
+alarm half is not observable from a widget test; it joins the queued phone pass.

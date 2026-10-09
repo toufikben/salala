@@ -137,6 +137,11 @@ of them needs a notification channel to be tested:
   per launch, because Android drops an app's pending alarms when it is
   force-stopped or cleared away and cannot be woken to notice (D20).
 
+Who may be booked at all is decided in one place: `AnimalStatus.isAtHome` (D40). The
+resync's herd map holds only animals still at this address, so a dose of a sold or
+deceased one books nothing, and `bookingsFor` has no fallback title to be vague with —
+the home agenda and the triage card read the same getter.
+
 Alarms are scheduled `AndroidScheduleMode.inexactAllowWhileIdle` deliberately: an
 exact one needs `SCHEDULE_EXACT_ALARM`, which Google Play audits, for a message
 whose only deadline is "somewhere in that morning". The notification channel is
