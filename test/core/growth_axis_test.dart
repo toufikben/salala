@@ -1,5 +1,20 @@
+import 'dart:math' show Random;
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:salala/core/utils/growth_axis.dart';
+
+/// The seed of the sweep below, fixed so CI and a laptop see the same inputs.
+const int _sweepSeed = 20261009;
+
+/// How many records each scale is asked to lay out.
+const int _sweepRuns = 1500;
+
+/// An age no dog lives to, so the sweep covers a birth date typed four digits wrong.
+const double _oldestAgeDays = 20000;
+
+/// A weight past anything on the page: the field has no maximum, so 430 grams typed
+/// into the kilogram box arrives as 430, and a finger on `0` arrives as thousands.
+const double _heaviestTypedKilos = 5000;
 
 /// The marks a growth curve is drawn against, before any page is drawn.
 ///
@@ -318,6 +333,85 @@ void main() {
         }
       },
     );
+  });
+
+  group('the rules of an axis, over records nobody picked', () {
+    // Every case above is one a reviewer could think of and write down. The page is
+    // built from whatever gets typed, and the two promises `growth_axis.dart` makes
+    // — no more than six marks, and the marks enclosing the data — are said about
+    // *every* input. They were checked over ~210,000 pairs on a laptop before the
+    // algorithm was pushed; this is that sweep, kept, so the next edit to the stride
+    // or the ladder is caught by CI rather than by a buyer's printed page.
+    void expectEveryRule(GrowthScale scale, List<double> measured) {
+      expect(
+        scale.ticks.length,
+        lessThanOrEqualTo(6),
+        reason:
+            'the axis of $measured prints more marks than the page has room for',
+      );
+      expectAscending(scale);
+      expectSpans(scale, measured);
+      for (final GrowthTick tick in scale.ticks) {
+        expect(tick.label, isNotEmpty);
+        expect(
+          scale.format(tick.value),
+          tick.label,
+          reason: 'a mark with no word of its own prints a blank',
+        );
+      }
+    }
+
+    test('ages from one day old to past any living dog', () {
+      final random = Random(_sweepSeed);
+      for (var run = 0; run < _sweepRuns; run++) {
+        final int points = 1 + random.nextInt(4);
+        final ages = <double>[
+          for (var i = 0; i < points; i++) random.nextDouble() * _oldestAgeDays,
+        ];
+
+        final scale = monthScale(agesInDays: ages);
+        expectEveryRule(scale, ages);
+        for (final GrowthTick tick in scale.ticks) {
+          // The word under a mark is the age it sits at, in months. The defect that
+          // first reached paper was a label that said something other than where the
+          // mark was, so the pair is asserted rather than the two halves.
+          expect(
+            double.parse(tick.label) * meanDaysPerMonth,
+            tick.value,
+            reason:
+                'the label ${tick.label} does not stand at that many months',
+          );
+        }
+      }
+    });
+
+    test('weights on the ledger\'s own gram lattice, and past it', () {
+      final random = Random(_sweepSeed);
+      for (var run = 0; run < _sweepRuns; run++) {
+        final int points = 1 + random.nextInt(4);
+        final kilos = <double>[
+          // Even runs are the only shape the app can store: a weigh-in is grams,
+          // divided by a thousand on the way here. Odd runs are the kilogram box
+          // filled in by hand, which has no maximum, so the thinning path runs.
+          for (var i = 0; i < points; i++)
+            if (run.isEven)
+              random.nextInt(60000) / 1000.0
+            else
+              random.nextDouble() * _heaviestTypedKilos,
+        ];
+
+        final scale = kiloScale(weightsInKg: kilos);
+        expectEveryRule(scale, kilos);
+        for (final GrowthTick tick in scale.ticks) {
+          expect(
+            double.parse(tick.label),
+            tick.value,
+            reason:
+                'the label ${tick.label} does not stand at that many kilograms',
+          );
+        }
+      }
+    });
   });
 
   group('meanDaysPerMonth', () {

@@ -273,6 +273,35 @@ void main() {
       expect(read.placedDate, 1000);
     });
 
+    test('every handover that named him is blanked, not only the one deleted from', () async {
+      // `ON DELETE SET NULL` fans out over the whole table, and one contact can
+      // be named by more than one animal: two dogs sold to the same person, or
+      // one bought back and re-homed. The request is the buyer's, and every row
+      // it must leave behind is a sale.
+      final other = await seedAnimal(daos, name: 'Bakir');
+      final mine = await daos.placements.create(handover(), nowMs: 1);
+      final theirs = await daos.placements.create(
+        Placement(
+          id: '',
+          animalId: other,
+          buyerId: buyerId,
+          placedDate: 2000,
+          createdAt: 0,
+          updatedAt: 0,
+        ),
+        nowMs: 2,
+      );
+
+      await daos.buyers.delete(buyerId);
+
+      expect((await daos.placements.findById(mine.id))!.buyerId, isNull);
+      final second = await daos.placements.findById(theirs.id);
+      expect(second, isNotNull);
+      expect(second!.buyerId, isNull);
+      expect(second.placedDate, 2000);
+      expect(await daos.placements.forBuyer(buyerId), isNull);
+    });
+
     test('deleting the animal takes its placements', () async {
       await daos.placements.create(handover(), nowMs: 1);
       await daos.animals.delete(animalId);
