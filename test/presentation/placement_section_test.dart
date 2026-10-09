@@ -123,6 +123,53 @@ Future<void> _saveIn(WidgetTester tester, String dialogTitle) async {
   await settleRealIo(tester);
 }
 
+/// Opens the contact form of the buyer a handover already names.
+///
+/// Reached from the handover form rather than from a contacts screen: the book
+/// has no such screen, and a contact the breeder can only see through a
+/// handover is still a person whose phone number is in the app.
+Future<void> _editBuyer(WidgetTester tester) async {
+  await _tap(tester, find.byTooltip('Edit buyer'));
+  expect(find.text('Edit buyer'), findsOneWidget);
+}
+
+/// Taps the contact form's Delete action and stops on the confirmation, so the
+/// caller chooses the answer and waits for whatever the database does next.
+Future<void> _askToDeleteBuyer(WidgetTester tester) async {
+  await _tap(
+    tester,
+    find.descendant(
+      of: find.widgetWithText(AlertDialog, 'Edit buyer'),
+      matching: find.widgetWithText(TextButton, 'Delete'),
+    ),
+  );
+  expect(find.text('Delete this record?'), findsOneWidget);
+}
+
+Future<void> _answerDeletePrompt(WidgetTester tester, String action) async {
+  await tester.tap(
+    find.descendant(
+      of: find.widgetWithText(AlertDialog, 'Delete this record?'),
+      matching: find.widgetWithText(
+        action == 'Delete' ? FilledButton : TextButton,
+        action,
+      ),
+    ),
+  );
+}
+
+/// Closes a dialog with its Cancel button, scoped by title because the handover
+/// form and the contact form are stacked on each other and both offer one.
+Future<void> _cancelDialog(WidgetTester tester, String dialogTitle) async {
+  await _tap(
+    tester,
+    find.descendant(
+      of: find.widgetWithText(AlertDialog, dialogTitle),
+      matching: find.widgetWithText(TextButton, 'Cancel'),
+    ),
+  );
+}
+
 /// Names a buyer in the contact form and saves it, leaving the placement form
 /// with that contact selected.
 Future<void> _createBuyer(WidgetTester tester, String name) async {
@@ -525,6 +572,182 @@ void main() {
       label: 'Price',
       text: '2500',
       dialogTitle: 'Log a placement',
+    );
+  });
+
+  testWidgets('deleting a contact keeps the handover and blanks its buyer', (
+    tester,
+  ) async {
+    // The two things this path must not confuse: the animal's history belongs to
+    // the animal, the phone number belongs to the person. The handover survives
+    // the delete with no buyer named — `placements.buyer_id ... ON DELETE SET
+    // NULL`, which the transfer pack then prints as its own sentence.
+    _usePhoneViewport(tester);
+    await pumpSalala(
+      tester,
+      seed: <Animal>[_animal(_nalaId, 'Nala')],
+      seedBuyers: <Buyer>[_aicha()],
+      seedPlacements: <Placement>[
+        _handover(
+          id: 'placement-1',
+          placed: _placedOn,
+          price: 2500,
+          currency: 'MAD',
+        ),
+      ],
+    );
+    await _openAnimal(tester, 'Nala');
+    await _scrollTo(tester, find.text('Aicha'));
+
+    await _tap(tester, find.text('Aicha'));
+    expect(find.text('Edit placement'), findsOneWidget);
+    await _editBuyer(tester);
+    // The form opened on the row the ledger holds, so the name in the box is the
+    // name being deleted — not whatever was typed last.
+    expect(
+      tester
+          .widget<TextFormField>(
+            find.descendant(
+              of: find.widgetWithText(AlertDialog, 'Edit buyer'),
+              matching: find.widgetWithText(TextFormField, 'Name'),
+            ),
+          )
+          .controller!
+          .text,
+      'Aicha',
+    );
+
+    await _askToDeleteBuyer(tester);
+    await _answerDeletePrompt(tester, 'Delete');
+    await settleRealIo(tester);
+    await settleRealIo(tester);
+
+    // The contact form closed on its own; the handover form it was opened from is
+    // still here, so removing a name does not throw away a record mid-correction.
+    expect(find.widgetWithText(AlertDialog, 'Edit buyer'), findsNothing);
+    expect(find.widgetWithText(AlertDialog, 'Edit placement'), findsOneWidget);
+    await _cancelDialog(tester, 'Edit placement');
+
+    await _scrollTo(tester, find.text('Buyer not recorded'));
+    expect(find.text('Buyer not recorded'), findsOneWidget);
+    expect(find.text('Aicha'), findsNothing);
+
+    // Off the ledger and back into it: the row printed below is SQLite's, so the
+    // handover did not go with the contact and neither did its amount.
+    await tester.tap(find.byIcon(Icons.arrow_back));
+    await settleRealIo(tester);
+    await _openAnimal(tester, 'Nala');
+    await _scrollTo(tester, find.text('Buyer not recorded'));
+    expect(find.text('Buyer not recorded'), findsOneWidget);
+    expect(find.textContaining('2500 MAD'), findsOneWidget);
+  });
+
+  testWidgets(
+    'a contact the database refuses to delete is still offered and still named',
+    (tester) async {
+      _usePhoneViewport(tester);
+      await pumpSalala(
+        tester,
+        seed: <Animal>[_animal(_nalaId, 'Nala')],
+        seedBuyers: <Buyer>[_aicha()],
+        seedPlacements: <Placement>[
+          _handover(id: 'placement-1', placed: _placedOn),
+        ],
+        beforeLaunch: refuseDeletesOf('buyers'),
+      );
+      await _openAnimal(tester, 'Nala');
+      await _scrollTo(tester, find.text('Aicha'));
+
+      await _tap(tester, find.text('Aicha'));
+      await _editBuyer(tester);
+      await _askToDeleteBuyer(tester);
+      await _answerDeletePrompt(tester, 'Delete');
+      await settleRefusal(tester, waitingFor: deleteRefusalSentence);
+
+      expect(find.text(deleteRefusalSentence), findsOneWidget);
+      final editBuyer = find.widgetWithText(AlertDialog, 'Edit buyer');
+      // A person SQLite kept stays the form's to show: it did not close on a delete
+      // that never happened, the name is still in the box, and the button answers a
+      // second tap instead of freezing disabled.
+      expect(editBuyer, findsOneWidget);
+      expect(
+        tester
+            .widget<TextFormField>(
+              find.descendant(
+                of: editBuyer,
+                matching: find.widgetWithText(TextFormField, 'Name'),
+              ),
+            )
+            .controller!
+            .text,
+        'Aicha',
+      );
+      expect(
+        tester
+            .widget<TextButton>(
+              find.descendant(
+                of: editBuyer,
+                matching: find.widgetWithText(TextButton, 'Delete'),
+              ),
+            )
+            .onPressed,
+        isNotNull,
+      );
+
+      await _cancelDialog(tester, 'Edit buyer');
+      await _cancelDialog(tester, 'Edit placement');
+      expect(find.text('Aicha'), findsOneWidget);
+      expect(find.text('Buyer not recorded'), findsNothing);
+    },
+  );
+
+  testWidgets('cancelling the confirmation deletes nobody', (tester) async {
+    _usePhoneViewport(tester);
+    await pumpSalala(
+      tester,
+      seed: <Animal>[_animal(_nalaId, 'Nala')],
+      seedBuyers: <Buyer>[_aicha()],
+      seedPlacements: <Placement>[
+        _handover(id: 'placement-1', placed: _placedOn),
+      ],
+    );
+    await _openAnimal(tester, 'Nala');
+    await _scrollTo(tester, find.text('Aicha'));
+
+    await _tap(tester, find.text('Aicha'));
+    await _editBuyer(tester);
+    await _askToDeleteBuyer(tester);
+    await _answerDeletePrompt(tester, 'Cancel');
+    await tester.pumpAndSettle();
+
+    // The question was asked once and the answer was no: the contact form is back
+    // where it was, and the ledger still has the buyer behind it.
+    expect(find.text('Delete this record?'), findsNothing);
+    expect(find.widgetWithText(AlertDialog, 'Edit buyer'), findsOneWidget);
+    await _cancelDialog(tester, 'Edit buyer');
+    await _cancelDialog(tester, 'Edit placement');
+    expect(find.text('Aicha'), findsOneWidget);
+    expect(find.text('Buyer not recorded'), findsNothing);
+  });
+
+  testWidgets('a contact being created offers no delete', (tester) async {
+    // Nobody has been written yet, so there is nothing to remove — and a Delete
+    // button on a new contact would ask the database to delete an id that does
+    // not exist.
+    _usePhoneViewport(tester);
+    await pumpSalala(tester, seed: <Animal>[_animal(_nalaId, 'Nala')]);
+    await _openAnimal(tester, 'Nala');
+    await _scrollTo(tester, find.text('Placements'));
+
+    await _tap(tester, find.widgetWithText(TextButton, 'Add placement'));
+    await _tap(tester, find.byTooltip('New buyer'));
+    expect(find.text('Add a buyer'), findsOneWidget);
+    expect(
+      find.descendant(
+        of: find.widgetWithText(AlertDialog, 'Add a buyer'),
+        matching: find.widgetWithText(TextButton, 'Delete'),
+      ),
+      findsNothing,
     );
   });
 }

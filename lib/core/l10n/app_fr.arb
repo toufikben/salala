@@ -255,6 +255,7 @@
   "buyerPhone": "Téléphone",
   "buyerEmail": "Courriel",
   "buyerCountryCode": "Code pays",
+  "buyerDeleteBody": "{name} est supprimé de vos contacts. Le placement reste dans l'historique de l'animal, sans acquéreur nommé. Action irréversible.",
 
   "reminderHeadsUpBody": "À noter : {what} arrive à échéance le {dueDay}",
   "@reminderHeadsUpBody": {
@@ -285,6 +286,7 @@
   "pdfPlacedOn": "Placé le",
   "pdfPrice": "Prix",
   "pdfGuarantee": "Conditions de garantie",
+  "pdfChartAxes": "Poids en kilogrammes, selon l'âge en mois. Le tableau ci-dessus écrit le poids d'un jeune chiot en grammes.",
   "pdfDisclaimer": "Établi hors ligne par Salala à partir des registres de l'éleveur. Ce document n'est pas un certificat vétérinaire.",
 
   "triageTitle": "Prochaine étape",

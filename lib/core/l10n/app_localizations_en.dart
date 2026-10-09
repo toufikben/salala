@@ -700,6 +700,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get buyerCountryCode => 'Country code';
 
   @override
+  String buyerDeleteBody(String name) {
+    return '$name is removed from your contacts. The handover stays in the animal\'s history, with no buyer named. This cannot be undone.';
+  }
+
+  @override
   String reminderHeadsUpBody(String what, String dueDay) {
     return 'Heads up: $what is due on $dueDay';
   }
@@ -755,6 +760,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get pdfGuarantee => 'Guarantee terms';
+
+  @override
+  String get pdfChartAxes =>
+      'Weight in kilograms, against age in months. The table above writes a young puppy\'s weight in grams.';
 
   @override
   String get pdfDisclaimer =>

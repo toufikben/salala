@@ -176,9 +176,6 @@ Future<void> deletePlacement(WidgetRef ref, Placement placement) async {
 
 /// Writes a contact and returns it as stored, because the placement form that
 /// asked for it has to select the id the dao just assigned.
-///
-/// There is no delete: `placements.buyer_id` is `ON DELETE SET NULL`, so removing
-/// a buyer would quietly blank the buyer block of a document already handed over.
 Future<Buyer> saveBuyer(WidgetRef ref, Buyer buyer) async {
   final daos = ref.read(daosProvider);
   if (buyer.id.isNotEmpty) {
@@ -189,6 +186,28 @@ Future<Buyer> saveBuyer(WidgetRef ref, Buyer buyer) async {
   final created = await daos.buyers.create(buyer);
   ref.invalidate(buyersProvider);
   return created;
+}
+
+/// Takes a contact out of the ledger, and says what that leaves behind.
+///
+/// A name and a phone number belong to the person who gave them, and this app
+/// keeps them on one device with their knowledge for one purpose: being able to
+/// call the dog back, or send its papers. When they ask for them back there has to
+/// be a way to say yes — the offline promise of `settingsOfflineNote` is not a
+/// reason to hold a contact forever, only a reason nobody else can read it.
+///
+/// What survives is the handover. `placements.buyer_id` is `ON DELETE SET NULL`,
+/// so the row that says *this animal went to someone on this day, for this price*
+/// stays exactly as it was except for the name: the breeder's record of the sale is
+/// theirs, and deleting a person must not quietly rewrite history into "unrecorded".
+/// The blank is what the confirmation sentence says out loud before it happens.
+///
+/// Every contact is reachable from here because the placement form's dropdown is
+/// the whole list, not one buyer's own page: a contact whose animal was deleted, or
+/// whose handover was never written, can still be asked to leave.
+Future<void> deleteBuyer(WidgetRef ref, Buyer buyer) async {
+  await ref.read(daosProvider).buyers.delete(buyer.id);
+  ref.invalidate(buyersProvider);
 }
 
 /// The name a reminder notification is filed under.

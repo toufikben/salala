@@ -6,6 +6,7 @@ import 'package:pdf/widgets.dart' as pw;
 import '../core/l10n/app_localizations.dart';
 import '../core/utils/animal_rows.dart';
 import '../core/utils/date_utils.dart';
+import '../core/utils/growth_axis.dart';
 import '../data/db/daos.dart';
 import '../data/models/animal.dart';
 import '../data/models/buyer.dart';
@@ -87,7 +88,7 @@ Future<Uint8List> animalPackPdf(
       ? const <Buyer>[]
       : await daos.buyers.alphabetical();
 
-  final chart = _growthChart(animal, weighIns);
+  final chart = _growthChart(animal, weighIns, l10n);
 
   final body = <pw.Widget>[
     ...pdfMasthead(
@@ -183,7 +184,17 @@ Future<Uint8List> animalPackPdf(
 /// numbers. Left out rather than drawn on an invented axis: without a birth date
 /// there is no age, and two weigh-ins on one day, or at one weight, leave a fixed
 /// axis with a single mark to place.
-pw.Widget? _growthChart(Animal animal, List<WeightEntry> weighIns) {
+///
+/// The marks themselves come from [monthScale] and [kiloScale], and both the units
+/// and their words are said in the caption under the curve: the axis is drawn
+/// through the embedded font, so nothing on this page can be read back by a test,
+/// and the first version of this chart printed the raw ages-in-days it was handed —
+/// `988.0 1009.0 1012.0` under a growth curve, on the one document a buyer keeps.
+pw.Widget? _growthChart(
+  Animal animal,
+  List<WeightEntry> weighIns,
+  AppLocalizations l10n,
+) {
   final birthDate = animal.birthDate;
   if (birthDate == null || weighIns.length < 2) return null;
 
@@ -202,20 +213,32 @@ pw.Widget? _growthChart(Animal animal, List<WeightEntry> weighIns) {
         ..sort();
   if (days.length < 2 || kilos.length < 2) return null;
 
-  return pw.SizedBox(
-    height: 170,
-    child: pw.Chart(
-      grid: pw.CartesianGrid(
-        xAxis: pw.FixedAxis<double>(days),
-        yAxis: pw.FixedAxis<double>(kilos),
-      ),
-      datasets: <pw.Dataset>[
-        pw.LineDataSet<pw.PointChartValue>(
-          data: points,
-          color: PdfColors.blueGrey700,
+  final age = monthScale(agesInDays: days);
+  final weight = kiloScale(weightsInKg: kilos);
+
+  return pw.Column(
+    crossAxisAlignment: pw.CrossAxisAlignment.stretch,
+    children: <pw.Widget>[
+      pw.SizedBox(
+        height: 170,
+        child: pw.Chart(
+          grid: pw.CartesianGrid(
+            xAxis: pw.FixedAxis<double>(age.values, format: age.format),
+            yAxis: pw.FixedAxis<double>(weight.values, format: weight.format),
+          ),
+          datasets: <pw.Dataset>[
+            pw.LineDataSet<pw.PointChartValue>(
+              data: points,
+              color: PdfColors.blueGrey700,
+            ),
+          ],
         ),
-      ],
-    ),
+      ),
+      pw.Text(
+        l10n.pdfChartAxes,
+        style: const pw.TextStyle(fontSize: 8, color: PdfColors.grey700),
+      ),
+    ],
   );
 }
 

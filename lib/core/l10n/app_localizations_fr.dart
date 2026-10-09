@@ -703,6 +703,11 @@ class AppLocalizationsFr extends AppLocalizations {
   String get buyerCountryCode => 'Code pays';
 
   @override
+  String buyerDeleteBody(String name) {
+    return '$name est supprimé de vos contacts. Le placement reste dans l\'historique de l\'animal, sans acquéreur nommé. Action irréversible.';
+  }
+
+  @override
   String reminderHeadsUpBody(String what, String dueDay) {
     return 'À noter : $what arrive à échéance le $dueDay';
   }
@@ -758,6 +763,10 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get pdfGuarantee => 'Conditions de garantie';
+
+  @override
+  String get pdfChartAxes =>
+      'Poids en kilogrammes, selon l\'âge en mois. Le tableau ci-dessus écrit le poids d\'un jeune chiot en grammes.';
 
   @override
   String get pdfDisclaimer =>

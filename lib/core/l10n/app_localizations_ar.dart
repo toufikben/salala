@@ -699,6 +699,11 @@ class AppLocalizationsAr extends AppLocalizations {
   String get buyerCountryCode => 'رمز البلد';
 
   @override
+  String buyerDeleteBody(String name) {
+    return 'يُحذف $name من جهات اتصالك. ويبقى سجل التسليم في تاريخ الحيوان دون ذكر المشتري. لا يمكن التراجع عن ذلك.';
+  }
+
+  @override
   String reminderHeadsUpBody(String what, String dueDay) {
     return 'تنبيه: $what مستحق في $dueDay';
   }
@@ -754,6 +759,10 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get pdfGuarantee => 'شروط الضمان';
+
+  @override
+  String get pdfChartAxes =>
+      'الوزن بالكيلوغرام مقابل العمر بالأشهر. أما الجدول أعلاه فيكتب وزن الجرو الصغير بالغرام.';
 
   @override
   String get pdfDisclaimer =>

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/l10n/app_localizations.dart';
 import '../../data/models/buyer.dart';
 import '../providers/record_providers.dart';
+import 'record_refusal.dart';
 
 /// Opens the contact form for a new buyer and for correcting one already chosen.
 ///
@@ -114,6 +115,49 @@ class _BuyerDialogState extends ConsumerState<BuyerDialog> {
     );
   }
 
+  /// Removing the contact, which is a different act from correcting it.
+  ///
+  /// The row deleted is the one the ledger holds ([BuyerDialog.existing]), not the
+  /// text in these boxes: a name half-retyped cannot be deleted, and the breeder
+  /// would hear "not there" about a person who is. The dialog then closes without a
+  /// result, so the placement form that opened it keeps whatever else it was
+  /// holding and simply loses this choice.
+  Future<void> _delete() async {
+    final existing = widget.existing;
+    if (existing == null) return;
+    final l10n = AppLocalizations.of(context);
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(l10n.recordDeleteTitle),
+        content: Text(l10n.buyerDeleteBody(existing.name)),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: Text(l10n.actionCancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: Text(l10n.actionDelete),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+    setState(() => _saving = true);
+
+    try {
+      await deleteBuyer(ref, existing);
+    } catch (error) {
+      if (mounted) {
+        setState(() => _saving = false);
+        refuseRecordDelete(context, error);
+      }
+      return;
+    }
+    if (mounted) Navigator.of(context).pop();
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -167,6 +211,11 @@ class _BuyerDialogState extends ConsumerState<BuyerDialog> {
         ),
       ),
       actions: <Widget>[
+        if (_isEdit)
+          TextButton(
+            onPressed: _saving ? null : _delete,
+            child: Text(l10n.actionDelete),
+          ),
         TextButton(
           onPressed: _saving ? null : () => Navigator.of(context).pop(),
           child: Text(l10n.actionCancel),

@@ -1354,6 +1354,12 @@ abstract class AppLocalizations {
   /// **'Country code'**
   String get buyerCountryCode;
 
+  /// Said before a contact is deleted, and it has to say what survives: the placement row is kept with its buyer blanked (`ON DELETE SET NULL`), because the fact that an animal went to someone is the breeder's record, while the name and phone belong to the person who can ask for them back.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} is removed from your contacts. The handover stays in the animal\'s history, with no buyer named. This cannot be undone.'**
+  String buyerDeleteBody(String name);
+
   /// The month-ahead alarm. {what} is the dose or screening name as the breeder typed it, {dueDay} a localised date.
   ///
   /// In en, this message translates to:
@@ -1455,6 +1461,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Guarantee terms'**
   String get pdfGuarantee;
+
+  /// Said under the growth curve, because the curve's own marks are drawn through the embedded font and no test can read them back. It names both units and reconciles them: the weigh-in table prints 430 g for a newborn while this axis puts the same puppy at 0.43, and a buyer holding both on one page is entitled to know which one the app made up.
+  ///
+  /// In en, this message translates to:
+  /// **'Weight in kilograms, against age in months. The table above writes a young puppy\'s weight in grams.'**
+  String get pdfChartAxes;
 
   /// No description provided for @pdfDisclaimer.
   ///
