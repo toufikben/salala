@@ -872,7 +872,9 @@ as "no buyer" instead of an error. Recorded as **D27**.
   real). The pass has not run: another app was being checked on the phone when the
   device was reached, so no input was sent and nothing was uninstalled.
 
-- **The same pass owes 3i through 3o too**, and these are facts a widget test
+- **The same pass owes 3i through 3p too** (3p changed only the test harness, so it
+  adds nothing to read on the phone — but the build the pass runs against is that
+  line), and these are facts a widget test
   structurally cannot produce:
   - **The app lock against a real keystore.** CI proves the digest ordering and the
     refused-`change()` path; only a device proves the hardware-backed key exists,
@@ -1558,8 +1560,41 @@ same idea.
   and does not enforce is named in D38 — `deathDate` against `birthDate` (no write
   path exists), and a mating before the dam's own birth (no screen reaches it).
 
+## Stage 3p — A test waits for the sentence it is about to assert *(CI green — 413 tests at `37904006479`, APK from the same run; analyze clean in 16.6s; harness only, so the queued device pass is unchanged)*
 
+No `lib/` file changed. This stage exists because Stage 3n measured a weakness in
+the test harness rather than reasoning about it, and then papered over it.
 
+- **What the mitigation was, and why it was not a fix.** `37855018407` returned
+  "405 tests passed, 6 failed" and every failure was a second-half assertion
+  reading a sentence from the phase before it: `ScaffoldMessenger` shows one
+  snackbar at a time and queues the next, so a form refused twice displays the
+  first reason while the second is still waiting. `dismissRefusals` spent four
+  seconds on whatever happened to be on screen and pushed each test forward. That
+  makes the queue *drain*; it does not make the wait answer the question the test
+  asks, and a test that settles on the wrong sentence still passes.
+- **What changed instead.** `settleRefusal` now polls for one named string —
+  `find.descendant(of: SnackBar, matching: find.text(waitingFor))` — and only
+  steps aside, burning the 4 s display, when some *other* snackbar is what blocks
+  the frame. Every sentence the app can print as a refusal now exists once, as a
+  constant in `test/helpers/pump_app.dart`, so "wait for X" and "assert X" are the
+  same token; nine literals copied across six files were the drift that got
+  measured. `dismissRefusals` is deleted along with its six call sites.
+- **Counting, honestly: 413 → 413.** No test was added or removed, so the count
+  had to hold; a harness refactor that moved it would be a different stage doing
+  something else. The number that matters is that all 413 settled: a wait keyed to
+  a sentence that never arrives would have burned its 40 rounds and failed.
+- **What the green run does not prove, and what will.** It shows every named wait
+  resolved; it cannot show that a *wrong* name would be caught — that is the
+  mutation check, and it is owed on a side branch before this harness is trusted
+  the way D30's tests are (see Stage 3k, "tests that can actually fail").
+- **A doc line that went missing.** The `## Stage 4 — Distribution` heading was
+  lost in `e48a72d` (an awk insertion in the same file, the same class of edit that
+  the D-entries keep blaming) and was absent from every ROADMAP read since. Found
+  by `git show <commit>:ROADMAP.md | grep '^## Stage 4'` over the file's history,
+  restored here from `15f33b1`. The Stage 4 text itself was never touched.
+
+## Stage 4 — Distribution
 
 Blocked on the business question in `docs/FEASIBILITY.md` §Payments: a Morocco
 resident developer cannot receive Play money directly. Options ranked there.

@@ -1133,3 +1133,39 @@ known pairs are not, for stated reasons rather than by oversight: `deathDate` ag
 modelled, printed and packed, never written, and a rule with no call site is a stub;
 and a mating dated before the dam's own birth, which the breeding form could reach but
 no current test seeds. Both are queued behind the phone pass, not closed.
+
+## D39 — A test waits for the refusal it is about to assert, by name
+
+`settleRefusal(tester, waitingFor: …)` polls for one specific `SnackBar` string, and
+the strings are nine constants in `test/helpers/pump_app.dart`
+(`saveRefusalSentence`, `deleteRefusalSentence`, `beforeBirthSentence`,
+`whelpingBeforeMatingSentence`, `weaningBeforeWhelpingSentence`,
+`doseDueBeforeDoseSentence`, `certificateBeforeTestSentence`,
+`appLockRefusalSentence`, `languageRefusalSentence`). `dismissRefusals`, added a stage
+earlier to get the queue moving, is deleted.
+
+**Why a wait keyed to "any snackbar" was not a wait.** `ScaffoldMessenger` displays one
+snackbar at a time and queues the rest for their full 4 s. A two-phase test — refuse the
+impossible, correct it, try again — therefore has a moment where the sentence it is
+about to assert is *pending* and an older one is *visible*. Waiting for any `SnackBar`
+returns at that moment, and the test then reads the earlier phase's reason and passes.
+Stage 3n did not reason about this, it measured it: run `37855018407`, "405 tests
+passed, 6 failed", all six in the second half of a pair.
+
+**Why the mitigation was replaced rather than kept.** Draining the queue makes the
+failing tests stop failing; it does not make the wait answer the question. A helper that
+clears whatever is on screen lets a test assert a sentence the app never printed for the
+thing under test, which is the failure mode the harness is supposed to make impossible.
+The cost of the real fix is one required argument at every call site, and that cost is
+the point: a call site now states which refusal it expects.
+
+**Why constants rather than literals at the assert.** The wait and the assertion have to
+name the same string, and while each test held its own copy of both, they could drift —
+which is how the queue got read as a verdict. One token each cannot. The names are also
+the index of what this app refuses, in one file, in one read.
+
+**What this proves and what it does not.** 413 green at `37904006479` shows every named
+wait resolved (a wrong name burns its 40 rounds and fails, so silence is not evidence of
+a vacuous wait). It does not show that a *deliberately* wrong name is caught; that
+mutation check is owed on a side branch, on the same terms as D30's "tests that can
+actually fail".
