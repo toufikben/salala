@@ -1,4 +1,4 @@
-package com.salala.salala
+package com.toufikben.ledger
 
 import io.flutter.embedding.android.FlutterActivity
 
