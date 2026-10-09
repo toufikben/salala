@@ -872,7 +872,7 @@ as "no buyer" instead of an error. Recorded as **D27**.
   real). The pass has not run: another app was being checked on the phone when the
   device was reached, so no input was sent and nothing was uninstalled.
 
-- **The same pass owes 3i through 3n too**, and these are facts a widget test
+- **The same pass owes 3i through 3o too**, and these are facts a widget test
   structurally cannot produce:
   - **The app lock against a real keystore.** CI proves the digest ordering and the
     refused-`change()` path; only a device proves the hardware-backed key exists,
@@ -880,10 +880,13 @@ as "no buyer" instead of an error. Recorded as **D27**.
     engages on the phone is worse than no lock, because the breeder believes the
     herd is private.
   - **Every refusal sentence on a real keyboard, in Arabic and French** — the
-    lengthened delete sentence, the two litter date sentences, and the dose-due
-    sentence. A snackbar that truncates mid-word at a 6-inch width, or that
-    overflows and shows the ellipsis Flutter inserts, is a fact about the rendering
-    pipeline on this device, not about the string.
+    lengthened delete sentence, the two litter date sentences, the dose-due sentence,
+    the certificate-expiry sentence, and the pre-birth sentence all six record forms
+    share. A snackbar that truncates mid-word at a 6-inch width, or that overflows and
+    shows the ellipsis Flutter inserts, is a fact about the rendering pipeline on this
+    device, not about the string. The last two are the ones to read carefully: the
+    certificate sentence is the longest date string in the app, and the pre-birth one
+    is said by six different screens, so a bad fit is repeated six times.
   - **The language menu actually switching and persisting**, including whether the
     restart lands on the chosen language rather than the system one.
   - **The startup-failure screen.** CI can only build it with an injected throw; the
@@ -1513,6 +1516,48 @@ rule, six call sites, and one measured defect in the test harness.
   the birth sentence with no database sentence, then the dismissed snackbar, a legal
   date, and the database sentence with no birth sentence. 398 → 411 at
   `37856022735`, analyze clean in 14.8s.
+
+## Stage 3o — A certificate that expired before its own screening *(CI green — 413 tests at `37896941494`, APK from the same run; analyze clean in 10.8s; device check queued with 3b–3n)*
+
+The pair D36 queued and D37 deferred, built on the condition those two set: add it
+by generalising the dose rule, not by bolting a second one-line predicate onto the
+same idea.
+
+- **What changed shape.** `doseDatesContradict` is gone; `measuredDatePrecedesAnchor`
+  takes the date a row measures *from* (dose given, screening performed) and the date
+  it measures *to* (booster due, certificate expiry). The vaccination form calls it
+  with the same arguments under new names, and the health-test form calls it too.
+  Renaming rather than wrapping was deliberate: a second predicate beside the first
+  would be the thing D37 said not to do, just spelled differently.
+- **Why the expiry is worth refusing at all.** `validUntil` is what turns a screening
+  from a fact into a claim with a date on it, and it is the field a buyer reads: the
+  transfer pack prints the result and its validity side by side. "OFA hips · Good ·
+  valid until 2025-11-30" under a screening performed 2026-05-01 is not an old
+  certificate — it is no certificate, and a document that presents it beside the
+  result is the app lying on paper. The agenda reads the same field for a reminder, so
+  an expiry behind its anchor books a reminder for a claim that never existed.
+- **Two sentences, because each names a different box.** A breeder told "the next dose
+  is due before this dose was given" knows which field to open; the same is true of
+  the expiry. One predicate, two strings — the reason D36 keeps these rules on the
+  screen instead of in a `CHECK`, restated where it now costs something: a shared
+  sentence would have to name neither field.
+- **The pair test, and what its absence half rests on.** The screening is seeded with
+  both dates inside the animal's life (whelped 1000 days ago, screened 400 days ago,
+  certificate lapsing 500 days ago), so the rule that answers is the row against
+  itself rather than D37's birth rule; the impossible expiry is refused here with the
+  UPDATE trigger never reached, then the same row against the same trigger with a live
+  expiry is refused by SQLite with no date sentence. Both halves name the other in
+  their `reason:`, because an absence assertion is only evidence beside the control
+  that proves the trigger does fire.
+- **Counting, honestly:** 4 unit cases in the renamed group (one per shape, the
+  anchor-day case still legal, both null combinations) and 1 widget pair test. 411 →
+  413 at `37896941494`.
+- **What the date rules are now, in full.** Four: a whelping before its mating, a
+  weaning before its litter, a measured date before its anchor (dose and certificate),
+  and a record before the animal's birth. Every remaining pair this app knows about
+  and does not enforce is named in D38 — `deathDate` against `birthDate` (no write
+  path exists), and a mating before the dam's own birth (no screen reaches it).
+
 
 
 

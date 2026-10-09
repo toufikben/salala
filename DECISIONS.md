@@ -1097,3 +1097,39 @@ theoretical weakness; a run turned it into a measured one. `dismissRefusals` now
 out the shipped 4-second display on the fake clock between phases (`pumpAndSettle`
 alone cannot: a pending timer is not a scheduled frame). The redesign — a helper that
 waits for a *specific* sentence — is still open and still queued.
+
+## D38 — One predicate for "a row's measured date before its anchor", two sentences
+
+`measuredDatePrecedesAnchor(anchorMs:, measuredMs:)` in `core/utils/date_utils.dart`
+replaces `doseDatesContradict`, and two forms call it: the dose form (booster due
+before the dose given) and the health-test form (certificate expiring before the
+screening performed).
+
+**Why generalise instead of adding a rule beside it.** D37 deferred this pair on a
+condition: a second one-line predicate next to the first would be the same failure
+spelled differently. Two predicates that are the same comparison drift — one gets a
+null fix, a day-boundary fix, a test, and the other does not. The shapes really are
+one shape: a date on a row that is *derived from* another date on that row, stamped
+behind it.
+
+**Why the sentences stay separate.** Each names the field to fix, which is the whole
+reason these rules live on the screen and not in a `CHECK` (**D36**). A merged
+sentence — "these two dates are the wrong way round" — would make the breeder open
+both pickers to find out which one lied. So: one predicate, one string per form.
+
+**Why a certificate expiry is a refusal rather than a warning.** `validUntil` is the
+field that turns a screening into a claim with a deadline, and it is what a buyer
+reads: the transfer pack prints the result and its validity side by side, and the herd
+agenda books a reminder from the same field. An expiry behind its own test is not a
+lapsed certificate — no certificate lapsed before it was issued — so there is no
+harmless reading of the row, and a document that prints it is the app misrepresenting
+an animal it sold.
+
+**The date rules as of this entry, and what is deliberately left out.** Four are
+enforced: whelping before mating, weaning before litter, a measured date before its
+anchor (dose, certificate), and any record before the animal's birth (**D37**). Two
+known pairs are not, for stated reasons rather than by oversight: `deathDate` against
+`birthDate`, because no screen in `lib/` can set a death date at all — the field is
+modelled, printed and packed, never written, and a rule with no call site is a stub;
+and a mating dated before the dam's own birth, which the breeding form could reach but
+no current test seeds. Both are queued behind the phone pass, not closed.
