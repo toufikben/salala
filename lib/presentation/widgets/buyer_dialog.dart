@@ -6,15 +6,38 @@ import '../../data/models/buyer.dart';
 import '../providers/record_providers.dart';
 import 'record_refusal.dart';
 
+/// What the contact form came back with.
+///
+/// The form does two different things to two different objects: it writes a
+/// contact, and it removes one. The placement form that opened it has to tell
+/// those apart — a saved contact is the choice to keep, a removed one is the
+/// choice to drop — and it cannot read the difference off the contact list,
+/// because that list is reloaded on the database isolate and still holds the
+/// deleted row for a moment after the dialog closes. So the form says which it
+/// did, and nothing depends on how fast the reload lands.
+class BuyerDialogResult {
+  const BuyerDialogResult.saved(Buyer this.buyer) : deletedId = null;
+
+  const BuyerDialogResult.deleted(String this.deletedId) : buyer = null;
+
+  /// The contact as written, when this was a save.
+  final Buyer? buyer;
+
+  /// The id this form removed from the ledger, when this was a delete.
+  final String? deletedId;
+}
+
 /// Opens the contact form for a new buyer and for correcting one already chosen.
 ///
 /// The saved buyer comes back rather than nothing, because the placement form
 /// that asked for a contact has to select the id the dao just assigned.
-Future<Buyer?> showBuyerDialog(BuildContext context, {Buyer? existing}) =>
-    showDialog<Buyer>(
-      context: context,
-      builder: (_) => BuyerDialog(existing: existing),
-    );
+Future<BuyerDialogResult?> showBuyerDialog(
+  BuildContext context, {
+  Buyer? existing,
+}) => showDialog<BuyerDialogResult>(
+  context: context,
+  builder: (_) => BuyerDialog(existing: existing),
+);
 
 /// The person an animal went home with.
 ///
@@ -75,7 +98,7 @@ class _BuyerDialogState extends ConsumerState<BuyerDialog> {
     final existing = widget.existing;
     final saved = await _write(existing);
     if (saved == null) return;
-    if (mounted) Navigator.of(context).pop(saved);
+    if (mounted) Navigator.of(context).pop(BuyerDialogResult.saved(saved));
   }
 
   /// The write on its own, so the dialog can tell a refused row from a saved
@@ -119,9 +142,9 @@ class _BuyerDialogState extends ConsumerState<BuyerDialog> {
   ///
   /// The row deleted is the one the ledger holds ([BuyerDialog.existing]), not the
   /// text in these boxes: a name half-retyped cannot be deleted, and the breeder
-  /// would hear "not there" about a person who is. The dialog then closes without a
-  /// result, so the placement form that opened it keeps whatever else it was
-  /// holding and simply loses this choice.
+  /// would hear "not there" about a person who is. The dialog then closes naming
+  /// the id it removed, so the placement form that opened it can drop the choice
+  /// and keep whatever else it was holding.
   Future<void> _delete() async {
     final existing = widget.existing;
     if (existing == null) return;
@@ -155,7 +178,9 @@ class _BuyerDialogState extends ConsumerState<BuyerDialog> {
       }
       return;
     }
-    if (mounted) Navigator.of(context).pop();
+    if (mounted) {
+      Navigator.of(context).pop(BuyerDialogResult.deleted(existing.id));
+    }
   }
 
   @override

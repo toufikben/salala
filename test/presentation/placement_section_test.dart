@@ -643,6 +643,57 @@ void main() {
   });
 
   testWidgets(
+    'a contact created and then removed in the same handover form still saves',
+    (tester) async {
+      // The form keeps the contact it wrote itself, next to its id, because the list
+      // reload takes real time on the database isolate. That snapshot is the one
+      // thing here that can still name a person the ledger no longer has — and a
+      // handover that cannot be saved, answered with "try again" over a name that is
+      // already gone, is a dead end nobody could dig themselves out of.
+      _usePhoneViewport(tester);
+      await pumpSalala(tester, seed: <Animal>[_animal(_nalaId, 'Nala')]);
+      await _openAnimal(tester, 'Nala');
+      await _scrollTo(tester, find.text('Placements'));
+
+      await _tap(tester, find.widgetWithText(TextButton, 'Add placement'));
+      await _createBuyer(tester, 'Aicha');
+      // The pencil only appears on a contact the loaded list answers to, so this is
+      // also the moment the form stops holding its own snapshot as the only copy.
+      expect(find.byTooltip('Edit buyer'), findsOneWidget);
+      await _editBuyer(tester);
+      await _askToDeleteBuyer(tester);
+      await _answerDeletePrompt(tester, 'Delete');
+      await settleRealIo(tester);
+      await settleRealIo(tester);
+
+      expect(
+        find.descendant(
+          of: find.widgetWithText(AlertDialog, 'Log a placement'),
+          matching: find.text('Buyer not recorded'),
+        ),
+        findsOneWidget,
+      );
+
+      await _priceAndSave(
+        tester,
+        'Log a placement',
+        price: '2500',
+        currency: 'mad',
+      );
+
+      expect(find.widgetWithText(AlertDialog, 'Log a placement'), findsNothing);
+      expect(
+        find.text(saveRefusalSentence),
+        findsNothing,
+        reason: 'the handover has no buyer left to name, so SQLite has nothing to refuse',
+      );
+      await _scrollTo(tester, find.textContaining('2500 MAD'));
+      expect(find.text('Buyer not recorded'), findsOneWidget);
+      expect(find.text('Aicha'), findsNothing);
+    },
+  );
+
+  testWidgets(
     'a contact the database refuses to delete is still offered and still named',
     (tester) async {
       _usePhoneViewport(tester);
@@ -694,6 +745,10 @@ void main() {
         isNotNull,
       );
 
+      // The sentence has to be gone before these buttons are tapped again: this
+      // runner treats a hit-test warning as fatal, and a snackbar still on the
+      // screen is one more thing in the way.
+      await tester.pump(const Duration(seconds: 5));
       await _cancelDialog(tester, 'Edit buyer');
       await _cancelDialog(tester, 'Edit placement');
       expect(find.text('Aicha'), findsOneWidget);

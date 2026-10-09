@@ -99,6 +99,34 @@ void main() {
       }
       expect(scale.format(scale.values.first), '0');
     });
+
+    test('the axis stops at the month the record reaches', () {
+      // The marks go by threes and the oldest weigh-in is fourteen months old, so
+      // the range closes on a mark two months past the last whole step. Without it
+      // that weigh-in is painted past the edge of the box.
+      final scale = monthScale(agesInDays: <double>[30, 400]);
+
+      expect(labelsOf(scale), <String>['0', '3', '6', '9', '12', '14']);
+      expectAscending(scale);
+      expectSpans(scale, <double>[30, 400]);
+    });
+
+    test('a dog weighed for four years is marked once a year', () {
+      final scale = monthScale(agesInDays: <double>[5, 1460]);
+
+      expect(labelsOf(scale), <String>['0', '12', '24', '36', '48']);
+      expect(scale.ticks.length, lessThanOrEqualTo(6));
+      expectAscending(scale);
+      expectSpans(scale, <double>[5, 1460]);
+    });
+
+    test('the last year before a dam is retired is still marked monthly', () {
+      final scale = monthScale(agesInDays: <double>[1095, 1200]);
+
+      expect(labelsOf(scale), <String>['35', '36', '37', '38', '39', '40']);
+      expectAscending(scale);
+      expectSpans(scale, <double>[1095, 1200]);
+    });
   });
 
   group('kiloScale', () {
@@ -138,6 +166,91 @@ void main() {
         expect(scale.format(value), isNotEmpty);
       }
     });
+
+    test('a range that starts mid-step is marked from the step below it', () {
+      // Three grown dogs, none of them on a multiple of the step the axis ends up
+      // using: the lightest weigh-in has to sit inside the marks, not on the edge
+      // the plot cannot reach.
+      final scale = kiloScale(weightsInKg: <double>[16, 22, 29]);
+
+      expect(labelsOf(scale), <String>['15', '20', '25', '30']);
+      expectAscending(scale);
+      expectSpans(scale, <double>[16, 22, 29]);
+    });
+
+    test('a heavy dog range is marked in whole tens', () {
+      final scale = kiloScale(weightsInKg: <double>[60, 75, 90, 110]);
+
+      expect(labelsOf(scale), <String>['60', '70', '80', '90', '100', '110']);
+      expect(scale.ticks.length, lessThanOrEqualTo(6));
+      expectAscending(scale);
+      expectSpans(scale, <double>[60, 75, 90, 110]);
+    });
+
+    test('two weigh-ins the scale barely moved between are still readable', () {
+      final scale = kiloScale(weightsInKg: <double>[0.43, 0.43, 0.45]);
+
+      expect(labelsOf(scale), <String>['0.43', '0.44', '0.45']);
+      expectAscending(scale);
+      expectSpans(scale, <double>[0.43, 0.43, 0.45]);
+    });
+
+    test('two identical weigh-ins still give the plot a width', () {
+      // A dam weighed on the day she arrived and the day she left. One mark would
+      // make the axis's whole span zero — the divisor every point is scaled by.
+      final scale = kiloScale(weightsInKg: <double>[3.2, 3.2]);
+
+      expect(labelsOf(scale), <String>['3.2', '3.21']);
+      expectAscending(scale);
+      expectSpans(scale, <double>[3.2, 3.2]);
+    });
+
+    test(
+      'the rules every input has to answer, over the shapes a ledger makes',
+      () {
+        // A hand-derived label list proves one input; the page is built from whatever
+        // the breeder typed. These are the three things that hold for all of them:
+        // the marks enclose the data, no two share a value, and every mark has the
+        // word it is keyed by.
+        const List<List<double>> weights = <List<double>>[
+          <double>[0.43, 0.43, 0.45],
+          <double>[0.5, 0.9],
+          <double>[2.5, 3.0],
+          <double>[3.01, 3.04],
+          <double>[3.2, 3.2],
+          <double>[16, 22, 29],
+          <double>[0.43, 5.5, 19.75, 35.2],
+          <double>[60, 75, 90, 110],
+        ];
+        const List<List<double>> ages = <List<double>>[
+          <double>[0, 30, 61, 92],
+          <double>[5, 400, 700, 900],
+          <double>[30, 400],
+          <double>[1095, 1200],
+          <double>[5, 1460],
+          <double>[988, 1009, 1012],
+          <double>[40, 45],
+          <double>[100, 100],
+        ];
+
+        for (final List<double> kilos in weights) {
+          final scale = kiloScale(weightsInKg: kilos);
+          expectAscending(scale);
+          expectSpans(scale, kilos);
+          for (final GrowthTick tick in scale.ticks) {
+            expect(scale.format(tick.value), tick.label);
+          }
+        }
+        for (final List<double> days in ages) {
+          final scale = monthScale(agesInDays: days);
+          expectAscending(scale);
+          expectSpans(scale, days);
+          for (final GrowthTick tick in scale.ticks) {
+            expect(scale.format(tick.value), tick.label);
+          }
+        }
+      },
+    );
   });
 
   group('meanDaysPerMonth', () {

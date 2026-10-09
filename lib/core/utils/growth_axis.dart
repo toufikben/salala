@@ -97,8 +97,9 @@ GrowthScale monthScale({required List<double> agesInDays, int maxTicks = 6}) {
 ///
 /// The arithmetic is done in whole hundredths, tenths or units of a kilogram
 /// rather than in fractions of a double: `3.01 / 0.01` comes out as 300.9999999,
-/// and an axis that starts a step below the lightest weigh-in because of a rounding
-/// error is a defect no test would ever see coming.
+/// and a mark placed by that quotient is not the mark the step says it is. The
+/// invariant the tests hold to is that the marks *enclose* the weigh-ins, every
+/// label is what its mark is, and no two marks share a value.
 GrowthScale kiloScale({required List<double> weightsInKg, int maxTicks = 6}) {
   var min = weightsInKg.first;
   var max = weightsInKg.first;
@@ -161,11 +162,17 @@ double _kiloStep(double min, double max, int maxTicks) {
 }
 
 /// The first and last whole-step marks enclosing both weights, in steps.
+///
+/// One conversion, not two: `(min * scale).floor()` on its own is a whole number
+/// only when the shift lands true, and a weight like `0.43` shifted by ten comes
+/// out `4.2999999`. Dividing before rounding keeps the mark on the step it is
+/// named for, and the floor and ceil directions are what make the pair enclose
+/// the data rather than cut into it.
 (int, int) _kiloRange(double min, double max, double step) {
   final scale = _scales[_decimals(step)];
   final unit = (step * scale).round();
-  final first = ((min * scale).floor() / unit).floor();
-  final last = ((max * scale).ceil() / unit).ceil();
+  final first = (min * scale / unit).floor();
+  final last = (max * scale / unit).ceil();
   return (first, last);
 }
 

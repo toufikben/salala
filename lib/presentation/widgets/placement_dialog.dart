@@ -116,11 +116,33 @@ class _PlacementDialogState extends ConsumerState<PlacementDialog> {
   }
 
   Future<void> _addBuyer() async {
-    final created = await showBuyerDialog(context);
+    final result = await showBuyerDialog(context);
+    final created = result?.buyer;
     if (created == null || !mounted) return;
     setState(() {
       _buyerId = created.id;
       _createdBuyer = created;
+    });
+  }
+
+  /// Correcting the contact this form has chosen — and dropping the choice if
+  /// that contact is gone when the form closes.
+  ///
+  /// The contact form can delete the row it opened on. `_buyerId` is this form's
+  /// own string and `_createdBuyer` is a snapshot of a write it did itself, so
+  /// without this the Save below still means to name a person the ledger no
+  /// longer has: the foreign key refuses it, and the form answers "this could not
+  /// be saved" to a handover whose only fault is a name the breeder just took
+  /// out — with nothing left to correct, because the name they would remove is
+  /// already gone. The answer comes from the dialog rather than from the loaded
+  /// list, which is reloaded on another isolate and still names the deleted
+  /// contact for a moment after it closes.
+  Future<void> _editBuyer(Buyer selected) async {
+    final result = await showBuyerDialog(context, existing: selected);
+    if (result?.deletedId == null || !mounted) return;
+    setState(() {
+      _buyerId = null;
+      if (_createdBuyer?.id == selected.id) _createdBuyer = null;
     });
   }
 
@@ -257,9 +279,7 @@ class _PlacementDialogState extends ConsumerState<PlacementDialog> {
         IconButton(
           icon: const Icon(Icons.edit_outlined),
           tooltip: l10n.buyerEditTitle,
-          onPressed: _saving
-              ? null
-              : () => showBuyerDialog(context, existing: selected),
+          onPressed: _saving ? null : () => _editBuyer(selected),
         ),
     ],
   );
