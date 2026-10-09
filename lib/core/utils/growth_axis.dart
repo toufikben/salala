@@ -141,10 +141,6 @@ GrowthScale kiloScale({required List<double> weightsInKg}) {
   return GrowthScale(ticks);
 }
 
-/// How many marks a step would put down, counting the one that closes the range.
-int _months(int first, int last, int step) =>
-    ((last - first) / step).ceil() + 1;
-
 /// Marks an axis may be given before its labels start overprinting each other.
 const int _maxAxisTicks = 6;
 
@@ -164,7 +160,7 @@ const int _maxAxisTicks = 6;
 /// last mark and nothing is appended, and otherwise the appended mark is the only
 /// extra.
 int _stride(int first, int last, int step) {
-  final beyondFirst = ((last - first) / step).ceil;
+  final beyondFirst = ((last - first) / step).ceil();
   return (beyondFirst + _maxAxisTicks - 2) ~/ (_maxAxisTicks - 1);
 }
 
