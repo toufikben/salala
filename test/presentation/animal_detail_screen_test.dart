@@ -1161,6 +1161,70 @@ void main() {
   });
 
   testWidgets(
+    'a certificate that expired before the screening it certifies is refused on '
+    'the edit, and a live expiry on the same row is SQLite\'s to refuse',
+    (tester) async {
+      _usePhoneViewport(tester);
+      await pumpSalala(
+        tester,
+        seed: <Animal>[_nala().copyWith(birthDate: _daysAgo(1000))],
+        seedHealthTests: <HealthTest>[
+          // Both days are inside this animal's life — the whelping was 1000 days
+          // ago — so the birth rule above is not what answers here. The pair is
+          // the row against itself: an expiry 100 days older than its own test.
+          _screening('OFA hips', result: 'Good', tested: 400, validUntil: -500),
+        ],
+        beforeLaunch: refuseUpdatesOf('health_tests'),
+      );
+      await _openNala(tester);
+      await _scrollTo(tester, find.text('OFA hips'));
+      await _tap(tester, find.text('OFA hips'));
+
+      await tapSaveAndGetAnswer(tester);
+
+      expect(
+        find.text(
+          'This certificate expires before the day of the test it certifies.',
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.text('This could not be saved. Nothing was written.'),
+        findsNothing,
+        reason:
+            'the predicate answered before SQLite was asked, so the UPDATE '
+            'trigger never ran — the second half of this test is what makes that '
+            'absence mean something rather than prove nothing',
+      );
+
+      await dismissRefusals(tester);
+      await typeDateIntoPicker(
+        tester,
+        scope: HealthTestFormScreen,
+        tile: 1,
+        usDay: usDay(_daysAhead(30)),
+      );
+      await tapSaveAndGetAnswer(tester);
+
+      expectRefusedWrite(
+        tester,
+        stillOnScreen: find.byType(HealthTestFormScreen),
+        label: 'Screening',
+        text: 'OFA hips',
+      );
+      expect(
+        find.text(
+          'This certificate expires before the day of the test it certifies.',
+        ),
+        findsNothing,
+        reason:
+            'one field apart on the same row against the same trigger: this '
+            'save reached SQLite and was refused there, not here',
+      );
+    },
+  );
+
+  testWidgets(
     'a visit dated before the animal was born is refused on the edit, and a '
     'legal day on the same visit is SQLite\'s to refuse',
     (tester) async {

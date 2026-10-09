@@ -253,6 +253,7 @@
   },
   "healthTestDate": "Tested on",
   "healthTestValidUntil": "Valid until",
+  "certificateExpiresBeforeTest": "This certificate expires before the day of the test it certifies.",
   "healthTestBody": "Testing body",
   "@healthTestBody": {
     "description": "The organisation that issued the certificate, e.g. OFA."

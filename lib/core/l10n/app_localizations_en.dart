@@ -554,6 +554,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get healthTestValidUntil => 'Valid until';
 
   @override
+  String get certificateExpiresBeforeTest =>
+      'This certificate expires before the day of the test it certifies.';
+
+  @override
   String get healthTestBody => 'Testing body';
 
   @override

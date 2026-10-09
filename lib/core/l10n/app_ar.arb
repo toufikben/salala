@@ -204,6 +204,7 @@
   "healthTestResultHelper": "كما في الشهادة: Clear · Carrier · Affected",
   "healthTestDate": "تاريخ الفحص",
   "healthTestValidUntil": "صالح حتى",
+  "certificateExpiresBeforeTest": "تنتهي صلاحية هذه الشهادة قبل يوم الفحص الذي تُصدَر عنه.",
   "healthTestBody": "الجهة المانحة",
   "healthTestVerifiedBy": "التحقق بواسطة",
   "healthTestExpired": "منتهي الصلاحية",

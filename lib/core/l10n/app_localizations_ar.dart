@@ -553,6 +553,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get healthTestValidUntil => 'صالح حتى';
 
   @override
+  String get certificateExpiresBeforeTest =>
+      'تنتهي صلاحية هذه الشهادة قبل يوم الفحص الذي تُصدَر عنه.';
+
+  @override
   String get healthTestBody => 'الجهة المانحة';
 
   @override

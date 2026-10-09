@@ -117,15 +117,22 @@ LitterDateProblem litterDateProblem({
   return LitterDateProblem.none;
 }
 
-/// A booster stamped due before the dose that earned it.
+/// The date a row measures *from* and the date it measures *to*, the wrong way
+/// round: a booster due before the dose that earned it, a certificate expiring
+/// before the test it certifies.
 ///
-/// Worth refusing on its own: a due date in the past never clears, so the row
-/// sits in the herd's agenda as overdue forever and trains the breeder to ignore
-/// the agenda — which is the one thing it exists for.
-bool doseDatesContradict({
-  required int? administeredMs,
-  required int? nextDueMs,
-}) => _isDayBefore(nextDueMs, administeredMs);
+/// One rule for both shapes, because both are the same failure: a date that is
+/// overdue against its own anchor never clears, so the row sits in the herd's
+/// agenda as overdue forever and trains the breeder to ignore the one screen it
+/// exists to be looked at. A certificate that expired before the screening it
+/// certifies is not a fact at all, and the transfer pack prints it as one.
+///
+/// One predicate, two sentences: each form names the field to fix, which is the
+/// reason **D36** keeps rules like this on the screen instead of in a constraint.
+bool measuredDatePrecedesAnchor({
+  required int? anchorMs,
+  required int? measuredMs,
+}) => _isDayBefore(measuredMs, anchorMs);
 
 /// A dated fact about one animal, stamped before that animal existed.
 ///

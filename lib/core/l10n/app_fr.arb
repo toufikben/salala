@@ -204,6 +204,7 @@
   "healthTestResultHelper": "Comme au certificat : Clear · Carrier · Affected",
   "healthTestDate": "Testé le",
   "healthTestValidUntil": "Valable jusqu'au",
+  "certificateExpiresBeforeTest": "Cette certification expire avant le jour du test qu'elle certifie.",
   "healthTestBody": "Organisme certificateur",
   "healthTestVerifiedBy": "Vérifié par",
   "healthTestExpired": "Expiré",

@@ -170,37 +170,53 @@ void main() {
     });
   });
 
-  group('doseDatesContradict', () {
+  group('measuredDatePrecedesAnchor', () {
     int day(int year, int month, int dayOfMonth) =>
         DateTime(year, month, dayOfMonth).millisecondsSinceEpoch;
 
     test('a booster due before the dose that earned it is refused', () {
       expect(
-        doseDatesContradict(
-          administeredMs: day(2026, 5, 1),
-          nextDueMs: day(2026, 4, 1),
+        measuredDatePrecedesAnchor(
+          anchorMs: day(2026, 5, 1),
+          measuredMs: day(2026, 4, 1),
         ),
         isTrue,
       );
     });
 
-    test('a booster due the same day is not a contradiction', () {
-      expect(
-        doseDatesContradict(
-          administeredMs: day(2026, 5, 1),
-          nextDueMs: day(2026, 5, 1),
-        ),
-        isFalse,
-      );
-    });
+    test(
+      'a certificate expiring before the screening it certifies is refused',
+      () {
+        expect(
+          measuredDatePrecedesAnchor(
+            anchorMs: day(2026, 5, 1),
+            measuredMs: day(2025, 11, 30),
+          ),
+          isTrue,
+        );
+      },
+    );
 
-    test('a dose with no next date has nothing to contradict', () {
+    test(
+      'the measured date landing on its anchor day is not a contradiction',
+      () {
+        expect(
+          measuredDatePrecedesAnchor(
+            anchorMs: day(2026, 5, 1),
+            measuredMs: day(2026, 5, 1),
+          ),
+          isFalse,
+        );
+      },
+    );
+
+    test('a row with no measured date has nothing to contradict', () {
       expect(
-        doseDatesContradict(administeredMs: day(2026, 5, 1), nextDueMs: null),
+        measuredDatePrecedesAnchor(anchorMs: day(2026, 5, 1), measuredMs: null),
         isFalse,
       );
       expect(
-        doseDatesContradict(administeredMs: null, nextDueMs: day(2026, 5, 1)),
+        measuredDatePrecedesAnchor(anchorMs: null, measuredMs: day(2026, 5, 1)),
         isFalse,
       );
     });

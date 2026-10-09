@@ -107,6 +107,23 @@ class _HealthTestFormScreenState extends ConsumerState<HealthTestFormScreen> {
     )) {
       return;
     }
+    if (measuredDatePrecedesAnchor(
+      anchorMs: _testDate,
+      measuredMs: _validUntil,
+    )) {
+      // Nothing written, so nothing to undo and the button is still live. A
+      // certificate dated as expiring before the screening it certifies cannot
+      // be a claim about that screening at all, and the buyer's pack prints it
+      // beside the result as if it were.
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            AppLocalizations.of(context).certificateExpiresBeforeTest,
+          ),
+        ),
+      );
+      return;
+    }
     setState(() => _saving = true);
 
     final base =

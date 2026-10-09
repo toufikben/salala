@@ -1072,6 +1072,12 @@ abstract class AppLocalizations {
   /// **'Valid until'**
   String get healthTestValidUntil;
 
+  /// No description provided for @certificateExpiresBeforeTest.
+  ///
+  /// In en, this message translates to:
+  /// **'This certificate expires before the day of the test it certifies.'**
+  String get certificateExpiresBeforeTest;
+
   /// The organisation that issued the certificate, e.g. OFA.
   ///
   /// In en, this message translates to:
