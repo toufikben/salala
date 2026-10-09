@@ -414,7 +414,7 @@ names the cause.
 Gate: reminders firing on the phone inside the window — **booked and cancelled on
 the device; delivery not yet observed.**
 
-### 1e — The launch that rebuilds the alarms (CI green; device proof pending)
+### 1e — The launch that rebuilds the alarms (CI green; device proof run and passed 2026-10-09, delivery still unwatched)
 
 The force-stop measurement in 1d turned a technical fact into a product rule: an
 Android app's pending alarms are not durable state, and Salala's only chance to
@@ -469,13 +469,32 @@ What is in it:
   nobody touched, a dose whose morning has gone does not, and switching tabs and
   back does not book it twice.
 
-Pending on the device, in this order, once the phone is free: install this build,
-book a dose due tomorrow, read the alarm in `dumpsys alarm`, `am force-stop`,
-read zero alarms, reopen Salala, read the alarm again. That last pair *is* D20.
-Then the overnight delivery watch from 1d, on the same untouched booking.
+**Run on the device in that exact order on 2026-10-09 (Realme RMX3910), and it holds.** A dose
+"D20" on a fresh dog, Given Oct 9 and Next due **Oct 10, 2026** — tomorrow, so the 30-day
+heads-up has no morning left to fire in and only one alarm should be booked. The plugin's own
+list holds exactly one entry (`id 344035147`, body "D20 is due today", title the animal's name,
+`scheduledDateTime 2026-10-10T09:00:00`) and `dumpsys alarm` agrees with one live
+`RTC_WAKEUP #93` at `origWhen 2026-10-10 09:00:00.000`. So the horizon rule is visible on
+hardware, not only in the widget test that asserts it.
 
-Gate: a reminder that was lost comes back by itself on the next launch — **proved
-in tests, not yet on the phone.**
+- `am force-stop`, then read again: **0** live alarms for `com.salala` — while the plugin's
+  prefs file still lists the booking, unchanged. That pair is the 1d finding reproduced on
+  demand: the OS store is not durable state, the app's bookkeeping is, and the two disagree
+  right after a kill.
+- Reopen Salala: **one** live alarm again, `origWhen 2026-10-10 09:00:00.000`, under a new
+  `Alarm` object identity (`da499b1` where `48abdd2` had been) — a re-registration, not a
+  resurrection of the cancelled one. The count is one, not two, which is the other half of D20:
+  the launch replaces rather than piles up.
+- The home agenda rebuilt from the same rows without being told to: "Vaccinations to book —
+  D20chk · D20 is due in 1 day", singular "1 day" intact under a real tomorrow.
+- The test animal then went through the card's own `Delete` → "Delete D20chk?" → confirm, and
+  every table in the pulled database is back to 0 with the notification store at `[]` and no
+  live alarm.
+
+Gate: a reminder that was lost comes back by itself on the next launch — **proved in tests and
+now on the phone (2026-10-09).** What is still not proved is the last centimetre: that the
+notification *appears* on the screen at 09:00, which needs a booking whose morning has not
+passed and a watch that has not been run yet.
 
 Gate: every record type creatable, editable, deletable on the device — **met**
 (weigh-ins by delete-and-relog, as designed) for all four record types and the
@@ -1730,7 +1749,7 @@ says `yyyy/mm/dd` while Flutter's shipped `parseCompactDate` reads `mm/dd/yyyy` 
 else: an upstream behaviour this app inherits, unanswered), and the pre-birth and date
 refusal sentences, of which no dump captured a single snackbar.
 
-## Stage 3r — An alarm that outlived its animal *(CI green — 426 tests at `37980578546`, APK from the same run and installed on the phone; the device re-check is owed, the phone was in use)*
+## Stage 3r — An alarm that outlived its animal *(CI green — 426 tests at `37980578546`, APK from the same run and installed on the phone; device re-check run on the Realme 2026-10-09)*
 
 The shape is already settled and it is small: when an animal is edited, cancel every dose
 and screening id belonging to it before deciding what to book, then re-book through the same
@@ -1780,13 +1799,40 @@ phone` and `saving a screening for an animal who has left books no alarm`, and a
 test that drives the real dropdown — «Placed» on the card, `Edit` on the menu — because the
 DAO cannot answer whether the screen the breeder touches reaches the scheduler.
 
-**Still owed on the device:** the same booking the phone was measured keeping, in the build
-that now removes it. Read both stores first (`shared_prefs/scheduled_notifications.xml` and
-`dumpsys alarm`), book a dose, mark the animal Placed, and confirm the entry is gone — then
-force-stop and reopen, because a booking the plugin re-arms from its own list is the exact
-failure this stage is about.
+**The device re-check, run on the Realme (RMX3910) on 2026-10-09.** Both stores were read
+before anything was typed: `shared_prefs/scheduled_notifications.xml` held
+`<string name="scheduled_notifications">[]</string>` and `dumpsys alarm` showed only
+`Reason=pi_cancelled` history for `ScheduledNotificationReceiver` — a clean baseline, not a
+leftover booking about to flatter the result. Then a dose on a test dog, Given today,
+**Next due Dec 15, 2026**:
 
-## Stage 3s — Months on the chart, and a contact taken back out *(CI green — 440 tests at `37987306323`, then 449 at `37988496860`, APK from both runs; the device check is owed)*
+- **Booking, both stores.** The prefs file immediately held two entries — id `336114074`,
+  "Heads up: Rabies is due on Dec 15, 2026" at `2026-11-15T09:00:00`, and id `336114075`,
+  "Rabies is due today" at `2026-12-15T09:00:00`, both `channelId: salala_reminders`,
+  `timeZoneName: Africa/Algiers`, titled with the animal's own name. `dumpsys alarm` agreed
+  from the other side of the boundary: two live `RTC_WAKEUP` alarms with `origWhen` at exactly
+  those two dates and `window=+1h0m0s0ms` (the inexact-while-idle mode the plugin was given).
+  The 30-day heads-up and the due-today reminder are two different alarms, which is what
+  `bookingsFor` promises and no test on a fake scheduler can prove.
+- **The status change, which is the stage.** `With me` → `Placed` through the real dropdown on
+  the edit form, saved. The prefs file is back to `[]`. The live `RTC_WAKEUP` lines for
+  `com.salala` are gone from `dumpsys alarm`, and the OS keeps the receipt: two
+  `Reason=alarm_cancelled` entries stamped `2026-10-09 23:25:43`, the same second as the save.
+  The herd card itself reads `Female · Placed`, and the dose record is still on the ledger
+  ("Rabies · Given Oct 9, 2026 · Next due Dec 15, 2026") — the reminders stop, the history
+  stays, which is the distinction the whole stage turns on.
+- **Force-stop and reopen, the failure this stage was actually about.** The plugin re-arms from
+  its own list on some paths, so a cancel that only moved the app's bookkeeping would still
+  come back here. It does not: after `am force-stop` and a fresh launch the prefs file is still
+  `[]` and `grep -c "RTC_WAKEUP #.*com.salala"` over `dumpsys alarm` returns **0**.
+
+**What the phone still cannot say.** That a notification *appears* at 09:00 has never been
+observed on hardware, in either build — the earliest booking this device can now hold is
+2026-11-15, so the fire itself stays owed by the calendar rather than by me. Everything up to
+the fire — the two alarms, their ids, their times, their removal, and their absence after a
+kill — is measured above.
+
+## Stage 3s — Months on the chart, and a contact taken back out *(CI green — 440 tests at `37987306323`, then 449 at `37988496860`, APK from both runs; device check run on the Realme 2026-10-09)*
 
 The two findings the batched phone pass left behind, shipped together because neither
 reaches the page without the other being true.
@@ -1838,7 +1884,35 @@ Eleven new widget tests and eighteen axis tests came with this; the axis file is
 chart's arithmetic can be argued about at all, and the widget tests run against real SQLite
 with foreign keys on, so `SET NULL` is observed rather than assumed.
 
-## Stage 3t — Holding the axis to what it promises, instead of trusting the rounding *(CI verdict pending)*
+**On the phone, the two things the tests cannot say (Realme RMX3910, 2026-10-09).** The chart
+finding is about ink on a page a buyer keeps, so it was measured on one — the animal's PDF
+shared out and opened in WPS Office on the device. The age axis now prints `0 1 2 3 4` under
+the curve and weight `0 5 10 15` up the side, where the build before this stage printed
+`988.0 1009.0 1012.0` on the same animal's page. The six-mark budget was then tested with the
+beginner's mistake the review predicted rather than with clean data: `430` typed into the
+kilogram box for a puppy, which is 430 grams, and the axis printed `0 100 200 300 400 450` —
+six marks, none of them on top of another, on the same page. The contact delete was read back
+out of the database rather than off a screen: after removing the buyer from the ledger's
+handover sheet, the pulled `salala.db` reports `buyers` at **0 rows** while the placement row
+is still there with `buyer_id` NULL and its `placed_date` intact, and the tile reads "Buyer not
+recorded".
+
+**Two things that delete deliberately does not do.** Both were raised in the review round and
+both are recorded here instead of quietly widened into the code:
+
+1. `deleteBuyer` invalidates `buyersProvider` and nothing else
+   (`lib/presentation/providers/record_providers.dart:208-211`), so a `placementsProvider`
+   snapshot still in the widget tree can name a contact who is gone until something else
+   reloads it. No user-visible defect was found — the tile that reads it re-resolves through
+   `buyerById` against the list it watches, and the phone pass above saw the correct text — and
+   a blanket invalidation on every delete is a behavior change with no failing test behind it.
+2. "This cannot be undone" is true of every delete in this app and false of none of them:
+   `restorePack` replaces the whole database, so a contact deleted before a restore returns
+   with it. That is a fact about backups, not about this one button, so it belongs in this file
+   and in the restore screen's own wording rather than being bolted onto a confirmation a
+   breeder reads in half a second.
+
+## Stage 3t — Holding the axis to what it promises, instead of trusting the rounding *(CI green — 452 tests at `37990888147`, then 455 at `37996935485`, APK from the 455 run; device check run on the Realme 2026-10-09)*
 
 The second reviewer's two `should-fix` findings, checked rather than accepted on authority:
 
@@ -1859,7 +1933,8 @@ The second reviewer's two `should-fix` findings, checked rather than accepted on
    holds for *every* value that can reach the page; `[3.1, 430]` prints `0 100 200 300 400
    450` and `[0.43, 5000]` prints `0 1000 2000 3000 4000 5000`. A stride of one — every
    record a breeder actually types — reproduces the previous axis exactly, which is what the
-   fifteen existing label expectations still assert.
+   fourteen exact-label expectations that predate this stage still assert (`c11bea5` carries
+   fourteen, the file carries seventeen today).
 3. `maxTicks` as a public knob was a parameter no caller and no test turned; it is now the
    file's own `_maxAxisTicks`, and the two tests that assert "no more than six" assert it for
    wide spans too.
@@ -1867,11 +1942,52 @@ The second reviewer's two `should-fix` findings, checked rather than accepted on
    of an integer (`"40"` → `"4"`), and the `contains('.')` early return is the only thing
    preventing it. That is now said where it can be broken.
 
-Twenty-one axis tests, every label in them read off a node simulation of this exact
-algorithm before it was written (the same discipline that made `37987306323` green on the
-first try), and a sweep of ~210,000 weight and age pairs — every gram value 1–60,000, 30,000
-random wide pairs, and the extremes — checking enclosure, strict ascent, unique keys,
-non-empty labels and the six-mark budget: **0 failures locally, CI verdict NOT RUN**.
+**The first CI verdict on this stage was a failure, and it was the compiler making the
+stage's own point back at me.** `37990588330` stopped in the Analyze job, before a single test
+ran, on `lib/core/utils/growth_axis.dart:168:23` — *"The operator '+' isn't defined for the
+type 'int Function()'"* — because the stride was written `ceil(x) + 4` with `ceil` never
+called, so the expression added four to a **tear-off of the function** instead of to a number.
+Alongside it, `_months` was defined twice (`:242`, one error and one unused-element warning).
+Fixed in `8f501ce` by calling `.ceil()` on the value and leaving one `_months`: 452 tests,
+`No issues found!`. Writing a promise as a value instead of a call is the same category of
+mistake as leaving enclosure to IEEE luck, which is what this stage exists to stop; the
+discipline that made `37987306323` green first try covered the *labels*, and it did not cover
+the syntax.
+
+**The sweep is no longer a script.** Twenty-one axis tests came in with the fix above, and the
+~210,000-pair sweep that justified them was a throwaway JS file — so CI could not re-enforce
+any of it, and the sentence "0 failures locally, CI verdict NOT RUN" was the honest ceiling
+available at the time. It is now `test/core/growth_axis_test.dart`, group *"the rules of an
+axis, over records nobody picked"*, and CI runs it on every push: 1,500 seeded draws per case
+(`_sweepSeed = 20261009`, so a failure is reproducible rather than merely rare) over ages from
+one day to 20,000 days — past any living dog — and weights taking every value on the ledger's
+own gram lattice (`nextInt(60000) / 1000.0`) alternating with arbitrary doubles up to 5,000
+kg, the typed-into-the-wrong-box case. Each record asserts the five rules the file promises:
+no more than six marks, strictly ascending, enclosing the data, no two marks on one label, and
+**every label re-parsing to its own mark's position** — months × `meanDaysPerMonth` for an age,
+plain kilograms for a weight. That last one is the D29 rule turned into a check: a mark whose
+word does not describe its own coordinate is exactly the bug the phone found. Twenty-three
+axis tests, 455 tests overall, `No issues found! (ran in 12.0s)` at **`37996935485`**, APK
+built in the same run.
+
+**One more absence, from the same review round.** `placement_dao_test.dart` deleted a buyer who
+had sold **one** animal; `ON DELETE SET NULL` does not care how many rows point at an id, so the
+test now books two handovers to one contact, deletes the contact, and requires both rows to lose
+the name and keep their `placed_date`, with `forBuyer` returning nothing for a person who is
+gone. +94 and +29 lines in two test files, no production file touched — which is also why the
+phone verdicts above (measured on the `8f501ce` build) still describe the shipped code.
+
+**The phone was left clean afterwards.** The test dog went through the herd card's own overflow
+menu — `Delete` → "Delete Devchk?" → confirm — and the pulled database reads **0 rows** in
+`animals`, `placements`, `vaccinations`, `weight_entries`, `symptoms`, `buyers` and
+`health_tests`: the animal's delete cascaded the handover, the dose and four weigh-ins that the
+alarm check had produced. A second animal (`D20chk`, one dose due tomorrow) was then added to
+run the 1e / D20 kill-and-reopen sequence recorded under Stage 1, and deleted the same way;
+every count above is taken after both. The herd screen shows "No animals yet", the notification
+store is back to `[]`, no live alarm remains for the package, and the scratch files this
+campaign pushed at the device (`after.pdf`, `budget.pdf`, and the Stage 2 export pack that had
+been sitting in Download since 2026-10-06) are gone from it, along with the three cached PDFs in
+the app's own `cache/salala_out`.
 
 ## Stage 4 — Distribution
 
