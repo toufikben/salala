@@ -441,10 +441,8 @@ Future<void> settleRefusal(
       return;
     }
     if (find.byType(SnackBar).evaluate().isNotEmpty) {
-      // Another refusal is on screen and this test's sentence is queued behind
-      // it: spend the display time the shipped app would have spent.
-      await tester.pump(const Duration(seconds: 4));
-      continue;
+      // MUTATION — pre-3p semantics: answer as soon as anything appears.
+      return;
     }
     await tester.runAsync(
       () => Future<void>.delayed(const Duration(milliseconds: 25)),

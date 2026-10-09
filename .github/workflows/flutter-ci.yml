@@ -47,6 +47,9 @@ jobs:
 
   build-debug:
     name: Build debug APK
+    # Branch-local only, for this mutation check: a green run here must not put a
+    # throwaway build over the rolling debug APK the owner installs on the phone.
+    if: github.ref == 'refs/heads/master'
     needs: analyze-and-test
     runs-on: ubuntu-latest
     permissions:
