@@ -825,9 +825,11 @@ this the largest proven gap in the app.
   converts it later and no locale formats it on the way out (D21) — hence
   `parsePrice` / `formatPrice` in `lib/core/utils/money.dart` printing `2500` and
   `250.5` rather than running the number through `intl`.
-- **A buyer has no delete, on purpose.** `placements.buyer_id` is
-  `ON DELETE SET NULL`, so removing a contact would silently blank the buyer of a
-  document already handed to a family.
+- **A contact can be taken back out; the handover stays.** `placements.buyer_id`
+  is `ON DELETE SET NULL`, so deleting a buyer blanks the name on the animal's
+  row instead of taking the row with it — which is why Stage 3s shipped the
+  delete with a confirmation that says so out loud, replacing this bullet's
+  original claim that a buyer had "no delete, on purpose".
 - **The form opens on a filled dropdown.** `_PlacementSection` watches both the
   placements and the contacts, so by the time the add button is pressed the
   contacts are already in hand — no spinner inside a dialog.
@@ -1741,9 +1743,13 @@ save path books past `reminderHorizonDays = 45` while the launch query is
 month two.
 
 Alongside it, the two smaller device findings are queued as their own work rather than
-left in prose: a buyer delete path (`BuyerDao` has none, and a contact outliving the herd
-contradicts the privacy promise on the About tile), and day-count labels on the PDF growth
-chart.
+left in prose: a buyer delete path, and day-count labels on the PDF growth chart.
+Both were shipped by Stage 3s; the framing of the first one here was wrong, and says so
+below rather than being quietly rewritten. On `BuyerDao` having "none": `delete(id)` is
+declared once on `RecordDao` (`lib/data/db/record_dao.dart:36`) and `BuyerDao extends
+RecordDao<Buyer>`, so the DAO has been able to delete a contact since the DAO was written.
+What had no delete was the *screen* — no button, no confirmation, nothing that could reach
+that method — which is why the fix is four presentation files and not a data-layer change.
 
 **What shipped (`d002d54`), and where it differs from the sketch above.** The paragraph
 above described cancelling *every* id of the edited animal before re-booking. What went in
@@ -1780,6 +1786,93 @@ that now removes it. Read both stores first (`shared_prefs/scheduled_notificatio
 force-stop and reopen, because a booking the plugin re-arms from its own list is the exact
 failure this stage is about.
 
+## Stage 3s — Months on the chart, and a contact taken back out *(CI green — 440 tests at `37987306323`, then 449 at `37988496860`, APK from both runs; the device check is owed)*
+
+The two findings the batched phone pass left behind, shipped together because neither
+reaches the page without the other being true.
+
+**The growth chart now says months and kilograms.** It is the D29 rule applied to a chart
+rather than a table: `pdf` draws an axis label through the embedded font's glyph ids, so a
+test over the bytes of a document cannot read a tick back, and the marks therefore get
+chosen in `lib/core/utils/growth_axis.dart`, where CI can read them. What the phone showed
+was the default `pw.FixedAxis` formatter — `value.toString()` — printing the ages in *days*
+under the curve: `988.0 1009.0 1012.0` on a buyer's page, three marks on top of each other
+saying nothing about a dog's age. Age is now in months (`meanDaysPerMonth`, because a
+calendar month has no fixed length and the axis is read for shape, not to the day) and
+weight in kilograms, each cut on a whole step chosen as the finest one whose marks fit six,
+each **enclosing** the data because an axis's first and last values *are* the plot domain —
+a mark inside the range puts the point outside the grid box.
+
+**A contact can be deleted, and the handover survives it.** `BuyerDao.delete` was never
+missing (it is `RecordDao`'s, `lib/data/db/record_dao.dart:36`); the screen had no way to
+reach it. The edit form now offers `حذف`, asks once with the contact's own name in the body,
+and pops a result that says which of the two happened. `placements.buyer_id` is
+`ON DELETE SET NULL`, so the animal's row keeps its day, its money and its guarantee and
+loses only the name — which the confirmation says out loud, because the alternative
+reading is "the sale was undone".
+
+**The review round, and what it got wrong.** Two reviewers read the diff while CI was up.
+Three of their four blockers did not survive checking, and one finding the first reviewer
+called a blocker was a real trap:
+
+- *"`0.43` shifted by ten truncates, so a weight axis can start above the lightest
+  weigh-in."* Reproduced against the algorithm and rejected: the shift and the divide each
+  round to the *nearest* double, floor errors low and ceil errors high, and a 20,000-case
+  sweep over the ledger's own weights (`grams / 1000.0`) found no leak. Their one-conversion
+  form of `_kiloRange` was adopted anyway — it is clearer, and it killed a comment that
+  claimed something untrue about `.floor()`.
+- *"`meanDaysPerMonth` is dead in production."* It is read four times in the same file
+  (`:71`, `:72`, `:87`, `:91`).
+- *"The placement tile keeps a stale buyer snapshot, so the test asserting «Buyer not
+  recorded» cannot pass."* It resolves `buyerById(contacts, placement.buyerId)` at build
+  time from `ref.watch(buyersProvider)`, and the test passed on the first CI try.
+- **Accepted:** the handover form's own `_createdBuyer` snapshot — kept because the contact
+  list reloads on another isolate — could bless a contact deleted from inside the pencil
+  dialog. The save then aborted on the foreign key and showed "try again" on a form that
+  would never save. The fix is the explicit `BuyerDialogResult` saved/deleted channel
+  (`c11bea5`), and the test that pins it creates a contact, deletes it in the same handover
+  form, and saves.
+- Also accepted from the second reviewer, as Stage 3t below.
+
+Eleven new widget tests and eighteen axis tests came with this; the axis file is where the
+chart's arithmetic can be argued about at all, and the widget tests run against real SQLite
+with foreign keys on, so `SET NULL` is observed rather than assumed.
+
+## Stage 3t — Holding the axis to what it promises, instead of trusting the rounding *(CI verdict pending)*
+
+The second reviewer's two `should-fix` findings, checked rather than accepted on authority:
+
+1. **Enclosure was float luck, not structure.** The claim reproduced exactly where the first
+   reviewer's did not: `kiloScale([1.8499999999999999, 1.9])` — one ulp under the mark 1.85 —
+   put its first mark *at* 1.85, so the lightest weigh-in sat outside the grid. Unreachable
+   from the ledger (the reviewer's own sweep of every gram value 1–60,000 found zero leaks,
+   and so did mine — 419,986 pairs, on which the walk-back never even runs). But the
+   invariant this file exists to hold was being *assumed* of IEEE rounding instead of
+   *enforced*. Both edges of both scales are now walked back until they contain the data;
+   on clean data the test is already true and the loop never runs.
+2. **`maxTicks` was a promise the fallback did not keep.** When no step on the ladder fits,
+   the code silently used the coarsest one and the mark count ran free — `[0.43, 5000]` gave
+   **101 marks**, `[3.1, 430]` gave **10**. That is not a hypothetical: the weight field has
+   no maximum (`parseWeightToGrams` bounds only the low end), so a puppy's 430 *grams* typed
+   into the kilogram box is a normal beginner mistake, and it lands on the one document a
+   buyer keeps. The marks are now thinned by an integer stride computed from the span, so six
+   holds for *every* value that can reach the page; `[3.1, 430]` prints `0 100 200 300 400
+   450` and `[0.43, 5000]` prints `0 1000 2000 3000 4000 5000`. A stride of one — every
+   record a breeder actually types — reproduces the previous axis exactly, which is what the
+   fifteen existing label expectations still assert.
+3. `maxTicks` as a public knob was a parameter no caller and no test turned; it is now the
+   file's own `_maxAxisTicks`, and the two tests that assert "no more than six" assert it for
+   wide spans too.
+4. The reviewer's `_trim` note was real but only as documentation: `\0+$` does eat the zeros
+   of an integer (`"40"` → `"4"`), and the `contains('.')` early return is the only thing
+   preventing it. That is now said where it can be broken.
+
+Twenty-one axis tests, every label in them read off a node simulation of this exact
+algorithm before it was written (the same discipline that made `37987306323` green on the
+first try), and a sweep of ~210,000 weight and age pairs — every gram value 1–60,000, 30,000
+random wide pairs, and the extremes — checking enclosure, strict ascent, unique keys,
+non-empty labels and the six-mark budget: **0 failures locally, CI verdict NOT RUN**.
+
 ## Stage 4 — Distribution
 
 Blocked on the business question in `docs/FEASIBILITY.md` §Payments: a Morocco
@@ -1801,11 +1894,107 @@ decision, not a billing-library detail. **Nothing in the code depends on it yet*
 is exactly why Stage 4 stays blocked instead of half-built. The decision needs the
 owner, with the Google answer sought from Play Console support first.
 
+**The `applicationId` menu (D9), measured before proposing it.** So that "pick a name"
+is a decision about one number of files rather than a vague fear: the id is written in
+exactly three places, and nothing else in the project knows it.
+
+| Where | Line | What it is |
+| --- | --- | --- |
+| `android/app/build.gradle.kts` | `:25` | `applicationId` — the store identity, the one-way door |
+| `android/app/build.gradle.kts` | `:8` | `namespace` — the Kotlin/`R` package, **may differ from the id** |
+| `android/app/src/main/kotlin/com/salala/salala/MainActivity.kt` | `:1` | `package` declaration, coupled to `namespace` and to that directory's path |
+| `ios/Runner.xcodeproj/project.pbxproj` | `:386`, `:567`, `:589` | `PRODUCT_BUNDLE_IDENTIFIER` (3 app configs) |
+| `ios/Runner.xcodeproj/project.pbxproj` | `:402`, `:419`, `:434` | `…RunnerTests` (3 test configs) |
+
+`grep` over `lib/`, `test/`, `tool/`, `.github/`, every `.xml` manifest and every `.arb`
+returns **zero** hits for `com.salala`: no deep link, no share target, no `FlutterEngine`
+plugin registration by package, no import in a single Dart file. Consequences worth having
+down before a choice is made:
+
+- **Android alone** can be renamed by editing one line (`:25`). Because `namespace` is a
+  separate value, `MainActivity.kt` and its directory do **not** have to move — and no
+  Dart, test or CI file has to change either. That is the whole Android blast radius.
+- The iOS lines are a 4th file, and can be left for the day an iOS build is funded.
+- The product name *is* currently encoded in the id (`salala` twice), which is the one
+  property D9 says a new id should not repeat.
+
+Candidates, all still the agent's proposal and none of them actionable without the owner:
+
+1. `com.<owner-domain>.<studio>` — the only shape with no future dispute over it, and it
+   costs a domain the owner does not have yet. If a domain is bought for the privacy-policy
+   URL Stage 4 already needs anyway, this becomes the default answer.
+2. `io.github.toufikben.salala` — unique on day one with nothing to buy, verifiable to a
+   reviewer, and it puts a personal GitHub handle in every user's installed-app list, and
+   in the one string that can never be changed.
+3. `com.<studio>.ledger` / `…herd` — neutral about the product name per D9, so a rename of
+   the app or a second species never touches the store identity; needs a studio name the
+   owner picks.
+4. Keep `com.salala.salala` — free today, and the doubled segment is a template artifact
+   that reads as unfinished on a Play listing.
+
+Recommendation: decide it in the same breath as D8/D3, since the payment route also decides
+who the *vendor* in the id has to be, and pick shape 1 or 3 over 2 — this string outlives
+the app's name. **Nothing was renamed.** A one-way door gets opened by the person who owns it.
+
+**What Stage 4 still lacks, measured.** Not prose about "polish": the release build signs
+itself with the debug key (`android/app/build.gradle.kts:39-42`, `signingConfig =
+signingConfigs.getByName("debug")`), and there is no upload keystore anywhere in the
+project or the CI cache (D19 caches only `debug.keystore`, for a different reason:
+reinstalling on the test phone without wiping data). `.github/workflows/flutter-ci.yml`
+has **two jobs** — `analyze-and-test` and `build-debug`; there is no `bundleRelease` /
+AAB step, no Play upload step, no signing of a release artifact. On the store side nothing
+exists yet: no privacy-policy URL (Play demands one for a health-adjacent app), no content
+rating answers, no store listing, no data-safety form. Each of those is either an owner
+credential or an owner statement, so the honest state of Stage 4 is *blocked on the owner*,
+not *in progress*.
+
 ## Stage 5 — Later candidates (no commitment yet)
 
 Multi-breeder/club accounts (the B2B2C path), breeding-plan and mate-pairing
 advice, FHIR `patient-animal` alignment for vet interoperability, iOS build,
 photo/attachment storage, and a web viewer for buyers who received a pack.
+
+**Triage of that list, so the next stage is chosen rather than drifted into.** Each
+verdict is about *this* project's evidence situation, and none of them is a claim that the
+idea is bad.
+
+- **Photo/attachment storage — buildable and CI-verifiable, still a product commitment.**
+  The only candidate the current harness can prove end to end: a real SQLite column plus a
+  file under the app's documents, tests that hit the DAO, and a widget test that drives the
+  picker's result. It is not free: it needs `image_picker`, a camera *and* a gallery
+  permission where the app today asks for none (standing constraint: offline-first, no
+  permission a feature does not provably need), an extension of
+  `data_extraction_rules.xml` to keep the image files out of cloud-backup and
+  device-transfer exactly as `salala.db` is (D10 — a photo of a dog is a lot more identifying
+  than a weight row), and a decision about whether images travel in the pack, which collides
+  with D22's "the pack is the whole database" being a *small, text* file a buyer can open in
+  a messaging app.
+- **Multi-breeder / club accounts — NEEDS OWNER PRODUCT DECISION, not code.** It breaks the
+  premise of three decisions at once: D1 (the wedge is one small breeder, judged on her own
+  ledger), D4 (an app-lock PIN on one device is the whole security story), and D22 (a pack
+  that *replaces* the database presumes one owner per database). A club means shared rows,
+  per-row authorship, and an identity model — which is a different product, and one whose
+  paying customer is a club, not the breeder the app is built for. Nothing here is a
+  refactor away; it is a D-level conversation with the owner.
+- **Breeding-plan and mate-pairing advice — NEEDS OWNER PRODUCT DECISION.** It collides with
+  D25: triage is a rule table over what is already recorded and never names a disease.
+  Pairing advice is the same category of claim pointed at the future instead of the past, and
+  it would need a breed standard dataset the repository does not have and cannot license
+  from the code. Health-screening *reminders* from existing data are already shipped;
+  "which sire" is a different promise, and a wrong one is a vet visit or a bad litter.
+- **FHIR `patient-animal` alignment — NOT VERIFIABLE HERE.** Verifying it means exchanging
+  with a server or a second system, and this project's only two verifiers are CI (no
+  network, no counterparty) and one Android phone. It can be *shaped* (a JSON structure that
+  maps cleanly later) at essentially no cost; claiming it "works" would need infrastructure
+  that does not exist.
+- **iOS build — NOT VERIFIABLE HERE.** There is no macOS runner in this account's CI and no
+  Apple hardware here, so a build could be *authored* but never run, and D-level rules forbid
+  claiming it. It is also the lowest-conversion candidate: the breeder with the ledger is
+  holding an Android phone today.
+- **Web viewer for received packs — NOT VERIFIABLE HERE, and dependent on D8.** Same
+  problem as FHIR plus a hosting decision and a privacy surface: a page that renders a
+  buyer's pack is a place where the whole-database file gets parsed for strangers.
+  The buyer's PDF (Stage 3g) already answers the need without a server.
 
 ## Standing constraints
 
