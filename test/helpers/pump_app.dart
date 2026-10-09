@@ -303,9 +303,15 @@ Future<void> Function(Database) refuseUpdatesOf(String table) => (db) async {
 ///
 /// [dialogTitle] scopes the button to one alert, because a handover form can
 /// have a contact form open on top of it and both end in a Save button.
+///
+/// [waitingFor] is the sentence the caller is about to assert. It defaults to the
+/// database's refusal because that is what most of these tests are waiting for; a
+/// form that refuses a date itself has to say so, or the wait settles on whatever
+/// appeared and the assertion below it reads a sentence from the phase before.
 Future<void> tapSaveAndGetAnswer(
   WidgetTester tester, {
   String? dialogTitle,
+  String waitingFor = saveRefusalSentence,
 }) async {
   final save = dialogTitle == null
       ? find.widgetWithText(FilledButton, 'Save')
@@ -316,7 +322,7 @@ Future<void> tapSaveAndGetAnswer(
   await tester.ensureVisible(save);
   await tester.pumpAndSettle();
   await tester.tap(save);
-  await settleRefusal(tester);
+  await settleRefusal(tester, waitingFor: waitingFor);
 }
 
 /// The whole evidence that a refused write stayed the screen's: the sentence, the
@@ -335,7 +341,7 @@ void expectRefusedWrite(
   FakeNotificationWriter? notifications,
 }) {
   expect(
-    find.text('This could not be saved. Nothing was written.'),
+    find.text(saveRefusalSentence),
     findsOneWidget,
     reason: 'a refused write has to say so, not sit on a spinner',
   );
@@ -372,22 +378,73 @@ void expectRefusedWrite(
   }
 }
 
-/// The wait a refusal has to be read from: as long as SQLite takes to answer,
-/// and no longer — the snackbar it answered with dismisses four seconds after it
+/// The sentence a refused write is answered with, as one token.
+///
+/// A test that waits for a refusal and a test that asserts one have to name the
+/// same string, and a sentence copy-pasted into both is how they drift apart: the
+/// wait settles on whatever appeared and the assertion reads a different one. The
+/// same argument holds for every refusal sentence below.
+const String saveRefusalSentence =
+    'This could not be saved. Nothing was written.';
+const String deleteRefusalSentence =
+    'This could not be deleted. The record is still there.';
+const String beforeBirthSentence = 'This date is before this animal was born.';
+const String whelpingBeforeMatingSentence =
+    'The whelping date is before the mating date.';
+const String weaningBeforeWhelpingSentence =
+    'The weaning date is before the whelping date.';
+const String doseDueBeforeDoseSentence =
+    'The next dose is due before this dose was given.';
+const String certificateBeforeTestSentence =
+    'This certificate expires before the day of the test it certifies.';
+const String appLockRefusalSentence =
+    'The phone would not change the app lock.';
+const String languageRefusalSentence =
+    'The phone would not keep this language.';
+
+/// The wait a refusal has to be read from: as long as SQLite takes to answer, and
+/// no longer — the snackbar it answered with dismisses four seconds after it
 /// appears, on the fake clock this helper does not run forward.
 ///
-/// It polls for the snackbar rather than sleeping a fixed 60 ms, because that
-/// number was a guess about a runner's speed: on a loaded CI machine the write
-/// can still be in flight when the assertions run, and a refusal that arrives
-/// late looks exactly like a refusal that never happened.
-Future<void> settleRefusal(WidgetTester tester) async {
+/// It polls for [waitingFor] rather than for *any* snackbar, because those are two
+/// different facts and only one of them is the test's. `ScaffoldMessenger` shows
+/// one snackbar at a time and queues the next, so a form refused twice keeps
+/// displaying the *first* reason while the second is still waiting; a helper that
+/// answers as soon as anything appears lets the second phase assert the first
+/// phase's sentence. CI measured that instead of leaving it to be reasoned about:
+/// the six birth-date tests all passed their first half, SQLite refused their
+/// second half as the log shows, and every one of them failed on a sentence that
+/// had not been displayed yet.
+///
+/// So a different sentence on screen costs the four seconds the app was going to
+/// spend on it, and the poll continues. Nothing on screen waits out the write the
+/// way the old fixed 60 ms sleep never could: on a loaded CI machine a refusal that
+/// arrives late looks exactly like a refusal that never happened.
+///
+/// If [waitingFor] never arrives the loop gives up and the assertion the caller was
+/// about to make fails on its own words, which is the right outcome — a wait that
+/// timed out *is* a refusal that did not arrive.
+Future<void> settleRefusal(
+  WidgetTester tester, {
+  required String waitingFor,
+}) async {
+  final sentence = find.descendant(
+    of: find.byType(SnackBar),
+    matching: find.text(waitingFor),
+  );
   for (var round = 0; round < 40; round++) {
     await tester.pump();
-    if (find.byType(SnackBar).evaluate().isNotEmpty) {
+    if (sentence.evaluate().isNotEmpty) {
       // One frame of the entry animation, so the sentence is where it will be
       // when a test reads it back, not half-slid in from the bottom.
       await tester.pump(const Duration(milliseconds: 120));
       return;
+    }
+    if (find.byType(SnackBar).evaluate().isNotEmpty) {
+      // Another refusal is on screen and this test's sentence is queued behind
+      // it: spend the display time the shipped app would have spent.
+      await tester.pump(const Duration(seconds: 4));
+      continue;
     }
     await tester.runAsync(
       () => Future<void>.delayed(const Duration(milliseconds: 25)),
@@ -459,25 +516,4 @@ String usDay(int ms) {
   final day = DateTime.fromMillisecondsSinceEpoch(ms);
   String two(int value) => value.toString().padLeft(2, '0');
   return '${two(day.month)}/${two(day.day)}/${day.year}';
-}
-
-/// Wait out a refusal sentence already on screen, between two phases of one test.
-///
-/// `ScaffoldMessenger` shows one snackbar at a time and queues the next, so a
-/// form refused twice displays the *first* reason while the second is still
-/// waiting. That makes a two-phase test — refuse the impossible, then fix it and
-/// try again — assert against a sentence from the phase before it, and
-/// [settleRefusal] cannot tell the difference: it answers as soon as any
-/// `SnackBar` exists. CI proved this rather than left it to be reasoned about:
-/// the six birth-date tests all passed their first half, SQLite refused their
-/// second half as the log shows, and every one of them failed on the sentence
-/// that had not been displayed yet.
-Future<void> dismissRefusals(WidgetTester tester) async {
-  for (var round = 0; round < 10; round++) {
-    if (find.byType(SnackBar).evaluate().isEmpty) return;
-    // Four seconds is what the shipped app waits before dismissing a snackbar;
-    // the fake clock only spends that time when a test asks for it.
-    await tester.pump(const Duration(seconds: 4));
-    await tester.pumpAndSettle();
-  }
 }

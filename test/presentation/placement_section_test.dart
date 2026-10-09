@@ -494,14 +494,15 @@ void main() {
       usDay: usDay(_daysAgo(500)),
     );
 
-    await tapSaveAndGetAnswer(tester, dialogTitle: 'Log a placement');
-
-    expect(
-      find.text('This date is before this animal was born.'),
-      findsOneWidget,
+    await tapSaveAndGetAnswer(
+      tester,
+      dialogTitle: 'Log a placement',
+      waitingFor: beforeBirthSentence,
     );
+
+    expect(find.text(beforeBirthSentence), findsOneWidget);
     expect(
-      find.text('This could not be saved. Nothing was written.'),
+      find.text(saveRefusalSentence),
       findsNothing,
       reason:
           'the trigger is what turns this absence into evidence: a handover '
@@ -510,7 +511,6 @@ void main() {
           'day below shows the trigger does bite',
     );
     expect(find.byType(PlacementDialog), findsOneWidget);
-    await dismissRefusals(tester);
     await typeDateIntoPicker(
       tester,
       scope: AlertDialog,

@@ -327,10 +327,7 @@ void main() {
     // `try` around both would be sitting here on "nothing was written" over a
     // dose that is in the ledger — and the breeder would save it a second time.
     expect(find.byType(VaccinationFormScreen), findsNothing);
-    expect(
-      find.text('This could not be saved. Nothing was written.'),
-      findsNothing,
-    );
+    expect(find.text(saveRefusalSentence), findsNothing);
     // Not merely "no alarm was written" — the fake records the attempt before it
     // throws, so `written` alone would stay empty even if the form never reached
     // the alarm at all. These three calls are the proof it tried and swallowed
@@ -372,10 +369,7 @@ void main() {
     // that failed. A single `try` would hold the form open, on a dose that has
     // already gone, telling the breeder it is still there.
     expect(find.byType(VaccinationFormScreen), findsNothing);
-    expect(
-      find.text('This could not be deleted. The record is still there.'),
-      findsNothing,
-    );
+    expect(find.text(deleteRefusalSentence), findsNothing);
     expect(find.text('Lepto'), findsNothing);
     // The row went first, so the cancel the phone refused is the only call this
     // screen ever made — and it refused on the first of the two.
@@ -794,15 +788,12 @@ void main() {
       await _tap(tester, find.text('DHPP'));
       await _tap(tester, find.byIcon(Icons.delete_outline));
       await tester.tap(find.widgetWithText(FilledButton, 'Delete'));
-      await settleRefusal(tester);
+      await settleRefusal(tester, waitingFor: deleteRefusalSentence);
 
       // The form stayed open on a dose that is still in the ledger, and nothing
       // was handed to the alarm manager: a row that survived keeps its reminder,
       // which is the half of this path a silent failure would have got wrong.
-      expect(
-        find.text('This could not be deleted. The record is still there.'),
-        findsOneWidget,
-      );
+      expect(find.text(deleteRefusalSentence), findsOneWidget);
       expect(find.byType(VaccinationFormScreen), findsOneWidget);
       expect(
         tester
@@ -839,14 +830,11 @@ void main() {
     await _scrollTo(tester, find.text('DHPP'));
     await _tap(tester, find.text('DHPP'));
 
-    await tapSaveAndGetAnswer(tester);
+    await tapSaveAndGetAnswer(tester, waitingFor: doseDueBeforeDoseSentence);
 
+    expect(find.text(doseDueBeforeDoseSentence), findsOneWidget);
     expect(
-      find.text('The next dose is due before this dose was given.'),
-      findsOneWidget,
-    );
-    expect(
-      find.text('This could not be saved. Nothing was written.'),
+      find.text(saveRefusalSentence),
       findsNothing,
       reason:
           'the trigger this test installs is what turns that absence into '
@@ -894,10 +882,7 @@ void main() {
       text: 'DHPP',
       notifications: notifications,
     );
-    expect(
-      find.text('The next dose is due before this dose was given.'),
-      findsNothing,
-    );
+    expect(find.text(doseDueBeforeDoseSentence), findsNothing);
   });
 
   testWidgets(
@@ -1029,14 +1014,11 @@ void main() {
         usDay: usDay(_daysAgo(500)),
       );
 
-      await tapSaveAndGetAnswer(tester);
+      await tapSaveAndGetAnswer(tester, waitingFor: beforeBirthSentence);
 
+      expect(find.text(beforeBirthSentence), findsOneWidget);
       expect(
-        find.text('This date is before this animal was born.'),
-        findsOneWidget,
-      );
-      expect(
-        find.text('This could not be saved. Nothing was written.'),
+        find.text(saveRefusalSentence),
         findsNothing,
         reason:
             'a weigh-in is append-only, so the insert trigger is the whole of '
@@ -1045,7 +1027,6 @@ void main() {
       );
       expect(find.byType(WeightFormScreen), findsOneWidget);
 
-      await dismissRefusals(tester);
       await typeDateIntoPicker(
         tester,
         scope: WeightFormScreen,
@@ -1083,14 +1064,11 @@ void main() {
       await _scrollTo(tester, find.text('DHPP'));
       await _tap(tester, find.text('DHPP'));
 
-      await tapSaveAndGetAnswer(tester);
+      await tapSaveAndGetAnswer(tester, waitingFor: beforeBirthSentence);
 
+      expect(find.text(beforeBirthSentence), findsOneWidget);
       expect(
-        find.text('This date is before this animal was born.'),
-        findsOneWidget,
-      );
-      expect(
-        find.text('This could not be saved. Nothing was written.'),
+        find.text(saveRefusalSentence),
         findsNothing,
         reason:
             'the dose is edited with an UPDATE, not an INSERT, which is why '
@@ -1098,7 +1076,6 @@ void main() {
             'SQLite itself says when a row does reach it',
       );
 
-      await dismissRefusals(tester);
       await typeDateIntoPicker(
         tester,
         scope: VaccinationFormScreen,
@@ -1131,19 +1108,15 @@ void main() {
     await _scrollTo(tester, find.text('OFA hips'));
     await _tap(tester, find.text('OFA hips'));
 
-    await tapSaveAndGetAnswer(tester);
+    await tapSaveAndGetAnswer(tester, waitingFor: beforeBirthSentence);
 
+    expect(find.text(beforeBirthSentence), findsOneWidget);
     expect(
-      find.text('This date is before this animal was born.'),
-      findsOneWidget,
-    );
-    expect(
-      find.text('This could not be saved. Nothing was written.'),
+      find.text(saveRefusalSentence),
       findsNothing,
       reason: 'see the dose test above: same trigger kind, same pairing',
     );
 
-    await dismissRefusals(tester);
     await typeDateIntoPicker(
       tester,
       scope: HealthTestFormScreen,
@@ -1180,16 +1153,14 @@ void main() {
       await _scrollTo(tester, find.text('OFA hips'));
       await _tap(tester, find.text('OFA hips'));
 
-      await tapSaveAndGetAnswer(tester);
-
-      expect(
-        find.text(
-          'This certificate expires before the day of the test it certifies.',
-        ),
-        findsOneWidget,
+      await tapSaveAndGetAnswer(
+        tester,
+        waitingFor: certificateBeforeTestSentence,
       );
+
+      expect(find.text(certificateBeforeTestSentence), findsOneWidget);
       expect(
-        find.text('This could not be saved. Nothing was written.'),
+        find.text(saveRefusalSentence),
         findsNothing,
         reason:
             'the predicate answered before SQLite was asked, so the UPDATE '
@@ -1197,7 +1168,6 @@ void main() {
             'absence mean something rather than prove nothing',
       );
 
-      await dismissRefusals(tester);
       await typeDateIntoPicker(
         tester,
         scope: HealthTestFormScreen,
@@ -1213,9 +1183,7 @@ void main() {
         text: 'OFA hips',
       );
       expect(
-        find.text(
-          'This certificate expires before the day of the test it certifies.',
-        ),
+        find.text(certificateBeforeTestSentence),
         findsNothing,
         reason:
             'one field apart on the same row against the same trigger: this '
@@ -1248,19 +1216,15 @@ void main() {
       await _scrollTo(tester, find.text('Atlas Veterinary'));
       await _tap(tester, find.text('Atlas Veterinary'));
 
-      await tapSaveAndGetAnswer(tester);
+      await tapSaveAndGetAnswer(tester, waitingFor: beforeBirthSentence);
 
+      expect(find.text(beforeBirthSentence), findsOneWidget);
       expect(
-        find.text('This date is before this animal was born.'),
-        findsOneWidget,
-      );
-      expect(
-        find.text('This could not be saved. Nothing was written.'),
+        find.text(saveRefusalSentence),
         findsNothing,
         reason: 'see the dose test above: same trigger kind, same pairing',
       );
 
-      await dismissRefusals(tester);
       await typeDateIntoPicker(
         tester,
         scope: VetVisitFormScreen,

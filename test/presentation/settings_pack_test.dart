@@ -408,12 +408,9 @@ void main() {
         '2481',
       );
       await tester.tap(find.widgetWithText(FilledButton, 'Save'));
-      await settleRefusal(tester);
+      await settleRefusal(tester, waitingFor: appLockRefusalSentence);
 
-      expect(
-        find.text('The phone would not change the app lock.'),
-        findsOneWidget,
-      );
+      expect(find.text(appLockRefusalSentence), findsOneWidget);
       expect(
         tester.widget<Switch>(find.byType(Switch)).value,
         isFalse,
@@ -453,12 +450,9 @@ void main() {
 
       await tapTile(tester, 'Language');
       await tester.tap(find.text('العربية'));
-      await settleRefusal(tester);
+      await settleRefusal(tester, waitingFor: languageRefusalSentence);
 
-      expect(
-        find.text('The phone would not keep this language.'),
-        findsOneWidget,
-      );
+      expect(find.text(languageRefusalSentence), findsOneWidget);
       // The choice was never stored, so the screen must not wear it: before this
       // order the app went Arabic for the session and English the next morning,
       // with no sentence anywhere between the two to say the tap had failed.

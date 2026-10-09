@@ -252,14 +252,14 @@ void main() {
         usDay: '01/01/2026',
       );
 
-      await tapSaveAndGetAnswer(tester);
-
-      expect(
-        find.text('The whelping date is before the mating date.'),
-        findsOneWidget,
+      await tapSaveAndGetAnswer(
+        tester,
+        waitingFor: whelpingBeforeMatingSentence,
       );
+
+      expect(find.text(whelpingBeforeMatingSentence), findsOneWidget);
       expect(
-        find.text('This could not be saved. Nothing was written.'),
+        find.text(saveRefusalSentence),
         findsNothing,
         reason:
             'the screen has to stop on its own reading of the dates, not on a '
@@ -320,19 +320,16 @@ void main() {
         usDay: '01/01/2026',
       );
 
-      await tapSaveAndGetAnswer(tester);
+      await tapSaveAndGetAnswer(
+        tester,
+        waitingFor: weaningBeforeWhelpingSentence,
+      );
 
       // The sentence is the one about weaning: two rules that answer with the
       // same words would leave a breeder hunting for the wrong field, and the
       // mating above is a legal pair, so a generic refusal would also be a lie.
-      expect(
-        find.text('The weaning date is before the whelping date.'),
-        findsOneWidget,
-      );
-      expect(
-        find.text('The whelping date is before the mating date.'),
-        findsNothing,
-      );
+      expect(find.text(weaningBeforeWhelpingSentence), findsOneWidget);
+      expect(find.text(whelpingBeforeMatingSentence), findsNothing);
       expect(find.byType(LitterFormScreen), findsOneWidget);
     },
   );
@@ -375,10 +372,7 @@ void main() {
     // Nothing is refused here, which is the point: the two tests above changed
     // one date each and nothing else, so a refusal they could not have avoided
     // would show up as this litter failing to land.
-    expect(
-      find.text('The whelping date is before the mating date.'),
-      findsNothing,
-    );
+    expect(find.text(whelpingBeforeMatingSentence), findsNothing);
     expect(find.byType(LitterFormScreen), findsNothing);
     expect(find.text('A litter'), findsOneWidget);
 

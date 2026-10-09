@@ -306,17 +306,14 @@ void main() {
         await tester.tap(find.text('Delete'));
         await tester.pumpAndSettle();
         await tester.tap(find.widgetWithText(FilledButton, 'Delete'));
-        await settleRefusal(tester);
+        await settleRefusal(tester, waitingFor: deleteRefusalSentence);
 
         // The card is still in the herd and the phone still holds the dose's
         // alarm: the statement that failed was the animal's own DELETE, and its
         // children cascade from it, so nothing left. The clear-all that a real
         // delete runs must not touch a ledger that survived — the three launch
         // calls are all the writer ever saw.
-        expect(
-          find.text('This could not be deleted. The record is still there.'),
-          findsOneWidget,
-        );
+        expect(find.text(deleteRefusalSentence), findsOneWidget);
         expect(find.text('Nala'), findsOneWidget);
         expect(notifications.log, hasLength(3));
         expect(notifications.log, isNot(contains('clearAll')));

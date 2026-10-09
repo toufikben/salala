@@ -322,16 +322,13 @@ void main() {
       await _tap(tester, find.text('Vomiting'));
       await _tap(tester, find.widgetWithText(TextButton, 'Delete'));
       await tester.tap(find.widgetWithText(FilledButton, 'Delete'));
-      await settleRefusal(tester);
+      await settleRefusal(tester, waitingFor: deleteRefusalSentence);
 
       // The confirmation is gone, the edit dialog is still open over the row it
       // could not remove, and the triage card still alarms: an `ongoing` sighting
       // the ledger still holds is still a sign the breeder has to act on. A
       // Delete that answered with silence would have said the opposite.
-      expect(
-        find.text('This could not be deleted. The record is still there.'),
-        findsOneWidget,
-      );
+      expect(find.text(deleteRefusalSentence), findsOneWidget);
       expect(find.byType(SymptomDialog), findsOneWidget);
       expect(find.text('Act now'), findsOneWidget);
     },
@@ -365,14 +362,15 @@ void main() {
         usDay: usDay(_daysAgo(500)),
       );
 
-      await tapSaveAndGetAnswer(tester, dialogTitle: 'Log a symptom');
-
-      expect(
-        find.text('This date is before this animal was born.'),
-        findsOneWidget,
+      await tapSaveAndGetAnswer(
+        tester,
+        dialogTitle: 'Log a symptom',
+        waitingFor: beforeBirthSentence,
       );
+
+      expect(find.text(beforeBirthSentence), findsOneWidget);
       expect(
-        find.text('This could not be saved. Nothing was written.'),
+        find.text(saveRefusalSentence),
         findsNothing,
         reason:
             'the insert trigger is what makes this absence mean anything: a '
@@ -382,7 +380,6 @@ void main() {
       );
       expect(find.byType(SymptomDialog), findsOneWidget);
 
-      await dismissRefusals(tester);
       await typeDateIntoPicker(
         tester,
         scope: AlertDialog,
