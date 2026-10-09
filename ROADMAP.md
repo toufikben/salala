@@ -853,6 +853,13 @@ as "no buyer" instead of an error. Recorded as **D27**.
 
 ### Queued next, in order
 
+> **Status, 2026-10-09:** the batched phone pass described below ran against build
+> `b7f3d1d` and is recorded in full at *Device check — the batched pass for 3b–3q* near the
+> end of this file, including what it proved, the two findings it produced, and the items
+> on this list it did **not** reach (French strings, the keystore lock, the startup-failure
+> screen, the search box, the date dialog's two modes, the refusal sentences). The list is
+> kept as written so the owed half stays in one place.
+
 - **One batched device pass** for 3b, 3c, 3d, 3e, **3f, 3g and 3h** together: the rule
   the owner
   set is that the phone is checked after a suitable batch, not after every small
@@ -1644,6 +1651,99 @@ read from source rather than inferred:
   both are user-visible and neither is provable in a widget test, so both join the queued
   phone pass. The alarm half needs the real notification channel: the ledger can be read
   back here, the phone's booked alarms cannot.
+
+### Device check — the batched pass for 3b–3q *(run 2026-10-09 on a Realme RMX3910, build `b7f3d1d`; passed for what it covered, with two findings only a phone could give and a queue that is shorter but not empty)*
+
+The build was read off the screen, not guessed: Settings showed **Build `b7f3d1d`**
+in English and **رقم البناء `b7f3d1d`** in Arabic (`w20-settings`, `w22-arabic-settings`).
+`versionCode` is still 1 for every CI build, so without that row there is no way to say
+which of the thirty-odd builds is installed.
+
+What the phone actually did, each line backed by a screenshot plus a re-pulled database
+after the write:
+
+- **A weigh-in, a symptom, a dose and a placement were written on hardware and read back**
+  (`w2`–`w4`, `c3`–`c6`, `c21`–`c23`, `w5`–`w18`). `databases/salala.db` pulled with
+  `run-as` after each one, so the claim is about the row, not about the widget.
+- **The herd agenda says what D40 promises** (3d, 3q). English: "Vaccinations to book /
+  Nala / *Rabies was due 2 days ago*"; Arabic: "تلقيحات يجب حجزها / *Rabies كان مستحقًا
+  منذ 2 يومين*" (`w19`, `w23`, `w30`). The Arabic line is the dual form, not a literal
+  "2 days", and the placed animal (Roya, "غير محدد · تم تسليمه") is on the list with no
+  agenda row — the visible half of the rule CI can only assert in a widget.
+- **The Arabic PDF's buyer block is populated** (3c, 2c, 3g). `nala-arabic.pdf` was pulled
+  out of `cache/salala_out/` and its text recovered by inflating the content streams and
+  mapping the embedded font's `beginbfchar` CMap back to Unicode: `Karim Benali`,
+  `0555123456`, the e-mail, country `DZ`, price `DZD45000`, and dates in Arabic month
+  names (`ﺮﺑﻮﺘﻛأ 2026`). The price and the phone keep **Latin digits** while the prose is
+  Arabic — the behaviour the owner asked for, now seen in the file a buyer receives.
+- **Language switching survives a restart** and the restart lands on the chosen language
+  rather than the system's (`w21`→`w22`, `w31`→`w32`).
+- **The cascade sentence on a 6-inch screen** and the cascade itself: "Delete Nala?" with
+  the full list of what goes with it (`d2`), then an empty ledger and an empty agenda
+  (`d3`), then the database itself: `animals`, `symptoms`, `vaccinations`,
+  `weight_entries`, `placements` all empty (`final-clean.db`).
+- **The alarm end state is clean**: no live Salala alarm in `dumpsys alarm` — the three
+  entries naming `ScheduledNotificationReceiver` are all `Reason=pi_cancelled` history
+  (`d3-alarms.txt`) — and the plugin's own cache reads `scheduled_notifications = []`.
+  Reading the raw dump matters here: grepping for the receiver's name alone makes a
+  cancelled alarm look booked.
+
+**Every row of test residue deleted, per the owner's instruction.** The residue was mine,
+not the owner's: Nala's `created_at` is 2026-10-06 (an earlier stage's check) and Roya's is
+today's, and the database was pulled and read before any of it was touched. One row
+survives because the app cannot remove it — see the findings.
+
+**Two findings this pass produced that no test could have:**
+
+1. **Changing an animal's status does not take its booked alarm back out.** A dose of a
+   placed animal was still booked after the placement. The app-level filter added in 3q is
+   correct and stays correct — `bookingsFor` refused to re-book it. The gap is one step
+   further: `resyncReminders` (`lib/services/reminder_resync.dart:110`) calls
+   `scheduler.replace()` *only for the records that survive the herd filter*, so the
+   records that fell out of it are never cancelled, and `flutter_local_notifications`
+   re-arms its own persisted list at launch anyway. The experiment that pinned this:
+   deleting the alarm looked like a resync re-booking it, until the plugin's
+   `shared_prefs/scheduled_notifications.xml` was emptied and the re-arm stopped — the
+   cache, not the query, was holding the booking. A sold dog's vaccination reminder waking
+   its breeder at 09:00 is exactly the noise D40 exists to prevent, so this is Stage 3r
+   below, not debt to note and leave.
+2. **A buyer contact cannot be deleted anywhere in the app.** Not a missing menu item:
+   `lib/data/db/buyer_dao.dart` has no delete at all, so the phone is left holding
+   "Karim Benali / 0555123456 / DZ" after every animal, placement and symptom of his has
+   been removed (`final-clean.db`: the one row that outlived the cleanup). For an app whose
+   promise is "everything is stored on this device", a person's name and phone number with
+   no way to erase it is a privacy gap as much as a UI gap.
+
+**One smaller thing the same PDF showed:** the growth chart's x axis is labelled with raw
+days since birth — `988.0`, `1009.0`, `1012.0` — because `animal_pdf.dart:186-220` hands
+`pw.FixedAxis` the day-count set directly. The document is for a buyer, and a buyer does
+not read "988" as anything.
+
+**What this pass did NOT cover, so the queue keeps it** rather than pretending: every
+French string on a real screen (the pass ran English and Arabic), the app lock against the
+hardware keystore, the startup-failure screen with a real unreadable database, the search
+box typed into on the on-screen keyboard — the field is not even on screen at two animals —
+the date dialog's input and calendar modes under a Moroccan Arabic keyboard (the `ar` hint
+says `yyyy/mm/dd` while Flutter's shipped `parseCompactDate` reads `mm/dd/yyyy` and nothing
+else: an upstream behaviour this app inherits, unanswered), and the pre-birth and date
+refusal sentences, of which no dump captured a single snackbar.
+
+## Stage 3r — An alarm that outlived its animal *(the fix the device pass asked for)*
+
+The shape is already settled and it is small: when an animal is edited, cancel every dose
+and screening id belonging to it before deciding what to book, then re-book through the same
+`bookingsFor` with a one-animal herd map when the new status `isAtHome`. `replace()`
+cancels before writing, so the second half is idempotent, and an animal that simply stayed
+at home pays two `cancel()` calls it did not need — cheaper than a notification about a dog
+who lives at another address. A blanket `clearEverything()` at launch was ruled out: the
+save path books past `reminderHorizonDays = 45` while the launch query is
+`dueBefore(now + 45d)`, so emptying the phone first would silently drop a dose due in
+month two.
+
+Alongside it, the two smaller device findings are queued as their own work rather than
+left in prose: a buyer delete path (`BuyerDao` has none, and a contact outliving the herd
+contradicts the privacy promise on the About tile), and day-count labels on the PDF growth
+chart.
 
 ## Stage 4 — Distribution
 
