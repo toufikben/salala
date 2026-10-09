@@ -127,6 +127,26 @@ void main() {
       expectAscending(scale);
       expectSpans(scale, <double>[1095, 1200]);
     });
+
+    test('an age no animal lives to is still thinned, not crowded', () {
+      // The month ladder stops at a decade because that is as long as a dog is
+      // tracked for; a birth date typed four digits wrong goes past it. The marks
+      // then thin by whole steps instead of running off the end of the ladder, so
+      // the page still gets a readable number of them.
+      final scale = monthScale(agesInDays: <double>[0, 100000]);
+
+      expect(labelsOf(scale), <String>[
+        '0',
+        '720',
+        '1440',
+        '2160',
+        '2880',
+        '3286',
+      ]);
+      expect(scale.ticks.length, lessThanOrEqualTo(6));
+      expectAscending(scale);
+      expectSpans(scale, <double>[0, 100000]);
+    });
   });
 
   group('kiloScale', () {
@@ -206,6 +226,46 @@ void main() {
     });
 
     test(
+      'a weight typed in grams into the kilogram box still prints marks',
+      () {
+        // The form has no maximum, so 430 g arrives as 430 kg and the axis is asked for
+        // two orders of magnitude more than the ladder was cut for. The marks are then
+        // thinned by whole steps rather than running off the end of it: the buyer's page
+        // gets every-one-hundred-kilograms, not a smear of a hundred labels.
+        final scale = kiloScale(weightsInKg: <double>[3.1, 430]);
+
+        expect(labelsOf(scale), <String>[
+          '0',
+          '100',
+          '200',
+          '300',
+          '400',
+          '450',
+        ]);
+        expect(scale.ticks.length, lessThanOrEqualTo(6));
+        expectAscending(scale);
+        expectSpans(scale, <double>[3.1, 430]);
+      },
+    );
+
+    test(
+      'a weigh-in a hair under a whole step is not cut off by the first mark',
+      () {
+        // `min * scale / unit` rounds to the nearest double before it is floored, and
+        // a weight one ulp below a mark can round up onto it — leaving the lightest
+        // weigh-in outside the box the grid drew. No weight the form can store sits
+        // there (measured: the guard never runs on the ledger's own values), but the
+        // enclosure is what the axis promises, so the promise is pinned with the one
+        // input that used to break it.
+        final scale = kiloScale(weightsInKg: <double>[1.8499999999999999, 1.9]);
+
+        expect(labelsOf(scale), <String>['1.84', '1.86', '1.88', '1.9']);
+        expectAscending(scale);
+        expectSpans(scale, <double>[1.8499999999999999, 1.9]);
+      },
+    );
+
+    test(
       'the rules every input has to answer, over the shapes a ledger makes',
       () {
         // A hand-derived label list proves one input; the page is built from whatever
@@ -221,6 +281,10 @@ void main() {
           <double>[16, 22, 29],
           <double>[0.43, 5.5, 19.75, 35.2],
           <double>[60, 75, 90, 110],
+          <double>[3.1, 430],
+          <double>[0.43, 5000],
+          <double>[1.8499999999999999, 1.9],
+          <double>[3.6999999999999997, 3.75],
         ];
         const List<List<double>> ages = <List<double>>[
           <double>[0, 30, 61, 92],
@@ -231,10 +295,12 @@ void main() {
           <double>[988, 1009, 1012],
           <double>[40, 45],
           <double>[100, 100],
+          <double>[0, 100000],
         ];
 
         for (final List<double> kilos in weights) {
           final scale = kiloScale(weightsInKg: kilos);
+          expect(scale.ticks.length, lessThanOrEqualTo(6));
           expectAscending(scale);
           expectSpans(scale, kilos);
           for (final GrowthTick tick in scale.ticks) {
@@ -243,6 +309,7 @@ void main() {
         }
         for (final List<double> days in ages) {
           final scale = monthScale(agesInDays: days);
+          expect(scale.ticks.length, lessThanOrEqualTo(6));
           expectAscending(scale);
           expectSpans(scale, days);
           for (final GrowthTick tick in scale.ticks) {

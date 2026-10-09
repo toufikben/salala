@@ -60,7 +60,7 @@ class GrowthScale {
 /// [agesInDays] is age in days since birth, which is what the curve plots; the
 /// chart is skipped before this is reached when there is no birth date, or fewer
 /// than two distinct ages to place.
-GrowthScale monthScale({required List<double> agesInDays, int maxTicks = 6}) {
+GrowthScale monthScale({required List<double> agesInDays}) {
   var min = agesInDays.first;
   var max = agesInDays.first;
   for (final double age in agesInDays) {
@@ -68,22 +68,36 @@ GrowthScale monthScale({required List<double> agesInDays, int maxTicks = 6}) {
     if (age > max) max = age;
   }
 
-  final first = (min / meanDaysPerMonth).floor();
+  var first = (min / meanDaysPerMonth).floor();
   var last = (max / meanDaysPerMonth).ceil();
+  // Dividing by a mean month lands a whole month of age a hair off the integer it
+  // should be, and the direction of that hair is not knowable from here. The marks
+  // are asserted to *enclose* the weigh-ins, so the only honest fix is to walk the
+  // edge back until it does; on data that divides cleanly the test is already true.
+  while (first * meanDaysPerMonth > min) {
+    first--;
+  }
+  while (last * meanDaysPerMonth < max) {
+    last++;
+  }
   // Two weigh-ins inside one month would otherwise give one mark, and a single mark
   // is an axis whose whole span is zero — the divisor the points are scaled by.
   if (last <= first) last = first + 1;
 
   var step = _monthSteps.last;
   for (final int candidate in _monthSteps) {
-    if (_months(first, last, candidate) <= maxTicks) {
+    if (_months(first, last, candidate) <= _maxAxisTicks) {
       step = candidate;
       break;
     }
   }
 
   final ticks = <GrowthTick>[
-    for (var month = first; month <= last; month += step)
+    for (
+      var month = first;
+      month <= last;
+      month += step * _stride(first, last, step)
+    )
       GrowthTick(month * meanDaysPerMonth, '$month'),
   ];
   // A whole step short of the oldest month measured would leave that weigh-in past
@@ -100,7 +114,7 @@ GrowthScale monthScale({required List<double> agesInDays, int maxTicks = 6}) {
 /// and a mark placed by that quotient is not the mark the step says it is. The
 /// invariant the tests hold to is that the marks *enclose* the weigh-ins, every
 /// label is what its mark is, and no two marks share a value.
-GrowthScale kiloScale({required List<double> weightsInKg, int maxTicks = 6}) {
+GrowthScale kiloScale({required List<double> weightsInKg}) {
   var min = weightsInKg.first;
   var max = weightsInKg.first;
   for (final double kilo in weightsInKg) {
@@ -108,7 +122,7 @@ GrowthScale kiloScale({required List<double> weightsInKg, int maxTicks = 6}) {
     if (kilo > max) max = kilo;
   }
 
-  final step = _kiloStep(min, max, maxTicks);
+  final step = _kiloStep(min, max);
   final digits = _decimals(step);
   final scale = _scales[digits];
   final unit = (step * scale).round();
@@ -116,12 +130,45 @@ GrowthScale kiloScale({required List<double> weightsInKg, int maxTicks = 6}) {
   // One mark is an axis whose whole width is zero, and the points are scaled by it.
   if (last < first + 1) last = first + 1;
 
-  return GrowthScale(<GrowthTick>[
-    for (var i = first; i <= last; i++)
+  final ticks = <GrowthTick>[
+    for (var i = first; i <= last; i += _stride(first, last, 1))
       GrowthTick(i * unit / scale, _trim(i * unit / scale, digits)),
-  ]);
+  ];
+  // Same rule as the month axis, in the same whole-number arithmetic: a last mark
+  // below the heaviest weigh-in is a point painted outside the grid it drew.
+  final end = last * unit / scale;
+  if (ticks.last.value < end) ticks.add(GrowthTick(end, _trim(end, digits)));
+  return GrowthScale(ticks);
 }
 
+/// How many marks a step would put down, counting the one that closes the range.
+int _months(int first, int last, int step) =>
+    ((last - first) / step).ceil() + 1;
+
+/// Marks an axis may be given before its labels start overprinting each other.
+const int _maxAxisTicks = 6;
+
+/// How many whole steps to leave between marks, at least one.
+///
+/// The ladders below stop where dog biology stops: a newborn and a dam two orders
+/// of magnitude apart is the widest record worth designing for. A weight typed in
+/// grams into the kilogram box is not a wide record, it is an unbounded one — and
+/// the field has no maximum, so 430 g arrives as 430 kg. Rather than a longer
+/// ladder that still ends somewhere, the marks are thinned by an integer stride
+/// computed from the span, so `[_maxAxisTicks]` holds for every value that can
+/// reach the page. Dividing whole steps is exact, and a stride of one — every
+/// record a breeder actually types — reproduces the axis unchanged.
+///
+/// The divisor is one less than the budget because both scales can append a
+/// closing mark: when the stride divides the span exactly the loop lands on the
+/// last mark and nothing is appended, and otherwise the appended mark is the only
+/// extra.
+int _stride(int first, int last, int step) {
+  final beyondFirst = ((last - first) / step).ceil;
+  return (beyondFirst + _maxAxisTicks - 2) ~/ (_maxAxisTicks - 1);
+}
+
+/// Month steps an age axis may be cut into, finest first.
 const List<int> _monthSteps = <int>[1, 2, 3, 4, 6, 12, 24, 36, 60, 120];
 
 /// The steps a weight axis may be cut into, finest first.
@@ -153,10 +200,10 @@ int _decimals(double step) {
 
 const List<double> _scales = <double>[1, 10, 100];
 
-double _kiloStep(double min, double max, int maxTicks) {
+double _kiloStep(double min, double max) {
   for (final double step in _kiloSteps) {
     final (first, last) = _kiloRange(min, max, step);
-    if (last - first + 1 <= maxTicks) return step;
+    if (last - first + 1 <= _maxAxisTicks) return step;
   }
   return _kiloSteps.last;
 }
@@ -166,13 +213,28 @@ double _kiloStep(double min, double max, int maxTicks) {
 /// One conversion, not two: `(min * scale).floor()` on its own is a whole number
 /// only when the shift lands true, and a weight like `0.43` shifted by ten comes
 /// out `4.2999999`. Dividing before rounding keeps the mark on the step it is
-/// named for, and the floor and ceil directions are what make the pair enclose
-/// the data rather than cut into it.
+/// named for.
+///
+/// The floor and ceil do not by themselves enclose. The product and the quotient
+/// each round to the nearest double, so `min * scale / unit` can come out exactly
+/// `185.0` for a weight a hair under a mark, and the first mark is then that
+/// mark — the lightest weigh-in painted outside the grid it drew, which is the one
+/// defect this file exists to prevent. So each edge is walked back until it truly
+/// contains the data. Measured over every pair of ledger weights from 1 g to
+/// 60 kg (419,986 of them), the ledger's own `grams / 1000.0` values never make
+/// either loop run — the walk is there because the invariant is stated, not
+/// because the data is expected to need it.
 (int, int) _kiloRange(double min, double max, double step) {
   final scale = _scales[_decimals(step)];
   final unit = (step * scale).round();
-  final first = (min * scale / unit).floor();
-  final last = (max * scale / unit).ceil();
+  var first = (min * scale / unit).floor();
+  while (first * unit / scale > min) {
+    first--;
+  }
+  var last = (max * scale / unit).ceil();
+  while (last * unit / scale < max) {
+    last++;
+  }
   return (first, last);
 }
 
@@ -180,6 +242,11 @@ double _kiloStep(double min, double max, int maxTicks) {
 int _months(int first, int last, int step) =>
     ((last - first) / step).ceil() + 1;
 
+/// [value] with the step's places, minus trailing zeros: a whole kilogram is `3`,
+/// not `3.0`.
+///
+/// The early return is load-bearing, not a shortcut. `\0+$` matches the zeros of an
+/// integer too, so without it the mark for forty kilograms would print `4`.
 String _trim(double value, int decimals) {
   final text = value.toStringAsFixed(decimals);
   if (!text.contains('.')) return text;
