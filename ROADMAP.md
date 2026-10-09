@@ -1584,10 +1584,18 @@ the test harness rather than reasoning about it, and then papered over it.
   had to hold; a harness refactor that moved it would be a different stage doing
   something else. The number that matters is that all 413 settled: a wait keyed to
   a sentence that never arrives would have burned its 40 rounds and failed.
-- **What the green run does not prove, and what will.** It shows every named wait
-  resolved; it cannot show that a *wrong* name would be caught — that is the
-  mutation check, and it is owed on a side branch before this harness is trusted
-  the way D30's tests are (see Stage 3k, "tests that can actually fail").
+- **The mutation check, run and measured.** On branch `check/settle-refusal-mutation`
+  (`367a6ec`, dispatched as run `37907847959` — a branch push cannot trigger this
+  workflow, and the APK job was gated on `master` for the check so a branch build
+  could not land on the rolling debug APK) `settleRefusal`'s "another snackbar is on
+  screen" branch was replaced with `return`, which is exactly the pre-3p semantics.
+  Verdict: **406 passed, 7 failed** — and the seven are precisely the two-phase tests:
+  the six pre-birth pairs from 3n plus the certificate pair from 3o, each failing at
+  `pump_app.dart:343` inside `expectRefusedWrite` with `Found 0 widgets with text
+  "This could not be saved. Nothing was written."` The wait returned on the *first*
+  phase's sentence, the queue never drained, and the second phase's assertion saw
+  nothing. Named, keyed-to-the-sentence waiting is load-bearing, not decoration; the
+  control is 413/0 at `37904006479`.
 - **A doc line that went missing.** The `## Stage 4 — Distribution` heading was
   lost in `e48a72d` (an awk insertion in the same file, the same class of edit that
   the D-entries keep blaming) and was absent from every ROADMAP read since. Found

@@ -1164,8 +1164,16 @@ name the same string, and while each test held its own copy of both, they could 
 which is how the queue got read as a verdict. One token each cannot. The names are also
 the index of what this app refuses, in one file, in one read.
 
-**What this proves and what it does not.** 413 green at `37904006479` shows every named
-wait resolved (a wrong name burns its 40 rounds and fails, so silence is not evidence of
-a vacuous wait). It does not show that a *deliberately* wrong name is caught; that
-mutation check is owed on a side branch, on the same terms as D30's "tests that can
-actually fail".
+**What this proved, and how.** 413 green at `37904006479` shows every named wait
+resolved. That is not yet evidence the name does anything, so the harness was mutated:
+on `check/settle-refusal-mutation` (`367a6ec`, dispatched as `37907847959` because a
+branch push cannot trigger this workflow) the queue-clearing branch became `return`,
+which is the pre-3p helper exactly. **406 passed, 7 failed**, and the seven are the
+two-phase tests and nothing else — the six pre-birth pairs of Stage 3n and the
+certificate pair of Stage 3o, each failing in `expectRefusedWrite` on
+`Found 0 widgets with text "This could not be saved. Nothing was written."` The wait had
+settled on the first phase's sentence, so the second phase's sentence was never
+displayed by the time it was asserted. Keying the wait to the name is load-bearing; a
+harness that only *looks* strict is not a harness. (The APK job was gated on `master`
+for the duration of the check, so a branch build could not take the rolling debug APK
+the phone installs from.)
