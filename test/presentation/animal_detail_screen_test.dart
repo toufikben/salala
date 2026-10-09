@@ -21,13 +21,13 @@ import '../helpers/pump_app.dart';
 /// the test has to know the id it points at.
 const String _nalaId = 'animal-nala';
 
-Animal _nala() => Animal(
+Animal _nala({AnimalStatus status = AnimalStatus.active}) => Animal(
   id: _nalaId,
   name: 'Nala',
   species: 'dog',
   breed: 'Border collie',
   sex: Sex.female,
-  status: AnimalStatus.active,
+  status: status,
   isBreedingStock: true,
   birthDate: DateTime(2024, 5, 12).millisecondsSinceEpoch,
   createdAt: 0,
@@ -110,6 +110,21 @@ Future<void> _save(WidgetTester tester) async {
 /// before writing, so two plus whatever alarms the due date still has ahead.
 /// [waitForSchedulerCalls] waits for that many before the assertions run.
 int _callsFor(int alarms) => 2 + alarms;
+
+/// Asserts two notification ids are one record's pair.
+///
+/// `notificationIdFor` doubles a record's id space and leaves the low bit for the
+/// kind, so a record's two alarms are consecutive with the lower one even — and
+/// `cancel` walks `ReminderKind.values`, so they come out in that order. A test
+/// that expects a cancel and cannot name the record cannot compute the ids: the
+/// row was seeded through the real dao, which assigns its own uuid. This says the
+/// one thing that still matters — the phone was asked about exactly one record's
+/// two alarms, and nothing else.
+void _expectOneRecordPair(List<int> ids) {
+  expect(ids, hasLength(2));
+  expect(ids.first.isEven, isTrue);
+  expect(ids.last, ids.first + 1);
+}
 
 int _daysAgo(int days) =>
     DateTime.now().subtract(Duration(days: days)).millisecondsSinceEpoch;
@@ -249,6 +264,43 @@ void main() {
     final dueMorning = notifications.written.last.at;
     final daysApart = dueMorning.difference(headsUp).inDays;
     expect(daysApart, reminderLeadDays);
+  });
+
+  testWidgets('saving a dose for an animal who has left books no alarm', (
+    tester,
+  ) async {
+    _usePhoneViewport(tester);
+    final notifications = FakeNotificationWriter();
+    await pumpSalala(
+      tester,
+      notifications: notifications,
+      seed: <Animal>[_nala(status: AnimalStatus.sold)],
+      seedVaccinations: <Vaccination>[
+        _dose(
+          name: 'Distemper',
+          administered: _daysAgo(10),
+          nextDue: _daysAhead(20),
+        ),
+      ],
+    );
+    await _openNala(tester);
+
+    await _tap(tester, find.text('Distemper'));
+    await _save(tester);
+    await waitForSchedulerCalls(tester, notifications, _callsFor(0));
+
+    // D40 seen from the form. The dose belongs to the animal, so the row still
+    // lands and the ledger stays hers — this save is the positive control, not
+    // something the alarm half could have written. What changed is the phone: two
+    // clears naming this record's pair and no write, where the test above books
+    // the very same dose for an animal at home. Whoever took her on owns the
+    // booster, and a 09:00 about it in this barn is a message about a booking
+    // that is no longer here.
+    expect(find.byType(VaccinationFormScreen), findsNothing);
+    expect(find.text('Distemper'), findsOneWidget);
+    expect(notifications.log, <String>['clear', 'clear']);
+    _expectOneRecordPair(notifications.cleared);
+    expect(notifications.written, isEmpty);
   });
 
   testWidgets('deleting a booked dose clears exactly the alarms it booked', (
@@ -629,6 +681,75 @@ void main() {
 
     expect(find.text('BAER'), findsNothing);
     expect(find.text('OFA hips'), findsOneWidget);
+  });
+
+  testWidgets('saving a screening books its expiry warnings on the phone', (
+    tester,
+  ) async {
+    _usePhoneViewport(tester);
+    final notifications = FakeNotificationWriter();
+    await pumpSalala(
+      tester,
+      notifications: notifications,
+      seed: <Animal>[_nala()],
+      seedHealthTests: <HealthTest>[
+        _screening('PENNFID', result: 'Clear', tested: 5, validUntil: 40),
+      ],
+    );
+    await _openNala(tester);
+    await _scrollTo(tester, find.text('PENNFID'));
+
+    await _tap(tester, find.text('PENNFID'));
+    await _save(tester);
+    await waitForSchedulerCalls(tester, notifications, _callsFor(2));
+
+    // Forty days out leaves both of a certificate's alarms still to come: the
+    // month-ahead note and the morning it lapses. This is the half the test below
+    // is measured against — the same form, the same fixture, an animal at home.
+    expect(find.byType(HealthTestFormScreen), findsNothing);
+    expect(notifications.log, <String>['clear', 'clear', 'write', 'write']);
+    expect(notifications.written, hasLength(2));
+    expect(notifications.written.map((a) => a.title).toSet(), <String>{'Nala'});
+    expect(
+      notifications.written.first.body,
+      contains('PENNFID'),
+      reason: 'a breeder with thirty dogs cannot act on "something is due"',
+    );
+    // The ids taken out are the ids written back: a replace, not a pile-up.
+    expect(
+      notifications.written.map((a) => a.id).toList(),
+      notifications.cleared,
+    );
+  });
+
+  testWidgets('saving a screening for an animal who has left books no alarm', (
+    tester,
+  ) async {
+    _usePhoneViewport(tester);
+    final notifications = FakeNotificationWriter();
+    await pumpSalala(
+      tester,
+      notifications: notifications,
+      seed: <Animal>[_nala(status: AnimalStatus.sold)],
+      seedHealthTests: <HealthTest>[
+        _screening('PENNFID', result: 'Clear', tested: 5, validUntil: 40),
+      ],
+    );
+    await _openNala(tester);
+    await _scrollTo(tester, find.text('PENNFID'));
+
+    await _tap(tester, find.text('PENNFID'));
+    await _save(tester);
+    await waitForSchedulerCalls(tester, notifications, _callsFor(0));
+
+    // The certificate stays in her ledger and the expiry warning leaves the
+    // phone: whoever took her on reads the same date off the same row, and a
+    // 09:00 about it here is a message about someone else's booking.
+    expect(find.byType(HealthTestFormScreen), findsNothing);
+    expect(find.text('PENNFID'), findsOneWidget);
+    expect(notifications.log, <String>['clear', 'clear']);
+    _expectOneRecordPair(notifications.cleared);
+    expect(notifications.written, isEmpty);
   });
 
   testWidgets('a vet visit logs the reason and keeps the cost as typed', (

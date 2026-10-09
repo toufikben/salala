@@ -198,16 +198,21 @@ class _HealthTestFormScreenState extends ConsumerState<HealthTestFormScreen> {
   /// was scheduled for this record rather than leaving a stale alarm behind.
   Future<void> _syncReminder(HealthTest test) async {
     final l10n = AppLocalizations.of(context);
-    await ref
-        .read(reminderSchedulerProvider)
-        .replace(
-          recordId: test.id,
-          dueMs: test.validUntil,
-          l10n: l10n,
-          title: reminderTitle(ref, l10n, widget.animalId),
-          what: test.testType,
-          dueDay: formatDay(context, test.validUntil),
-        );
+    final scheduler = ref.read(reminderSchedulerProvider);
+    if (!reminderAllowedFor(ref, widget.animalId)) {
+      // The certificate belongs to the animal, and so does the expiry warning:
+      // a screening of a dog who has left is booked by whoever took her home.
+      await scheduler.cancel(test.id);
+      return;
+    }
+    await scheduler.replace(
+      recordId: test.id,
+      dueMs: test.validUntil,
+      l10n: l10n,
+      title: reminderTitle(ref, l10n, widget.animalId),
+      what: test.testType,
+      dueDay: formatDay(context, test.validUntil),
+    );
   }
 
   Future<void> _delete() async {

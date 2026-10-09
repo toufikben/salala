@@ -199,6 +199,55 @@ void main() {
     });
   });
 
+  group('staleRecordIds', () {
+    test('the records the herd map drops are named for cancelling, in the same walk', () {
+      // The two halves of one loop, asserted together: `bookingsFor` refusing a
+      // sold dog's dose is not the same thing as taking her alarm out of the
+      // phone, and the device showed the difference (a 09:00 message for a dog at
+      // another address). A record missing from the bookings is only harmless if
+      // something here still names it.
+      final doses = <Vaccination>[
+        dose(id: 'dose-away', animalId: 'sold-1', dueMs: dayAhead(20)),
+        dose(id: 'dose-home', dueMs: dayAhead(20)),
+      ];
+      final herd = const <String, String>{'animal-1': 'Nala'};
+
+      final bookings = bookingsFor(
+        doses: doses,
+        screenings: const <HealthTest>[],
+        herd: herd,
+        dueDayText: stampedDay,
+        now: noon,
+      );
+
+      expect(bookings.map((b) => b.recordId), <String>['dose-home']);
+      expect(
+        staleRecordIds(
+          doses: doses,
+          screenings: const <HealthTest>[],
+          herd: herd,
+          now: noon,
+        ),
+        <String>['dose-away'],
+      );
+    });
+
+    test('a record with nothing ahead of it is neither booked nor stale', () {
+      // The overdue half is the absence, so the same test carries the day that
+      // still has a morning coming: without the pair this says nothing about
+      // which of the two rules made the list empty.
+      List<String> stale(int dueMs) => staleRecordIds(
+        doses: <Vaccination>[dose(animalId: 'gone', dueMs: dueMs)],
+        screenings: const <HealthTest>[],
+        herd: const <String, String>{},
+        now: noon,
+      );
+
+      expect(stale(dayAhead(-3)), isEmpty);
+      expect(stale(dayAhead(3)), hasLength(1));
+    });
+  });
+
   group('resyncReminders', () {
     late Daos daos;
     late String animalId;
@@ -402,6 +451,192 @@ void main() {
           reason: 'a sold dog\'s booster is someone else\'s 09:00',
         );
       }
+    });
+
+    test(
+      'a launch takes a sold dog\'s already-booked dose out of the phone',
+      () async {
+        // The same walk as the test above, read the other way round: not "was
+        // this re-booked?" but "is the phone still holding it?". The launch is the
+        // self-healing half — an app killed before its edit could finish leaves
+        // the booking in the plugin's own list, and only a launch that clears what
+        // the herd map dropped can take it back.
+        final soldDoseId = await seedDose(dayAhead(20));
+        final sold = (await daos.animals.findById(animalId))!;
+        await daos.animals.update(
+          sold.copyWith(status: AnimalStatus.sold),
+          nowMs: 6,
+        );
+        final retiredId = await seedAnimal('Old Girl', AnimalStatus.retired);
+        final retiredDoseId = await seedDoseFor(retiredId, dayAhead(20));
+
+        expect(await run(), 1);
+
+        // The retired dam's morning is still written: dropping a booking nobody
+        // owns must not become a way to lose one the breeder still owes.
+        expect(writer.written, hasLength(1));
+        expect(writer.written.single.title, 'Old Girl');
+        expect(
+          writer.cleared,
+          containsAll(<int>[
+            notificationIdFor(soldDoseId, ReminderKind.headsUp),
+            notificationIdFor(soldDoseId, ReminderKind.dueToday),
+          ]),
+        );
+        expect(
+          writer.written.map((a) => a.id),
+          isNot(contains(notificationIdFor(soldDoseId, ReminderKind.dueToday))),
+        );
+        expect(
+          writer.cleared,
+          contains(notificationIdFor(retiredDoseId, ReminderKind.headsUp)),
+          reason:
+              'a re-book clears its own ids first, so both records are named',
+        );
+      },
+    );
+  });
+
+  group('resyncAnimalReminders', () {
+    late Daos daos;
+    late FakeNotificationWriter writer;
+    late ReminderScheduler scheduler;
+    late AppLocalizations l10n;
+    late String animalId;
+
+    setUp(() async {
+      daos = Daos(await openTestDatabase());
+      l10n = await AppLocalizations.delegate.load(const Locale('en'));
+      tz_data.initializeTimeZones();
+      tz.setLocalLocation(tz.getLocation('UTC'));
+      writer = FakeNotificationWriter();
+      scheduler = ReminderScheduler(writer);
+      animalId = (await daos.animals.create(
+        Animal(
+          id: '',
+          name: 'Nala',
+          species: 'dog',
+          sex: Sex.female,
+          status: AnimalStatus.active,
+          createdAt: 0,
+          updatedAt: 0,
+        ),
+        nowMs: 1,
+      )).id;
+    });
+
+    Future<String> seedDose(int? dueMs) async =>
+        (await daos.vaccinations.create(
+          Vaccination(
+            id: '',
+            animalId: animalId,
+            vaccineName: 'Rabies',
+            dateAdministered: dayAhead(-10),
+            nextDueDate: dueMs,
+            createdAt: 0,
+            updatedAt: 0,
+          ),
+          nowMs: 2,
+        )).id;
+
+    /// The form's own write: the row goes back with a new status, and nothing
+    /// else in the app is asked to notice.
+    Future<void> setStatus(AnimalStatus status) async {
+      final animal = await daos.animals.findById(animalId);
+      await daos.animals.update(animal!.copyWith(status: status), nowMs: 3);
+    }
+
+    Future<int> reconcile() => resyncAnimalReminders(
+      scheduler,
+      daos: daos,
+      animalId: animalId,
+      l10n: l10n,
+      dueDayText: dayText,
+      now: noon,
+    );
+
+    Future<int> launch() => resyncReminders(
+      scheduler,
+      daos: daos,
+      l10n: l10n,
+      dueDayText: dayText,
+      now: noon,
+    );
+
+    test('an animal marked Placed loses the alarm the launch booked', () async {
+      final doseId = await seedDose(dayAhead(20));
+      expect(await launch(), 1);
+      expect(writer.log, <String>['clear', 'clear', 'write']);
+
+      await setStatus(AnimalStatus.sold);
+      expect(await reconcile(), 0);
+
+      // The two ids the launch had just been handed, taken back out in the same
+      // order the plugin was given them, and no write behind them.
+      expect(writer.log, <String>['clear', 'clear', 'write', 'clear', 'clear']);
+      expect(writer.cleared.sublist(2), <int>[
+        notificationIdFor(doseId, ReminderKind.headsUp),
+        notificationIdFor(doseId, ReminderKind.dueToday),
+      ]);
+      expect(
+        writer.written,
+        hasLength(1),
+        reason: 'a dose of a dog who left is nobody\'s 09:00',
+      );
+    });
+
+    test('a dose beyond the launch horizon is taken out by the animal that goes', () async {
+      // Why this path reads the animal's own rows instead of reusing the
+      // horizon query: the form books a dose as far ahead as it is dated, while
+      // the launch only asks for the next 45 days. A dose 75 days out is
+      // invisible to a launch, so a launch-only rule would leave it booked for
+      // as long as the animal stays sold.
+      final doseId = await seedDose(dayAhead(reminderHorizonDays + 30));
+      expect(await launch(), 0);
+      expect(writer.log, isEmpty);
+
+      await setStatus(AnimalStatus.sold);
+      expect(await reconcile(), 0);
+
+      expect(writer.cleared, <int>[
+        notificationIdFor(doseId, ReminderKind.headsUp),
+        notificationIdFor(doseId, ReminderKind.dueToday),
+      ]);
+    });
+
+    test('an animal brought back to the herd is booked again', () async {
+      final doseId = await seedDose(dayAhead(20));
+
+      await setStatus(AnimalStatus.sold);
+      expect(await reconcile(), 0);
+      expect(writer.written, isEmpty);
+
+      await setStatus(AnimalStatus.active);
+      expect(await reconcile(), 1);
+
+      expect(writer.log, <String>['clear', 'clear', 'clear', 'clear', 'write']);
+      expect(writer.written.single.title, 'Nala');
+      expect(
+        writer.written.single.id,
+        notificationIdFor(doseId, ReminderKind.dueToday),
+      );
+    });
+
+    test('a dam edited to retired keeps her booked morning', () async {
+      // D40 at the edit path: `retired` is a word about the breeding plan, so
+      // editing her out of the whelping box must not silence the shot she still
+      // needs in the house. The pair of the test above that empties the phone.
+      final doseId = await seedDose(dayAhead(20));
+
+      await setStatus(AnimalStatus.retired);
+      expect(await reconcile(), 1);
+
+      expect(writer.log, <String>['clear', 'clear', 'write']);
+      expect(writer.written.single.title, 'Nala');
+      expect(
+        writer.written.single.id,
+        notificationIdFor(doseId, ReminderKind.dueToday),
+      );
     });
   });
 }

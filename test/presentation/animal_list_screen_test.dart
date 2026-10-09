@@ -320,5 +320,58 @@ void main() {
         expect(notifications.written, hasLength(1));
       },
     );
+
+    testWidgets(
+      'marking an animal Placed takes her booked dose out of the phone',
+      (tester) async {
+        // The device gave this one: a dose was still waking the breeder at 09:00
+        // after her dog had been marked Placed, because nothing on the edit path
+        // named the alarm. The DAO cannot answer that — only the screen the
+        // breeder actually changes can say whether it reaches the scheduler.
+        tester.view.physicalSize = const Size(1080, 2400);
+        tester.view.devicePixelRatio = 2.625;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+
+        final notifications = FakeNotificationWriter();
+        await pumpSalala(
+          tester,
+          notifications: notifications,
+          resyncOnLaunch: true,
+          seed: <Animal>[nala()],
+          seedVaccinations: <Vaccination>[doseDueInDays(20)],
+        );
+        await waitForSchedulerCalls(tester, notifications, 3);
+        // `replace` clears the record's two ids before writing, so the launch names
+        // them here — and those are the ids the edit has to take back out.
+        final booked = List<int>.from(notifications.cleared);
+        expect(booked, hasLength(2));
+        expect(notifications.written, hasLength(1));
+
+        await tester.tap(find.byIcon(Icons.more_vert));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Edit'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.byType(DropdownButtonFormField<AnimalStatus>));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Placed'));
+        await tester.pumpAndSettle();
+
+        final save = find.widgetWithText(FilledButton, 'Save');
+        await tester.ensureVisible(save);
+        await tester.pumpAndSettle();
+        await tester.tap(save);
+        await waitForSchedulerCalls(tester, notifications, 5);
+
+        expect(notifications.cleared.sublist(2), booked);
+        expect(
+          notifications.written,
+          hasLength(1),
+          reason: 'the edit books nothing for an animal who left',
+        );
+        expect(find.byType(AnimalFormScreen), findsNothing);
+        expect(find.textContaining('Placed'), findsOneWidget);
+      },
+    );
   });
 }

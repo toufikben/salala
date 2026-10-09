@@ -6,6 +6,7 @@ import '../../core/l10n/app_localizations.dart';
 import '../../core/l10n/enum_labels.dart';
 import '../../core/utils/date_utils.dart';
 import '../../data/models/animal.dart';
+import '../../services/reminder_resync.dart';
 import '../providers/app_providers.dart';
 import '../widgets/date_tile.dart';
 
@@ -131,8 +132,17 @@ class _AnimalFormScreenState extends ConsumerState<AnimalFormScreen> {
       clearBirthDate: _birthDate == null,
     );
 
+    // Read before the write rather than after it: the form is popped as soon as
+    // the save answers, and a disposed widget's `ref` and `context` say nothing
+    // about which language a reminder should be booked in.
+    final l10n = AppLocalizations.of(context);
+    final localeTag = Localizations.localeOf(context).toString();
+    final scheduler = ref.read(reminderSchedulerProvider);
+    final daos = ref.read(daosProvider);
+    final isEdit = widget.mode == AnimalFormMode.edit;
+
     try {
-      if (widget.mode == AnimalFormMode.edit) {
+      if (isEdit) {
         await controller.edit(draft);
       } else {
         await controller.create(draft);
@@ -141,6 +151,31 @@ class _AnimalFormScreenState extends ConsumerState<AnimalFormScreen> {
       debugPrint('Animal save failed: $error');
       if (mounted) _refuseSave();
       return;
+    }
+
+    // The row is written, so the phone is now the only place an alarm can still
+    // be living. An animal edited away from home — sold, or dead — keeps the dose
+    // her ledger used to book, and `flutter_local_notifications` re-arms that
+    // booking every time the app starts: measured on the phone as a 09:00 message
+    // about a dog who sleeps at another address. Reconciling her own records here
+    // is what takes it out, and it runs for every edit because the same call
+    // refreshes the title of an animal who stayed.
+    if (isEdit) {
+      try {
+        await resyncAnimalReminders(
+          scheduler,
+          daos: daos,
+          animalId: draft.id,
+          l10n: l10n,
+          dueDayText: (ms) => formatDayFor(localeTag, ms),
+        );
+      } catch (error) {
+        // The animal is saved, which is the part that was asked for. The next
+        // launch reads the herd again and takes another run at the alarms, so the
+        // failure is said out loud in the log rather than passed off as a failed
+        // save — the line the delete path already takes.
+        debugPrint('Reminder reconcile after an animal edit failed: $error');
+      }
     }
 
     if (mounted) context.pop();

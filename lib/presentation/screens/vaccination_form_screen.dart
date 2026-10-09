@@ -201,16 +201,23 @@ class _VaccinationFormScreenState extends ConsumerState<VaccinationFormScreen> {
   /// of scheduling one, which is what `remindersFor` does with a null due date.
   Future<void> _syncReminder(Vaccination dose) async {
     final l10n = AppLocalizations.of(context);
-    await ref
-        .read(reminderSchedulerProvider)
-        .replace(
-          recordId: dose.id,
-          dueMs: dose.nextDueDate,
-          l10n: l10n,
-          title: reminderTitle(ref, l10n, widget.animalId),
-          what: dose.vaccineName,
-          dueDay: formatDay(context, dose.nextDueDate),
-        );
+    final scheduler = ref.read(reminderSchedulerProvider);
+    if (!reminderAllowedFor(ref, widget.animalId)) {
+      // The dose is in the ledger, and the phone is told nothing about it: the
+      // next person to wake for this shot lives at another address. Cancelling
+      // rather than skipping means a dose edited back onto an animal who is home
+      // again cannot leave its old booking stranded.
+      await scheduler.cancel(dose.id);
+      return;
+    }
+    await scheduler.replace(
+      recordId: dose.id,
+      dueMs: dose.nextDueDate,
+      l10n: l10n,
+      title: reminderTitle(ref, l10n, widget.animalId),
+      what: dose.vaccineName,
+      dueDay: formatDay(context, dose.nextDueDate),
+    );
   }
 
   Future<void> _delete() async {

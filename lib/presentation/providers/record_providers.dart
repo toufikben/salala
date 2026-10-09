@@ -204,3 +204,24 @@ String reminderTitle(WidgetRef ref, AppLocalizations l10n, String animalId) {
   }
   return l10n.appTitle;
 }
+
+/// Whether the phone may wake anyone for this animal at all (D40).
+///
+/// The record forms ask it before booking, because a dose saved for an animal who
+/// has been sold or died is the same 09:00 message about a booking somebody else
+/// now owns that the launch filter refuses — and without this question the two
+/// halves of Stage 3r cancel each other out: mark a dog Placed, take her alarms
+/// back out, then save one more dose for her and have the phone hold it again.
+///
+/// An animal the herd list has not finished loading for counts as at home: the
+/// save is the breeder's own act, and a screen whose providers are still filling
+/// in must not quietly un-book the row it just wrote. That is the one case where
+/// the list and the ledger can disagree for a reason that is not about the animal.
+bool reminderAllowedFor(WidgetRef ref, String animalId) {
+  final loaded = ref.read(animalsProvider).value;
+  if (loaded == null) return true;
+  for (final animal in loaded) {
+    if (animal.id == animalId) return animal.status.isAtHome;
+  }
+  return false;
+}
