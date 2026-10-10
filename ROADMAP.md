@@ -2061,9 +2061,35 @@ change, and CI is the proof of that rather than the grep: commit `4cf246c` (the 
 `✓ Built build/app/outputs/flutter-apk/app-debug.apk`), and the rolling release asset came
 off that run at 176,598,495 bytes, sha256 `0a08340c…2977`.
 
+**Read back on the phone (RMX3910), 2026-10-10 18:04–18:18.** The docs commit `1f7683d` ran its
+own job green at **`38023514312`** (`completed success`: `No issues found! (ran in 16.5s)`,
+`🎉 455 tests passed.`, `✓ Built build/app/outputs/flutter-apk/app-debug.apk`) and republished
+the rolling asset at 176,598,499 bytes, sha256 `8a251b93…8a66`. Before installing it, the
+artifact was inspected with `aapt2 dump badging`, which prints
+`package: name='com.toufikben.ledger' versionCode='1' versionName='0.1.0'`,
+`application-label:'سلالة'` and `launchable-activity: name='com.toufikben.ledger.MainActivity'`
+— the rename is in the shipped binary, not only in the source. On the device: installed fresh at
+`firstInstallTime=2026-10-10 18:05:04`, the OS permission sheet read **«Allow ‎سلالة‎ to send you
+notifications?»**, and Settings prints **Build `1f7683d`**.
+
+**The write path was exercised too, because a rename can break storage in a way `analyze` cannot
+see.** The new package's `databases/salala.db` started at 0 rows in all five tables. Adding
+`D9chk` (species `dog`) and pressing Save put exactly one row in it — `animals=1` with
+`name=D9chk`, `species=dog`, `sex=female`, `status=active`, the other four tables still 0 — while
+the old `com.salala.salala` database stayed at `animals=0` across the whole pass: two separate
+silos, as the paragraph below predicts. Deleting the animal through the card menu returned
+`animals` to 0, and both alarm stores were re-read at the end (`shared_prefs` under the new id
+holds no `scheduled_notifications.xml` at all — the plugin writes it on the first booking — and
+every `com.salala.salala` entry in `dumpsys alarm` is history with `Reason=alarm_cancelled` /
+`pi_cancelled`, 0 live). The phone was left as clean as it was found.
+
+One trap cost a pass and belongs in the record: **`Species` is a required picker.** Save with it
+empty does nothing visible except print «اختر النوع» / *Choose a species* under the field, so it
+looks like a dropped tap rather than a form refusing correctly.
+
 One consequence worth stating before anyone repeats this on a released app: **a changed
 `applicationId` is a different app.** On the phone the old `com.salala.salala` install stays
-where it is, and the new package arrives with its own empty database, its own
+where it is, and the new package arrives with its own empty database, its own (initially absent)
 `shared_prefs/scheduled_notifications.xml` and no alarm bookings carried over. This was safe
 on 2026-10-10 only because Stage 3t had already left every table at zero rows and the alarm
 stores empty. After launch, the same one-line rename would strand a breeder's whole ledger.
