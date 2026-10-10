@@ -11,6 +11,7 @@ import 'package:salala/data/models/animal.dart';
 import 'package:salala/data/models/buyer.dart';
 import 'package:salala/data/models/health_test.dart';
 import 'package:salala/data/models/placement.dart';
+import 'package:salala/data/models/photo.dart';
 import 'package:salala/data/models/symptom.dart';
 import 'package:salala/data/models/vaccination.dart';
 import 'package:salala/data/models/vet_visit.dart';
@@ -26,6 +27,7 @@ import 'package:timezone/timezone.dart' as tz;
 
 import 'fake_notification_writer.dart';
 import 'fake_pack_files.dart';
+import 'fake_photo_files.dart';
 import 'fake_secure_storage.dart';
 import 'test_db.dart';
 
@@ -152,6 +154,10 @@ Future<FakeSecureStorage> pumpSalala(
   FakeNotificationWriter? notifications,
   // The share sheet and the file picker, which no test runner can answer.
   FakePackFiles? packFiles,
+  // The gallery picker and the picture folder, for the same reason. A launch
+  // without one gets a fake that has never heard of any file: the screen still
+  // has to answer a row whose bytes are not on the phone.
+  FakePhotoFiles? photoFiles,
   // Whether opening the app rebuilds the alarms from the ledger, which is what
   // a real launch does. Off by default: a test about saving one dose should not
   // also be handed the alarms that opening the list booked for it. The launch
@@ -163,6 +169,7 @@ Future<FakeSecureStorage> pumpSalala(
   List<HealthTest> seedHealthTests = const <HealthTest>[],
   List<VetVisit> seedVisits = const <VetVisit>[],
   List<Symptom> seedSymptoms = const <Symptom>[],
+  List<Photo> seedPhotos = const <Photo>[],
   List<Buyer> seedBuyers = const <Buyer>[],
   List<Placement> seedPlacements = const <Placement>[],
   // A database the test wants bent before the first frame, after the seeds have
@@ -232,6 +239,12 @@ Future<FakeSecureStorage> pumpSalala(
     for (final symptom in seedSymptoms) {
       await daos.symptoms.create(symptom, nowMs: nowMs++);
     }
+    // A picture is a row about a file, and this seeds the row only: the folder
+    // belongs to `FakePhotoFiles`, which answers null for every name unless a
+    // test says it holds that one.
+    for (final photo in seedPhotos) {
+      await daos.photos.create(photo, nowMs: nowMs++);
+    }
     // A buyer before a placement for the same reason: `placements.buyer_id` is a
     // foreign key, so the contact a seeded handover names has to exist first.
     for (final buyer in seedBuyers) {
@@ -254,6 +267,10 @@ Future<FakeSecureStorage> pumpSalala(
         hasPinProvider.overrideWith(() => SeededHasPin(hasPin)),
         reminderSchedulerProvider.overrideWithValue(scheduler),
         if (packFiles != null) packFilesProvider.overrideWithValue(packFiles),
+        // Every test that opens a ledger gets a folder, even the ones that never
+        // mention pictures: the shipped class asks the platform for its documents
+        // directory, and a test runner has no platform.
+        photoFilesProvider.overrideWithValue(photoFiles ?? FakePhotoFiles()),
         if (!resyncOnLaunch)
           remindersResyncProvider.overrideWith(AlreadyResynced.new),
         if (locale != null) initialLocaleProvider.overrideWithValue(locale),

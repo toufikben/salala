@@ -71,15 +71,22 @@ class AppDatabase {
 
   /// Version 2 adds the `symptoms` table. It runs the very [createSymptomsTable]
   /// text a fresh install runs, so an upgraded phone and a brand-new one end up
-  /// holding one shape of row rather than two.
+  /// holding one shape of row rather than two. Version 3 does the same for
+  /// `photos`.
   static const Map<int, Future<void> Function(Database db)>
   _productionMigrations = <int, Future<void> Function(Database db)>{
     2: AppDatabase._addSymptoms,
+    3: AppDatabase._addPhotos,
   };
 
   static Future<void> _addSymptoms(Database db) async {
     await db.execute(createSymptomsTable);
     await db.execute(createSymptomsIndex);
+  }
+
+  static Future<void> _addPhotos(Database db) async {
+    await db.execute(createPhotosTable);
+    await db.execute(createPhotosIndex);
   }
 
   /// Production migrations belong in [_productionMigrations] as a literal; this

@@ -2122,6 +2122,7 @@ verdict is about *this* project's evidence situation, and none of them is a clai
 idea is bad.
 
 - **Photo/attachment storage — buildable and CI-verifiable, still a product commitment.**
+  *(Built as Stage 5a below; three of the costs named here turned out not to exist.)*
   The only candidate the current harness can prove end to end: a real SQLite column plus a
   file under the app's documents, tests that hit the DAO, and a widget test that drives the
   picker's result. It is not free: it needs `image_picker`, a camera *and* a gallery
@@ -2158,6 +2159,62 @@ idea is bad.
   problem as FHIR plus a hosting decision and a privacy surface: a page that renders a
   buyer's pack is a place where the whole-database file gets parsed for strangers.
   The buyer's PDF (Stage 3g) already answers the need without a server.
+
+## Stage 5a — The animal's own pictures *(CI requested; the phone has not seen it)*
+
+Taken off the Stage 5 list because the triage above found it the only candidate this
+project's two verifiers can judge. The scope shipped is the narrow one: a picture per
+animal, stored on the phone, shown in her ledger, deleted with her. Not a camera, not an
+album, not a document attachment.
+
+**What is there now.**
+- `photos` at schema version 3 — `id`, `animal_id`, `file_name`, `created_at`, FK cascade,
+  one index — plus the `_addPhotos` migration step for installs coming from v2.
+  `animals.photo_path` is *not* the mechanism: it has never had a writer, and one path per
+  animal is not a ledger. It stays as it was (D41).
+- `services/photo_files.dart`: the gallery pick, one folder per animal under the app's
+  documents directory, the 24 MB cap, the extension list, and the two name checks that keep
+  a row from pointing outside that folder. `photo_files_test.dart` runs it against a real
+  temp folder on a real disk.
+- `PhotoDao.forAnimal` (oldest first), `photosForAnimalProvider`, `photoPathProvider`.
+- A Photos strip in the ledger between the weigh-ins and the placements: thumbnails, tap to
+  open one big with the day it was taken, two questions before anything is removed.
+- A row whose bytes this phone does not hold renders as a named blank — «Not on this
+  phone» — which is the state of every ledger restored from a pack, said plainly and not as
+  an error.
+- `files/photos` excluded from cloud backup *and* device transfer, in both
+  `data_extraction_rules.xml` and the legacy `backup_rules.xml`, because a dog's photograph
+  is more identifying than a weight row (D10).
+
+**Three things the triage line got wrong, found by reading the packages instead.** No new
+dependency: `file_selector` is already here for the pack, and `file_selector_android` opens
+the pick with `ACTION_OPEN_DOCUMENT` — the Storage Access Framework — which asks for no
+permission, so the standing "offline-first, no permission a feature does not provably need"
+constraint is met by adding none, and there is no camera in scope at all. Pictures do not
+travel in the pack: `photos` is a `fileBackedTables` table, so a JSON pack stays the small
+text file D22 promised, and `schema_test.dart` now compares `dataTables + fileBackedTables`
+against the `CREATE TABLE` statements so no table can belong to neither and silently drop
+out of every export. And HEIC is refused rather than stored: the engine has no HEIF decoder,
+so accepting one writes a blank that never fills.
+
+**The order of the two stores is the substance of the stage**, and it is the part with
+tests on it: file first then row when adding (a refused insert takes the copy back out, so
+"Nothing was written." cannot lie), row first then file when deleting (a leftover byte is
+invisible to the ledger and swept by the folder clear that follows the animal). D41 has the
+argument for each.
+
+**What CI cannot answer, stated before the run rather than after.** `Image.file` never
+completes inside a fake-async zone, so no widget test here can prove a photograph is drawn.
+CI proves the contract — the bytes written are the ones the row names, and the name on the
+row is the name the screen asked the folder for. Rendering, the gallery sheet on ColorOS,
+and the real path the backup rules must point at are the phone's.
+
+**Queued for the device pass, as one visit:** pick from the gallery and see a real
+thumbnail; open the viewer; delete one picture and confirm both the row and
+`files/photos/<animal>/` entry are gone (read back with adb, not assumed); delete an animal
+with pictures and confirm the folder goes with her; confirm the exclude path in the XML is
+the folder the app actually writes. Then the phone is left with no test animal and no
+picture, as every pass this project has run.
 
 ## Standing constraints
 

@@ -54,6 +54,7 @@
   "recordsWeights": "الأوزان",
   "recordsVisits": "الزيارات البيطرية",
   "recordsSymptoms": "الأعراض",
+"recordsPhotos": "الصور",
   "recordsPlacements": "التسليم",
   "recordsEmpty": "لا يوجد سجل بعد.",
 
@@ -236,6 +237,12 @@
   "symptomOngoing": "ما زال مستمرًا",
   "symptomResolved": "زائل",
   "symptomDeleteBody": "يُحذف هذا العَرَض من سجل الحيوان. لا يمكن التراجع عن ذلك.",
+
+  "photoAdd": "صورة جديدة",
+  "photoDeleteBody": "تُحذف هذه الصورة من سجل الحيوان ويُحذف ملفها معها. لا يمكن التراجع عن ذلك.",
+  "photoMissing": "ليست على هذا الهاتف",
+  "photoTooLarge": "هذه الصورة كبيرة جدًا لحفظها",
+  "photoNotAnImage": "هذا الملف ليس صورة",
 
   "placementAdd": "تسليم جديد",
   "placementAddTitle": "تسجيل تسليم",

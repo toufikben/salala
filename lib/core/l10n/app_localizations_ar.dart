@@ -154,6 +154,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get recordsSymptoms => 'الأعراض';
 
   @override
+  String get recordsPhotos => 'الصور';
+
+  @override
   String get recordsPlacements => 'التسليم';
 
   @override
@@ -645,6 +648,22 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get symptomDeleteBody =>
       'يُحذف هذا العَرَض من سجل الحيوان. لا يمكن التراجع عن ذلك.';
+
+  @override
+  String get photoAdd => 'صورة جديدة';
+
+  @override
+  String get photoDeleteBody =>
+      'تُحذف هذه الصورة من سجل الحيوان ويُحذف ملفها معها. لا يمكن التراجع عن ذلك.';
+
+  @override
+  String get photoMissing => 'ليست على هذا الهاتف';
+
+  @override
+  String get photoTooLarge => 'هذه الصورة كبيرة جدًا لحفظها';
+
+  @override
+  String get photoNotAnImage => 'هذا الملف ليس صورة';
 
   @override
   String get placementAdd => 'تسليم جديد';

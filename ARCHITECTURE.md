@@ -46,11 +46,15 @@ wrap. No placeholder files.
 
 ## Data
 
-One SQLite database (`salala.db`) opened by `AppDatabase.openAt`. Nine tables,
-schema version 1, declared once in `data/db/schema.dart`:
+One SQLite database (`salala.db`) opened by `AppDatabase.openAt`. Eleven tables,
+schema version 3, declared once in `data/db/schema.dart`:
 
 `animals` `litters` `vaccinations` `health_tests` `weight_entries`
-`vet_visits` `buyers` `placements` `user_settings`
+`vet_visits` `symptoms` `buyers` `placements` `user_settings` `photos`
+
+Ten of them hold everything the app knows. `photos` holds a *name*: the bytes are
+files under the app's documents directory, which is why it is in
+`fileBackedTables` and not in `dataTables` (D41).
 
 Decisions encoded in the schema:
 
@@ -74,8 +78,9 @@ Decisions encoded in the schema:
 `AppDatabase.runMigrations(db, from, to)` steps one version at a time and throws
 `StateError` if a version in the gap has no registered step. A silent schema
 skip would corrupt a breeder's ledger, so the failure is loud by design. Steps
-register in `_migrations` keyed by target version; `registerMigration` is
-`@visibleForTesting` today and becomes the real registry when version 2 lands.
+register in `_migrations` keyed by target version — 2 for `symptoms`, 3 for
+`photos` — each one creating exactly the shape `createStatements` declares, which
+`schema_test.dart` checks by dropping the table and running the step.
 
 ### DAOs
 
@@ -87,7 +92,8 @@ level, so the DAO can set an id without rebuilding an Equatable value object.
 Subclasses add only real queries: `AnimalDao.findAll(species:, status:)`,
 `findBreedingStock()`, `findOffspring(litterId)`; `VaccinationDao.dueBefore(cutoffMs)`;
 `WeightDao.forAnimal` (ascending, for charts) and `latestFor`;
-`LitterDao.forDam`/`recent`; `PlacementDao.forAnimal`/`forBuyer`.
+`LitterDao.forDam`/`recent`; `PlacementDao.forAnimal`/`forBuyer`;
+`PhotoDao.forAnimal` (ascending, the order a strip is drawn in).
 
 ## State
 
@@ -170,6 +176,12 @@ last one needs a device:
   the share sheet is allowed to reach them, open the sheet, read a picked file
   back. It is small and it has no logic, which is what leaves the flow above it
   testable (D23).
+- `services/photo_files.dart` is the same kind of surface for the animal's
+  pictures: open the gallery, copy the chosen file into one folder per animal
+  under the app's documents directory, hand a row's name back as a path, delete
+  one or the folder. The rules live here — the extension list, the size cap, and
+  the two name checks that keep a `photos` row from pointing outside the folder
+  this app owns — and the screens above it run against a recorder (D41).
 - `presentation/screens/settings_screen.dart` is the only place that asks before
   it replaces, and it names the counts it is about to destroy first. A restore
   re-arms the alarms afterwards, because the phone holds a different ledger and
@@ -202,8 +214,15 @@ last one needs a device:
   layout, and says what stays inside it — the pedigree, whose lines are its
   nesting, and the growth curve, which is a picture (D29).
 
-Photos are deliberately not in a pack: `photo_path` is a path on *this* phone, so
-copying it would ship a broken reference — the PDF pack is where an image belongs.
+Photos are deliberately not in a pack. `photos` is in `fileBackedTables`, not
+`dataTables`, so a JSON pack carries no picture rows and a pack that names the
+table is refused as `unknownTable` rather than half-restored: the bytes stay on
+the phone that has them, and the file a buyer opens in a messaging app stays the
+small text document D22 made it. A ledger restored on a second phone therefore
+shows each picture as a named blank — «Not on this phone» — which is the truth
+about those rows and not a fault to alarm the breeder with. `animals.photo_path`
+is a path on *this* phone for the same reason, and nothing writes it. The PDF pack
+is where an image belongs.
 The PIN digest is not in a pack either (it lives in the keystore, not in
 `user_settings`), so a restored file can neither leak it nor lock anybody out.
 
@@ -297,3 +316,11 @@ popped — an earlier version passed green while saving nothing.
 Two UI rules follow from that: forms scroll with `SingleChildScrollView` +
 `Column` and never a lazy `ListView` (`Form.validate()` skips unmounted
 fields), and no widget test awaits database work outside `runAsync`.
+
+A third limit of the same kind: `Image.file` reads on the platform's IO thread,
+so a widget test that handed it a real file would hang exactly the way an
+un-awaited `sqflite` future does. `test/helpers/fake_photo_files.dart` therefore
+answers null for every path, and the strip is driven through the blank a missing
+file renders as — while the name the row carries is compared against the name the
+screen asked the folder for. Whether a real photograph draws is a question with
+one judge, and it is the phone (D41).

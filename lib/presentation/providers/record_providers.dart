@@ -1,9 +1,11 @@
+import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/l10n/app_localizations.dart';
 import '../../data/models/animal.dart';
 import '../../data/models/buyer.dart';
 import '../../data/models/health_test.dart';
+import '../../data/models/photo.dart';
 import '../../data/models/placement.dart';
 import '../../data/models/symptom.dart';
 import '../../data/models/vaccination.dart';
@@ -70,6 +72,75 @@ Future<void> saveWeight(WidgetRef ref, WeightEntry entry) async {
 Future<void> deleteWeight(WidgetRef ref, WeightEntry entry) async {
   await ref.read(daosProvider).weights.delete(entry.id);
   ref.invalidate(weightsForAnimalProvider(entry.animalId));
+}
+
+/// One animal's pictures, oldest first — the order a growth strip reads in.
+final photosForAnimalProvider = FutureProvider.autoDispose
+    .family<List<Photo>, String>(
+      (ref, animalId) => ref.read(daosProvider).photos.forAnimal(animalId),
+    );
+
+/// Where one picture's bytes actually are, or null when they are not.
+///
+/// Its own provider rather than a `FutureBuilder` built in `build`: a section
+/// rebuilds on every save on the page, and a future made in a build body is a new
+/// filesystem stat per frame — and a widget that restarts its own future keeps
+/// painting the loading state, which is how a thumbnail flickers on a phone.
+final photoPathProvider = FutureProvider.autoDispose.family<String?, Photo>(
+  (ref, photo) =>
+      ref.read(photoFilesProvider).pathFor(photo.animalId, photo.fileName),
+);
+
+/// Asks for an image, puts the bytes in the animal's folder, then writes the row.
+///
+/// In that order, because the reverse leaves the ledger holding a name with
+/// nothing behind it: a row written first and a copy that then fails is a
+/// picture that cannot be deleted through the screen that would have shown it.
+/// A file written without a row is only a stray in a folder the animal's own
+/// delete clears, so the failure this ordering can produce is the smaller one.
+///
+/// Returns null when the breeder backed out of the picker — which is not a
+/// failure to report, and not a row to write.
+Future<Photo?> addPhoto(WidgetRef ref, String animalId) async {
+  final files = ref.read(photoFilesProvider);
+  final picked = await files.pick();
+  if (picked == null) return null;
+  final fileName = await files.store(animalId, picked);
+  final Photo created;
+  try {
+    created = await ref
+        .read(daosProvider)
+        .photos
+        .create(
+          Photo(id: '', animalId: animalId, fileName: fileName, createdAt: 0),
+        );
+  } catch (error) {
+    // The screen answers a refused insert with "nothing was written", and a
+    // JPEG sitting in the folder with no row would make that sentence false.
+    try {
+      await files.delete(animalId, fileName);
+    } catch (cleanup) {
+      debugPrint('Stray photo $fileName outlived the row it refused: $cleanup');
+    }
+    rethrow;
+  }
+  ref.invalidate(photosForAnimalProvider(animalId));
+  return created;
+}
+
+/// Deletes the row first, then the file.
+///
+/// The row is the thing the breeder pressed delete on; the file is behind it. If
+/// the file refuses to go, the ledger is already correct and the leftover is
+/// swept by the folder delete that follows the animal itself.
+Future<void> deletePhoto(WidgetRef ref, Photo photo) async {
+  await ref.read(daosProvider).photos.delete(photo.id);
+  ref.invalidate(photosForAnimalProvider(photo.animalId));
+  try {
+    await ref.read(photoFilesProvider).delete(photo.animalId, photo.fileName);
+  } catch (error) {
+    debugPrint('Photo file ${photo.fileName} survived its row: $error');
+  }
 }
 
 /// Screening results, newest test first.

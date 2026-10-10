@@ -21,10 +21,13 @@ void main() {
             statement.trimLeft().split(_whitespace)[2],
       ];
 
-      // A table missing from `dataTables` would be silently left out of every
-      // export, which is the kind of data loss no screen shows.
-      expect(dataTables.toSet(), created.toSet());
-      expect(dataTables, hasLength(created.length));
+      // A table missing from both lists is a table no export carries and no
+      // restore writes back, which is the kind of data loss no screen shows.
+      // `photos` is in the second list on purpose: its rows are pointers into a
+      // folder the pack does not travel with, so it must *not* be in `dataTables`.
+      final listed = <String>[...dataTables, ...fileBackedTables];
+      expect(listed.toSet(), created.toSet());
+      expect(listed, hasLength(created.length));
     });
 
     test('creates every table the app reads', () async {
@@ -46,6 +49,7 @@ void main() {
           'weight_entries',
           'vet_visits',
           'symptoms',
+          'photos',
           'buyers',
           'placements',
           'user_settings',
@@ -66,7 +70,7 @@ void main() {
       // Counted against the schema rather than a number typed here, so a new
       // index cannot be added to `createStatements` without being created.
       expect(rows.length, declared);
-      expect(declared, 10);
+      expect(declared, 11);
     });
 
     test('user_version matches the declared schema version', () async {
@@ -113,6 +117,13 @@ void main() {
         'updated_at': 1,
       });
 
+      await db.insert('photos', <String, Object?>{
+        'id': 'ph1',
+        'animal_id': 'a1',
+        'file_name': '1-100.jpg',
+        'created_at': 1,
+      });
+
       // The two the delete dialog's copy left out until this test said so: a
       // handover recorded for this animal, and a whelping it is the dam of. One
       // of that whelping's puppies is inserted too, because what happens to *it*
@@ -149,6 +160,14 @@ void main() {
       expect(await _count(db, 'vaccinations'), 0);
       expect(await _count(db, 'weight_entries'), 0);
       expect(await _count(db, 'symptoms'), 0);
+      expect(
+        await _count(db, 'photos'),
+        0,
+        reason:
+            'the rows go with the animal; the bytes are the screen above this '
+            'table\'s job, and a folder the ledger no longer points at is '
+            'what `deleteAll` is for',
+      );
       expect(await _count(db, 'placements'), 0);
       expect(await _count(db, 'litters'), 0);
       final survivors = await db.query('animals');
@@ -260,6 +279,55 @@ void main() {
           'ongoing': 1,
           'created_at': 1,
           'updated_at': 1,
+        }),
+        throwsA(anything),
+      );
+    });
+
+    test('version 3 gives an older install the photos table', () async {
+      final db = await openTestDatabase();
+      addTearDown(db.close);
+
+      // The same trick as the step above: a version-2 phone is this schema with
+      // `photos` taken away, so the migration under test has to rebuild exactly
+      // what `createPhotosTable` writes rather than a hand-typed copy of it.
+      await db.execute('DROP INDEX idx_photos_animal');
+      await db.execute('DROP TABLE photos');
+      await db.insert('animals', <String, Object?>{
+        'id': 'a1',
+        'name': 'Zida',
+        'species': 'dog',
+        'created_at': 1,
+        'updated_at': 1,
+      });
+
+      await AppDatabase.runMigrations(db, 2, 3);
+
+      final tables = await db.rawQuery(
+        "SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'photos'",
+      );
+      expect(tables, hasLength(1));
+      final indexes = await db.rawQuery(
+        "SELECT name FROM sqlite_master WHERE type = 'index' AND name = 'idx_photos_animal'",
+      );
+      expect(indexes, hasLength(1));
+
+      await db.insert('photos', <String, Object?>{
+        'id': 'ph1',
+        'animal_id': 'a1',
+        'file_name': '1729000000000-20480.jpg',
+        'created_at': 1,
+      });
+      expect(await _count(db, 'photos'), 1);
+
+      // The upgraded table is the guarded one, not a name in the schema log: a
+      // picture whose animal is not on the phone has nothing to hang on.
+      await expectLater(
+        db.insert('photos', <String, Object?>{
+          'id': 'ph2',
+          'animal_id': 'nobody',
+          'file_name': 'stray.jpg',
+          'created_at': 1,
         }),
         throwsA(anything),
       );

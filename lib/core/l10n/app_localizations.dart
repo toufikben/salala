@@ -352,6 +352,12 @@ abstract class AppLocalizations {
   /// **'Symptoms'**
   String get recordsSymptoms;
 
+  /// No description provided for @recordsPhotos.
+  ///
+  /// In en, this message translates to:
+  /// **'Photos'**
+  String get recordsPhotos;
+
   /// No description provided for @recordsPlacements.
   ///
   /// In en, this message translates to:
@@ -1251,6 +1257,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The symptom is removed from this animal\'s history. This cannot be undone.'**
   String get symptomDeleteBody;
+
+  /// No description provided for @photoAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add photo'**
+  String get photoAdd;
+
+  /// A photo is the only record here whose row and bytes are two different things, so the sentence says both go.
+  ///
+  /// In en, this message translates to:
+  /// **'The picture is removed from this animal\'s ledger, and the file with it. This cannot be undone.'**
+  String get photoDeleteBody;
+
+  /// Shown where a picture should be: the row survived a restore or a cleared folder, the file did not. Never a path, never a crash.
+  ///
+  /// In en, this message translates to:
+  /// **'Not on this phone'**
+  String get photoMissing;
+
+  /// No description provided for @photoTooLarge.
+  ///
+  /// In en, this message translates to:
+  /// **'This picture is too big to keep'**
+  String get photoTooLarge;
+
+  /// No description provided for @photoNotAnImage.
+  ///
+  /// In en, this message translates to:
+  /// **'This file is not a picture'**
+  String get photoNotAnImage;
 
   /// No description provided for @placementAdd.
   ///

@@ -151,6 +151,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get recordsSymptoms => 'Symptoms';
 
   @override
+  String get recordsPhotos => 'Photos';
+
+  @override
   String get recordsPlacements => 'Placements';
 
   @override
@@ -646,6 +649,22 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get symptomDeleteBody =>
       'The symptom is removed from this animal\'s history. This cannot be undone.';
+
+  @override
+  String get photoAdd => 'Add photo';
+
+  @override
+  String get photoDeleteBody =>
+      'The picture is removed from this animal\'s ledger, and the file with it. This cannot be undone.';
+
+  @override
+  String get photoMissing => 'Not on this phone';
+
+  @override
+  String get photoTooLarge => 'This picture is too big to keep';
+
+  @override
+  String get photoNotAnImage => 'This file is not a picture';
 
   @override
   String get placementAdd => 'Add placement';

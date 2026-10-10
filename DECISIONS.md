@@ -1264,3 +1264,80 @@ booked as notifications, and its card stops saying "act now". Records themselves
 untouched — the ledger, the JSON pack and the PDF keep every row whatever the status,
 because the transfer pack is precisely where a buyer reads a sold animal's history. The
 alarm half is not observable from a widget test; it joins the queued phone pass.
+
+## D41 — A picture is a row and a file, so the order of the two is the feature
+
+Stage 5a gives each animal its photographs. The schema part is three lines:
+`photos (id, animal_id, file_name, created_at)` with `ON DELETE CASCADE`, one
+index, schema version 3. Everything interesting is in what is *not* in those
+lines. There is no caption and no `updated_at` — a picture is written once, shown,
+and deleted, and a column nothing fills is the dormant scaffold `animals.photo_path`
+already became. And `file_name` is a bare name, never a path: the folder is
+derived (`photos/<sanitised animal id>/`), so nothing a row says can point the
+renderer outside the directory this app owns.
+
+**Why a table and not the column that is already there.** `photo_path` holds one
+path per animal and has never had a writer. One picture per animal is not a
+medical ledger — the dose photo, the whelping photo and the sellable photo are
+three facts about three days — and a second dormant column added to a table that
+already carries a dormant one is how a schema becomes folklore. The old column
+stays as it was; `photos` is the record.
+
+**Why the bytes never travel in a pack.** `schema.dart` splits its tables into
+`dataTables` and `fileBackedTables`, and `photos` is in the second list, so a JSON
+pack stays the small text file D22 promised a buyer who opens it in a messaging
+app. The cost is real and visible: a ledger restored on a second phone has every
+row and no bytes, and the strip renders each one as «Not on this phone». That is
+the truth about those rows, so it is shown as a named blank rather than as an
+error — a breeder who has just moved her herd is not the one who lost the
+photographs. `schema_test.dart` compares the union of the two lists against the
+`CREATE TABLE` statements, so a table cannot belong to neither and quietly vanish
+from every export.
+
+**The write goes file, then row.** A `photos` row without bytes is the ordinary
+state of a restored ledger, but a file without a row is a picture no screen can
+name, no delete can reach and no folder-clear would miss until the animal itself
+went. So `addPhoto` copies first, and if SQLite refuses the insert it takes the
+copy back out before rethrowing. That sweep is not tidiness: the sentence this
+screen answers a refused write with is "This could not be saved. Nothing was
+written.", and after one failed insert the app would otherwise be holding a file
+while saying that. A widget test asserts both halves of the pair — the refusal
+sentence, and `deleted == stored`.
+
+**The delete goes row, then file, and stays quiet about a leftover.** The row is
+what the breeder is removing; the bytes are the consequence. Taking the row first
+means a file that refuses to go leaves a *smaller* lie than the reverse: a picture
+still on the phone that no longer appears in the ledger, and the folder clear that
+follows the animal's own deletion sweeps it. So a failed `File.delete` prints a
+line and shows no snackbar — the ledger is already correct, and "could not
+delete" about bytes the person cannot see would report a second failure while
+undoing the first was impossible. The reverse order would have left a row pointing
+at bytes that are gone, which is a blank in the strip the breeder cannot remove.
+
+**The gallery is `file_selector`, and it asks for nothing.** `image_picker` was the
+name in the Stage 5 triage, and the triage's price — a camera permission and a
+gallery permission — belongs to that package, not to the feature. `file_selector`
+is already a dependency for the pack; `file_selector_android` opens the pick with
+`ACTION_OPEN_DOCUMENT`, the Storage Access Framework, whose own source names no
+permission at all, and a picture this app keeps is a copy in its own directory.
+So the standing constraint (no permission a feature does not provably need) is
+met by adding none, and the app stays gallery-only — which is also the honest
+scope: a dog's condition is photographed by whoever is with the dog, and the
+ledger is not the camera.
+
+**HEIC is refused, not stored.** The Flutter engine has no HEIF decoder, so a
+`.heic` row is a picture this app can never draw: a blank with a name, forever, in
+a folder that looks like a saved photograph. Android's own gallery content provider
+transcodes to JPEG when one is opened through the picker, so the refusal costs the
+breeder nothing she can see. `photo_files_test.dart` names that file alongside
+`notes.txt` so the codec rule, not just the text-file rule, is checked.
+
+**What CI cannot decide.** `Image.file` reads on the platform's IO thread and never
+completes inside `testWidgets`' fake-async zone, so no widget test in this
+repository can prove that a real photograph is drawn. The tests prove the contract
+around it — that the bytes written to a real temp folder are the ones the row names
+(`photo_files_test.dart`), and that the name the ledger carries is the name the
+screen asked the folder for (`pathsAsked` against `stored`). Whether a thumbnail
+appears, whether the gallery sheet opens on a Realme, and whether the backup rules
+point at the folder that actually exists are the phone's verdict, and until it
+gives one they are recorded as NOT RUN.

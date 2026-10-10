@@ -12,6 +12,13 @@
       (values) and shared_prefs/FlutterSecureKeyStorage.xml (the wrapped key)
       when no sharedPreferencesName/storageNamespace option is set, which is
       the case for this app.
+    - the animal pictures (Stage 5a) are written by `photo_files.dart` under
+      photos/, off `getApplicationDocumentsDirectory()`, which path_provider's
+      own README documents as the internal files directory on Android -- hence
+      domain="file". A dog's photograph is more identifying than a weight row,
+      so it goes where the database goes. The device pass reads this folder
+      back with adb to confirm the path really is files/photos and not a
+      plugin-nested one.
 -->
 <data-extraction-rules>
     <cloud-backup>
@@ -21,6 +28,7 @@
         <exclude domain="database" path="salala.db-shm" />
         <exclude domain="sharedpref" path="FlutterSecureStorage.xml" />
         <exclude domain="sharedpref" path="FlutterSecureKeyStorage.xml" />
+        <exclude domain="file" path="photos" />
     </cloud-backup>
     <device-transfer>
         <exclude domain="database" path="salala.db" />
@@ -29,5 +37,6 @@
         <exclude domain="database" path="salala.db-shm" />
         <exclude domain="sharedpref" path="FlutterSecureStorage.xml" />
         <exclude domain="sharedpref" path="FlutterSecureKeyStorage.xml" />
+        <exclude domain="file" path="photos" />
     </device-transfer>
 </data-extraction-rules>

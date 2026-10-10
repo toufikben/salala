@@ -9,8 +9,11 @@
 // - `symptoms` hangs off an animal like every other record type, never off a
 //   litter: a litter's puppies *are* animals, so a second ownership model would
 //   only be a second way for a row to end up belonging to nobody.
+// - Version 3 adds `photos`. It is the one table whose row is a pointer rather
+//   than a value, which is why it is listed in [fileBackedTables] and not in
+//   [dataTables] below.
 
-const int schemaVersion = 2;
+const int schemaVersion = 3;
 
 /// The `symptoms` table is named here rather than written inline because version
 /// 2 has to create exactly this shape for the installs it upgrades; a copy that
@@ -33,6 +36,35 @@ const String createSymptomsTable = '''
 
 const String createSymptomsIndex =
     'CREATE INDEX idx_symptoms_animal ON symptoms (animal_id, observed_at)';
+
+/// Version 3: one row per picture of an animal.
+///
+/// `file_name` is a bare name, never a path. The bytes live in one folder this
+/// app owns (`photos/<animal_id>/` under the app's documents), so a row cannot
+/// point outside it — and a ledger restored on another phone, where the folder
+/// is empty, draws a named blank for each row rather than reaching for someone
+/// else's files.
+///
+/// `animals.photo_path` is *not* that mechanism. It has been in the table since
+/// the scaffold, nothing has ever written it, and dropping it now would make
+/// every pack this app has already exported fail to restore on a column it no
+/// longer has. So the dormant column stays dormant and pictures live here.
+///
+/// There is no caption column and no `updated_at`: a picture is written once,
+/// shown, and deleted, and a column nothing fills is exactly the dormant
+/// scaffold `photo_path` became.
+const String createPhotosTable = '''
+  CREATE TABLE photos (
+    id TEXT PRIMARY KEY,
+    animal_id TEXT NOT NULL,
+    file_name TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    FOREIGN KEY (animal_id) REFERENCES animals (id) ON DELETE CASCADE
+  )
+''';
+
+const String createPhotosIndex =
+    'CREATE INDEX idx_photos_animal ON photos (animal_id, created_at)';
 
 const List<String> createStatements = <String>[
   '''
@@ -141,6 +173,7 @@ const List<String> createStatements = <String>[
   )
   ''',
   createSymptomsTable,
+  createPhotosTable,
   '''
   CREATE TABLE buyers (
     id TEXT PRIMARY KEY,
@@ -185,20 +218,22 @@ const List<String> createStatements = <String>[
   'CREATE INDEX idx_weights_animal ON weight_entries (animal_id, measured_at)',
   'CREATE INDEX idx_visits_animal ON vet_visits (animal_id, visit_date)',
   createSymptomsIndex,
+  createPhotosIndex,
   'CREATE INDEX idx_placements_animal ON placements (animal_id)',
 ];
 
-/// Every table the database holds, in the order a reader thinks about the
-/// ledger: an animal before its litter, a buyer before a placement.
+/// Every table whose rows a JSON pack carries, in the order a reader thinks
+/// about the ledger: an animal before its litter, a buyer before a placement.
 ///
 /// The order is for reading, not for correctness — `animals.litter_id` and
 /// `litters.dam_id` point at each other, so no order inserts without a dangling
 /// reference. That circular pair is why a restore defers its foreign key checks
 /// (see `data_pack.dart`) instead of trusting this list to break the cycle.
 ///
-/// Export and import iterate this list, so a new table is one line here and
-/// nothing else; the test that compares it against the `CREATE TABLE`
-/// statements above is what stops a table from quietly going unexported.
+/// Export and import iterate this list, so a new table of values is one line
+/// here and nothing else; the test in `schema_test.dart` compares this list
+/// *plus* [fileBackedTables] against the `CREATE TABLE` statements above, which
+/// is what stops a table from quietly belonging to neither.
 const List<String> dataTables = <String>[
   'animals',
   'litters',
@@ -211,3 +246,13 @@ const List<String> dataTables = <String>[
   'placements',
   'user_settings',
 ];
+
+/// Tables a pack deliberately leaves out, because their rows are pointers into
+/// this phone's filesystem rather than values the app can rewrite from a file.
+///
+/// A `photos` row is a filename. The bytes it names stay behind on the old
+/// phone, so carrying the row would restore a list of pictures that no longer
+/// open and let a pack claim it holds images it does not hold. D22's promise is
+/// that the pack carries the *ledger*; the pictures travel as themselves, or as
+/// a printed PDF.
+const List<String> fileBackedTables = <String>['photos'];

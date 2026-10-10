@@ -15,8 +15,11 @@ import '../data/db/schema.dart';
 /// version may add, and a format that travels table-by-table costs one line in
 /// `schema.dart` per new table instead of a branch here.
 ///
-/// Photos are **not** inside. A `photo_path` travels as the text it is, so
-/// restoring brings the ledger back and leaves the pictures on the old phone.
+/// Photos are **not** inside. `photos` is a [fileBackedTables] table, so a pack
+/// that names one is refused as `unknownTable` rather than quietly dropping the
+/// rows a phone cannot answer anyway: the bytes stay where they were written.
+/// A `photo_path` travels as the text it is, so restoring brings the ledger back
+/// and leaves the pictures on the old phone, and the ledger says so per row.
 /// The PDF pack is where an image belongs.
 const String packFormat = 'salala-pack';
 

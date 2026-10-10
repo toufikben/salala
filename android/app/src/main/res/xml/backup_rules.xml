@@ -11,4 +11,5 @@
     <exclude domain="database" path="salala.db-shm" />
     <exclude domain="sharedpref" path="FlutterSecureStorage.xml" />
     <exclude domain="sharedpref" path="FlutterSecureKeyStorage.xml" />
+    <exclude domain="file" path="photos" />
 </full-backup-content>

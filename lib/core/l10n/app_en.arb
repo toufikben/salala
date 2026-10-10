@@ -71,6 +71,7 @@
   "recordsWeights": "Weights",
   "recordsVisits": "Vet visits",
   "recordsSymptoms": "Symptoms",
+"recordsPhotos": "Photos",
   "recordsPlacements": "Placements",
   "recordsEmpty": "Nothing recorded yet.",
 
@@ -297,6 +298,18 @@
   "symptomOngoing": "Still happening",
   "symptomResolved": "Resolved",
   "symptomDeleteBody": "The symptom is removed from this animal's history. This cannot be undone.",
+
+  "photoAdd": "Add photo",
+  "photoDeleteBody": "The picture is removed from this animal's ledger, and the file with it. This cannot be undone.",
+  "@photoDeleteBody": {
+    "description": "A photo is the only record here whose row and bytes are two different things, so the sentence says both go."
+  },
+  "photoMissing": "Not on this phone",
+  "@photoMissing": {
+    "description": "Shown where a picture should be: the row survived a restore or a cleared folder, the file did not. Never a path, never a crash."
+  },
+  "photoTooLarge": "This picture is too big to keep",
+  "photoNotAnImage": "This file is not a picture",
 
   "placementAdd": "Add placement",
   "placementAddTitle": "Log a placement",

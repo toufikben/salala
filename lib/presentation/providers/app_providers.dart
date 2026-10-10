@@ -8,6 +8,7 @@ import '../../data/models/animal.dart';
 import '../../data/models/litter.dart';
 import '../../services/app_lock_service.dart';
 import '../../services/pack_files.dart';
+import '../../services/photo_files.dart';
 import '../../services/reminder_scheduler.dart';
 
 /// The opened database. `main()` overrides this after `ensureInitialized`, and
@@ -57,6 +58,12 @@ final appLockProvider = Provider<AppLockService>((ref) => AppLockService());
 /// The share sheet and the file picker. Tests hand in a recorder, because the
 /// real one talks to Android.
 final packFilesProvider = Provider<PackFiles>((ref) => const SystemPackFiles());
+
+/// The photo folder and the image picker. Same seam for the same reason: the
+/// real one talks to Android, so the screens are tested against a recorder.
+final photoFilesProvider = Provider<PhotoFiles>(
+  (ref) => const SystemPhotoFiles(),
+);
 
 /// True once the PIN gate has been satisfied (or never armed). The router
 /// redirects on this, so it is a synchronous flag, not the async digest check.
@@ -128,8 +135,25 @@ class AnimalsController extends AsyncNotifier<List<Animal>> {
     await _rereadAfter('change');
   }
 
+  /// Deleting an animal takes its picture folder with it.
+  ///
+  /// The foreign key removes the rows; only this app can reach the bytes. A
+  /// delete that left them behind would keep a dead animal's photographs on the
+  /// phone with no row, no screen and no way to find them again.
+  ///
+  /// So this clears the folder whether or not any row survived to be counted: the
+  /// one state where the ledger says "no pictures" and the folder disagrees is a
+  /// copy whose row was refused *and* whose sweep failed, and it is exactly the
+  /// photograph that must not outlive the animal. The promise is the folder going,
+  /// not the file list being walked.
   Future<void> delete(String id) async {
-    await ref.read(daosProvider).animals.delete(id);
+    final daos = ref.read(daosProvider);
+    await daos.animals.delete(id);
+    try {
+      await ref.read(photoFilesProvider).deleteAll(id);
+    } catch (error) {
+      debugPrint('Photo folder for deleted animal $id not removed: $error');
+    }
     await _rereadAfter('delete');
   }
 

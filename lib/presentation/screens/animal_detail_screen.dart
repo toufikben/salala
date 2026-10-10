@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -13,6 +15,7 @@ import '../../data/models/animal.dart';
 import '../../data/models/buyer.dart';
 import '../../data/models/health_test.dart';
 import '../../data/models/placement.dart';
+import '../../data/models/photo.dart';
 import '../../data/models/symptom.dart';
 import '../../data/models/vaccination.dart';
 import '../../data/models/vet_visit.dart';
@@ -20,6 +23,7 @@ import '../../data/models/weight_entry.dart';
 import '../../services/animal_pdf.dart';
 import '../../services/pack_files.dart';
 import '../../services/pdf_layout.dart';
+import '../../services/photo_files.dart';
 import '../providers/app_providers.dart';
 import '../providers/record_providers.dart';
 import '../providers/triage_providers.dart';
@@ -232,6 +236,15 @@ class AnimalDetailScreen extends ConsumerWidget {
                               ],
                             ),
                     ),
+              ),
+              _PhotoSection(
+                animalId: animal.id,
+                // Watched here for the reason `placements` is: a section this far
+                // down the ledger is not built until it is scrolled to, and a
+                // query started in that frame has no time left to answer in.
+                photos: ref.watch(photosForAnimalProvider(animal.id)),
+                onRetry: () =>
+                    ref.invalidate(photosForAnimalProvider(animal.id)),
               ),
               _PlacementSection(
                 animalId: animal.id,
@@ -815,4 +828,223 @@ class _SectionEmpty extends StatelessWidget {
     padding: const EdgeInsets.fromLTRB(12, 4, 12, 16),
     child: Text(text, style: Theme.of(context).textTheme.bodyMedium),
   );
+}
+
+/// The animal's pictures, oldest first, as a strip of thumbnails.
+///
+/// A section with a second store behind it: the row says `1729-…-20480.jpg` and
+/// only `PhotoFiles` knows whether this phone still holds those bytes. A row with
+/// no file is not a fault to shout about — that is exactly what a ledger restored
+/// on a second phone looks like — so it renders as a blank with a name, and the
+/// folder itself is the phone's to check.
+class _PhotoSection extends ConsumerWidget {
+  const _PhotoSection({
+    required this.animalId,
+    required this.photos,
+    required this.onRetry,
+  });
+
+  final String animalId;
+  final AsyncValue<List<Photo>> photos;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    return _RecordSection(
+      title: l10n.recordsPhotos,
+      addLabel: l10n.photoAdd,
+      onAdd: () => _addPhoto(context, ref, animalId),
+      body: photos.when(
+        loading: () => const _SectionLoading(),
+        error: (error, stack) => _SectionError(onRetry: onRetry),
+        data: (records) => records.isEmpty
+            ? _SectionEmpty(text: l10n.recordsEmpty)
+            : Padding(
+                padding: const EdgeInsets.fromLTRB(12, 4, 12, 16),
+                child: Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    for (final record in records)
+                      _PhotoThumb(
+                        photo: record,
+                        onOpen: () => _viewPhoto(context, ref, record),
+                      ),
+                  ],
+                ),
+              ),
+      ),
+    );
+  }
+}
+
+class _PhotoThumb extends StatelessWidget {
+  const _PhotoThumb({required this.photo, required this.onOpen});
+
+  final Photo photo;
+  final VoidCallback onOpen;
+
+  @override
+  Widget build(BuildContext context) => InkWell(
+    onTap: onOpen,
+    child: _PhotoImage(photo: photo),
+  );
+}
+
+/// One picture: the bytes when this phone has them, a named blank when not.
+class _PhotoImage extends ConsumerWidget {
+  const _PhotoImage({required this.photo, this.size = 104});
+
+  final Photo photo;
+  final double size;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return SizedBox(
+      width: size,
+      height: size,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(8),
+        child: ref
+            .watch(photoPathProvider(photo))
+            .when(
+              // Not a spinner: the answer is one stat call, and a bar that appears
+              // and disappears per thumbnail is a strip that flickers.
+              loading: () => const ColoredBox(color: Color(0x14000000)),
+              error: (error, stack) => const _PhotoMissing(),
+              data: (path) => path == null
+                  ? const _PhotoMissing()
+                  : Image.file(
+                      File(path),
+                      fit: BoxFit.cover,
+                      // A file that will not decode is the same fact as one that is
+                      // not there, told the same way.
+                      errorBuilder: (context, error, stack) =>
+                          const _PhotoMissing(),
+                    ),
+            ),
+      ),
+    );
+  }
+}
+
+class _PhotoMissing extends StatelessWidget {
+  const _PhotoMissing();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return ColoredBox(
+      color: theme.colorScheme.surfaceContainerHighest,
+      child: Padding(
+        padding: const EdgeInsets.all(6),
+        child: Center(
+          child: Text(
+            AppLocalizations.of(context).photoMissing,
+            textAlign: TextAlign.center,
+            style: theme.textTheme.labelSmall,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Takes the file the breeder chose into this animal's folder and its row into
+/// the ledger, and says which of the two refused.
+///
+/// A refusal here has three answers, not one: the file is not a picture, the
+/// file is too big, and the database would not take the row. The first two are
+/// about the breeder's own file and have to name it; the third is `recordSaveFailed`
+/// like every other write on this screen, and `addPhoto` has already taken the
+/// copy back out of the folder so that sentence stays true.
+Future<void> _addPhoto(
+  BuildContext context,
+  WidgetRef ref,
+  String animalId,
+) async {
+  final l10n = AppLocalizations.of(context);
+  final messenger = ScaffoldMessenger.of(context);
+  try {
+    // Null is the picker closed without a choice. That is a decision, not a
+    // failure, and it gets no sentence and no row.
+    await addPhoto(ref, animalId);
+  } on PhotoRefused catch (refused) {
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(switch (refused.problem) {
+          PhotoProblem.tooLarge => l10n.photoTooLarge,
+          PhotoProblem.notAnImage => l10n.photoNotAnImage,
+        }),
+      ),
+    );
+  } catch (error) {
+    debugPrint('Photo add failed: $error');
+    messenger.showSnackBar(SnackBar(content: Text(l10n.recordSaveFailed)));
+  }
+}
+
+/// Opens one picture big enough to see, with the day it was taken in, and the
+/// delete that takes the row and the file with it.
+///
+/// The delete is a second dialog rather than a button on the thumbnail because
+/// this is the record whose removal destroys something the ledger cannot rewrite:
+/// bytes no backup carries. Two questions, then — *do you want it gone*, and
+/// *this also deletes the file* — and the row stays until the second one says yes.
+Future<void> _viewPhoto(
+  BuildContext context,
+  WidgetRef ref,
+  Photo photo,
+) async {
+  final l10n = AppLocalizations.of(context);
+  final wantsDelete = await showDialog<bool>(
+    context: context,
+    builder: (dialogContext) => AlertDialog(
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          _PhotoImage(photo: photo, size: 220),
+          const SizedBox(height: 8),
+          Text(formatDay(context, photo.createdAt)),
+        ],
+      ),
+      actions: <Widget>[
+        TextButton(
+          onPressed: () => Navigator.of(dialogContext).pop(true),
+          child: Text(l10n.actionDelete),
+        ),
+        TextButton(
+          onPressed: () => Navigator.of(dialogContext).pop(false),
+          child: Text(l10n.actionClose),
+        ),
+      ],
+    ),
+  );
+  if (wantsDelete != true || !context.mounted) return;
+
+  final confirmed = await showDialog<bool>(
+    context: context,
+    builder: (dialogContext) => AlertDialog(
+      title: Text(l10n.recordDeleteTitle),
+      content: Text(l10n.photoDeleteBody),
+      actions: <Widget>[
+        TextButton(
+          onPressed: () => Navigator.of(dialogContext).pop(false),
+          child: Text(l10n.actionCancel),
+        ),
+        FilledButton(
+          onPressed: () => Navigator.of(dialogContext).pop(true),
+          child: Text(l10n.actionDelete),
+        ),
+      ],
+    ),
+  );
+  if (confirmed != true || !context.mounted) return;
+
+  try {
+    await deletePhoto(ref, photo);
+  } catch (error) {
+    if (context.mounted) refuseRecordDelete(context, error);
+  }
 }

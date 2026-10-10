@@ -5,6 +5,7 @@ import 'buyer_dao.dart';
 import 'health_test_dao.dart';
 import 'litter_dao.dart';
 import 'placement_dao.dart';
+import 'photo_dao.dart';
 import 'symptom_dao.dart';
 import 'vaccination_dao.dart';
 import 'vet_visit_dao.dart';
@@ -21,7 +22,8 @@ class Daos {
       vetVisits = VetVisitDao(db),
       symptoms = SymptomDao(db),
       buyers = BuyerDao(db),
-      placements = PlacementDao(db);
+      placements = PlacementDao(db),
+      photos = PhotoDao(db);
 
   final AnimalDao animals;
   final LitterDao litters;
@@ -32,4 +34,5 @@ class Daos {
   final SymptomDao symptoms;
   final BuyerDao buyers;
   final PlacementDao placements;
+  final PhotoDao photos;
 }
