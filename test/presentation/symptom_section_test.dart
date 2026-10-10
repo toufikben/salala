@@ -5,6 +5,7 @@ import 'package:salala/data/models/animal.dart';
 import 'package:salala/data/models/symptom.dart';
 import 'package:salala/presentation/screens/animal_detail_screen.dart';
 import 'package:salala/presentation/widgets/symptom_dialog.dart';
+import 'package:salala/presentation/widgets/triage_card.dart';
 
 import '../helpers/pump_app.dart';
 
@@ -71,6 +72,32 @@ Future<void> _scrollTo(WidgetTester tester, Finder finder) async {
     ),
   );
   await tester.pumpAndSettle();
+}
+
+/// What the triage card is actually showing, so a missing verdict says why.
+///
+/// A bare `expect(find.text('Act now'), findsOneWidget)` reads the same for
+/// three different faults: the card is not built (this is a lazy page and the
+/// card lives at its top), the card is still waiting on its query, or the card
+/// answered with its retry button because the provider threw. Run
+/// `38078494745` failed on all three of these assertions at once and the log
+/// could not tell those apart, so the reason is part of the assertion.
+String _cardReading(WidgetTester tester) {
+  final card = find.descendant(
+    of: find.byType(AnimalDetailScreen),
+    matching: find.byType(TriageCard),
+  );
+  final words = card.evaluate().isEmpty
+      ? 'no TriageCard is built on this page right now'
+      : tester
+            .widgetList<Text>(
+              find.descendant(of: card, matching: find.byType(Text)),
+            )
+            .map((text) => text.data ?? '')
+            .join(' | ');
+  return tester.any(find.bySubtype<ProgressIndicator>())
+      ? 'a widget is still loading; $words'
+      : words;
 }
 
 Future<void> _save(WidgetTester tester) async {
@@ -172,9 +199,21 @@ void main() {
       seedSymptoms: <Symptom>[_sighting(observedAt: _seenOn)],
     );
     await _openNala(tester);
+    // Read where the card lives before scrolling away from it: this page is a
+    // lazy list, and an expect that only runs after the scroll cannot tell a
+    // finding that never fired from a card the page stopped building.
+    expect(
+      find.text('Act now'),
+      findsOneWidget,
+      reason: 'before the scroll: ${_cardReading(tester)}',
+    );
     await _scrollTo(tester, find.text('Vomiting'));
 
-    expect(find.text('Act now'), findsOneWidget);
+    expect(
+      find.text('Act now'),
+      findsOneWidget,
+      reason: 'after the scroll: ${_cardReading(tester)}',
+    );
 
     await _tap(tester, find.text('Vomiting'));
     expect(find.text('Edit symptom'), findsOneWidget);
@@ -186,6 +225,7 @@ void main() {
     expect(
       find.text('Nothing in this record calls for a next step'),
       findsOneWidget,
+      reason: _cardReading(tester),
     );
     // The fact survives as history; only the alarm stops. The row reads
     // "resolved" now, in the same joined subtitle it is shown in when open.
@@ -213,9 +253,18 @@ void main() {
       seedSymptoms: <Symptom>[_sighting(observedAt: _seenOn)],
     );
     await _openNala(tester);
+    expect(
+      find.text('Act now'),
+      findsOneWidget,
+      reason: 'before the scroll: ${_cardReading(tester)}',
+    );
     await _scrollTo(tester, find.text('Vomiting'));
 
-    expect(find.text('Act now'), findsOneWidget);
+    expect(
+      find.text('Act now'),
+      findsOneWidget,
+      reason: 'after the scroll: ${_cardReading(tester)}',
+    );
 
     await _tap(tester, find.text('Vomiting'));
     await _tap(tester, find.widgetWithText(TextButton, 'Delete'));
@@ -231,6 +280,7 @@ void main() {
     expect(
       find.text('Nothing in this record calls for a next step'),
       findsOneWidget,
+      reason: _cardReading(tester),
     );
   });
 
@@ -330,7 +380,11 @@ void main() {
       // Delete that answered with silence would have said the opposite.
       expect(find.text(deleteRefusalSentence), findsOneWidget);
       expect(find.byType(SymptomDialog), findsOneWidget);
-      expect(find.text('Act now'), findsOneWidget);
+      expect(
+        find.text('Act now'),
+        findsOneWidget,
+        reason: _cardReading(tester),
+      );
     },
   );
 
