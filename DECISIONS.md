@@ -149,14 +149,50 @@ feasibility study:
 Until this is settled the app stays network-free and payment-free — nothing in
 the codebase depends on D3, so no rework is risked by deciding late.
 
-## D9 — `applicationId` is not finalised
-**Open. Owner decision required before the first Play upload.**
+## D9 — The store identity is `com.toufikben.ledger`
+**Decided by the owner, 2026-10-10. Implemented on `master`.**
 The scaffold generated `com.salala.salala`. A package name is a one-way door on
 Google Play (it is permanently tied to the developer account and cannot be
 changed after upload), and it also blocks option 3 in D8 if the app is ever
-distributed under a different vendor. So it is deliberately left unchanged
-rather than "fixed" quietly. The candidate is a neutral id that does not encode
-the current product name.
+distributed under a different vendor. So it was deliberately left open rather
+than "fixed" quietly, and the owner has now chosen it: **`com.toufikben.ledger`**.
+
+Two properties the earlier note asked for, and one it did not anticipate:
+
+- It does not encode the product name, so a rename of the app — or a second
+  species in the ledger — never touches the store identity. That was D9's rule,
+  and `salala` twice broke it.
+- It names a vendor the owner already controls (the GitHub account), so no
+  dispute over the first segment is possible later. A domain would have been
+  stronger still, and this id can be revisited **only** before the first upload:
+  after that the door is shut, which is exactly why the id was not changed
+  casually for two weeks.
+- **The cost the note did not anticipate: an id change is a new app.** The phone
+  that held `com.salala.salala` now holds `com.toufikben.ledger` beside it, with
+  its own empty database, its own `shared_prefs` and its own alarm bookings. Data
+  does not follow the rename — there was nothing to lose only because Stage 3t
+  left every table at zero rows. On a breeder's real phone this is the whole
+  danger of doing it after launch, and it is why the decision belongs before
+  Stage 4 and not after it.
+
+`namespace` moved with the id, so `MainActivity.kt` moved to
+`android/app/src/main/kotlin/com/toufikben/ledger/` and the Kotlin `package`
+declaration matches the path. Verified blast radius over the whole tree: the id
+appeared in exactly three code locations (`build.gradle.kts:8` and `:25`, and
+that one Kotlin file), plus six `PRODUCT_BUNDLE_IDENTIFIER` lines in
+`ios/Runner.xcodeproj/project.pbxproj`, which stay as `com.salala.salala`
+because no macOS runner and no Apple hardware exist here to build or verify a
+change to them — that is the one place where the old id still lives, and iOS is
+unfunded anyway (Stage 5 triage). No Dart file, test, workflow, manifest or
+`.arb` entry ever named the id, which is why the Android rename is those three
+paths and no more.
+
+The owner renamed the icon label in the same breath: `android:label` is now
+**«سلالة»**, matching `appTitle`, which has read «سلالة» in the Arabic locale
+from the start. That string is one value for every locale, so English and French
+installs also show Arabic script under the icon — while `appTitle` *inside* the
+app stays `Salala` in those two locales, and `MaterialApp.title`
+(`lib/app.dart:15`) is still the Latin `'Salala'` in the recents card.
 
 ## D10 — Backup and device transfer are disabled
 **Decided by the agent, 2026-10-04.**

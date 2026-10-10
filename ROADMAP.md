@@ -2006,8 +2006,10 @@ merchant registration ✘** — which is the half of Play Billing that a paid ap
 needs, and it applies identically to in-app purchases and subscriptions. If that
 holds, D8 cannot be executed as written and the monetization shape is a product
 decision, not a billing-library detail. **Nothing in the code depends on it yet**
-— no billing dependency, no purchase screen, no `applicationId` commitment — which
-is exactly why Stage 4 stays blocked instead of half-built. The decision needs the
+— no billing dependency and no purchase screen — which
+is exactly why Stage 4 stays blocked instead of half-built. The `applicationId`
+half of that sentence was true until 2026-10-10 and is now closed separately as D9.
+The decision needs the
 owner, with the Google answer sought from Play Console support first.
 
 **The `applicationId` menu (D9), measured before proposing it.** So that "pick a name"
@@ -2031,26 +2033,45 @@ down before a choice is made:
   separate value, `MainActivity.kt` and its directory do **not** have to move — and no
   Dart, test or CI file has to change either. That is the whole Android blast radius.
 - The iOS lines are a 4th file, and can be left for the day an iOS build is funded.
-- The product name *is* currently encoded in the id (`salala` twice), which is the one
-  property D9 says a new id should not repeat.
+- The product name *was* encoded in the id (`salala` twice), the one property D9 says a new
+  id should not repeat. That bullet is now history, not an open finding — see below.
 
-Candidates, all still the agent's proposal and none of them actionable without the owner:
+**D9 was decided on 2026-10-10 and is implemented on `master`.** The owner picked
+`com.toufikben.ledger` — shape 3 from the list, with the GitHub account standing in for a
+studio name, since it names a vendor he already controls and needs nothing bought. Shape 2
+(`io.github.toufikben.salala`) and keeping the scaffold id were declined for the reasons
+written in the table above; shape 1 stays available as a *better* id, but only until the
+first upload, which is the whole point of D9 being closed now rather than later.
 
-1. `com.<owner-domain>.<studio>` — the only shape with no future dispute over it, and it
-   costs a domain the owner does not have yet. If a domain is bought for the privacy-policy
-   URL Stage 4 already needs anyway, this becomes the default answer.
-2. `io.github.toufikben.salala` — unique on day one with nothing to buy, verifiable to a
-   reviewer, and it puts a personal GitHub handle in every user's installed-app list, and
-   in the one string that can never be changed.
-3. `com.<studio>.ledger` / `…herd` — neutral about the product name per D9, so a rename of
-   the app or a second species never touches the store identity; needs a studio name the
-   owner picks.
-4. Keep `com.salala.salala` — free today, and the doubled segment is a template artifact
-   that reads as unfinished on a Play listing.
+What moved, and what the measured blast radius predicted exactly:
 
-Recommendation: decide it in the same breath as D8/D3, since the payment route also decides
-who the *vendor* in the id has to be, and pick shape 1 or 3 over 2 — this string outlives
-the app's name. **Nothing was renamed.** A one-way door gets opened by the person who owns it.
+| File | Change |
+| --- | --- |
+| `android/app/build.gradle.kts:8` | `namespace` → `com.toufikben.ledger` |
+| `android/app/build.gradle.kts:25` | `applicationId` → `com.toufikben.ledger`, and the template's `// TODO: Specify your own unique Application ID` comment went with it |
+| `android/app/src/main/kotlin/com/toufikben/ledger/MainActivity.kt` | new path, `package com.toufikben.ledger`; `com/salala/salala/MainActivity.kt` deleted (confirmed absent from the tree at `2afabda`) |
+| `android/app/src/main/AndroidManifest.xml:8` | `android:label` → «سلالة», the owner's choice for the name under the icon |
+| `ios/Runner.xcodeproj/project.pbxproj` | **untouched**, six `PRODUCT_BUNDLE_IDENTIFIER` lines still `com.salala.salala` — no macOS runner and no Apple hardware here, so a change to them could be authored and never built. Recorded as NOT VERIFIABLE, not as done. |
+
+Zero Dart, test, workflow, manifest or `.arb` file named the id, so nothing else had to
+change, and CI is the proof of that rather than the grep: commit `4cf246c` (the id) ran
+`No issues found!` and **455 tests passed** and built `app-debug.apk` at run
+**`38004021774`**. The label commit `2afabda` ran its own job green at **`38021992277`**
+(03:51–03:59 UTC: `No issues found! (ran in 10.5s)`, `🎉 455 tests passed.`,
+`✓ Built build/app/outputs/flutter-apk/app-debug.apk`), and the rolling release asset came
+off that run at 176,598,495 bytes, sha256 `0a08340c…2977`.
+
+One consequence worth stating before anyone repeats this on a released app: **a changed
+`applicationId` is a different app.** On the phone the old `com.salala.salala` install stays
+where it is, and the new package arrives with its own empty database, its own
+`shared_prefs/scheduled_notifications.xml` and no alarm bookings carried over. This was safe
+on 2026-10-10 only because Stage 3t had already left every table at zero rows and the alarm
+stores empty. After launch, the same one-line rename would strand a breeder's whole ledger.
+
+The name under the icon is now Arabic script for every locale, because `android:label` is a
+single string with no locale variants — `appTitle` inside the app remains `Salala` for
+English and French, and `MaterialApp.title` (`lib/app.dart:15`) still feeds `'Salala'` to the
+recents card, so the two surfaces disagree in those locales by design rather than by accident.
 
 **What Stage 4 still lacks, measured.** Not prose about "polish": the release build signs
 itself with the debug key (`android/app/build.gradle.kts:39-42`, `signingConfig =
