@@ -194,6 +194,17 @@ installs also show Arabic script under the icon — while `appTitle` *inside* th
 app stays `Salala` in those two locales, and `MaterialApp.title`
 (`lib/app.dart:15`) is still the Latin `'Salala'` in the recents card.
 
+**Verified, on the only two verifiers this project has.** Three green CI runs — `38004021774`
+(the id), `38021992277` (the label), `38023514312` (the docs) — each `No issues found!` with
+455 tests passing and a debug APK built. The artifact itself was read with
+`aapt2 dump badging`: `package: name='com.toufikben.ledger'`, `application-label:'سلالة'`,
+`launchable-activity: name='com.toufikben.ledger.MainActivity'`. On the Realme the new build
+installed, printed «سلالة» in the OS notification permission sheet, showed Build `1f7683d` in
+Settings, and **wrote and deleted a row in its own database** (`animals` 0 → 1 → 0) while the
+old package's database stayed at 0 — the storage half of the rename works, and the two silos are
+real. The six iOS `PRODUCT_BUNDLE_IDENTIFIER` lines remain **NOT VERIFIED**: nothing here can
+build them.
+
 ## D10 — Backup and device transfer are disabled
 **Decided by the agent, 2026-10-04.**
 An offline-first health ledger whose PIN digest silently restored onto a new
