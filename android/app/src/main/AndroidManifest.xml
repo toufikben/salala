@@ -5,7 +5,7 @@
          purpose, so a Play policy audit never has to be entered into. -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <application
-        android:label="Salala"
+        android:label="سلالة"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
         android:supportsRtl="true"
