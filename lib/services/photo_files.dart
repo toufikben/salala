@@ -110,13 +110,14 @@ String _extensionOf(String name) {
 class SystemPhotoFiles extends PhotoFiles {
   /// Overridable so the file rules are testable on a host without a phone;
   /// production uses the app's own documents directory.
-  const SystemPhotoFiles({Future<String> Function()? directory})
-    : _directory = directory;
+  /// Overridable so the file rules are testable on a host without a phone;
+  /// production uses the app's own documents directory.
+  const SystemPhotoFiles({this.directory});
 
-  final Future<String> Function()? _directory;
+  final Future<String> Function()? directory;
 
   Future<String> get _root async {
-    final base = await (_directory ?? _documents)();
+    final base = await (directory ?? _documents)();
     return p.join(base, 'photos');
   }
 
