@@ -2,7 +2,11 @@ name: Flutter CI
 
 # No build_runner: Riverpod providers are hand-written. The l10n Dart files are
 # committed for the IDE, and `flutter gen-l10n` below regenerates them from the
-# .arb sources so a stale commit can never mask a missing translation.
+# .arb sources, so a stale generated file cannot mask an .arb edit. It does not
+# catch a key missing from one locale: measured 2026-10-11, gen-l10n writes the
+# English value into that locale's class with no marker in the file and prints
+# "1 untranslated message(s)" to stdout only. That case is what
+# test/core/localization_parity_test.dart reads the .arb files for.
 
 on:
   push:

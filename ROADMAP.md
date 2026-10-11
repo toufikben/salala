@@ -2396,9 +2396,46 @@ a dialog most taps never open.
   text containing photographs: []`. That is the assertion shown to be able to fail, which is
   the only reason to write it.
 - `38172109076` — master `f6ceb11`: `No issues found!` and 🎉 **494 tests passed**, `Build
-  debug APK` green, so the rolling `debug-apk` release is now built from this commit. The count
-  is the honest arithmetic of the stage: 493 on `d434985` before it, 494 after one test lands,
-  and the RED run's 493 + 1 failed is the same 494 read one commit earlier.
+  debug APK` green. The `debug-apk` release is a rolling asset that every green master run
+  rebuilds, so the tag the phone's Settings row shows is the newest master commit, not this
+  one; the sentence itself is `f6ceb11`'s.
+
+**A guard for the three `.arb` files, added the same evening.** D43 is a rule about one
+sentence kept in three hand-edited files, and the pipeline cannot see the failure it protects.
+CI's `Analyze and test` job runs `flutter gen-l10n` before it analyses, so anything that
+compares the *committed* generated Dart against the `.arb` sources can never fail there — the
+runner overwrites those files first. And a key missing from one locale is not an error at all:
+measured on this working copy by deleting `recordsPhotos` from `app_ar.arb` and regenerating,
+`gen-l10n` wrote `String get recordsPhotos => 'Photos';` into `AppLocalizationsAr` — the
+English word, no TODO, nothing in the file to find — and said `1 untranslated message(s)` to a
+stdout no test reads. The workflow's own comment claimed the regeneration step meant "a stale
+commit can never mask a missing translation"; it masks a stale generated file and does nothing
+about a missing translation, and that comment is corrected in this commit.
+
+So `test/core/localization_parity_test.dart` reads the `.arb` files, which nothing regenerates,
+and asks six questions: the template has messages at all (a guard that iterates over nothing
+is green), every locale carries every key and no extras, a translation fills the same
+`{placeholders}`, no message is empty, every Arabic value contains an Arabic letter, and the
+French values that read exactly like the English ones are the nine that legitimately do —
+`appTitle`, `animalNotes`, `recordsPhotos`, `recordsPlacements`, `unitKg`, `unitGrams`,
+`weightNote`, `visitNoReason`, `pdfPlacement` — with the list asserted in both directions so it
+shrinks when a real translation arrives. Baseline the day it was written: 256 keys per locale,
+227 of them placeholder-free, zero Arabic values without Arabic script.
+
+- `38174149987` — master `2892e1a`, the guard's first push: failed at **Analyze**, on
+  `for (const locale in …)` and a `const RegExp`, five errors of mine. No assertion ran, so
+  nothing was proved, and the run is on record as the wrong-reason RED it is.
+- `38174346262` — `workflow_dispatch` on branch `check/l10n-parity-mutation` at `c49477f`: the
+  fixed guard plus one deliberate break, `recordsPhotos` deleted from `app_ar.arb`. Analyze
+  clean, **497 tests passed, 3 failed**, and the three name the same key from three directions:
+  the new parity test (`Actual: ['recordsPhotos']`), the new Arabic-script test (`these Arabic
+  values carry no Arabic letter at all … [recordsPhotos]`), and — the useful one —
+  `photo_section_test.dart: the Arabic ledger names the picture strip and its blank`, a test
+  that predates this guard and started failing because the Arabic screen was rendering the
+  English word. The guard says *which key*; the old widget test says *which screen lies to the
+  user*. Branch deleted once the verdict was read.
+- `38174276540` — master `5056404`: `No issues found!` and 🎉 **500 tests passed**, `Build
+  debug APK` green. 494 + the six above.
 
 **A run id on record that does not exist.** The commit message of `f6ceb11` cites run
 `38172351141` as its RED verdict. No such run exists on this repository, and the right-reason
