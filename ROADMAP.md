@@ -2233,7 +2233,17 @@ the pictures at `<home>/app_flutter/photos` — path_provider's Android document
 photograph was left inside both cloud backup and device transfer. Fixed in `4bafd27`, run
 `38162007379` (analyze clean in 16.2s, 483 tests, APK from the same run), and pinned by
 `test/services/photo_backup_rules_test.dart`, which reads both rule files off disk and refuses
-any exclusion that does not resolve to the folder `photo_files.dart` names.
+any exclusion that does not resolve to the folder `photo_files.dart` names. The guard was then
+shown to bite: a throwaway branch put the old rule back, and run `38164434145` answered
+`484 tests passed, 1 failed` with `cloud-backup does not exclude app_flutter/photos, the
+folder the app actually writes pictures to`. Master's verdicts for the guard and the follow-up
+are runs `38163399154` and `38163644705` (analyze clean, **485 tests**, APK from the same run).
+
+**Decoded at the width it is drawn, not at the camera.** The Realme reports 5.9 GB of RAM with
+about 350 MB free and a device pixel ratio of 2. `Image.file` given no decode budget asks for
+the whole picture, and a 12-megapixel JPEG is roughly 48 MB once decoded, so a strip of a
+dozen thumbnails is not a slow screen but a dead process. `_PhotoImage` now passes
+`cacheWidth` at its own size times the ratio (`45dcf0f`).
 
 **What the phone still owes, as one visit.** Delete one picture and read back that both its
 row and its file under `app_flutter/photos/<animal>/` are gone; delete an animal with pictures
