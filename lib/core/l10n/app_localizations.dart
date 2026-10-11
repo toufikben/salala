@@ -265,7 +265,7 @@ abstract class AppLocalizations {
   /// No description provided for @animalDeleteBody.
   ///
   /// In en, this message translates to:
-  /// **'Its vaccinations, health tests, weights, visits and symptoms are deleted too, with any handover recorded for it and, if it is a dam, its whelpings. This cannot be undone.'**
+  /// **'Its vaccinations, health tests, weights, visits and symptoms are deleted too, with any handover recorded for it, its photographs and the files that hold them on this phone, and, if it is a dam, its whelpings. This cannot be undone.'**
   String get animalDeleteBody;
 
   /// No description provided for @animalNameRequired.

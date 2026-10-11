@@ -287,6 +287,31 @@ void main() {
     });
 
     testWidgets(
+      'the warning before an animal dies names the photographs it takes',
+      (tester) async {
+        await pumpSalala(tester, seed: <Animal>[nala()]);
+
+        await tester.tap(find.byIcon(Icons.more_vert));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Delete'));
+        await tester.pumpAndSettle();
+
+        // One picture is deleted behind two questions precisely because its
+        // bytes are the one thing the ledger cannot rewrite. Deleting the
+        // animal destroys the same bytes behind a single warning, so that
+        // warning has to say so: on `d434985` the phone read a sentence that
+        // listed vaccinations, tests, weights, visits, symptoms, the handover
+        // and the whelpings — and not the pictures.
+        final body = tester
+            .widget<Text>(find.textThat(startsWith('Its vaccinations')))
+            .data!;
+        expect(body, contains('photographs'));
+        expect(body, contains('files'));
+        expect(body, contains('cannot be undone'));
+      },
+    );
+
+    testWidgets(
       'an animal the database refuses to delete keeps its card and its alarms',
       (tester) async {
         final notifications = FakeNotificationWriter();
