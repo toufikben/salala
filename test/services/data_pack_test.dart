@@ -286,6 +286,45 @@ void main() {
       },
     );
 
+    // Which way the picture rows go on a restore decides what the files under
+    // `photos/` have to do, and the answer is SQLite's rather than this file's:
+    // `restorePack` deletes every animal inside a transaction that has
+    // `defer_foreign_keys` on, so whether the `ON DELETE CASCADE` fires there is
+    // a fact to be read off a real database, not one to be recalled from docs.
+    test(
+      'a restore leaves no photo row for an animal the pack carries',
+      () async {
+        final source = await openTestDatabase();
+        await seed(source);
+        final pack = await packOf(source);
+
+        final target = await openTestDatabase();
+        await target.insert('animals', <String, Object?>{
+          'id': 'a-dam',
+          'name': 'Zida',
+          'species': 'dog',
+          'created_at': 1,
+          'updated_at': 1,
+        });
+        await target.insert('photos', <String, Object?>{
+          'id': 'p-here',
+          'animal_id': 'a-dam',
+          'file_name': '1700000000000-2.jpg',
+          'created_at': 1700000000000,
+        });
+
+        await restorePack(target, pack);
+
+        expect(
+          await target.query('photos'),
+          isEmpty,
+          reason:
+              'a pack carries no pictures, so a row that survives the restore '
+              'is a pointer only this phone can resolve',
+        );
+      },
+    );
+
     test('an empty pack empties the database', () async {
       final db = await openTestDatabase();
       await seed(db);
