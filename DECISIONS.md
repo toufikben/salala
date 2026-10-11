@@ -1431,3 +1431,9 @@ run `38172097929`. Master went green at `38172109076` with **494 tests**. Two ea
 `find.textThat` is not a `CommonFinders` method on this Flutter: a check that cannot run is
 not a check that passed, and the CI job that says so is the reason to write the assertion
 against a real finder.
+
+**And on the phone.** The rule's whole claim is about a screen, so the screen was read: at
+build `96eaa7c` on 2026-10-12 the warning said the Arabic and the English sentence each in
+full, each matching its `.arb` file character for character, and after `Delete` on an animal
+with one picture `app_flutter/photos` came back `total 0`. The store the sentence names is the
+store the tap empties. `ROADMAP.md` carries the pass.

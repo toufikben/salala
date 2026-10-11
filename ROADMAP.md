@@ -2351,7 +2351,7 @@ destroyed. The single-picture delete asks twice precisely because a photograph i
 irreplaceable; deleting the animal destroys the same bytes after a warning that does not name
 them. Stage 5c below ships the sentence; D43 records the rule it comes from.
 
-## Stage 5c — The delete warning names the photographs it takes *(CI green — 494 tests at `38172109076`, master `f6ceb11`; the phone has NOT re-read it yet)*
+## Stage 5c — The delete warning names the photographs it takes *(CI green — 494 tests at `38172109076`, master `f6ceb11`; read on the Realme at build `96eaa7c`)*
 
 The sentence Stage 5b's device pass found missing. It is a wording change with a real
 consequence behind it: `photos` is the only table in this schema whose deletion destroys
@@ -2442,13 +2442,36 @@ shrinks when a real translation arrives. Baseline the day it was written: 256 ke
 RED is `38172097929`. Master is not force-pushed to fix prose in a message that has already
 shipped, so the correction lives here and in the line above.
 
-**What the phone owes.** The new warning has been read by a widget test, not by eyes on that
-screen. The pass is: install the `debug-apk` asset built from `f6ceb11`, add one animal with
-one picture, open her delete confirmation in Arabic and in English, screenshot the sentence,
-then cancel once and delete once, and read back `run-as com.toufikben.ledger ls -lR
-app_flutter/photos` returning `total 0` with the herd empty. At 21:38 on 2026-10-11 the phone
-was mid-recording in `dev.toufik.track_scribe` (elapsed 03:27, «إيقاف» live), so it was not
-touched; `stage5b-device/50-phone-state.png` is that frame.
+**What the phone said.** Read on the Realme RMX3910 after midnight on 2026-10-12, on the
+`debug-apk` asset installed at 00:20 and identified on screen by الإعدادات → Build →
+`96eaa7c` — current master, a build that carries the sentence. The herd was empty before the
+pass (`animals=0 photos=0` from a pulled `salala.db`), so none of the owner's own records were
+in the way.
+
+One animal (`Nala`, species `dog`), one picture: a 1,147,248-byte PNG pushed to
+`/sdcard/Download` and chosen through the ledger's own **Add photo** tile. The app stored it as
+`app_flutter/photos/4dc31859-…/1791761342494-1147248.png`, the byte length in its name equal to
+the gallery source's MediaStore `_size`.
+
+- English (`stage5c-device/15-delete-en.png`) reads "…with any handover recorded for it, its
+  photographs and the files that hold them on this phone, and, if it is a dam, its whelpings.
+  This cannot be undone." **Cancel** was tapped next and the picture was still on disk
+  afterwards (`ls -lR app_flutter/photos` still listed the one `.png`).
+- Arabic, after switching اللغة → العربية on the phone itself
+  (`stage5c-device/22-delete-ar.png`): «…وسجل التسليم إن وُجد، وصورها وما على هذا الهاتف من
+  ملفات تلك الصور، والولادات التي هي أمّ لها.» Right-to-left, six lines, nothing clipped.
+- Both sentences were then compared against the `.arb` files character by character rather than
+  by eye: `compare-ar.cjs` prints `231 / 231 / equal: true` for English and
+  `205 / 205 / equal: true` for Arabic. A screenshot proves a person can read the sentence; it
+  does not prove the sentence on the glass is the sentence under review.
+- **Delete**, tapped while the app was in Arabic: the herd came back to «لا توجد حيوانات بعد»,
+  `run-as com.toufikben.ledger ls -lR app_flutter/photos` printed `total 0` — the animal's
+  folder is gone, not merely emptied — and the pulled DB read
+  `animals=0 photos=0 vaccinations=0 placements=0`.
+
+The phone was left as found: both pushed copies of the test picture deleted and de-indexed (a
+MediaStore query for `d43check` now returns 0 rows), the language set back to System default,
+the app force-stopped with the launcher in focus.
 
 ## Standing constraints
 
