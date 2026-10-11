@@ -14,7 +14,7 @@
       the case for this app.
     - the animal pictures (Stage 5a) are written by `photo_files.dart` under
       photos/, off `getApplicationDocumentsDirectory()`, which path_provider's
-      own README documents as the internal files directory on Android -- hence
+      own README documents as the internal files directory on Android; hence
       domain="file". A dog's photograph is more identifying than a weight row,
       so it goes where the database goes. The device pass reads this folder
       back with adb to confirm the path really is files/photos and not a

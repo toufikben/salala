@@ -77,8 +77,9 @@ class AnimalDetailScreen extends ConsumerWidget {
             return Center(child: Text(l10n.animalGone));
           }
           return ListView(
-            // The last section is a weigh-in, and on a phone with a three-button
-            // bar it sat under that bar with no scroll left to free it.
+            // The last section of a ledger sat under the phone's three-button
+            // bar with no scroll left to free it, so the list keeps its own
+            // clearance for that bar whatever section happens to be last.
             padding: EdgeInsets.fromLTRB(
               8,
               8,
