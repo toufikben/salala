@@ -302,12 +302,10 @@ void main() {
         // warning has to say so: on `d434985` the phone read a sentence that
         // listed vaccinations, tests, weights, visits, symptoms, the handover
         // and the whelpings — and not the pictures.
-        final body = tester
-            .widget<Text>(find.textThat(startsWith('Its vaccinations')))
-            .data!;
-        expect(body, contains('photographs'));
-        expect(body, contains('files'));
-        expect(body, contains('cannot be undone'));
+        expect(find.textContaining('Its vaccinations'), findsOneWidget);
+        expect(find.textContaining('photographs'), findsOneWidget);
+        expect(find.textContaining('files that hold them'), findsOneWidget);
+        expect(find.textContaining('cannot be undone'), findsOneWidget);
       },
     );
 
