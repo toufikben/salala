@@ -76,7 +76,7 @@ void main() {
   });
 
   test('every locale carries every message the template has, and no others', () {
-    for (const locale in translated) {
+    for (final locale in translated) {
       final localeKeys = messageKeys(arb[locale]!).toSet();
       expect(
         keys.where((key) => !localeKeys.contains(key)).toList(),
@@ -99,7 +99,7 @@ void main() {
   test('a translation fills the same holes the English message names', () {
     for (final key in keys) {
       final expected = placeholdersOf(message(arb[template]!, key));
-      for (const locale in translated) {
+      for (final locale in translated) {
         final value = message(arb[locale]!, key);
         if (value.isEmpty) continue; // the key test reports that one
         expect(
@@ -116,7 +116,7 @@ void main() {
   });
 
   test('no message is empty in any locale', () {
-    for (const locale in allLocales) {
+    for (final locale in allLocales) {
       for (final key in messageKeys(arb[locale]!)) {
         expect(
           message(arb[locale]!, key).trim(),
@@ -128,7 +128,7 @@ void main() {
   });
 
   test('every Arabic message is written in Arabic', () {
-    const arabicScript = RegExp(r'[؀-ۿ]');
+    final arabicScript = RegExp(r'[؀-ۿ]');
     final latin = <String>[];
     for (final key in keys) {
       if (!arabicScript.hasMatch(message(arb['ar']!, key))) latin.add(key);
