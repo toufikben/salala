@@ -902,6 +902,12 @@ class _PhotoImage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Decoded at the size actually drawn. A 12-megapixel camera JPEG costs about
+    // 48 MB once decoded, and this widget is a 104-point square in a strip that
+    // can hold a dozen of them: asked for the whole picture, the ledger screen
+    // spends its memory on pixels it then shrinks to nothing on the way to the
+    // canvas, on a phone with about 350 MB free.
+    final decodeWidth = (size * MediaQuery.devicePixelRatioOf(context)).ceil();
     return SizedBox(
       width: size,
       height: size,
@@ -918,6 +924,7 @@ class _PhotoImage extends ConsumerWidget {
                   ? const _PhotoMissing()
                   : Image.file(
                       File(path),
+                      cacheWidth: decodeWidth,
                       fit: BoxFit.cover,
                       // A file that will not decode is the same fact as one that is
                       // not there, told the same way.
