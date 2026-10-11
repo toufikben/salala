@@ -6,11 +6,11 @@ import 'package:salala/services/photo_files.dart';
 /// D10's privacy promise is a sentence about a path, and a path in a comment is
 /// not evidence. The first version of these rules read
 /// `<exclude domain="file" path="photos" />`, which is `<home>/files/photos`.
-/// The Realme then answered `run-as com.toufikben.ledger ls -lR
-/// app_flutter/photos` with the pictures under `<home>/app_flutter/photos`:
-/// path_provider's Android documents directory is a `getDir()` folder beside
-/// `files/`, not inside it. The exclusion matched nothing while looking entirely
-/// correct, which is the failure a privacy rule is most likely to have.
+/// The Realme then listed `<home>/app_flutter/photos` as the folder holding the
+/// pictures, which is path_provider's Android documents directory: a `getDir()`
+/// folder beside `files/`, not inside it. The exclusion matched nothing while
+/// looking entirely correct, which is the failure a privacy rule is most likely
+/// to have.
 ///
 /// CI cannot ask path_provider where it writes, and `allowBackup="false"` means
 /// a backup run on the phone refuses to produce the listing that would settle
@@ -37,7 +37,7 @@ void main() {
 
   List<String> homeRelativeExcludes(String xml) =>
       excludePattern.allMatches(xml).map((match) {
-        final domain = match.group[1]!;
+        final domain = match.group(1)!;
         final dir = domainDirs[domain];
         expect(
           dir,
@@ -48,7 +48,7 @@ void main() {
         );
         return <String>[
           dir!,
-          match.group[2]!,
+          match.group(2)!,
         ].where((part) => part.isNotEmpty).join('/');
       }).toList();
 
