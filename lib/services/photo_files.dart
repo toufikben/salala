@@ -110,8 +110,6 @@ String _extensionOf(String name) {
 class SystemPhotoFiles extends PhotoFiles {
   /// Overridable so the file rules are testable on a host without a phone;
   /// production uses the app's own documents directory.
-  /// Overridable so the file rules are testable on a host without a phone;
-  /// production uses the app's own documents directory.
   const SystemPhotoFiles({this.directory});
 
   final Future<String> Function()? directory;

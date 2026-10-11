@@ -3,6 +3,10 @@
   Pre-Android-12 (legacy) backup rules. `allowBackup="false"` is the primary
   gate; these exclusions state the same intent in the form Android 11 and below
   reads, and they are what the Play data-safety declaration will claim.
+
+  The pictures live at <home>/app_flutter/photos, measured on the phone, so the
+  exclusion is from the home directory rather than the files domain. See
+  data_extraction_rules.xml for the same rule in the Android 12+ form.
 -->
 <full-backup-content>
     <exclude domain="database" path="salala.db" />
@@ -11,5 +15,5 @@
     <exclude domain="database" path="salala.db-shm" />
     <exclude domain="sharedpref" path="FlutterSecureStorage.xml" />
     <exclude domain="sharedpref" path="FlutterSecureKeyStorage.xml" />
-    <exclude domain="file" path="photos" />
+    <exclude domain="root" path="app_flutter/photos" />
 </full-backup-content>
