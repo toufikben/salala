@@ -2160,7 +2160,7 @@ idea is bad.
   buyer's pack is a place where the whole-database file gets parsed for strangers.
   The buyer's PDF (Stage 3g) already answers the need without a server.
 
-## Stage 5a — The animal's own pictures *(CI green; the phone has seen most of it)*
+## Stage 5a — The animal's own pictures *(CI green; the phone has now seen all of it)*
 
 Taken off the Stage 5 list because the triage above found it the only candidate this
 project's two verifiers can judge. The scope shipped is the narrow one: a picture per
@@ -2245,18 +2245,112 @@ the whole picture, and a 12-megapixel JPEG is roughly 48 MB once decoded, so a s
 dozen thumbnails is not a slow screen but a dead process. `_PhotoImage` now passes
 `cacheWidth` at its own size times the ratio (`45dcf0f`).
 
-**What the phone still owes, as one visit.** Delete one picture and read back that both its
+**What the phone owed, and what it answered.** Delete one picture and read back that both its
 row and its file under `app_flutter/photos/<animal>/` are gone; delete an animal with pictures
 and read back that the folder went with her; leave the phone with no test animal and no
-picture, as every pass this project has run. The animal "Photo test"
-(`241b3141-d21b-4468-a753-5ce185ed6e4f`) and its two files are still on the device, so these
-two are **NOT RUN**, not assumed.
+picture, as every pass this project has run. Measured on the Realme on 2026-10-11, on the
+animal "Photo test" (`241b3141-d21b-4468-a753-5ce185ed6e4f`) and its two files:
+
+- Deleting `1791696358685-17279.png` through the viewer's two questions left the folder
+  holding exactly one file — `1791697071538-46565.jpg` — and `select id, animal_id, file_name
+  from photos` returned exactly one row naming it. One question, one row, one byte. The strip
+  showed one thumbnail (`photos-dev/06-after-one-delete.png`).
+- Deleting the animal took the folder with her: `run-as com.toufikben.ledger ls -lR
+  app_flutter/photos` answered `app_flutter/photos: total 0`, and the database read
+  `animals=0 photos=0` (`photos-dev/09-after-animal-delete.png`, "No animals yet").
+
+The phone was left with no test animal and no picture.
 
 **Method note for the next pass.** A screenshot pulled from a fixed path (`/sdcard/s.png`)
 came back as a frame from an earlier session and was nearly read as current. `exec-out
 screencap` into a new file name per step, and treat `mCurrentFocus` as the only signal for
 whose phone this is at the moment — the owner took the device mid-pass, and two taps went in
 before that was known.
+
+## Stage 5b — What a restore does to the pictures already on this phone *(CI green — 493 tests at `38168629165`; device pass measured 2026-10-11 on build `d434985`)*
+
+The contradiction Stage 5a left behind. D22 keeps `photos` out of the pack, so a JSON file is
+still the small text document a buyer can open in a messaging app; and `restorePack` replaces
+every row of every table it is given. Those two facts meet at one point: the moment a breeder
+reads a pack back onto her own phone, the photographs she took are rows in a table being
+cleared and files in a folder the pack never mentions.
+
+**The measurement that set the shape.** `photos` carries `ON DELETE CASCADE` from `animals`,
+and run `38165892860` asked SQLite whether that cascade fires inside the restore's own
+deferred transaction. It does. So before this stage a restore orphaned every photograph on
+the device: the rows were gone with the herd they belonged to, while the bytes stayed in
+`app_flutter/photos/<animal>/` — invisible to the ledger, invisible to the backup rules, and
+taking the space anyway.
+
+**The rule chosen: rows move with the herd, and the folder is told.** `restorePack` now reads
+the phone's own `photos` rows *before* it clears them, and re-inserts the ones whose
+`animal_id` is in the herd the pack brings back. An animal the pack does not carry loses her
+row here, in the same transaction that deletes her; an animal it does carry keeps hers, and
+with it the picture she can still point at. Then, once the commit holds, the screen sweeps
+the folder against exactly those survivors — `PhotoFiles.deleteUnbacked(kept)` removes folders
+no row names, files inside a kept folder that no row names, and loose files at the root. The
+restore's own sentence is unchanged; a sweep that the disk refuses is a `debugPrint` line, not
+a failed restore, because the ledger is already correct at that point and the leftover byte is
+the same kind of harmlessness Stage 5a accepted when deleting a picture file first.
+
+`restorePack` **returns** the rows it kept rather than letting the screen re-query the DAO,
+for two reasons that are the same reason: one question gets one answer, and the answer is the
+exact set the transaction committed, not a set that could have moved since. The rows are built
+inside the transaction and returned out of it — a caller that swept its folder against a list
+from a rolled-back transaction would delete pictures for a restore that never happened.
+
+**What was declined.** No folder scan that turns an orphaned file back into a row. A file with
+no row is a file this app was never told about; inventing a record for it would put a
+photograph into a ledger with no animal, no date and no provenance, which is the opposite of
+what a ledger is for.
+
+**CI verdicts.** The first attempt at the shape was RED where it should be: run `38167035402`
+answered `492 tests passed, 1 failed` with `Found 0 widgets with text "Records restored: 3"`
+— and the failure was the harness, not the rule. `settleRealIo` pumps a fixed number of rounds
+waiting for a loading bar; the photo row added to the restore transaction pushed the snackbar
+one step past that budget, so the same test had been green while reading nothing. The three
+restore tests now wait on the sentence they assert (`settleRefusal(tester, waitingFor:
+'Records restored: 3')`), which is the Stage 3p rule applied where it had not been applied.
+`38168267830` then failed at Analyze with `body_might_complete_normally` at
+`data_pack.dart:254` — `db.transaction` had inferred `T` from a callback whose only exit was
+the `return kept;` at the end — fixed by writing `db.transaction<List<Photo>>`. Run
+`38168629165` on `d434985`: `No issues found! (ran in 17.8s)`, 🎉 **493 tests passed**, `Build
+debug APK` green, and the APK from that run installed on the phone. Baseline before the stage:
+485 tests.
+
+**What the phone answered, on build `d434985`.** The Settings tile read `Build d434985` before
+anything was touched. Then, with the folder and the database read at each step:
+
+- Alpha (`fb859f90-…`) got one picture, `1791748723032-112379.jpg` — 112,379 bytes on disk for
+  a 112 kB source, so the copy is the copy. Her ledger's Photos strip drew it.
+- `Export records` reached the chooser; the pack it wrote is 962 bytes and its `rows` map has
+  `animals: 1` and **no `photos` key at all** — D22 read off the device, not off a test.
+- Beta (`cf2d5c1c-…`) then got a second picture, `1791748946967-626058.png`. Before the
+  restore the phone held `animals=2 photos=2` and two folders.
+- That Alpha-only pack was read back through `Restore from a pack` → *Replace everything on
+  this phone?* → `Replace`. After it: `animals=1 photos=1`, the one row joining to Alpha as
+  `Alpha | 1791748723032-112379.jpg`, `ls -lR app_flutter/photos` listing **only** Alpha's
+  folder and her file, and her ledger still drawing the photograph itself rather than «Not on
+  this phone». Beta's folder was gone — row and bytes both — and the herd list showed one
+  card. (`stage5b-device/34-alpha-after.png`, `35-herd-after-restore.png`.)
+- The phone was left as every pass leaves it: Alpha deleted, `app_flutter/photos: total 0`,
+  `animals=0 photos=0`, and the exported pack removed from `/sdcard/Download` again.
+
+**How the pack got back onto the phone, for the next pass.** The chooser was dismissed rather
+than completed, and the file the app had just written was read out of its own scratch folder —
+`run-as com.toufikben.ledger cat cache/salala_out/salala-pack-*.json` — then pushed to
+`/sdcard/Download`. Those are the app's bytes, not a hand-written pack. DocumentsUI will not
+find them under *Recent* or the *Download* smart folder (both filter to MediaStore's document
+types); the root that works is the drawer's device entry, which lists the file plainly.
+
+**The one thing this pass found that is not yet fixed.** The animal's own delete confirmation
+still says *"Its vaccinations, health tests, weights, visits and symptoms are deleted too, with
+any handover recorded for it and, if it is a dam, its whelpings."* — read verbatim off the
+device on `d434985` — and never mentions that her photographs go with her, or that the files
+are destroyed. The single-picture delete asks twice precisely because a photograph is
+irreplaceable; deleting the animal destroys the same bytes after a warning that does not name
+them. Owed: the sentence in all three locales, and a widget test that the delete dialog says
+it.
 
 ## Standing constraints
 
