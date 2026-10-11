@@ -63,16 +63,29 @@ Future<void> _tap(WidgetTester tester, Finder finder) async {
 /// the scrollable is taken from the detail screen so a route still held by the
 /// router underneath cannot be scrolled by mistake.
 Future<void> _scrollTo(WidgetTester tester, Finder finder) async {
-  await tester.scrollUntilVisible(
-    finder,
-    240,
-    scrollable: find.descendant(
-      of: find.byType(AnimalDetailScreen),
-      matching: find.byType(Scrollable),
-    ),
-  );
+  await tester.scrollUntilVisible(finder, 240, scrollable: _pageScrollable);
   await tester.pumpAndSettle();
 }
+
+/// Back to where the card lives, because a `ListView` stops building what is
+/// off screen: run `38080069651` failed three card assertions with
+/// `no TriageCard is built on this page right now` while the page was scrolled
+/// to a lower section, and every `findsNothing` about the card in this file had
+/// been passing for that same reason the whole time.
+///
+/// `jumpTo` rather than a drag, because in the refused-delete tests a modal
+/// dialog is over the page and a drag would hit its barrier.
+Future<void> _scrollToTop(WidgetTester tester) async {
+  tester.state<ScrollableState>(_pageScrollable).position.jumpTo(0);
+  // Coming back re-reads the verdict the way re-entering the screen does, so
+  // the section is loading again and has to be waited for.
+  await settleRealIo(tester);
+}
+
+final Finder _pageScrollable = find.descendant(
+  of: find.byType(AnimalDetailScreen),
+  matching: find.byType(Scrollable),
+);
 
 /// What the triage card is actually showing, so a missing verdict says why.
 ///
@@ -179,10 +192,16 @@ void main() {
       await _tap(tester, find.widgetWithText(ChoiceChip, 'Severe'));
       await _save(tester);
 
-      expect(find.text('Act now'), findsOneWidget);
+      await _scrollToTop(tester);
+      expect(
+        find.text('Act now'),
+        findsOneWidget,
+        reason: _cardReading(tester),
+      );
       expect(
         find.text('Vomiting was recorded as severe and is still happening'),
         findsOneWidget,
+        reason: _cardReading(tester),
       );
       await _scrollTo(tester, find.text('Vomiting'));
       expect(find.text('Vomiting'), findsOneWidget);
@@ -208,12 +227,13 @@ void main() {
       reason: 'before the scroll: ${_cardReading(tester)}',
     );
     await _scrollTo(tester, find.text('Vomiting'));
-
+    await _scrollToTop(tester);
     expect(
       find.text('Act now'),
       findsOneWidget,
-      reason: 'after the scroll: ${_cardReading(tester)}',
+      reason: 'back at the top: ${_cardReading(tester)}',
     );
+    await _scrollTo(tester, find.text('Vomiting'));
 
     await _tap(tester, find.text('Vomiting'));
     expect(find.text('Edit symptom'), findsOneWidget);
@@ -221,12 +241,13 @@ void main() {
     await _tap(tester, find.byType(Switch));
     await _save(tester);
 
-    expect(find.text('Act now'), findsNothing);
+    await _scrollToTop(tester);
     expect(
       find.text('Nothing in this record calls for a next step'),
       findsOneWidget,
       reason: _cardReading(tester),
     );
+    expect(find.text('Act now'), findsNothing, reason: _cardReading(tester));
     // The fact survives as history; only the alarm stops. The row reads
     // "resolved" now, in the same joined subtitle it is shown in when open.
     await _scrollTo(tester, find.text('Vomiting'));
@@ -260,12 +281,6 @@ void main() {
     );
     await _scrollTo(tester, find.text('Vomiting'));
 
-    expect(
-      find.text('Act now'),
-      findsOneWidget,
-      reason: 'after the scroll: ${_cardReading(tester)}',
-    );
-
     await _tap(tester, find.text('Vomiting'));
     await _tap(tester, find.widgetWithText(TextButton, 'Delete'));
     expect(find.text('Delete this record?'), findsOneWidget);
@@ -274,14 +289,17 @@ void main() {
     await settleRealIo(tester);
 
     expect(find.text('Vomiting'), findsNothing);
-    await _scrollTo(tester, find.text('Symptoms'));
-    expect(find.text('Nothing recorded yet.'), findsWidgets);
-    expect(find.text('Act now'), findsNothing);
+    await _scrollToTop(tester);
     expect(
       find.text('Nothing in this record calls for a next step'),
       findsOneWidget,
       reason: _cardReading(tester),
     );
+    expect(find.text('Act now'), findsNothing, reason: _cardReading(tester));
+    // Downward from the top, which is the direction this page is known to
+    // scroll in: the emptied section is above where the row just was.
+    await _scrollTo(tester, find.text('Symptoms'));
+    expect(find.text('Nothing recorded yet.'), findsWidgets);
   });
 
   testWidgets('an empty label is refused and the dialog stays open', (
@@ -296,7 +314,17 @@ void main() {
 
     expect(find.text('Say what you saw'), findsOneWidget);
     expect(find.text('Log a symptom'), findsOneWidget);
-    expect(find.text('Act now'), findsNothing);
+    await _scrollToTop(tester);
+    // The card is read from the top, where the page builds it, and the sentence
+    // that says nothing is due is the proof it is there at all: a bare
+    // `findsNothing` on `Act now` passes just as happily when the card has
+    // scrolled out of the tree.
+    expect(
+      find.text('Nothing in this record calls for a next step'),
+      findsOneWidget,
+      reason: _cardReading(tester),
+    );
+    expect(find.text('Act now'), findsNothing, reason: _cardReading(tester));
   });
 
   testWidgets('the Arabic ledger renders the symptom date in Latin digits', (
@@ -380,6 +408,7 @@ void main() {
       // Delete that answered with silence would have said the opposite.
       expect(find.text(deleteRefusalSentence), findsOneWidget);
       expect(find.byType(SymptomDialog), findsOneWidget);
+      await _scrollToTop(tester);
       expect(
         find.text('Act now'),
         findsOneWidget,
