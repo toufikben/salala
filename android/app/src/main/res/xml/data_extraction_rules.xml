@@ -17,10 +17,11 @@
       directory was read back with adb and is /data/user/0/<package>/app_flutter,
       not <home>/files, so the exclusion has to name the whole path from the
       home directory with domain="root". domain="file" points at <home>/files
-      and would have excluded nothing while looking correct. Android backs up
-      the app home directory apart from the caches by default, which is why the
-      folder needs naming at all. A dog's photograph is more identifying than a
-      weight row, so it goes where the database goes.
+      and would have excluded nothing while looking correct. Android's backup
+      documentation lists what getFilesDir() and getDir() reach as backed up
+      unless excluded, and app_flutter is a getDir() directory beside files/, so
+      naming the folder here is what closes it. A dog's photograph is more
+      identifying than a weight row, so it goes where the database goes.
 -->
 <data-extraction-rules>
     <cloud-backup>

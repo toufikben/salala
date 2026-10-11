@@ -2160,7 +2160,7 @@ idea is bad.
   buyer's pack is a place where the whole-database file gets parsed for strangers.
   The buyer's PDF (Stage 3g) already answers the need without a server.
 
-## Stage 5a — The animal's own pictures *(CI requested; the phone has not seen it)*
+## Stage 5a — The animal's own pictures *(CI green; the phone has seen most of it)*
 
 Taken off the Stage 5 list because the triage above found it the only candidate this
 project's two verifiers can judge. The scope shipped is the narrow one: a picture per
@@ -2182,9 +2182,10 @@ album, not a document attachment.
 - A row whose bytes this phone does not hold renders as a named blank — «Not on this
   phone» — which is the state of every ledger restored from a pack, said plainly and not as
   an error.
-- `files/photos` excluded from cloud backup *and* device transfer, in both
+- The pictures' folder excluded from cloud backup *and* device transfer, in both
   `data_extraction_rules.xml` and the legacy `backup_rules.xml`, because a dog's photograph
-  is more identifying than a weight row (D10).
+  is more identifying than a weight row (D10). The path in that rule is the one the phone
+  measured: `<exclude domain="root" path="app_flutter/photos" />`.
 
 **Three things the triage line got wrong, found by reading the packages instead.** No new
 dependency: `file_selector` is already here for the pack, and `file_selector_android` opens
@@ -2209,12 +2210,43 @@ CI proves the contract — the bytes written are the ones the row names, and the
 row is the name the screen asked the folder for. Rendering, the gallery sheet on ColorOS,
 and the real path the backup rules must point at are the phone's.
 
-**Queued for the device pass, as one visit:** pick from the gallery and see a real
-thumbnail; open the viewer; delete one picture and confirm both the row and
-`files/photos/<animal>/` entry are gone (read back with adb, not assumed); delete an animal
-with pictures and confirm the folder goes with her; confirm the exclude path in the XML is
-the folder the app actually writes. Then the phone is left with no test animal and no
-picture, as every pass this project has run.
+**CI verdicts.** `9b5e849` shipped the stage; run `38110515752` came back with 483 tests
+passing and the APK job red on `The string "--" is not permitted within comments` in the
+extraction-rules comment I had just added, so `ed3f145` fixed the comment and run `38111614675`
+went green end to end (analyze clean in 16.5s, 483 tests, `✓ Built build/app`). Baseline before
+the stage was 455 tests.
+
+**What the phone answered, on build `ed3f145`.** The gallery sheet opens on ColorOS with no
+permission dialog anywhere in the way, because `ACTION_OPEN_DOCUMENT` is the Storage Access
+Framework speaking. The Photos strip sits between Weigh-ins and Placements. A picked picture
+comes back as bytes the row can name: the stored files were `1791696358685-17279.png` and
+`1791697071538-46565.jpg`, and MediaStore reported the two sources as 17279 and 46565 bytes,
+so the length inside the name is the copy and not a re-encode. The thumbnail draws real
+pixels, the viewer shows the picture with the day it was taken, and the second question comes
+before anything is removed. One thumbnail rendered solid black and looked like a decode
+defect until the byte counts above matched a source that *is* a black image.
+
+**The one defect only a phone could find.** The rules excluded `domain="file" path="photos"`,
+which is `<home>/files/photos`. `run-as com.toufikben.ledger ls -lR app_flutter/photos` showed
+the pictures at `<home>/app_flutter/photos` — path_provider's Android documents directory is a
+`getDir()` folder beside `files/`, not inside it — so D10 read as satisfied while a dog's
+photograph was left inside both cloud backup and device transfer. Fixed in `4bafd27`, run
+`38162007379` (analyze clean in 16.2s, 483 tests, APK from the same run), and pinned by
+`test/services/photo_backup_rules_test.dart`, which reads both rule files off disk and refuses
+any exclusion that does not resolve to the folder `photo_files.dart` names.
+
+**What the phone still owes, as one visit.** Delete one picture and read back that both its
+row and its file under `app_flutter/photos/<animal>/` are gone; delete an animal with pictures
+and read back that the folder went with her; leave the phone with no test animal and no
+picture, as every pass this project has run. The animal "Photo test"
+(`241b3141-d21b-4468-a753-5ce185ed6e4f`) and its two files are still on the device, so these
+two are **NOT RUN**, not assumed.
+
+**Method note for the next pass.** A screenshot pulled from a fixed path (`/sdcard/s.png`)
+came back as a frame from an earlier session and was nearly read as current. `exec-out
+screencap` into a new file name per step, and treat `mCurrentFocus` as the only signal for
+whose phone this is at the moment — the owner took the device mid-pass, and two taps went in
+before that was known.
 
 ## Standing constraints
 

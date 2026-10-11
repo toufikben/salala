@@ -56,6 +56,14 @@ const List<String> photoExtensions = <String>[
   'gif',
 ];
 
+/// The folder under the app's documents that holds every animal's pictures.
+///
+/// Named once because two things outside this file have to agree with it: the
+/// backup exclusions in `android/app/src/main/res/xml/`, which are a privacy
+/// claim about a path, and `photo_backup_rules_test.dart`, which checks the two
+/// still say the same directory.
+const String photosDirectoryName = 'photos';
+
 /// Where a picture lives, and how it gets there — behind one seam.
 ///
 /// `data_pack.dart` decides what a backup holds and proves it against a real
@@ -116,7 +124,7 @@ class SystemPhotoFiles extends PhotoFiles {
 
   Future<String> get _root async {
     final base = await (directory ?? _documents)();
-    return p.join(base, 'photos');
+    return p.join(base, photosDirectoryName);
   }
 
   static Future<String> _documents() async =>
