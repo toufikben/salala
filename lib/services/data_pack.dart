@@ -251,7 +251,7 @@ bool _addedAfterPack(String table, int packSchema) {
 /// database a second time what this transaction already decided would be a
 /// second answer to the same question, and a slower one.
 Future<List<Photo>> restorePack(Database db, PackRows pack) {
-  return db.transaction((txn) async {
+  return db.transaction<List<Photo>>((txn) async {
     await txn.execute('PRAGMA defer_foreign_keys = ON');
 
     final pictures = await txn.query('photos');
@@ -288,6 +288,10 @@ Future<List<Photo>> restorePack(Database db, PackRows pack) {
     if (dangling.isNotEmpty) {
       throw PackReject(PackProblem.danglingReference, _rowRef(dangling.first));
     }
+    // Out of the transaction, not beside it: the rows are only real once the
+    // commit holds, and a caller that swept its folder against a rolled-back
+    // list would have deleted pictures for a restore that never happened.
+    return kept;
   });
 }
 
