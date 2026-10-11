@@ -179,13 +179,15 @@ last one needs a device:
 - `services/photo_files.dart` is the same kind of surface for the animal's
   pictures: open the gallery, copy the chosen file into one folder per animal
   under the app's documents directory, hand a row's name back as a path, delete
-  one or the folder. The rules live here — the extension list, the size cap, and
-  the two name checks that keep a `photos` row from pointing outside the folder
-  this app owns — and the screens above it run against a recorder (D41).
+  one or the folder, and sweep whatever no row names. The rules live here — the
+  extension list, the size cap, and the two name checks that keep a `photos` row
+  from pointing outside the folder this app owns — and the screens above it run
+  against a recorder (D41, D42).
 - `presentation/screens/settings_screen.dart` is the only place that asks before
   it replaces, and it names the counts it is about to destroy first. A restore
   re-arms the alarms afterwards, because the phone holds a different ledger and
-  nothing else would tell the alarm manager about it.
+  nothing else would tell the alarm manager about it, and it then tells the photo
+  folder which pictures that new ledger still owns (D42).
 - `services/animal_pdf.dart` is the buyer's document: one animal's identity, three
   generations of pedigree, its doses, screenings, weigh-ins with a growth curve,
   visits, the litters it produced or sired, and the placement. It reads the
@@ -218,11 +220,15 @@ Photos are deliberately not in a pack. `photos` is in `fileBackedTables`, not
 `dataTables`, so a JSON pack carries no picture rows and a pack that names the
 table is refused as `unknownTable` rather than half-restored: the bytes stay on
 the phone that has them, and the file a buyer opens in a messaging app stays the
-small text document D22 made it. A ledger restored on a second phone therefore
-shows each picture as a named blank — «Not on this phone» — which is the truth
-about those rows and not a fault to alarm the breeder with. `animals.photo_path`
-is a path on *this* phone for the same reason, and nothing writes it. The PDF pack
-is where an image belongs.
+small text document D22 made it. What a pack does decide is which of this phone's
+pictures still have a row: `restorePack` puts back the rows whose animal the
+incoming file carries, and Settings then sweeps every file no row names, so a
+restore cannot leave a photograph the ledger has forgotten (D42). A row whose
+bytes this phone does not hold — a database file copied across by hand, a folder
+cleared outside the app — draws a named blank, «Not on this phone», which is the
+truth about that row and not a fault to alarm the breeder with.
+`animals.photo_path` is a path on *this* phone for the same reason, and nothing
+writes it. The PDF pack is where an image belongs.
 The PIN digest is not in a pack either (it lives in the keystore, not in
 `user_settings`), so a restored file can neither leak it nor lock anybody out.
 

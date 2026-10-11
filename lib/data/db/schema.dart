@@ -41,9 +41,10 @@ const String createSymptomsIndex =
 ///
 /// `file_name` is a bare name, never a path. The bytes live in one folder this
 /// app owns (`photos/<animal_id>/` under the app's documents), so a row cannot
-/// point outside it — and a ledger restored on another phone, where the folder
-/// is empty, draws a named blank for each row rather than reaching for someone
-/// else's files.
+/// point outside it — and a row whose bytes this phone does not hold, from a
+/// database file carried across by hand, draws a named blank rather than reaching
+/// for someone else's files. A pack carries no rows here at all, and D42 is what
+/// keeps a restore from leaving a file that no row names.
 ///
 /// `animals.photo_path` is *not* that mechanism. It has been in the table since
 /// the scaffold, nothing has ever written it, and dropping it now would make

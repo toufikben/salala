@@ -225,7 +225,13 @@ void main() {
 
       await tapTile(tester, 'Restore from a pack');
       await tester.tap(find.widgetWithText(FilledButton, 'Replace'));
-      await settleRealIo(tester);
+      // Keyed on the sentence rather than on a fixed pump: the restore is a
+      // transaction, a resync, a sweep and two refreshes deep, and a snackbar at
+      // the end of that chain lands whenever the database isolate answers. Run
+      // `38167035402` measured the alternative — the same green test read 0
+      // snackbars after a photo row was added to the transaction, because
+      // `settleRealIo`'s rounds ran out one step before the last one.
+      await settleRefusal(tester, waitingFor: 'Records restored: 3');
 
       expect(find.text('Records restored: 3'), findsOneWidget);
 
@@ -318,7 +324,10 @@ void main() {
 
       await tapTile(tester, 'Restore from a pack');
       await tester.tap(find.widgetWithText(FilledButton, 'Replace'));
-      await settleRealIo(tester);
+      // The sweep is not the last thing the restore does, so this waits for the
+      // sentence that is: once the chain has reached the snackbar, the call below
+      // it has certainly happened or certainly been refused.
+      await settleRefusal(tester, waitingFor: 'Records restored: 1');
 
       // A pack carries no pictures, so the rows that came through are the only
       // answer to which bytes still belong on this phone. Without this call a
@@ -342,11 +351,12 @@ void main() {
 
       await tapTile(tester, 'Restore from a pack');
       await tester.tap(find.widgetWithText(FilledButton, 'Replace'));
-      await settleRealIo(tester);
+      await settleRefusal(tester, waitingFor: 'Records restored: 1');
 
       // The records are the win. A folder the phone will not clear is a log
       // line, not a message that says the restore failed when it did not.
       expect(find.text('Records restored: 1'), findsOneWidget);
+      expect(photos.sweeps, isEmpty);
     });
 
     testWidgets('a file that is not a pack is refused without asking', (

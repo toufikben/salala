@@ -1341,3 +1341,58 @@ screen asked the folder for (`pathsAsked` against `stored`). Whether a thumbnail
 appears, whether the gallery sheet opens on a Realme, and whether the backup rules
 point at the folder that actually exists are the phone's verdict, and until it
 gives one they are recorded as NOT RUN.
+
+## D42 — A restore replaces the ledger, so it is what decides which pictures belong
+
+D22 keeps the pictures out of a pack, and D41 makes a `photos` row a pointer into
+this phone's folder. Put the two together and there is a moment nobody had looked
+at: a restore rewrites every row the ledger holds while the files sit where they
+were. `restorePack` deletes the animals table inside its transaction, and the
+foreign key's `ON DELETE CASCADE` goes through and takes every `photos` row with
+it — measured, not recalled: run `38165892860` ran a real database through that
+exact sequence and the table came back empty.
+
+So a restore used to leave every photograph on the phone named by no row. That is
+the one state D41 exists to forbid, and it is worse than untidy: a file no row
+names is drawn by no screen, so the breeder has no way to see it and no way to
+delete it. It sits in the app's own storage until an uninstall. D10's promise —
+that a dog's photograph is kept where the breeder keeps it — cannot be made about
+bytes the ledger has forgotten.
+
+**The rows move with the herd, in one direction only.** `restorePack` now reads
+the `photos` rows before the animals go, clears the table by hand rather than
+trusting when SQLite fires a deferred cascade, and puts back the rows whose
+animal the incoming file carries. A breeder who restores her own backup on her own
+phone gets her own photographs: same animal, same bytes, same row. A picture of an
+animal the pack does not name loses its row, because that animal is no longer on
+this phone.
+
+**The files are then the ledger's to evict.** `restorePack` hands the rows it put
+back to its caller rather than making the screen ask the database a second time
+what its own transaction already decided, and Settings calls
+`PhotoFiles.deleteUnbacked` with them: every file under the photos folder that no
+row names goes, with the folder that empties as a result and any file loose in the
+root. It is the only pass that can reach those bytes, because nothing above it
+draws a picture except through a row. A phone that refuses the sweep has still
+restored the ledger, so the refusal is a log line and not the sentence that says
+nothing moved.
+
+**What was declined.** Rebuilding rows by scanning the folder — adopting whatever
+files are on disk — would survive a pack whose rows were lost, but it would also
+resurrect a picture whose row was deliberately deleted and whose file the phone
+failed to remove. D41 chose that leftover to be invisible and swept, not a
+photograph that comes back. The rows this app writes are the only thing that gets
+a file drawn here.
+
+**Tests.** `data_pack_test.dart` holds both halves of the row rule (kept for an
+animal the pack carries, dropped for one it does not) and that the rows it hands
+back are the rows left on the phone, `photo_files_test.dart` runs the sweep against
+a real temp folder — kept name, forgotten name, emptied folder, loose file, and a
+phone with no pictures at all — and `settings_pack_test.dart` proves the screen
+asks with the surviving rows and that a refused sweep still reports a restore that
+worked. Run `38167035402` cost a round trip to write the last part: two restore
+tests waited on `settleRealIo`, which is a fixed number of pumps keyed on a
+*loading bar*, and the sentence they then asserted is not a bar — the transaction
+that grew by one query pushed the snackbar past the wait and a green test that had
+nothing to do with pictures read zero of them. Those waits now poll for the exact
+sentence, the way the write tests have since Stage 3p.

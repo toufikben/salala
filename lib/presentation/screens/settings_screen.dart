@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/build_info.dart';
 import '../../core/l10n/app_localizations.dart';
 import '../../core/utils/date_utils.dart';
+import '../../data/models/photo.dart';
 import '../../services/data_pack.dart';
 import '../../services/pack_files.dart';
 import '../../services/reminder_resync.dart';
@@ -270,8 +271,9 @@ Future<void> _importPack(BuildContext context, WidgetRef ref) async {
   );
   if (confirmed != true) return;
 
+  final List<Photo> survivors;
   try {
-    await restorePack(db, pack);
+    survivors = await restorePack(db, pack);
   } catch (error) {
     // The transaction is what failed, so the rows that were here are still here
     // and the message can say so out loud.
@@ -307,7 +309,7 @@ Future<void> _importPack(BuildContext context, WidgetRef ref) async {
   // restore are the only honest answer to which files still belong here.
   try {
     final kept = <String, Set<String>>{};
-    for (final photo in await ref.read(daosProvider).photos.all()) {
+    for (final photo in survivors) {
       kept.putIfAbsent(photo.animalId, () => <String>{}).add(photo.fileName);
     }
     await ref.read(photoFilesProvider).deleteUnbacked(kept);

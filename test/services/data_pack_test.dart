@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:salala/data/db/schema.dart';
+import 'package:salala/data/models/photo.dart';
 import 'package:salala/services/data_pack.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -304,7 +305,7 @@ void main() {
         'created_at': 1700000000000,
       });
 
-      await restorePack(target, pack);
+      final survivors = await restorePack(target, pack);
 
       // The bytes are still in the folder, and this is the same animal: the
       // breeder who restores her own backup on her own phone keeps her
@@ -313,6 +314,15 @@ void main() {
       expect(kept, hasLength(1));
       expect(kept.single['id'], 'p-here');
       expect(kept.single['file_name'], '1700000000000-2.jpg');
+      // And the caller is handed that row rather than told to go and ask again:
+      // it is the list the screen sweeps its picture folder against, so a row
+      // on the phone that the sweep never heard of would delete a living
+      // photograph off the phone.
+      expect(survivors, hasLength(1));
+      expect(survivors.single, isA<Photo>());
+      expect(survivors.single.id, 'p-here');
+      expect(survivors.single.animalId, 'a-dam');
+      expect(survivors.single.fileName, '1700000000000-2.jpg');
     });
 
     test('a restore drops the picture of an animal the pack does not carry', () async {
@@ -335,12 +345,13 @@ void main() {
         'created_at': 1700000000000,
       });
 
-      await restorePack(target, pack);
+      final survivors = await restorePack(target, pack);
 
       // No row may outlive its animal: the file is the caller's to sweep, and
       // a row left here would name a picture of an animal this phone no longer
       // has, which no screen could explain.
       expect(await target.query('photos'), isEmpty);
+      expect(survivors, isEmpty);
     });
 
     test('an empty pack empties the database', () async {

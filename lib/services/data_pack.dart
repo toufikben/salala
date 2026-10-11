@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:sqflite/sqflite.dart';
 
 import '../data/db/schema.dart';
+import '../data/models/photo.dart';
 
 /// The whole database as one JSON document (Stage 2).
 ///
@@ -243,9 +244,13 @@ bool _addedAfterPack(String table, int packSchema) {
 /// read back before the animals go (the cascade takes them with it, measured on
 /// a real database at run `38165892860`), and the ones whose animal the incoming
 /// file carries are put back: those bytes are still this phone's own pictures,
-/// and dropping the row would hide them behind no screen at all. What is left
-/// over is the caller's to sweep from disk — see `PhotoFiles.deleteUnbacked`.
-Future<void> restorePack(Database db, PackRows pack) {
+/// and dropping the row would hide them behind no screen at all.
+///
+/// The rows that came through are what this returns, because the caller has a
+/// folder to sweep against them — `PhotoFiles.deleteUnbacked` — and asking the
+/// database a second time what this transaction already decided would be a
+/// second answer to the same question, and a slower one.
+Future<List<Photo>> restorePack(Database db, PackRows pack) {
   return db.transaction((txn) async {
     await txn.execute('PRAGMA defer_foreign_keys = ON');
 
@@ -271,9 +276,11 @@ Future<void> restorePack(Database db, PackRows pack) {
     final herd = <String>{
       for (final row in await txn.query('animals')) row['id']! as String,
     };
+    final kept = <Photo>[];
     for (final picture in pictures) {
       if (herd.contains(picture['animal_id'])) {
         await txn.insert('photos', picture);
+        kept.add(Photo.fromMap(picture));
       }
     }
 
