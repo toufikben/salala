@@ -2448,10 +2448,13 @@ shipped, so the correction lives here and in the line above.
 pass (`animals=0 photos=0` from a pulled `salala.db`), so none of the owner's own records were
 in the way.
 
-One animal (`Nala`, species `dog`), one picture: a 1,147,248-byte PNG pushed to
-`/sdcard/Download` and chosen through the ledger's own **Add photo** tile. The app stored it as
+Two animals, three readings. The first was built while the app was in English (`Nala`, species
+`dog`, plus one picture — a 1,147,248-byte PNG pushed to `/sdcard/Download` and chosen through
+the ledger's own **Add photo** tile, which landed as
 `app_flutter/photos/4dc31859-…/1791761342494-1147248.png`, the byte length in its name equal to
-the gallery source's MediaStore `_size`.
+the gallery source's MediaStore `_size`); her dialog was read in English, cancelled, read again
+after switching اللغة → العربية on the phone, and then deleted in Arabic. The second animal was
+built the same way with the app already in French, and gave the third reading.
 
 - English (`stage5c-device/15-delete-en.png`) reads "…with any handover recorded for it, its
   photographs and the files that hold them on this phone, and, if it is a dam, its whelpings.
@@ -2460,18 +2463,33 @@ the gallery source's MediaStore `_size`.
 - Arabic, after switching اللغة → العربية on the phone itself
   (`stage5c-device/22-delete-ar.png`): «…وسجل التسليم إن وُجد، وصورها وما على هذا الهاتف من
   ملفات تلك الصور، والولادات التي هي أمّ لها.» Right-to-left, six lines, nothing clipped.
-- Both sentences were then compared against the `.arb` files character by character rather than
-  by eye: `compare-ar.cjs` prints `231 / 231 / equal: true` for English and
-  `205 / 205 / equal: true` for Arabic. A screenshot proves a person can read the sentence; it
-  does not prove the sentence on the glass is the sentence under review.
+- French, on a second animal built the same way (`stage5c-device/38-delete-fr.png`): «…ainsi
+  que la cession enregistrée, ses photos et les fichiers qui les gardent sur cet appareil, et
+  les portées dont cet animal est la mère.» Eight lines — the longest of the three, and the one
+  that comes closest to the dialog's height.
+- All three sentences were then compared against their `.arb` files character by character
+  rather than by eye: `compare-ar.cjs` prints `231 / 231 / equal: true` for English,
+  `205 / 205 / true` for Arabic and `241 / 241 / true` for French. A screenshot proves a person
+  can read the sentence; it does not prove the sentence on the glass is the sentence under
+  review.
 - **Delete**, tapped while the app was in Arabic: the herd came back to «لا توجد حيوانات بعد»,
   `run-as com.toufikben.ledger ls -lR app_flutter/photos` printed `total 0` — the animal's
   folder is gone, not merely emptied — and the pulled DB read
-  `animals=0 photos=0 vaccinations=0 placements=0`.
+  `animals=0 photos=0 vaccinations=0 placements=0`. The French round ended the same way:
+  `total 0` and `0 animals, 0 photos`.
 
-The phone was left as found: both pushed copies of the test picture deleted and de-indexed (a
-MediaStore query for `d43check` now returns 0 rows), the language set back to System default,
-the app force-stopped with the launcher in focus.
+One tap on the second animal did nothing, and it is worth recording why. The `Annuler` press
+closed the dialog, and the `Supprimer` press that followed was still computed from the dump
+taken while it was open, so it landed on the herd screen with no dialog there to answer. The
+animal, her row and her file were all still in place afterwards, and the delete was redone from
+a fresh dump. That is the stale-coordinate rule in the pass's own numbers, and the reason the
+`Supprimer` that finally fired was resolved from the screen it was tapped on.
+
+The phone was left as found: every copy of the test picture pushed for the pass (the first
+`DCIM/Camera` one and both `Download` pushes) deleted and de-indexed — a MediaStore query for
+`d43check` now returns 0 rows — the language set back to System default, the app force-stopped
+with the launcher in focus, and the herd and `app_flutter/photos` both empty, which is where
+this pass started.
 
 ## Standing constraints
 

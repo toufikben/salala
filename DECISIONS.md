@@ -1433,7 +1433,7 @@ not a check that passed, and the CI job that says so is the reason to write the 
 against a real finder.
 
 **And on the phone.** The rule's whole claim is about a screen, so the screen was read: at
-build `96eaa7c` on 2026-10-12 the warning said the Arabic and the English sentence each in
-full, each matching its `.arb` file character for character, and after `Delete` on an animal
-with one picture `app_flutter/photos` came back `total 0`. The store the sentence names is the
-store the tap empties. `ROADMAP.md` carries the pass.
+build `96eaa7c` on 2026-10-12 all three warnings — English, Arabic, French — were read off the
+Realme for an animal holding one picture, each matching its `.arb` file character for
+character, and each `Delete` left `app_flutter/photos` at `total 0`. The store the sentence
+names is the store the tap empties. `ROADMAP.md` carries the pass.
