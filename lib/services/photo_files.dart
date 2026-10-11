@@ -89,6 +89,15 @@ abstract class PhotoFiles {
   /// itself with it.
   Future<void> deleteAll(String animalId);
 
+  /// Removes every file this folder holds that no row in [kept] names, and the
+  /// folders that empty as a result.
+  ///
+  /// The one sweep that keeps the folder and the ledger the same size: a pack
+  /// restore replaces the rows, and a picture no row points at is invisible to
+  /// every screen, so nothing on the phone could ever delete it. [kept] is keyed
+  /// by animal id — the same ids [store] was called with, not folder names.
+  Future<void> deleteUnbacked(Map<String, Set<String>> kept);
+
   /// The path to render, or null when the bytes are not on this phone.
   Future<String?> pathFor(String animalId, String fileName);
 }
@@ -181,6 +190,37 @@ class SystemPhotoFiles extends PhotoFiles {
   Future<void> deleteAll(String animalId) async {
     final folder = Directory(await _folder(animalId));
     if (await folder.exists()) await folder.delete(recursive: true);
+  }
+
+  @override
+  Future<void> deleteUnbacked(Map<String, Set<String>> kept) async {
+    final root = Directory(await _root);
+    if (!await root.exists()) return;
+    final wanted = <String, Set<String>>{
+      for (final entry in kept.entries) photoFolder(entry.key): entry.value,
+    };
+    // Listed into a list before anything is removed: `Directory.list()` walks
+    // lazily, and deleting the folder it is standing in throws instead of ending.
+    for (final entry in await root.list().toList()) {
+      if (entry is! Directory) {
+        // A picture loose in the photos folder is one no row of this app's shape
+        // can name — every row resolves through an animal's folder — so it
+        // belongs to no ledger, and no screen could ever reach it.
+        if (entry is File) await entry.delete();
+        continue;
+      }
+      final keep = wanted[p.basename(entry.path)];
+      if (keep == null) {
+        await entry.delete(recursive: true);
+        continue;
+      }
+      for (final picture in await entry.list().toList()) {
+        if (!keep.contains(p.basename(picture.path))) {
+          await picture.delete(recursive: true);
+        }
+      }
+      if ((await entry.list().toList()).isEmpty) await entry.delete();
+    }
   }
 
   @override

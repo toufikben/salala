@@ -301,6 +301,21 @@ Future<void> _importPack(BuildContext context, WidgetRef ref) async {
     // not be reported as a failed restore.
     debugPrint('Reminder resync after a restore failed: $error');
   }
+  // A pack carries no pictures, so the animals the file did not name leave their
+  // folders on this phone with no row and no screen that can reach them — bytes
+  // D10 promised nobody else would ever hold. The rows that came through the
+  // restore are the only honest answer to which files still belong here.
+  try {
+    final kept = <String, Set<String>>{};
+    for (final photo in await ref.read(daosProvider).photos.all()) {
+      kept.putIfAbsent(photo.animalId, () => <String>{}).add(photo.fileName);
+    }
+    await ref.read(photoFilesProvider).deleteUnbacked(kept);
+  } catch (error) {
+    // The ledger is restored; a folder this phone will not clear is said to the
+    // log, not to the breeder, who has nothing to do about it.
+    debugPrint('Photo sweep after a restore failed: $error');
+  }
   await ref.read(animalsProvider.notifier).refresh();
   await ref.read(littersProvider.notifier).refresh();
   // The herd agenda on the home screen is the third thing derived from these

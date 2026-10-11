@@ -215,5 +215,69 @@ void main() {
       expect(folder.existsSync(), isFalse);
       await expectLater(files().deleteAll(id), completes);
     });
+
+    // The sweep a pack restore runs. A file no row names is invisible to every
+    // screen on the phone, so nothing but this pass could ever remove it — and
+    // D10's promise that a dog's photograph stays where the breeder put it does
+    // not hold while bytes sit in the app's storage with no ledger behind them.
+    test('deleteUnbacked keeps exactly the names the rows carry', () async {
+      final here = animalId('kept');
+      final gone = animalId('gone');
+      final named = await files().store(here, picked('one.jpg', bytes: 4));
+      final forgotten = await files().store(here, picked('two.jpg', bytes: 9));
+      await files().store(gone, picked('three.jpg', bytes: 16));
+
+      final folder = Directory(p.join(root.path, 'photos', photoFolder(here)));
+      final keptPath = p.join(folder.path, named);
+      final forgottenPath = p.join(folder.path, forgotten);
+      expect(File(forgottenPath).existsSync(), isTrue);
+      expect(
+        Directory(p.join(root.path, 'photos', photoFolder(gone))).existsSync(),
+        isTrue,
+      );
+
+      await files().deleteUnbacked(<String, Set<String>>{
+        here: <String>{named},
+      });
+
+      expect(File(keptPath).existsSync(), isTrue);
+      expect(File(forgottenPath).existsSync(), isFalse);
+      expect(folder.existsSync(), isTrue);
+      expect(
+        Directory(p.join(root.path, 'photos', photoFolder(gone))).existsSync(),
+        isFalse,
+      );
+    });
+
+    test('deleteUnbacked takes a folder the last picture left empty', () async {
+      final id = animalId('a');
+      await files().store(id, picked('one.jpg', bytes: 4));
+      final folder = Directory(p.join(root.path, 'photos', photoFolder(id)));
+
+      await files().deleteUnbacked(<String, Set<String>>{id: <String>{}});
+
+      expect(folder.existsSync(), isFalse);
+    });
+
+    test('deleteUnbacked removes a file no animal folder holds', () async {
+      final loose = File(p.join(root.path, 'photos', 'loose.jpg'));
+      await loose.create(recursive: true);
+
+      await files().deleteUnbacked(<String, Set<String>>{});
+
+      expect(loose.existsSync(), isFalse);
+    });
+
+    test('deleteUnbacked on a phone with no pictures says nothing', () async {
+      expect(
+        Directory(p.join(root.path, 'photos')).existsSync(),
+        isFalse,
+        reason: 'the sweep must not be what creates the folder',
+      );
+      await expectLater(
+        files().deleteUnbacked(<String, Set<String>>{}),
+        completes,
+      );
+    });
   });
 }

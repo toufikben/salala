@@ -24,6 +24,9 @@ class FakePhotoFiles implements PhotoFiles {
   /// Thrown instead of deleting, for the file that would not go.
   Object? deleteFailure;
 
+  /// Thrown instead of sweeping, for the folder the phone will not clear.
+  Object? sweepFailure;
+
   /// Every store, as `<animalId>/<fileName>`, in the order they happened.
   final List<String> stored = <String>[];
 
@@ -32,6 +35,10 @@ class FakePhotoFiles implements PhotoFiles {
 
   /// Every whole-folder clear, by animal id.
   final List<String> clearedFolders = <String>[];
+
+  /// Every orphan sweep, as the file names it was told to keep per animal. The
+  /// last one is what a restore left standing.
+  final List<Map<String, Set<String>>> sweeps = <Map<String, Set<String>>>[];
 
   /// Every path the screen asked for, as `<animalId>/<fileName>` — what the row
   /// told this app the picture was called. Compared against [stored], it is how
@@ -64,6 +71,12 @@ class FakePhotoFiles implements PhotoFiles {
   @override
   Future<void> deleteAll(String animalId) async {
     clearedFolders.add(animalId);
+  }
+
+  @override
+  Future<void> deleteUnbacked(Map<String, Set<String>> kept) async {
+    if (sweepFailure != null) throw sweepFailure!;
+    sweeps.add(kept);
   }
 
   @override

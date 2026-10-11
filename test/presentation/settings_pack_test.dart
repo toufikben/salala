@@ -4,12 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:salala/data/db/schema.dart';
 import 'package:salala/data/models/animal.dart';
+import 'package:salala/data/models/photo.dart';
 import 'package:salala/data/models/vaccination.dart';
 import 'package:salala/presentation/widgets/animal_card.dart';
 import 'package:salala/services/data_pack.dart';
 
 import '../helpers/fake_notification_writer.dart';
 import '../helpers/fake_pack_files.dart';
+import '../helpers/fake_photo_files.dart';
 import '../helpers/pump_app.dart';
 
 /// A pack with every table present, so [parsePack] accepts it, holding only the
@@ -289,6 +291,62 @@ void main() {
       expect(notifications.written, hasLength(1));
       expect(notifications.written.single.title, 'Kenza');
       expect(notifications.written.single.body, contains('Rabies'));
+    });
+
+    testWidgets('the restore tells the folder which pictures still belong', (
+      tester,
+    ) async {
+      final photos = FakePhotoFiles();
+      files.pickedText = packJson(
+        animals: <Map<String, Object?>>[animalRow('atlas', 'Atlas')],
+      );
+      await pumpSalala(
+        tester,
+        packFiles: files,
+        photoFiles: photos,
+        seed: <Animal>[animal('Atlas')],
+        seedPhotos: <Photo>[
+          Photo(
+            id: 'p-1',
+            animalId: 'atlas',
+            fileName: '1759000000000-4.jpg',
+            createdAt: 1759000000000,
+          ),
+        ],
+      );
+      await goTo(tester, 'Settings');
+
+      await tapTile(tester, 'Restore from a pack');
+      await tester.tap(find.widgetWithText(FilledButton, 'Replace'));
+      await settleRealIo(tester);
+
+      // A pack carries no pictures, so the rows that came through are the only
+      // answer to which bytes still belong on this phone. Without this call a
+      // restore leaves a photograph named by nothing — invisible to every screen,
+      // so nothing but an uninstall could ever remove it.
+      expect(photos.sweeps, hasLength(1));
+      expect(photos.sweeps.single, <String, Set<String>>{
+        'atlas': <String>{'1759000000000-4.jpg'},
+      });
+    });
+
+    testWidgets('a phone that refuses the sweep still restored the ledger', (
+      tester,
+    ) async {
+      final photos = FakePhotoFiles()..sweepFailure = StateError('busy');
+      files.pickedText = packJson(
+        animals: <Map<String, Object?>>[animalRow('a-1', 'Kenza')],
+      );
+      await pumpSalala(tester, packFiles: files, photoFiles: photos);
+      await goTo(tester, 'Settings');
+
+      await tapTile(tester, 'Restore from a pack');
+      await tester.tap(find.widgetWithText(FilledButton, 'Replace'));
+      await settleRealIo(tester);
+
+      // The records are the win. A folder the phone will not clear is a log
+      // line, not a message that says the restore failed when it did not.
+      expect(find.text('Records restored: 1'), findsOneWidget);
     });
 
     testWidgets('a file that is not a pack is refused without asking', (

@@ -237,9 +237,22 @@ bool _addedAfterPack(String table, int packSchema) {
 /// pack's dangling rows are therefore rejected while a rollback still works, so
 /// the rows that were on the phone before the attempt are still there and the
 /// database is still answering questions.
+///
+/// The pictures are the one table a pack does not carry, and the restore is the
+/// one moment the ledger changes underneath a folder of files. Their rows are
+/// read back before the animals go (the cascade takes them with it, measured on
+/// a real database at run `38165892860`), and the ones whose animal the incoming
+/// file carries are put back: those bytes are still this phone's own pictures,
+/// and dropping the row would hide them behind no screen at all. What is left
+/// over is the caller's to sweep from disk — see `PhotoFiles.deleteUnbacked`.
 Future<void> restorePack(Database db, PackRows pack) {
   return db.transaction((txn) async {
     await txn.execute('PRAGMA defer_foreign_keys = ON');
+
+    final pictures = await txn.query('photos');
+    // Cleared by hand rather than left to the cascade, so the outcome does not
+    // depend on when SQLite fires a deferred foreign key's action.
+    await txn.delete('photos');
 
     for (final table in dataTables.reversed) {
       await txn.delete(table);
@@ -253,6 +266,15 @@ Future<void> restorePack(Database db, PackRows pack) {
         batch.insert(table, row, conflictAlgorithm: ConflictAlgorithm.abort);
       }
       await batch.commit(noResult: true);
+    }
+
+    final herd = <String>{
+      for (final row in await txn.query('animals')) row['id']! as String,
+    };
+    for (final picture in pictures) {
+      if (herd.contains(picture['animal_id'])) {
+        await txn.insert('photos', picture);
+      }
     }
 
     final dangling = await txn.rawQuery('PRAGMA foreign_key_check');
