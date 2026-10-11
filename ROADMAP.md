@@ -2343,14 +2343,75 @@ than completed, and the file the app had just written was read out of its own sc
 find them under *Recent* or the *Download* smart folder (both filter to MediaStore's document
 types); the root that works is the drawer's device entry, which lists the file plainly.
 
-**The one thing this pass found that is not yet fixed.** The animal's own delete confirmation
-still says *"Its vaccinations, health tests, weights, visits and symptoms are deleted too, with
-any handover recorded for it and, if it is a dam, its whelpings."* — read verbatim off the
-device on `d434985` — and never mentions that her photographs go with her, or that the files
-are destroyed. The single-picture delete asks twice precisely because a photograph is
+**The one thing this pass found.** The animal's own delete confirmation said *"Its
+vaccinations, health tests, weights, visits and symptoms are deleted too, with any handover
+recorded for it and, if it is a dam, its whelpings."* — read verbatim off the device on
+`d434985` — and never mentioned that her photographs go with her, or that the files are
+destroyed. The single-picture delete asks twice precisely because a photograph is
 irreplaceable; deleting the animal destroys the same bytes after a warning that does not name
-them. Owed: the sentence in all three locales, and a widget test that the delete dialog says
-it.
+them. Stage 5c below ships the sentence; D43 records the rule it comes from.
+
+## Stage 5c — The delete warning names the photographs it takes *(CI green — 494 tests at `38172109076`, master `f6ceb11`; the phone has NOT re-read it yet)*
+
+The sentence Stage 5b's device pass found missing. It is a wording change with a real
+consequence behind it: `photos` is the only table in this schema whose deletion destroys
+something outside the database, and the warning that authorises that destruction did not
+mention it. D43 is the rule this installs; the rest of the stage is the rule applied to one
+string and the test that keeps it applied.
+
+**The sentence.** `animalDeleteBody` in all three locales now reads, in English: *"Its
+vaccinations, health tests, weights, visits and symptoms are deleted too, with any handover
+recorded for it, its photographs and the files that hold them on this phone, and, if it is a
+dam, its whelpings. This cannot be undone."* Arabic says the same clause («وصورها وما على هذا
+الهاتف من ملفات تلك الصور») and French «ses photos et les fichiers qui les gardent sur cet
+appareil». The generated `app_localizations*.dart` files were regenerated here with
+`flutter gen-l10n` — the one code generation this project allows offline, because it reads the
+`.arb` files and touches nothing else; the abstract file's only change is the doc-comment copy
+of the default string.
+
+**The test.** `animal_list_screen_test.dart:290` seeds one animal, taps the card's overflow
+menu to `Delete`, and asserts four phrases off the dialog the way the phone reads them. It is
+in the group that owns `nala()`, next to the test that a delete takes her alarms out of the
+phone — the two together say what one tap removes from each of the two stores.
+
+**What was declined.** A second confirmation for an animal that happens to have pictures. The
+single picture asks twice because the question changes mid-flow (remove the row, then destroy
+the bytes); an animal's delete is one decision about one herd, and a dialog that must be read
+twice trains the reader to tap through both. Also declined: putting the picture *count* in the
+warning. The dialog is built by the card from localization strings and holds no DAO read; a
+number there would mean the herd list queries `photos` for every card to serve one sentence in
+a dialog most taps never open.
+
+**CI verdicts, including the two that were not the point.**
+
+- `38171962415` — branch `5c-red`, commit `9134077`. RED for the **wrong** reason: `flutter
+  analyze --fatal-infos` stopped with `The method 'textThat' isn't defined for the type
+  'CommonFinders'` at `animal_list_screen_test.dart:306`. That finder does not exist on this
+  Flutter (3.47.5); `textContaining` does.
+- `38171992198` — master `a5ce9a2`, the `.arb` fix landed carrying that same bad finder, so
+  master failed at Analyze for the same reason and `Build debug APK` was skipped. The sentence
+  was on master a commit before the test that reads it could run.
+- `38172097929` — branch `5c-red`, commit `822a9e3`: pre-fix code with only the corrected test
+  on it. RED for the **right** reason — `493 tests passed, 1 failed`, `Found 0 widgets with
+  text containing photographs: []`. That is the assertion shown to be able to fail, which is
+  the only reason to write it.
+- `38172109076` — master `f6ceb11`: `No issues found!` and 🎉 **494 tests passed**, `Build
+  debug APK` green, so the rolling `debug-apk` release is now built from this commit. The count
+  is the honest arithmetic of the stage: 493 on `d434985` before it, 494 after one test lands,
+  and the RED run's 493 + 1 failed is the same 494 read one commit earlier.
+
+**A run id on record that does not exist.** The commit message of `f6ceb11` cites run
+`38172351141` as its RED verdict. No such run exists on this repository, and the right-reason
+RED is `38172097929`. Master is not force-pushed to fix prose in a message that has already
+shipped, so the correction lives here and in the line above.
+
+**What the phone owes.** The new warning has been read by a widget test, not by eyes on that
+screen. The pass is: install the `debug-apk` asset built from `f6ceb11`, add one animal with
+one picture, open her delete confirmation in Arabic and in English, screenshot the sentence,
+then cancel once and delete once, and read back `run-as com.toufikben.ledger ls -lR
+app_flutter/photos` returning `total 0` with the herd empty. At 21:38 on 2026-10-11 the phone
+was mid-recording in `dev.toufik.track_scribe` (elapsed 03:27, «إيقاف» live), so it was not
+touched; `stage5b-device/50-phone-state.png` is that frame.
 
 ## Standing constraints
 

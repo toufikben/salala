@@ -1396,3 +1396,38 @@ tests waited on `settleRealIo`, which is a fixed number of pumps keyed on a
 that grew by one query pushed the snackbar past the wait and a green test that had
 nothing to do with pictures read zero of them. Those waits now poll for the exact
 sentence, the way the write tests have since Stage 3p.
+
+## D43 — A confirmation names every store it destroys, and the file store is the one that needs saying
+
+`photos` is the only table in this schema whose row deletion takes something with it that
+lives outside the database. D41 built the delete in that knowledge — row first, then file,
+then the folder — and the ledger screen asks twice before removing one picture, because the
+bytes are the part nobody can rewrite. The animal's own confirmation, which destroys every
+picture she has at once, listed six tables and said nothing about any of them. Stage 5b read
+that sentence off the phone on `d434985` and recorded it as the pass's one finding; this is
+the rule that closes it.
+
+**The rule.** A dialog that authorises a deletion names, in the sentence the user reads
+before tapping, every store the tap empties: each table whose rows go *and* the files on this
+phone those rows pointed at. Where a warning cannot say it, the deletion does not belong
+behind that warning.
+
+**Why the wording, and not an icon or a count.** The sentence is the only part of the dialog
+a breeder reads once and then trusts; a picture count there would be true only for the animal
+whose card happens to be open, and the card holds no `photos` read — adding one means the
+herd list queries the table for every card to serve a line most taps never show. So the
+warning says *what* goes, in the same breath as the vaccinations and the whelpings it already
+named, in all three locales: «وصورها وما على هذا الهاتف من ملفات تلك الصور» / "its
+photographs and the files that hold them on this phone" / «ses photos et les fichiers qui les
+gardent sur cet appareil».
+
+**Why a test and not a review note.** Strings rot in a `.arb` file with no compiler between
+them and the screen. `animal_list_screen_test.dart` drives the card's overflow menu to
+`Delete` and asserts the four phrases off the dialog the way the phone renders them. Its RED
+was proved, not assumed: branch `5c-red` at `822a9e3` (pre-fix code plus only that test) came
+back `493 tests passed, 1 failed` with `Found 0 widgets with text containing photographs` —
+run `38172097929`. Master went green at `38172109076` with **494 tests**. Two earlier runs
+(`38171962415`, and `38171992198` on master) failed at Analyze instead, because
+`find.textThat` is not a `CommonFinders` method on this Flutter: a check that cannot run is
+not a check that passed, and the CI job that says so is the reason to write the assertion
+against a real finder.
