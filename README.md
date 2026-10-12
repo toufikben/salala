@@ -2,11 +2,15 @@
 
 سجل صحي ونسلي offline للمربّين الصغار (كلاب/قطط): حيوانات، بطنات، تطعيمات،
 تحاليل صحية، أوزان، زيارات بيطرية، مشترٍ وتسليم — مع حزمة PDF تُسلَّم لمقتني
-الجرو. بدون حساب، بدون سيرفر، بدون إذن إنترنت في المراحل 0–2.
+الجرو. بدون حساب، بدون سيرفر، وبدون إذن إنترنت: الصلاحية الوحيدة في
+أندرويد هي `RECEIVE_BOOT_COMPLETED`، أي إعادة جدولة التنبيهات بعد الإقلاع.
 
 An offline-first health and lineage record for small-scale dog and cat breeders,
 with a transferable document pack for puppy buyers. No account, no server, no
-network permission in Phase 0–2.
+network permission — the only Android permission the manifest declares is
+`RECEIVE_BOOT_COMPLETED`, which is what keeps a dose reminder alive through a
+reboot. Pictures come from the file picker, so there is no camera or storage
+permission either.
 
 | Document | What it answers |
 |---|---|
@@ -17,20 +21,36 @@ network permission in Phase 0–2.
 
 ## Status
 
-- CI run **37236013403** (`Analyze and test`, commit `1dbf60c`): **No issues
-  found!** and **60 tests passed** — schema 8, animal DAO 8, record DAOs 7,
-  litter DAO 4, gestation 5, weight units 6, app-lock 7, widget 15 (5 animal
-  list, 3 litter, 7 ledger). That is the authoritative verdict; the same
-  commands run on the laptop are a convenience, not a gate (see `ROADMAP.md`).
-- Built: database layer with foreign keys and migrations, animal list/form,
-  settings, app-lock PIN gate, English/Arabic/French with RTL, litter
-  list/form/detail with a whelping that registers its puppies in one save, and
-  the animal ledger (vaccinations with an overdue badge, weigh-ins with a
-  growth curve).
-- Device: the CI debug APK from the `debug-apk` release installed on the Realme
-  (`com.salala.salala`, `versionName 0.1.0`) at 2026-10-04 21:53. Screenshots
-  and button-by-button checks are still owed.
-- Not yet done: health-test and vet-visit sections, reminders, PDF/JSON export.
+Two verifiers only, and neither is this machine: GitHub Actions, and one Android
+phone. `ROADMAP.md` is the authoritative history — every stage there carries its
+own run id and its own phone record. This section is a summary, and the numbers
+are as of the run named below.
+
+- CI verdict: run **38186602185** (commit `d46b367`, 2026-10-12) — `flutter
+  analyze --fatal-infos`: **No issues found! (ran in 18.9s)**; `flutter test -j
+  1 --dart-define=use_arabic=true`: **500 tests passed**.
+- Built: the database layer with foreign keys and migrations; the animal list and
+  form; settings and the app-lock PIN gate; English/Arabic/French with RTL; the
+  litter list/form/detail, with a whelping that registers its puppies in one
+  save; the animal ledger — vaccinations with an overdue badge, weigh-ins with a
+  growth curve, health screenings, vet visits, symptoms; a triage card built from
+  a rule table that never names a disease; the herd agenda and herd search;
+  reminder alarms the operating system keeps and the next launch rebuilds; JSON
+  export of the whole database and its restore; a per-animal PDF pack a buyer can
+  open on any phone; and each animal's own photographs, stored under the app's
+  documents and deleted with the animal behind a warning that says so, in all
+  three languages.
+- Device (`com.toufikben.ledger`, `versionName 0.1.0`): checked stage by stage on
+  a Realme, most recently on 2026-10-12 at build `96eaa7c`, where the delete
+  warning was read in English, Arabic and French and the picture folder was read
+  back empty after the tap.
+- Not yet done: **Stage 4 — Distribution**, and it is blocked on a business
+  decision rather than code. No billing dependency, no purchase screen and no
+  network permission exist yet, which is the point: the payment route (D8) has to
+  be chosen before the store listing is a one-way door. Also open and named in
+  `ROADMAP.md` — the launcher icon is still the stock Flutter template art, and
+  iOS, FHIR alignment and a web viewer for received packs are triaged as not
+  verifiable on this machine and this CI, so none is claimed.
 
 ## Toolchain
 

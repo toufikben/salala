@@ -175,6 +175,13 @@ const List<String> createStatements = <String>[
   ''',
   createSymptomsTable,
   createPhotosTable,
+  // `contract_file_path` is a path, and paths are the one kind of value a pack
+  // cannot promise to make good on (see [fileBackedTables] and the note on
+  // `animals.photo_path` above). Nothing writes it today, so a placement
+  // exports null and the dormant column costs nothing. The day a screen can
+  // attach a contract, that column stops being a value and joins the pictures:
+  // excluded from the pack, and named out loud in the delete warning that
+  // destroys it (D43) — not left to point at a file on the phone it came from.
   '''
   CREATE TABLE buyers (
     id TEXT PRIMARY KEY,

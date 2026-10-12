@@ -1,7 +1,13 @@
 import 'package:equatable/equatable.dart';
 
-/// One animal transferred to one buyer. This is what makes the export pack
-/// valuable: the guarantee terms and contract file travel with the animal.
+/// One animal transferred to one buyer. The guarantee terms are what make the
+/// export pack worth something to the person receiving the animal.
+///
+/// [contractFilePath] has never had a value in it: no screen offers a contract
+/// to attach, so it round-trips as null and the pack carries a paper promise,
+/// not a file. It is the same kind of dormant column as `animals.photo_path`
+/// (`lib/data/db/schema.dart`), and it has to be read as one — a path a pack
+/// restores is a pointer into someone else's phone.
 class Placement extends Equatable {
   const Placement({
     required this.id,
