@@ -2516,6 +2516,145 @@ a sentence that names a red run and then the green run that followed it reads as
 at once. Everything else the docs call green is green on GitHub, and every RED they cite is a
 failure there.
 
+## Stage 5d — The queue the record owed, paid on the phone *(2026-10-12, build `96eaa7c` on the Realme RMX3910)*
+
+Stage 5c's own last paragraph listed what it had not covered. This pass reads that list and
+says, row by row, what each one turned out to be. It also carries the two pushes that came
+out of the hole 5c left behind, because those are the record's verdicts and not prose.
+
+**The clause guard closed the hole, with its RED proved.** Stage 5c's sentence test asserted
+the four English phrases and let Arabic and French pass on a key-existence check alone. The
+guard now reads the `.arb` files and asks each locale to name all ten things the warning
+promises to destroy — `test/core/localization_parity_test.dart`, "the delete warning names
+every store it destroys, in every locale". Master is green at `d9d29e3`, run `38187541168`:
+`No issues found! (ran in 16.0s)` and `🎉 501 tests passed`. The RED twin is
+`check/delete-body-clauses` at run `38187119612`: `500 tests passed, 1 failed`, and the failure
+names exactly the two fragments the branch deleted — `['صورها', 'ملفات تلك الصور']` — which is
+the right reason, not merely a failure.
+
+**The record was then read for truth rather than for shape.** `6f497fa`, run `38187670876`,
+success. `README.md` was still describing a 60-test, `com.salala.salala`, no-PDF app; it now
+cites the run it is describing. `lib/data/models/placement.dart` claimed a contract file rode
+in the export pack; `contractFilePath` has never had a value in it — no screen offers a
+contract to attach — so the comment says that, and `lib/data/db/schema.dart` carries the same
+warning where the column is declared, with the rule for the day someone does add the screen
+(joins the pictures: excluded from the pack, named in the delete warning).
+
+### What the phone said
+
+Read overnight on the `debug-apk` from CI, identified on screen by الإعدادات → Build →
+`96eaa7c`, in that order: Arabic, French, then back to System default.
+
+- **French strings on a real screen — read, and clean.** Settings, the herd list, the ledger,
+  the edit form and the delete warning were all dumped in `Français`
+  (`107-fr-settings.png` … `113-fr-delete-warning.png`). Nothing fell back to English and
+  nothing clipped. The French warning carries all ten fragments the new guard asserts —
+  «Ses vaccins, tests de santé, pesées, visites et symptômes … ainsi que la cession
+  enregistrée, ses photos et les fichiers qui les gardent sur cet appareil, et les portées
+  dont cet animal est la mère. Action irréversible.» — so the guard's `fr` row is now verified
+  off the glass and not only off the `.arb`. One wording note, not a defect: the restore tile
+  says «Restaurer un pack» while its export twin says «Exporter les dossiers».
+- **The search box typed into on the on-screen keyboard — works.** With the Arabic Gboard up,
+  a query of `Rey` kept the one card; extending it to `Reyzzz` replaced the herd with
+  «لا نتيجة تطابق « Reyzzz »» and clearing it brought the card back
+  (`101-search-nomatch.png`). The keys were injected as events rather than swiped or chosen
+  from a candidate strip, so this proves the field accepts typed input and filters live; it
+  does not prove gesture or predictive-text entry, which no adb path can reach.
+- **The app lock against the device keystore — works end to end, and its files say so.** A PIN
+  was set through Settings → Verrouillage, the app was force-stopped, and the relaunch came up
+  on «Salala est verrouillé» rather than the herd. A wrong PIN was refused with «Code incorrect»
+  and the correct one let the app open; disabling the lock asked for the current PIN first.
+  `run-as com.toufikben.ledger ls shared_prefs` then showed `FlutterSecureKeyStorage.xml` (the
+  wrapped key) beside `FlutterSecureStorage.xml`, and after the disable the value file reads
+  `<map />` — 65 bytes, both entries gone, which is `disable()`'s delete-digest-first order
+  leaving the harmless residue it was reordered to leave. So `AppLockService`'s claim that the
+  digest lives in keystore-backed storage is true on this phone, not just on paper.
+- **The pre-birth refusal sentence — captured, which no earlier pass managed.** An animal born
+  `Oct 15, 2025` was given a vaccination dated `Oct 1, 2025` and saved. The form stayed open
+  and the snackbar read "This date is before this animal was born."
+  (`155-prebirth-snackbar.png`, dump `d155.txt`); cancelling left the ledger's triage card on
+  "Nothing in this record calls for a next step", so the refusal wrote nothing. The same walk
+  showed where the rule lives: the picker itself does not forbid a pre-birth day — 2025 and
+  October 1 were both selectable — so the guard is the save, not the calendar.
+- **The date dialog under Arabic — calendar mode fine, text input unusable.** In العربية the
+  dialog's field pre-fills `12‏/10‏/2026`, and `2026-10-12`, `12/10/2026` and `10/12/2026` each
+  answered «التنسيق غير صالح.» while «حسنًا» refused to close the dialog
+  (`59-dateinput-ar.png`, `65-dialog-state.png`, `66-mmddyyyy.png`). Switching to calendar mode
+  worked completely — right-to-left, month names in Arabic — and produced «15 أكتوبر 2025» on
+  the form. This is the `parseCompactDate` seam Stage 5c left open, now measured: Flutter's
+  locale-aware override rejects every shape the Arabic dialog hints at. *Why* is still a
+  hypothesis (Arabic-Indic digits against the Latin ones the field shows) and is recorded as
+  one. The practical consequence is that an Arabic-reading breeder cannot type a date and must
+  drive the calendar, which works.
+- **The startup-failure screen — NOT RUN, on purpose.** Reaching it means making the database
+  fail to open, which on this phone means corrupting the owner's live `salala.db`. The
+  reversible recipe exists (copy the file out through `run-as`, truncate, launch, restore) and
+  was not taken: a check that can only be paid for with someone else's data is not a check worth
+  running unasked. It is covered in CI by `test/presentation/startup_failure_screen_test.dart`.
+
+### Two defects this pass produced that no test in the repository covers
+
+**1. A refused save is invisible.** The animal form's `_save()` begins
+`if (!_formKey.currentState!.validate() || _saving) return;`
+(`lib/presentation/screens/animal_form_screen.dart:103`) — no snackbar, no scroll, no focus
+move, because `_refuseSave()` is only reached when the *write* fails. The controlled reading:
+with a name typed and the species box empty, the form was scrolled to the bottom and `حفظ`
+tapped; the dump taken after the tap is byte-identical to the one before it (`d89` vs `d90`,
+`screenshot 89-bottom-pre.png` / `90-bottom-post.png`) — the screen does not answer. Scrolling
+to the top then showed why: «اختر الفصيلة» sitting under the species box in the error colour,
+where the grey helper «كلب · قط» had been a minute earlier (`91-top-after.png`, and the same
+field read fresh in `84-fresh-top.png`). The validation is correct and its message is on
+screen; it is on the part of the screen the breeder is not looking at. Eight other call sites
+have the same one-line shape (`health_test_form_screen.dart:101`, `litter_form_screen.dart:62`,
+`vaccination_form_screen.dart:105`, `vet_visit_form_screen.dart:105`, `weight_form_screen.dart:59`,
+`buyer_dialog.dart:95`, `placement_dialog.dart:150`, `symptom_dialog.dart:93`), and every one of
+them is a scrollable form, so the same shape applies wherever a required field is above the
+fold. Only the animal form was measured on the phone.
+
+A second, smaller thing fell out of the same sentence: the Arabic species error «اختر الفصيلة»
+is an imperative — the shape of a placeholder — while its neighbour for the name is
+«الاسم مطلوب», a statement. In English they are "Choose a species" and "A name is required".
+Two registers in one form.
+
+**2. A text field disappears from the accessibility tree the moment anything hangs under it.**
+Six readings, three screens, and one counter-example that points at the cause:
+
+| field | decoration under the box | node in the dump |
+| --- | --- | --- |
+| Breed, Colour, Microchip, Registration, Registry (animal form) | none | present, `hint` = the label |
+| Species (animal form, `ar`) | `helperText` «كلب · قط» | absent — only a View at the helper's rect |
+| Species, after a refused save | `errorText` «اختر الفصيلة» | absent — the same View now carries the error, and still does after `dog` was typed into the box |
+| Both PIN fields, setup dialog (`fr`) | `maxLength: 12` → counter «0/12» | absent — two Views reading "12 caractères restants", no `EditText` at all |
+| Lock screen PIN | `counterText: ''`, no error | **present** — `EditText` with hint "Saisissez votre code" |
+| Lock screen PIN, after a wrong PIN | `errorText` "Code incorrect" | **absent** — a View at the error's rect (`d123.txt`, 3 nodes on a screen whose only job is one field) |
+
+The app already knows the workaround — `lib/presentation/screens/lock_screen.dart:81` sets
+`counterText: ''` — and it is the only place in `lib/` where that string appears, out of the
+forty-six text fields the app builds. What is *not*
+known is the fix for the cases where the text under the box is the point: a validation error
+has to be said, and a helper like «كلب · قط» carries the two species a breeder may type. This
+is Flutter's `InputDecorator` semantics rather than anything Salala does to them, so the
+honest statement of it is the table above plus the observation that the herd card's own text
+(`Card > ListTile` with a title, a subtitle and an avatar initial) likewise produced no node at
+all in either locale — `s97.xml` lists nine nodes for a screen showing an animal named Rey —
+while the same card's overflow menu button did. A screen-reader user gets the menu and not the
+animal.
+
+No fix is claimed for either defect in this pass, and neither is stubbed. The first one has an
+obvious small shape (a form that refuses should show the field it refused) and the second one
+does not, so the second stays a finding until something measures a cure.
+
+### What this pass still did not cover
+
+The startup-failure screen, named above as NOT RUN with its reason. The two defects, which
+have no test and no fix. The predictive-text half of the search box, which adb cannot reach.
+And the herd card's missing accessibility node was read on the animal list only — the litter
+list and the ledger's record rows use the same `ListTile` shape and were not dumped for it.
+
+The phone was left as found: the test animal deleted from her own card menu, the herd back to
+"No animals yet", the app lock off with `FlutterSecureStorage.xml` at `<map />`, the language
+back on System default, and the app force-stopped.
+
 ## Standing constraints
 
 - Offline-first: no network permission until a feature provably needs it.

@@ -2,8 +2,18 @@
 
 Salala (سلالة, "lineage") is an offline-first Android app that keeps health,
 lineage and placement records for small-scale dog and cat breeders, and exports
-a transferable document pack for puppy buyers. No account, no server, no
-network permission in Phase 0–2.
+a transferable document pack for puppy buyers. No account, no server, and as of
+Stage 5c still no network permission: the app's own manifest declares exactly one
+permission, `RECEIVE_BOOT_COMPLETED`
+(`android/app/src/main/AndroidManifest.xml:6`), which is what re-books a dose
+reminder after a reboot.
+`POST_NOTIFICATIONS` is deliberately not repeated here — the notifications
+plugin has declared it since v16, which is the note written in
+`android/app/src/main/AndroidManifest.xml` — and the app asks the user for it
+during launch: `main.dart` → `ReminderScheduler.bootstrap` →
+`PluginNotifications.initialise`. Reminders are scheduled inexact on purpose, so
+no exact-alarm permission is declared, and pictures come in through the file
+picker, so neither the camera nor storage is asked for.
 
 ## Layers
 
@@ -275,7 +285,7 @@ Static segments are declared before their parameterised siblings
 (`/animals/new` before `/animals/:id`, `vaccinations/new` before
 `vaccinations/:recordId`) so the word `new` is never read as an id.
 
-## Security model (Phase 0–2)
+## Security model
 
 - The database is **not** encrypted at rest (SQLCipher deliberately deferred:
   it costs a licence decision and a build complexity spike, and the threat it
@@ -287,11 +297,16 @@ Static segments are declared before their parameterised siblings
 - `enable()` rejects a PIN shorter than 4 digits *before* writing anything, so a
   rejected attempt leaves no partial state.
 - Backup surfaces are closed: `android:allowBackup="false"` plus
-  `data_extraction_rules.xml` excluding `salala.db` and the two
-  `flutter_secure_storage` preference files from both `cloud-backup` and
-  `device-transfer`. Verified against Android's own docs: `allowBackup=false`
-  does not reliably block manufacturer device-to-device transfer, which is why
-  the extraction rules are not redundant.
+  `data_extraction_rules.xml` excluding `salala.db` and its journal/WAL/SHM
+  siblings, the two `flutter_secure_storage` preference files, and
+  `app_flutter/photos` from both `cloud-backup` and `device-transfer`. Verified
+  against Android's own docs: `allowBackup=false` does not reliably block
+  manufacturer device-to-device transfer, which is why the extraction rules are
+  not redundant. The photos line is spelled with `domain="root"` because
+  `getApplicationDocumentsDirectory()` was read back off the Realme and is
+  `<home>/app_flutter`, while `domain="file"` means `<home>/files` — the
+  exclusion written the obvious way matches nothing and still looks correct
+  (Stage 5a, pinned by `test/services/photo_backup_rules_test.dart`).
 
 ## Tests
 

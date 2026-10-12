@@ -1143,7 +1143,9 @@ exists — it settled on the previous phase's sentence. That was a review note a
 theoretical weakness; a run turned it into a measured one. `dismissRefusals` now waits
 out the shipped 4-second display on the fake clock between phases (`pumpAndSettle`
 alone cannot: a pending timer is not a scheduled frame). The redesign — a helper that
-waits for a *specific* sentence — is still open and still queued.
+waits for a *specific* sentence — was still open and still queued when this was
+written; D39 is the decision that took it, and Stage 3p's run `37904006479` is its
+verdict.
 
 ## D38 — One predicate for "a row's measured date before its anchor", two sentences
 
