@@ -1095,7 +1095,7 @@ shot, who went home with whom — was a lap of the phone.
 
 ### The verdict, and what the first attempt cost
 
-Run `3777104006` on `7cf7457` stopped in Analyze with **21 issues, every one of
+Run `37771040066` on `7cf7457` stopped in Analyze with **21 issues, every one of
 them mine**: `litter_rows.dart` reached the models as `../models/` when they live in
 `data/models/`, which left every type it names undefined; `litter_pdf.dart` pinned
 `litter` to a non-null `Litter` while `findById` can return null, so its own
@@ -2466,7 +2466,10 @@ built the same way with the app already in French, and gave the third reading.
 - French, on a second animal built the same way (`stage5c-device/38-delete-fr.png`): «…ainsi
   que la cession enregistrée, ses photos et les fichiers qui les gardent sur cet appareil, et
   les portées dont cet animal est la mère.» Eight lines — the longest of the three, and the one
-  that comes closest to the dialog's height.
+  that comes closest to the dialog's height. It cannot overflow it: Flutter's Material 3
+  `AlertDialog` wraps `content` in a `Flexible(child: SingleChildScrollView(…))`
+  (`packages/flutter/lib/src/material/dialog.dart:1336`), so a longer locale or a larger system
+  font scrolls the warning instead of clipping its last line.
 - All three sentences were then compared against their `.arb` files character by character
   rather than by eye: `compare-ar.cjs` prints `231 / 231 / equal: true` for English,
   `205 / 205 / true` for Arabic and `241 / 241 / true` for French. A screenshot proves a person
@@ -2490,6 +2493,28 @@ The phone was left as found: every copy of the test picture pushed for the pass 
 `d43check` now returns 0 rows — the language set back to System default, the app force-stopped
 with the launcher in focus, and the herd and `app_flutter/photos` both empty, which is where
 this pass started.
+
+## The record, audited *(2026-10-12)*
+
+A run id in these files is a claim that a verdict happened. Two scripts ask GitHub whether
+each one still is: `audit-runids.cjs` resolves every 11-digit id cited in backticks, and
+`audit-claims.cjs` reads the sentence around each and compares the colour it asserts with the
+run's conclusion.
+
+87 ids are cited across `ROADMAP.md`, `DECISIONS.md` and `ARCHITECTURE.md`. Three did not
+resolve, and only one of those was a broken citation:
+
+- `3777104006`, at the head of the first Stage 3f verdict, is a digit short of the real
+  `37771040066`. That run is `completed/failure` on `7cf7457`, and its Analyze step does print
+  `21 issues found. (ran in 12.3s)`, so the sentence was true and only its address was wrong.
+  Fixed here.
+- `0555123456` is a phone number in a test fixture, not a run.
+- `38172351141` is the invented id Stage 5c already records above as never having existed.
+
+The claim check returned one flag, and the flag is the script's fault rather than the record's:
+a sentence that names a red run and then the green run that followed it reads as both colours
+at once. Everything else the docs call green is green on GitHub, and every RED they cite is a
+failure there.
 
 ## Standing constraints
 
