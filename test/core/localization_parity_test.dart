@@ -23,8 +23,9 @@ import 'package:flutter_test/flutter_test.dart';
 /// "1 untranslated message(s)" to stdout, which no test reads. An Arabic user
 /// then gets one English word in the middle of an Arabic screen, and CI is green.
 ///
-/// So this reads the `.arb` files, which nothing regenerates, and asks the four
-/// questions that arrangement can actually get wrong.
+/// So this reads the `.arb` files, which nothing regenerates, and asks the
+/// questions that only a reader of those files can answer — the last of them
+/// about what one specific sentence has to say in each language.
 void main() {
   const arbDir = 'lib/core/l10n';
   const template = 'en';
@@ -140,6 +141,81 @@ void main() {
           'these Arabic values carry no Arabic letter at all, which is what a '
           'value pasted from the template looks like: $latin',
     );
+  });
+
+  test('the delete warning names every store it destroys, in every locale', () {
+    // The checks above are about keys, placeholders and scripts. None of them
+    // can see what a sentence says, so a retranslation that keeps the shape of
+    // `animalDeleteBody` and quietly drops the photographs half of it is an
+    // Arabic screen promising a breeder that no picture of hers dies with the
+    // animal — while CI stays green and the phone deletes the folder. That
+    // sentence is the app's only promise about data it cannot get back (D43),
+    // and it is worth more than a key count.
+    //
+    // The clauses below are spelled out here in three languages instead of
+    // read from the `.arb` files, because a file compared to itself guards
+    // nothing. Each one is a fragment of what a person actually read off the
+    // Realme on 2026-10-12 at build `96eaa7c`, character for character equal
+    // to its `.arb` value there — 231 characters in English, 205 in Arabic,
+    // 241 in French.
+    //
+    // A rewording that keeps the meaning has to edit this table too. That is
+    // the cost, and it is the point: three edits in three files now become one
+    // deliberate edit here plus the translations, and a silent drop stops
+    // being silent.
+    const mustName = <String, List<String>>{
+      'en': <String>[
+        'vaccinations',
+        'health tests',
+        'weights',
+        'visits',
+        'symptoms',
+        'handover',
+        'photographs',
+        'files that hold them',
+        'whelpings',
+        'cannot be undone',
+      ],
+      'ar': <String>[
+        'التطعيمات',
+        'فحوصات الصحة',
+        'الأوزان',
+        'الزيارات البيطرية',
+        'الأعراض',
+        'سجل التسليم',
+        'صورها',
+        'ملفات تلك الصور',
+        'الولادات',
+        'لا يمكن التراجع',
+      ],
+      'fr': <String>[
+        'vaccins',
+        'tests de santé',
+        'pesées',
+        'visites',
+        'symptômes',
+        'cession',
+        'photos',
+        'fichiers qui les gardent',
+        'portées',
+        'irréversible',
+      ],
+    };
+    for (final locale in allLocales) {
+      final body = message(arb[locale]!, 'animalDeleteBody');
+      final absent = <String>[];
+      for (final fragment in mustName[locale]!) {
+        if (!body.contains(fragment)) absent.add(fragment);
+      }
+      expect(
+        absent,
+        isEmpty,
+        reason:
+            '$locale "animalDeleteBody" says "$body", which never names '
+            '${absent.join(', ')} — and a delete warning has to name every '
+            'store the tap destroys, in the language the breeder reads it in',
+      );
+    }
   });
 
   test(
