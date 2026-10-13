@@ -112,3 +112,78 @@ jobs:
             --notes "Rolling debug APK — every green CI run replaces this file." \
             || true
           gh release upload debug-apk build/app/outputs/flutter-apk/app-debug.apk --clobber
+
+  build-release:
+    name: Build signed release APK and AAB
+    needs: analyze-and-test
+    # A fork's pull request cannot read the repository secrets, so the signed build
+    # only runs on pushes and manual runs.
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.5'
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Write the signing key and key.properties
+        # android/app/build.gradle.kts reads android/key.properties and falls back to
+        # the debug key when it is absent, so this step is the whole difference between
+        # an uploadable release build and one that only installs over itself.
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          if [ -z "$KEYSTORE_BASE64" ]; then
+            echo "Repository secret KEYSTORE_BASE64 is not set — add it before this job can produce a signed build." >&2
+            exit 1
+          fi
+          printf '%s' "$KEYSTORE_BASE64" | base64 --decode > android/app/release-keystore.jks
+          printf 'storeFile=release-keystore.jks\nstorePassword=%s\nkeyAlias=%s\nkeyPassword=%s\n' \
+            "$KEYSTORE_PASSWORD" "$KEY_ALIAS" "$KEY_PASSWORD" > android/key.properties
+
+      - name: Build signed release APK and AAB
+        run: |
+          flutter build apk --release --target-platform=android-arm64 \
+            --dart-define=SALALA_BUILD_TAG=${GITHUB_SHA::7} --dart-define=use_arabic=true
+          flutter build appbundle --dart-define=use_arabic=true
+
+      - name: Prove the APK carries the release certificate
+        run: |
+          set -euo pipefail
+          APKSIGNER=$(find "$ANDROID_HOME/build-tools" -name apksigner -type f | sort | tail -1)
+          "$APKSIGNER" verify --print-certs build/app/outputs/flutter-apk/app-release.apk
+
+      - name: Publish the signed pair on the rolling release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          gh release create release-latest \
+            --prerelease \
+            --title "Release builds" \
+            --notes "Rolling signed release — every green CI run replaces these files." \
+            || true
+          gh release upload release-latest \
+            build/app/outputs/flutter-apk/app-release.apk \
+            build/app/outputs/bundle/release/app-release.aab \
+            --clobber
