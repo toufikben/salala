@@ -37,6 +37,18 @@ void main() {
     return rect.top >= viewport.top && rect.bottom <= viewport.bottom;
   }
 
+  // Scrolled to the end by the position, not by ensureVisible: a focused field
+  // re-asserts its own visibility on the next frame, so a helper that scrolls
+  // "until the button is visible" can leave the top boxes on screen and the
+  // precondition below would then be asserting nothing.
+  Future<void> scrollToEnd(WidgetTester tester) async {
+    final position = tester
+        .state<ScrollableState>(find.byType(Scrollable).first)
+        .position;
+    position.jumpTo(position.maxScrollExtent);
+    await tester.pumpAndSettle();
+  }
+
   testWidgets('a save refused for no name scrolls the name box back into view', (
     tester,
   ) async {
@@ -44,8 +56,7 @@ void main() {
 
     final name = find.widgetWithText(TextFormField, 'Name');
     final save = find.widgetWithText(FilledButton, 'Save');
-    await tester.ensureVisible(save);
-    await tester.pumpAndSettle();
+    await scrollToEnd(tester);
 
     // The precondition, asserted rather than assumed: without it the test would
     // also pass on a build that never scrolled anywhere.
@@ -74,15 +85,18 @@ void main() {
       );
       final species = find.widgetWithText(TextFormField, 'Species');
       final save = find.widgetWithText(FilledButton, 'Save');
-      await tester.ensureVisible(save);
-      await tester.pumpAndSettle();
+      await scrollToEnd(tester);
       expect(insideTheForm(tester, species), isFalse);
 
       await tester.tap(save);
       await tester.pumpAndSettle();
 
       expect(find.text('Choose a species'), findsOneWidget);
-      expect(insideTheForm(tester, species), isTrue);
+      expect(
+        insideTheForm(tester, species),
+        isTrue,
+        reason: 'the box that was refused has to be the box on screen',
+      );
       // The field that answered is the first refusing one, not the first field:
       // a name already filled in must not be what the screen drags her back to.
       expect(tester.widget<TextFormField>(species).controller!.text, isEmpty);
