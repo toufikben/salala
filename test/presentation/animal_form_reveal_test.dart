@@ -83,6 +83,12 @@ void main() {
         find.widgetWithText(TextFormField, 'Name'),
         'Nala',
       );
+      // A focused field pulls itself back into view whenever the viewport moves,
+      // which would undo the scroll below and leave the precondition asserting
+      // nothing. Unfocus is the keyboard-down a breeder does before reaching for
+      // the Save pill.
+      FocusManager.instance.primaryFocus?.unfocus();
+      await tester.pumpAndSettle();
       final species = find.widgetWithText(TextFormField, 'Species');
       final save = find.widgetWithText(FilledButton, 'Save');
       await scrollToEnd(tester);
