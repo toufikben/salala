@@ -117,9 +117,17 @@ class ReminderScheduler {
     required String title,
     required String what,
     required String dueDay,
+    // The caller's clock, not the machine's: `reconcile` decides what is booked
+    // against one `now`, and if the write re-filtered against a different one a
+    // pinned-clock caller would book a record and then write none of its alarms.
+    DateTime? now,
   }) async {
     await cancel(recordId);
-    for (final reminder in remindersFor(recordId: recordId, dueMs: dueMs)) {
+    for (final reminder in remindersFor(
+      recordId: recordId,
+      dueMs: dueMs,
+      now: now,
+    )) {
       await _writer.write(
         id: reminder.notificationId,
         title: title,

@@ -226,6 +226,7 @@ Future<int> reconcile(
       title: booking.title,
       what: booking.what,
       dueDay: booking.dueDay,
+      now: from,
     );
     rebooked++;
   }

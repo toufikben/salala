@@ -79,15 +79,15 @@ void main() {
     (tester) async {
       await openAnimalForm(tester);
 
-      await tester.enterText(
-        find.widgetWithText(TextFormField, 'Name'),
-        'Nala',
-      );
-      // A focused field pulls itself back into view whenever the viewport moves,
-      // which would undo the scroll below and leave the precondition asserting
-      // nothing. Unfocus is the keyboard-down a breeder does before reaching for
-      // the Save pill.
-      FocusManager.instance.primaryFocus?.unfocus();
+      // Filled without focusing: `enterText` focuses the box, and a focused
+      // field pulls itself back into view whenever the viewport moves, which
+      // would undo the scroll below and leave the precondition asserting
+      // nothing. The controller is the same one `_save()` reads.
+      tester
+              .widget<TextFormField>(find.widgetWithText(TextFormField, 'Name'))
+              .controller!
+              .text =
+          'Nala';
       await tester.pumpAndSettle();
       final species = find.widgetWithText(TextFormField, 'Species');
       final save = find.widgetWithText(FilledButton, 'Save');
