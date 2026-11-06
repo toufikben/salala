@@ -18,10 +18,12 @@ void main() {
   WidgetController.hitTestWarningShouldBeFatal = true;
 
   Future<void> openAnimalForm(WidgetTester tester) async {
-    // The same phone-sized surface the shipped-form tests use: the default
-    // 800x600 window is shorter than the form and the Save pill has to be
-    // reachable by a real hit test.
-    tester.view.physicalSize = const Size(1080, 2400);
+    // A short phone on purpose. On the 2400px-tall surface the shipped-form tests
+    // use, the form is only ~66px taller than the viewport, so scrolling to the
+    // end hides the Name box but leaves Species — the second field — still on
+    // screen, and a precondition about Species would assert nothing. At 1920px
+    // there is enough overflow that both top boxes genuinely leave the viewport.
+    tester.view.physicalSize = const Size(1080, 1920);
     tester.view.devicePixelRatio = 2.625;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
