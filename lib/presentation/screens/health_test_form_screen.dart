@@ -98,7 +98,12 @@ class _HealthTestFormScreenState extends ConsumerState<HealthTestFormScreen> {
   }
 
   Future<void> _save() async {
-    if (!_formKey.currentState!.validate() || _saving) return;
+    final form = _formKey.currentState!;
+    if (!form.validate()) {
+      revealRefusedField(form);
+      return;
+    }
+    if (_saving) return;
     if (refuseRecordBeforeBirth(
       context,
       ref,

@@ -9,6 +9,7 @@ import '../../data/models/animal.dart';
 import '../../data/models/litter.dart';
 import '../providers/app_providers.dart';
 import '../widgets/date_tile.dart';
+import '../widgets/record_refusal.dart';
 
 /// Records a mating and, in the same save, registers its puppies as animals.
 ///
@@ -59,7 +60,12 @@ class _LitterFormScreenState extends ConsumerState<LitterFormScreen> {
   }
 
   Future<void> _save() async {
-    if (!_formKey.currentState!.validate() || _saving) return;
+    final form = _formKey.currentState!;
+    if (!form.validate()) {
+      revealRefusedField(form);
+      return;
+    }
+    if (_saving) return;
     final problem = litterDateProblem(
       matingDateMs: _matingDate,
       whelpingDateMs: _whelpingDate,

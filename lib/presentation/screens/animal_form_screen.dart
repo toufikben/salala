@@ -9,6 +9,7 @@ import '../../data/models/animal.dart';
 import '../../services/reminder_resync.dart';
 import '../providers/app_providers.dart';
 import '../widgets/date_tile.dart';
+import '../widgets/record_refusal.dart';
 
 enum AnimalFormMode { create, edit }
 
@@ -100,7 +101,12 @@ class _AnimalFormScreenState extends ConsumerState<AnimalFormScreen> {
   }
 
   Future<void> _save() async {
-    if (!_formKey.currentState!.validate() || _saving) return;
+    final form = _formKey.currentState!;
+    if (!form.validate()) {
+      revealRefusedField(form);
+      return;
+    }
+    if (_saving) return;
     setState(() => _saving = true);
 
     final controller = ref.read(animalsProvider.notifier);

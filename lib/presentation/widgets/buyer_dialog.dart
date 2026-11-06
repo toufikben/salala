@@ -92,7 +92,12 @@ class _BuyerDialogState extends ConsumerState<BuyerDialog> {
   }
 
   Future<void> _save() async {
-    if (!_formKey.currentState!.validate() || _saving) return;
+    final form = _formKey.currentState!;
+    if (!form.validate()) {
+      revealRefusedField(form);
+      return;
+    }
+    if (_saving) return;
     setState(() => _saving = true);
 
     final existing = widget.existing;
