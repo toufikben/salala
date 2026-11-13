@@ -175,7 +175,16 @@ Future<int> resyncReminders(
 
   final doses = await daos.vaccinations.dueBefore(cutoff);
   final screenings = await daos.healthTests.expiringBy(cutoff);
-  if (doses.isEmpty && screenings.isEmpty) return 0;
+  if (doses.isEmpty && screenings.isEmpty) {
+    // Nothing in the ledger is worth waking anyone for, which is a statement
+    // about the *phone* too: it should be holding no alarm at all. Returning
+    // zero here left the booking of a deleted record in place for ever, because
+    // `staleRecordIds` names ids out of rows and the rows are exactly what is
+    // gone — the one case [ReminderScheduler.clearEverything] exists for. It is
+    // one platform call, on a ledger that books nothing anyway.
+    await scheduler.clearEverything();
+    return 0;
+  }
 
   final herd = <String, String>{
     for (final animal in await daos.animals.findAll())

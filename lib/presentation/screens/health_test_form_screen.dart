@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/l10n/app_localizations.dart';
 import '../../core/utils/date_utils.dart';
+import '../../core/utils/text_input.dart';
 import '../../data/models/health_test.dart';
 import '../providers/app_providers.dart';
 import '../providers/record_providers.dart';
@@ -172,10 +173,10 @@ class _HealthTestFormScreenState extends ConsumerState<HealthTestFormScreen> {
           animalId: widget.animalId,
           testType: _testType.text.trim(),
           result: _result.text.trim(),
-          testingBody: _testingBody.text.trim(),
-          certificateNo: _certificateNo.text.trim(),
-          verifiedBy: _verifiedBy.text.trim(),
-          notes: _notes.text.trim(),
+          testingBody: blankToNull(_testingBody.text),
+          certificateNo: blankToNull(_certificateNo.text),
+          verifiedBy: blankToNull(_verifiedBy.text),
+          notes: blankToNull(_notes.text),
           testDate: _testDate,
           validUntil: _validUntil,
           clearValidUntil: _validUntil == null,

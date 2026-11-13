@@ -88,12 +88,16 @@ void main() {
       await book(recordId: '0f1e2d3c-4b5a', dueMs: due);
 
       final day = dayFromMs(due)!;
+      // Built as a wall-clock time, not re-expressed from an instant.
+      // `TZDateTime.from(DateTime(...), tz.local)` reads the runner's local
+      // midnight-or-nine as an instant and shifts it into the pinned zone, which
+      // is the very bug `_wallClock` exists to prevent: on a runner at +01 it
+      // expected 08:00 for an alarm the phone should ring at 09:00. "Nine in the
+      // morning" is a reading of the clock, so the expectation has to be built
+      // the same way the scheduler builds it.
       expect(
         writer.written.last.at,
-        tz.TZDateTime.from(
-          DateTime(day.year, day.month, day.day, reminderHour),
-          tz.local,
-        ),
+        tz.TZDateTime(tz.local, day.year, day.month, day.day, reminderHour),
       );
       expect(writer.written.last.at.location, tz.local);
       for (final alarm in writer.written) {

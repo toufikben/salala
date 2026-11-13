@@ -66,9 +66,13 @@ Future<void> _save(WidgetTester tester) async {
   await tester.ensureVisible(save);
   await tester.pumpAndSettle();
   await tester.tap(save);
-  // The row is written through SQLite and the section re-reads itself
-  // afterwards, so one round of real waiting is not enough.
-  await settleRealIo(tester);
+  // The row is written through SQLite and the sections above re-read
+  // themselves afterwards. Waited for by its outcome — the form closing — since
+  // a fixed number of rounds is what made this pass alone and fail under load.
+  await settleUntil(
+    tester,
+    () => find.widgetWithText(FilledButton, 'Save').evaluate().isEmpty,
+  );
   await settleRealIo(tester);
 }
 
@@ -189,6 +193,13 @@ void main() {
       '0.8',
     );
     await _save(tester);
+
+    // The verdict is derived from the record lists, which reload after the
+    // write: waiting for the sentence itself is waiting for that reload.
+    await settleUntil(
+      tester,
+      () => find.text('Keep watching').evaluate().isNotEmpty,
+    );
 
     expect(find.text('Keep watching'), findsOneWidget);
     expect(

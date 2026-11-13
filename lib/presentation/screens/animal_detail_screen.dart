@@ -14,6 +14,7 @@ import '../../core/utils/weight.dart';
 import '../../data/models/animal.dart';
 import '../../data/models/buyer.dart';
 import '../../data/models/health_test.dart';
+import '../../data/models/litter.dart';
 import '../../data/models/placement.dart';
 import '../../data/models/photo.dart';
 import '../../data/models/symptom.dart';
@@ -43,6 +44,7 @@ class AnimalDetailScreen extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final animalsAsync = ref.watch(animalsProvider);
     final animals = animalsAsync.value ?? const <Animal>[];
+    final litters = ref.watch(littersProvider).value ?? const <Litter>[];
     final matches = animals.where((a) => a.id == animalId);
     final animal = matches.isEmpty ? null : matches.first;
 
@@ -87,7 +89,7 @@ class AnimalDetailScreen extends ConsumerWidget {
               24 + MediaQuery.paddingOf(context).bottom,
             ),
             children: <Widget>[
-              _IdentityCard(animal: animal, animals: animals),
+              _IdentityCard(animal: animal, animals: animals, litters: litters),
               // Above the records, because it is the one part of this page that
               // answers a question rather than showing what was typed.
               ref
@@ -298,14 +300,21 @@ Future<void> _sharePdfPack(
 
 /// Name, lineage and the paperwork a buyer asks to see.
 class _IdentityCard extends StatelessWidget {
-  const _IdentityCard({required this.animal, required this.animals});
+  const _IdentityCard({
+    required this.animal,
+    required this.animals,
+    required this.litters,
+  });
 
   final Animal animal;
   final List<Animal> animals;
+  final List<Litter> litters;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final litterMatches = litters.where((l) => l.id == animal.litterId);
+    final litter = litterMatches.isEmpty ? null : litterMatches.first;
     final rows = <(String, String)>[
       (l10n.animalSpecies, animal.species),
       if (animal.breed != null && animal.breed!.isNotEmpty)
@@ -318,6 +327,8 @@ class _IdentityCard extends StatelessWidget {
         (l10n.animalColor, animal.color!),
       if (animal.microchipId != null && animal.microchipId!.isNotEmpty)
         (l10n.animalMicrochip, animal.microchipId!),
+      if (animal.microchipDate != null)
+        (l10n.animalMicrochipDate, formatDay(context, animal.microchipDate)),
       if (animal.registrationNo != null && animal.registrationNo!.isNotEmpty)
         (l10n.animalRegistrationNo, animal.registrationNo!),
       if (animal.registry != null && animal.registry!.isNotEmpty)
@@ -332,6 +343,7 @@ class _IdentityCard extends StatelessWidget {
         l10n.animalSire,
         animalById(animals, animal.sireId)?.name ?? l10n.valueUnknown,
       ),
+      if (litter != null) (l10n.animalLitter, litter.name),
       if (animal.deathDate != null)
         (l10n.animalDeathDate, formatDay(context, animal.deathDate)),
     ];

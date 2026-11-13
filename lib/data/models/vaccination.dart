@@ -1,5 +1,7 @@
 import 'package:equatable/equatable.dart';
 
+import '../../core/utils/day_math.dart';
+
 class Vaccination extends Equatable {
   const Vaccination({
     required this.id,
@@ -29,10 +31,13 @@ class Vaccination extends Equatable {
   final int createdAt;
   final int updatedAt;
 
-  bool isOverdue(int nowMs) {
-    final due = nextDueDate;
-    return due != null && due < nowMs;
-  }
+  /// A dose is late when its day has gone by, not when its instant has.
+  ///
+  /// The stored date is a calendar day (local midnight), so comparing instants
+  /// called a booster due *today* overdue from one minute past midnight — the
+  /// same animal the agenda card and the triage rules were still calling "due
+  /// today". One definition now, in `day_math.dart`, for all four.
+  bool isOverdue(int nowMs) => isPastDay(nextDueDate, nowMs);
 
   Vaccination copyWith({
     String? animalId,

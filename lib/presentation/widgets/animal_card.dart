@@ -6,6 +6,7 @@ import '../../core/l10n/app_localizations.dart';
 import '../../core/l10n/enum_labels.dart';
 import '../../core/router/app_router.dart';
 import '../../core/utils/date_utils.dart';
+import '../../data/db/daos.dart';
 import '../../data/models/animal.dart';
 import '../../services/reminder_resync.dart';
 import '../providers/app_providers.dart';
@@ -74,6 +75,27 @@ class AnimalCard extends ConsumerWidget {
 
 enum _CardAction { edit, delete }
 
+/// The rows a dam's deletion would take with it, counted before the dialog.
+///
+/// A failed count is not a reason to refuse a delete the breeder asked for: the
+/// dialog falls back to the sentence that names no numbers.
+Future<({int litters, int puppies})> _deleteImpact(
+  Daos daos,
+  String animalId,
+) async {
+  try {
+    final litters = await daos.litters.countForDam(animalId);
+    if (litters == 0) return (litters: 0, puppies: 0);
+    return (
+      litters: litters,
+      puppies: await daos.animals.countPuppiesOfDam(animalId),
+    );
+  } catch (error) {
+    debugPrint('Delete impact count failed: $error');
+    return (litters: 0, puppies: 0);
+  }
+}
+
 Future<void> confirmDelete(
   BuildContext context,
   WidgetRef ref,
@@ -85,11 +107,42 @@ Future<void> confirmDelete(
   // after an `await` is what `use_build_context_synchronously` exists to catch:
   // the card can be gone by the time the delete answers.
   final localeTag = Localizations.localeOf(context).toString();
+  final daos = ref.read(daosProvider);
+
+  // What the cascade actually costs, counted while the rows still exist.
+  // `litters.dam_id` is CASCADE and the puppies under it are SET NULL, so a dam's
+  // delete takes her whelpings and leaves her puppies behind without a mother on
+  // file. Read by the dialog rather than awaited here: the question has to open
+  // on the same frame the breeder tapped it.
+  final impact = _deleteImpact(daos, animal.id);
+  if (!context.mounted) return;
+
   final confirmed = await showDialog<bool>(
     context: context,
     builder: (dialogContext) => AlertDialog(
       title: Text(l10n.animalDeleteTitle(animal.name)),
-      content: Text(l10n.animalDeleteBody),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(l10n.animalDeleteBody),
+          FutureBuilder<({int litters, int puppies})>(
+            future: impact,
+            builder: (context, snapshot) {
+              final counts = snapshot.data;
+              if (counts == null || counts.litters == 0) {
+                return const SizedBox.shrink();
+              }
+              return Padding(
+                padding: const EdgeInsets.only(top: 12),
+                child: Text(
+                  l10n.animalDeleteLittersNote(counts.litters, counts.puppies),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
       actions: <Widget>[
         TextButton(
           onPressed: () => Navigator.of(dialogContext).pop(false),
@@ -109,7 +162,6 @@ Future<void> confirmDelete(
   // it: the card can be gone by then, and a disposed widget's `ref` answers
   // nothing.
   final scheduler = ref.read(reminderSchedulerProvider);
-  final daos = ref.read(daosProvider);
 
   try {
     await ref.read(animalsProvider.notifier).delete(animal.id);

@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:salala/core/utils/agenda.dart';
+import 'package:salala/core/utils/day_math.dart';
 import 'package:salala/data/models/animal.dart';
 import 'package:salala/data/models/vaccination.dart';
 
@@ -230,7 +231,15 @@ void main() {
     // answer through `buildHerdAgenda`; if the two disagreed, a dose would be
     // read from disk and quietly dropped, or a row would depend on a dose that
     // was never read.
-    expect(agendaHorizonMs(_now), _now + agendaWindowDays * _day);
-    expect(agendaHorizonMs(_now, windowDays: 3), _now + 3 * _day);
+    //
+    // Counted in calendar days: the window is a number of *days* a breeder can
+    // act on, so the horizon has to keep the clock time and land on the same day
+    // number, on either side of a clock change.
+    final horizon = DateTime.fromMillisecondsSinceEpoch(agendaHorizonMs(_now));
+    final start = DateTime.fromMillisecondsSinceEpoch(_now);
+    expect(horizon.hour, start.hour);
+    expect(horizon.minute, start.minute);
+    expect(wholeDaysBetween(_now, agendaHorizonMs(_now)), agendaWindowDays);
+    expect(wholeDaysBetween(_now, agendaHorizonMs(_now, windowDays: 3)), 3);
   });
 }

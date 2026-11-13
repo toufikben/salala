@@ -51,4 +51,20 @@ class AnimalDao extends RecordDao<Animal> {
     final rows = await db.rawQuery('SELECT COUNT(*) AS c FROM animals');
     return rows.first['c']! as int;
   }
+
+  /// Puppies that stay in the herd but lose their mother's record when [damId]
+  /// is deleted.
+  ///
+  /// Counted before the delete rather than discovered after it: `animals.dam_id`
+  /// and `animals.litter_id` are both `SET NULL`, so a dam's puppies survive her
+  /// deletion as animals with no mother on file, and the confirmation sentence
+  /// has to say so out loud instead of claiming the whole family goes.
+  Future<int> countPuppiesOfDam(String damId) async {
+    final rows = await db.rawQuery(
+      'SELECT COUNT(*) AS c FROM animals '
+      'WHERE dam_id = ? OR litter_id IN (SELECT id FROM litters WHERE dam_id = ?)',
+      <Object?>[damId, damId],
+    );
+    return rows.first['c']! as int;
+  }
 }

@@ -132,7 +132,12 @@ class ReminderScheduler {
         id: reminder.notificationId,
         title: title,
         body: _body(reminder, l10n: l10n, what: what, dueDay: dueDay),
-        at: tz.TZDateTime.from(reminder.at, tz.local),
+        // The wall-clock fields, not the instant: `remindersFor` worked out
+        // "nine in the morning" as a day and a time, so the alarm has to be
+        // nine in the morning *where the phone is*. `TZDateTime.from` would
+        // read the value as an instant and re-express it in the phone's zone,
+        // which is only the same answer when the two zones are one.
+        at: _wallClock(reminder.at),
         // Inexact on purpose: an exact alarm needs SCHEDULE_EXACT_ALARM, which
         // Google Play audits, for a message whose only deadline is "that
         // morning". Allow-while-idle so a phone asleep in a pocket still gets it.
@@ -159,6 +164,10 @@ class ReminderScheduler {
   /// breeder cannot act on. So the wholesale paths empty the phone and let the
   /// rebuild that follows re-book exactly what is left.
   Future<void> clearEverything() => _writer.clearAll();
+
+  /// [at]'s calendar fields read as a wall clock in the phone's zone.
+  static tz.TZDateTime _wallClock(DateTime at) =>
+      tz.TZDateTime(tz.local, at.year, at.month, at.day, at.hour, at.minute);
 
   String _body(
     Reminder reminder, {

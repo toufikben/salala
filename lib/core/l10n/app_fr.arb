@@ -27,6 +27,9 @@
   "animalSex": "Sexe",
   "animalBirthDate": "Date de naissance",
   "animalStatus": "Statut",
+  "animalMicrochipDate": "Date du puçage",
+  "animalLitter": "Portée",
+  "animalNone": "Aucun",
   "animalMicrochip": "N° de puce",
   "animalRegistrationNo": "N° d'affiliation",
   "animalRegistry": "Organisme généalogique",
@@ -36,6 +39,17 @@
   "animalAddTitle": "Ajouter un animal",
   "animalEditTitle": "Modifier l'animal",
   "animalDeleteTitle": "Supprimer {name} ?",
+  "animalDeleteLittersNote": "Cela supprime aussi {litters} portée(s) dont elle est la mère ; {puppies} de leurs chiots restent dans vos animaux mais perdent la trace de leur mère.",
+  "@animalDeleteLittersNote": {
+    "placeholders": {
+      "litters": {
+        "type": "int"
+      },
+      "puppies": {
+        "type": "int"
+      }
+    }
+  },
   "animalDeleteBody": "Ses vaccins, tests de santé, pesées, visites et symptômes seront supprimés aussi, ainsi que la cession enregistrée, ses photos et les fichiers qui les gardent sur cet appareil, et les portées dont cet animal est la mère. Action irréversible.",
   "animalNameRequired": "Le nom est obligatoire",
   "animalSpeciesRequired": "Choisissez une espèce",
@@ -108,6 +122,9 @@
   "packRestoreFailed": "Le pack n'a pas pu être restauré. Rien n'a changé sur ce téléphone.",
 
   "litterAdd": "Nouvelle portée",
+  "litterEditTitle": "Modifier la portée",
+  "litterAddPuppies": "Ajouter des chiots",
+  "litterHowMany": "Combien ?",
   "litterAddTitle": "Enregistrer une portée",
   "litterEmptyTitle": "Aucune portée pour l'instant",
   "litterEmptyBody": "Enregistrez un accouplement pour suivre la gestation et déclarer les chiots en une étape.",

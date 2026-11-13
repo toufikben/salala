@@ -79,6 +79,15 @@ class AppLocalizationsFr extends AppLocalizations {
   String get animalMicrochip => 'N° de puce';
 
   @override
+  String get animalMicrochipDate => 'Date du puçage';
+
+  @override
+  String get animalLitter => 'Portée';
+
+  @override
+  String get animalNone => 'Aucun';
+
+  @override
   String get animalRegistrationNo => 'N° d\'affiliation';
 
   @override
@@ -102,6 +111,11 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String animalDeleteTitle(String name) {
     return 'Supprimer $name ?';
+  }
+
+  @override
+  String animalDeleteLittersNote(int litters, int puppies) {
+    return 'Cela supprime aussi $litters portée(s) dont elle est la mère ; $puppies de leurs chiots restent dans vos animaux mais perdent la trace de leur mère.';
   }
 
   @override
@@ -319,6 +333,15 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get litterAdd => 'Nouvelle portée';
+
+  @override
+  String get litterEditTitle => 'Modifier la portée';
+
+  @override
+  String get litterAddPuppies => 'Ajouter des chiots';
+
+  @override
+  String get litterHowMany => 'Combien ?';
 
   @override
   String get litterAddTitle => 'Enregistrer une portée';

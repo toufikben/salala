@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/l10n/app_localizations.dart';
 import '../../core/utils/date_utils.dart';
+import '../../core/utils/text_input.dart';
 import '../../data/models/vaccination.dart';
 import '../providers/app_providers.dart';
 import '../providers/record_providers.dart';
@@ -146,11 +147,11 @@ class _VaccinationFormScreenState extends ConsumerState<VaccinationFormScreen> {
     final draft = base.copyWith(
       animalId: widget.animalId,
       vaccineName: _vaccineName.text.trim(),
-      manufacturer: _manufacturer.text.trim(),
-      batchNumber: _batchNumber.text.trim(),
-      vetName: _vetName.text.trim(),
-      clinicName: _clinicName.text.trim(),
-      certificateNumber: _certificateNumber.text.trim(),
+      manufacturer: blankToNull(_manufacturer.text),
+      batchNumber: blankToNull(_batchNumber.text),
+      vetName: blankToNull(_vetName.text),
+      clinicName: blankToNull(_clinicName.text),
+      certificateNumber: blankToNull(_certificateNumber.text),
       dateAdministered: _administered,
       nextDueDate: _nextDue,
       clearNextDueDate: _nextDue == null,

@@ -214,6 +214,24 @@ abstract class AppLocalizations {
   /// **'Microchip number'**
   String get animalMicrochip;
 
+  /// No description provided for @animalMicrochipDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Microchip implanted'**
+  String get animalMicrochipDate;
+
+  /// No description provided for @animalLitter.
+  ///
+  /// In en, this message translates to:
+  /// **'Litter'**
+  String get animalLitter;
+
+  /// No description provided for @animalNone.
+  ///
+  /// In en, this message translates to:
+  /// **'None'**
+  String get animalNone;
+
   /// No description provided for @animalRegistrationNo.
   ///
   /// In en, this message translates to:
@@ -262,10 +280,16 @@ abstract class AppLocalizations {
   /// **'Delete {name}?'**
   String animalDeleteTitle(String name);
 
+  /// No description provided for @animalDeleteLittersNote.
+  ///
+  /// In en, this message translates to:
+  /// **'This also deletes {litters} whelping record(s) she is the dam of, and {puppies} of their puppies stay in your animals without the record of their mother.'**
+  String animalDeleteLittersNote(int litters, int puppies);
+
   /// No description provided for @animalDeleteBody.
   ///
   /// In en, this message translates to:
-  /// **'Its vaccinations, health tests, weights, visits and symptoms are deleted too, with any handover recorded for it, its photographs and the files that hold them on this phone, and, if it is a dam, its whelpings. This cannot be undone.'**
+  /// **'Its vaccinations, health tests, weights, visits and symptoms are deleted too, with any handover recorded for it, its photographs and the files that hold them on this phone. This cannot be undone.'**
   String get animalDeleteBody;
 
   /// No description provided for @animalNameRequired.
@@ -651,6 +675,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'New litter'**
   String get litterAdd;
+
+  /// No description provided for @litterEditTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit litter'**
+  String get litterEditTitle;
+
+  /// No description provided for @litterAddPuppies.
+  ///
+  /// In en, this message translates to:
+  /// **'Add puppies'**
+  String get litterAddPuppies;
+
+  /// No description provided for @litterHowMany.
+  ///
+  /// In en, this message translates to:
+  /// **'How many?'**
+  String get litterHowMany;
 
   /// No description provided for @litterAddTitle.
   ///

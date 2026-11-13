@@ -11,15 +11,14 @@ import 'date_utils.dart';
 /// agenda into the calendar the app does not have.
 const int agendaWindowDays = 14;
 
-const double _dayMs = 86400000.0;
-
 /// The instant the agenda stops looking: [nowMs] plus the window.
 ///
-/// Lives here rather than in the provider that queries with it, so the list on
-/// screen and the rows built from it can never disagree about how far ahead the
-/// two weeks reach.
+/// Counted in calendar days, not in `windowDays * 86400000` milliseconds. The
+/// old arithmetic was right on 363 days a year and one hour wrong on the two the
+/// clock moves — which was enough to drop the dose that fell on the last day of
+/// the window, once a year, on a phone whose owner had no way to know why.
 int agendaHorizonMs(int nowMs, {int windowDays = agendaWindowDays}) =>
-    nowMs + (windowDays * _dayMs).round();
+    addDays(nowMs, windowDays);
 
 /// One thing to book: the earliest dose an animal still in the herd is waiting
 /// for, with the count of days said the way the triage card says it.

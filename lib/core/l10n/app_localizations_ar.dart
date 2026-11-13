@@ -82,6 +82,15 @@ class AppLocalizationsAr extends AppLocalizations {
   String get animalMicrochip => 'رقم الشريحة';
 
   @override
+  String get animalMicrochipDate => 'تاريخ زرع الشريحة';
+
+  @override
+  String get animalLitter => 'الولادة';
+
+  @override
+  String get animalNone => 'لا شيء';
+
+  @override
   String get animalRegistrationNo => 'رقم التسجيل';
 
   @override
@@ -105,6 +114,11 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String animalDeleteTitle(String name) {
     return 'حذف $name؟';
+  }
+
+  @override
+  String animalDeleteLittersNote(int litters, int puppies) {
+    return 'سيُحذف أيضاً $litters سجل ولادة هي أمّها، ويبقى $puppies من جرائها في حيواناتك لكن دون سجل أمّهم.';
   }
 
   @override
@@ -317,6 +331,15 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get litterAdd => 'ولادة جديدة';
+
+  @override
+  String get litterEditTitle => 'تعديل الولادة';
+
+  @override
+  String get litterAddPuppies => 'إضافة جراء';
+
+  @override
+  String get litterHowMany => 'كم عددها؟';
 
   @override
   String get litterAddTitle => 'تسجيل ولادة';

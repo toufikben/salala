@@ -194,9 +194,32 @@ class LittersController extends AsyncNotifier<List<Litter>> {
     return created;
   }
 
-  Future<void> edit(Litter litter) async {
-    await ref.read(daosProvider).litters.update(litter);
+  /// Saves an edited whelping and carries the correction into its puppies.
+  ///
+  /// The puppies' birthday and parents were stamped from the litter at
+  /// registration, so leaving them behind would make the herd disagree with the
+  /// whelping it came from. Passing [previous] is what lets the database tell a
+  /// copied value apart from one the breeder fixed by hand.
+  Future<void> edit(Litter litter, {Litter? previous}) async {
+    final daos = ref.read(daosProvider);
+    await daos.litters.update(litter);
+    if (previous != null) {
+      await daos.litters.retargetPuppies(previous: previous, updated: litter);
+      await ref
+          .read(animalsProvider.notifier)
+          ._rereadAfter('a whelping change');
+    }
     await _rereadAfter('a whelping change');
+  }
+
+  /// Registers puppies for a whelping already in the ledger.
+  Future<List<Animal>> addPuppies(Litter litter, int count) async {
+    final daos = ref.read(daosProvider);
+    final created = await daos.litters.addPuppies(litter, count);
+    // Puppies are animals: the home list is stale the moment they land.
+    await ref.read(animalsProvider.notifier)._rereadAfter('new puppies');
+    await _rereadAfter('new puppies');
+    return created;
   }
 
   /// Deleting a litter unlinks its animals (`litter_id ON DELETE SET NULL`), so

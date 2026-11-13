@@ -86,9 +86,12 @@ void main() {
       'dog',
     );
     // Focusing a field can scroll the button out from under the tap, so the
-    // scroll is re-asserted rather than assumed.
-    await tester.ensureVisible(save);
+    // scroll is re-asserted rather than assumed — and the caret's own
+    // scroll-into-view runs on the frame after the jump, so it is settled first
+    // and the tap follows the jump in the same frame.
     await tester.pumpAndSettle();
+    await tester.ensureVisible(save);
+    await tester.pump();
     await tester.tap(save);
     // The write goes to the database, so the fake clock alone cannot finish it.
     await settleRealIo(tester);

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/l10n/app_localizations.dart';
 import '../../core/utils/date_utils.dart';
+import '../../core/utils/text_input.dart';
 import '../../core/utils/money.dart';
 import '../../data/models/vet_visit.dart';
 import '../providers/record_providers.dart';
@@ -133,14 +134,14 @@ class _VetVisitFormScreenState extends ConsumerState<VetVisitFormScreen> {
         ref,
         base.copyWith(
           animalId: widget.animalId,
-          clinicName: _clinic.text.trim(),
-          vetName: _vet.text.trim(),
-          reason: _reason.text.trim(),
-          outcome: _outcome.text.trim(),
+          clinicName: blankToNull(_clinic.text),
+          vetName: blankToNull(_vet.text),
+          reason: blankToNull(_reason.text),
+          outcome: blankToNull(_outcome.text),
           cost: _parsedCost,
           clearCost: _parsedCost == null,
-          currency: _currency.text.trim().toUpperCase(),
-          notes: _notes.text.trim(),
+          currency: blankToNull(_currency.text)?.toUpperCase(),
+          notes: blankToNull(_notes.text),
           visitDate: _visitDate,
         ),
       );

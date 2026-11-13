@@ -109,6 +109,11 @@ Future<void> _scrollTo(WidgetTester tester, Finder finder) async {
 /// on each other for part of this flow, and both end in a FilledButton that
 /// reads "Save": an unscoped finder would tap whichever one the widget tree
 /// happens to visit first, and the test would save the wrong record.
+///
+/// The wait is on the dialog closing, not on a frame count: the row is written
+/// through SQLite on another isolate, and a busy machine can still be inside the
+/// write while the fixed rounds run out — which left the barrier up and made the
+/// next tap land on it instead of on the button behind it.
 Future<void> _saveIn(WidgetTester tester, String dialogTitle) async {
   final save = find.descendant(
     of: find.widgetWithText(AlertDialog, dialogTitle),
@@ -117,9 +122,12 @@ Future<void> _saveIn(WidgetTester tester, String dialogTitle) async {
   await tester.ensureVisible(save);
   await tester.pumpAndSettle();
   await tester.tap(save);
+  await settleUntil(
+    tester,
+    () => find.widgetWithText(AlertDialog, dialogTitle).evaluate().isEmpty,
+  );
   // The row is written through SQLite, and both the contact list and this
   // animal's placements re-read themselves afterwards.
-  await settleRealIo(tester);
   await settleRealIo(tester);
 }
 
@@ -402,7 +410,14 @@ void main() {
     await _tap(tester, find.widgetWithText(TextButton, 'Delete'));
     expect(find.text('Delete this record?'), findsOneWidget);
     await tester.tap(find.widgetWithText(FilledButton, 'Delete'));
-    await settleRealIo(tester);
+    // A placement delete pops the dialog, rewrites the animal's status, and
+    // re-reads two lists before the row leaves the screen. Waiting for the
+    // dialog to close is waiting for the whole chain, not for a fixed count of
+    // frames — the fixed count is what made this pass alone and fail in a suite.
+    await settleUntil(
+      tester,
+      () => find.byType(AlertDialog).evaluate().isEmpty,
+    );
     await settleRealIo(tester);
 
     expect(find.byType(AlertDialog), findsNothing);
@@ -619,8 +634,12 @@ void main() {
 
     await _askToDeleteBuyer(tester);
     await _answerDeletePrompt(tester, 'Delete');
-    await settleRealIo(tester);
-    await settleRealIo(tester);
+    // The delete runs on SQLite and the contact form pops behind it, so this
+    // waits for the dialog to be gone instead of for two rounds of frames.
+    await settleUntil(
+      tester,
+      () => find.widgetWithText(AlertDialog, 'Edit buyer').evaluate().isEmpty,
+    );
 
     // The contact form closed on its own; the handover form it was opened from is
     // still here, so removing a name does not throw away a record mid-correction.
@@ -663,8 +682,12 @@ void main() {
       await _editBuyer(tester);
       await _askToDeleteBuyer(tester);
       await _answerDeletePrompt(tester, 'Delete');
-      await settleRealIo(tester);
-      await settleRealIo(tester);
+      // The contact form closes once the row is gone and the handover form takes
+      // its name back out; waited for by that, not by a count of frames.
+      await settleUntil(
+        tester,
+        () => find.widgetWithText(AlertDialog, 'Edit buyer').evaluate().isEmpty,
+      );
 
       expect(
         find.descendant(

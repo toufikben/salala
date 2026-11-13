@@ -1,22 +1,38 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:salala/data/models/animal.dart';
+import 'package:salala/data/models/litter.dart';
 import 'package:salala/presentation/screens/litter_form_screen.dart';
 import 'package:salala/presentation/widgets/animal_card.dart';
 
 import '../helpers/pump_app.dart';
 
-Animal _stock({required String name, required Sex sex}) => Animal(
-  id: '',
-  name: name,
-  species: 'dog',
-  breed: 'Border collie',
-  sex: sex,
-  status: AnimalStatus.active,
-  isBreedingStock: true,
-  createdAt: 0,
-  updatedAt: 0,
-);
+Animal _stock({required String name, required Sex sex, String id = ''}) =>
+    Animal(
+      id: id,
+      name: name,
+      species: 'dog',
+      breed: 'Border collie',
+      sex: sex,
+      status: AnimalStatus.active,
+      isBreedingStock: true,
+      createdAt: 0,
+      updatedAt: 0,
+    );
+
+/// A whelping already in the ledger: the row an edit screen opens, and the row
+/// a puppy has to be addable to afterwards.
+Litter _litter({String id = 'lit', required String damId, String? sireId}) =>
+    Litter(
+      id: id,
+      name: 'A litter',
+      damId: damId,
+      sireId: sireId,
+      matingDate: DateTime(2026, 1, 1).millisecondsSinceEpoch,
+      whelpingDate: DateTime(2026, 1, 3).millisecondsSinceEpoch,
+      createdAt: 0,
+      updatedAt: 0,
+    );
 
 /// A phone-sized surface: the litter form stacks five fields plus a dropdown,
 /// and the default 800x600 test window leaves Save out of reach of a real tap.
@@ -134,6 +150,10 @@ void main() {
     await tester.tap(save);
     // The litter and three animals are written through SQLite, so the fake
     // clock alone cannot finish the save.
+    await settleUntil(
+      tester,
+      () => find.byType(LitterFormScreen).evaluate().isEmpty,
+    );
     await settleRealIo(tester);
 
     // The route is gone and the list behind it shows the whelping: asserting on
@@ -367,6 +387,10 @@ void main() {
     await tester.ensureVisible(save);
     await tester.pumpAndSettle();
     await tester.tap(save);
+    await settleUntil(
+      tester,
+      () => find.byType(LitterFormScreen).evaluate().isEmpty,
+    );
     await settleRealIo(tester);
 
     // Nothing is refused here, which is the point: the two tests above changed
@@ -379,5 +403,100 @@ void main() {
     await tester.tap(find.widgetWithText(NavigationDestination, 'Animals'));
     await settleRealIo(tester);
     expect(find.byType(AnimalCard), findsNWidgets(4));
+  });
+
+  testWidgets('an edit opens the whelping filled and saves the correction', (
+    tester,
+  ) async {
+    _usePhoneViewport(tester);
+    await pumpSalala(
+      tester,
+      seed: <Animal>[
+        _stock(id: 'dam', name: 'Nala', sex: Sex.female),
+        _stock(id: 'sire', name: 'Atlas', sex: Sex.male),
+      ],
+      seedLitters: <Litter>[_litter(damId: 'dam', sireId: 'sire')],
+    );
+    await _openLittersTab(tester);
+
+    await tester.tap(find.text('A litter'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Edit'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Edit litter'), findsOneWidget);
+    // The stored parents are selected, not the first entry of each menu: a form
+    // that pre-filled late would show the top item and save it back.
+    expect(
+      find.widgetWithText(DropdownButtonFormField<String>, 'Nala'),
+      findsOneWidget,
+    );
+    expect(
+      find.widgetWithText(DropdownButtonFormField<String?>, 'Atlas'),
+      findsOneWidget,
+    );
+    // An edit does not register animals — that is the add-puppies action on the
+    // litter screen — so the counter has to be absent, or a correction could
+    // quietly create another set of puppies.
+    expect(find.byType(DropdownButtonFormField<int>), findsNothing);
+
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Litter name'),
+      'B litter',
+    );
+    final save = find.widgetWithText(FilledButton, 'Save');
+    await tester.ensureVisible(save);
+    await tester.pumpAndSettle();
+    await tester.tap(save);
+    // The edit writes, then rewrites the puppies it stamped, then re-reads both
+    // lists. Waiting for the route to close is waiting for all of it.
+    await settleUntil(
+      tester,
+      () => find.byType(LitterFormScreen).evaluate().isEmpty,
+    );
+    await settleRealIo(tester);
+
+    expect(find.byType(LitterFormScreen), findsNothing);
+    // The detail screen this edit was opened from, carrying the new name.
+    expect(find.text('B litter'), findsWidgets);
+    expect(find.text('A litter'), findsNothing);
+  });
+
+  testWidgets('puppies can be added to a whelping after it is registered', (
+    tester,
+  ) async {
+    _usePhoneViewport(tester);
+    await pumpSalala(
+      tester,
+      seed: <Animal>[_stock(id: 'dam', name: 'Nala', sex: Sex.female)],
+      seedLitters: <Litter>[_litter(damId: 'dam')],
+    );
+    await _openLittersTab(tester);
+    await tester.tap(find.text('A litter'));
+    await tester.pumpAndSettle();
+
+    // Registered before the count was known: the whelping is here with none.
+    expect(
+      find.text('No puppies registered for this litter yet.'),
+      findsOneWidget,
+    );
+
+    await tester.tap(find.widgetWithText(OutlinedButton, 'Add puppies'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byType(DropdownButtonFormField<int>));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('2').last);
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilledButton, 'Add'));
+    await settleUntil(
+      tester,
+      () => find.text('A litter 2').evaluate().isNotEmpty,
+    );
+    await settleRealIo(tester);
+
+    // Numbered from one, not from the count of puppies in the whole ledger.
+    expect(find.text('A litter 1'), findsOneWidget);
+    expect(find.text('A litter 2'), findsOneWidget);
+    expect(find.textContaining('2 puppies'), findsOneWidget);
   });
 }

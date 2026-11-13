@@ -10,6 +10,7 @@ import 'package:salala/data/db/daos.dart';
 import 'package:salala/data/models/animal.dart';
 import 'package:salala/data/models/buyer.dart';
 import 'package:salala/data/models/health_test.dart';
+import 'package:salala/data/models/litter.dart';
 import 'package:salala/data/models/placement.dart';
 import 'package:salala/data/models/photo.dart';
 import 'package:salala/data/models/symptom.dart';
@@ -112,6 +113,33 @@ Future<void> settleRealIo(WidgetTester tester) async {
   }
 }
 
+/// Waits for a fact a write produces, giving SQLite real time to land it.
+///
+/// `settleRealIo` is right for a section that closes when it stops spinning, and
+/// its rounds are fixed. A save that pops a route, replaces a row, or moves a
+/// card shows no spinner at all: the screen sits still while the write runs on
+/// another isolate, and a loaded machine can need longer than the fixed rounds
+/// allow. That is how the same test passes alone and fails inside a suite.
+///
+/// The bound is finite and the caller's own assertion still decides the outcome:
+/// a wait that times out leaves the screen in exactly the state the test then
+/// reports, rather than turning a stuck screen into a pass.
+Future<void> settleUntil(
+  WidgetTester tester,
+  bool Function() done, {
+  Duration timeout = const Duration(seconds: 20),
+}) async {
+  var waited = Duration.zero;
+  const step = Duration(milliseconds: 25);
+  const real = Duration(milliseconds: 20);
+  while (!done() && waited < timeout) {
+    await tester.pump(step);
+    await tester.runAsync(() => Future<void>.delayed(real));
+    waited += step + real;
+  }
+  await tester.pump();
+}
+
 /// Waits until the scheduler has been handed a whole save or a whole launch.
 ///
 /// The dose is written on another isolate, so the alarms reach the writer some
@@ -170,6 +198,7 @@ Future<FakeSecureStorage> pumpSalala(
   List<VetVisit> seedVisits = const <VetVisit>[],
   List<Symptom> seedSymptoms = const <Symptom>[],
   List<Photo> seedPhotos = const <Photo>[],
+  List<Litter> seedLitters = const <Litter>[],
   List<Buyer> seedBuyers = const <Buyer>[],
   List<Placement> seedPlacements = const <Placement>[],
   // A database the test wants bent before the first frame, after the seeds have
@@ -252,6 +281,12 @@ Future<FakeSecureStorage> pumpSalala(
     }
     for (final placement in seedPlacements) {
       await daos.placements.create(placement, nowMs: nowMs++);
+    }
+    // Litters last: `dam_id` and `sire_id` are foreign keys into the animals
+    // just written. Seeded as rows rather than through `createWithPuppies`, so a
+    // test can hand a screen a whelping that has no puppies yet.
+    for (final litter in seedLitters) {
+      await daos.litters.create(litter, nowMs: nowMs++);
     }
     if (beforeLaunch != null) await beforeLaunch(database);
   });
@@ -336,8 +371,13 @@ Future<void> tapSaveAndGetAnswer(
           of: find.widgetWithText(AlertDialog, dialogTitle),
           matching: find.widgetWithText(FilledButton, 'Save'),
         );
-  await tester.ensureVisible(save);
+  // The field that was typed into last owns a caret whose own scroll-into-view
+  // runs one frame later and drags the page back to that field. Settling first,
+  // then jumping to the button and tapping in the same frame, is what keeps the
+  // tap on the button rather than on whatever moved in front of it.
   await tester.pumpAndSettle();
+  await tester.ensureVisible(save);
+  await tester.pump();
   await tester.tap(save);
   await settleRefusal(tester, waitingFor: waitingFor);
 }

@@ -1,5 +1,7 @@
 import 'package:equatable/equatable.dart';
 
+import '../../core/utils/day_math.dart';
+
 /// Genetic / orthopaedic screening a breeder must disclose to buyers
 /// (OFA hips, PENNFID, BAER, echocardiography, ...). `testType` is free-form
 /// because the recognised panel changes per breed and per registry.
@@ -32,10 +34,11 @@ class HealthTest extends Equatable {
   final int createdAt;
   final int updatedAt;
 
-  bool isExpired(int nowMs) {
-    final until = validUntil;
-    return until != null && until < nowMs;
-  }
+  /// A certificate is expired when its last valid day has gone by.
+  ///
+  /// Same rule as `Vaccination.isOverdue`: the stored date is a day, so an
+  /// instant comparison expired a certificate on its own last valid morning.
+  bool isExpired(int nowMs) => isPastDay(validUntil, nowMs);
 
   HealthTest copyWith({
     String? animalId,

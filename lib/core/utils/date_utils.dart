@@ -2,6 +2,9 @@ import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 
 import '../l10n/app_localizations.dart';
+import 'day_math.dart';
+
+export 'day_math.dart';
 
 /// [formatDay] for work that outlives the widget that started it.
 ///
@@ -60,36 +63,13 @@ String formatDay(BuildContext context, int? epochMs) =>
 DateTime? dayFromMs(int? epochMs) =>
     epochMs == null ? null : DateTime.fromMillisecondsSinceEpoch(epochMs);
 
-int msFromDay(DateTime day) =>
-    DateTime(day.year, day.month, day.day).millisecondsSinceEpoch;
+int msFromDay(DateTime day) => dayStartMs(day.millisecondsSinceEpoch);
 
-/// Whole calendar days from [fromMs] to [toMs]: negative when [fromMs] is still
-/// ahead, zero when both instants fall on the same day.
-///
-/// The dates a breeder reads off paper — a due booster, a certificate's validity,
-/// a whelping day — are stored at local midnight, so an *instant* difference says
-/// the morning has already gone by and reports a dose due today as one day late.
-/// Counting the dates rather than the elapsed milliseconds is the same arithmetic
-/// the animal's card and the herd's agenda have to agree on (D28), which is why it
-/// lives here rather than in either of them.
-int wholeDaysBetween(int fromMs, int toMs) {
-  final from = DateTime.fromMillisecondsSinceEpoch(fromMs);
-  final to = DateTime.fromMillisecondsSinceEpoch(toMs);
-  final a = DateTime(from.year, from.month, from.day).millisecondsSinceEpoch;
-  final b = DateTime(to.year, to.month, to.day).millisecondsSinceEpoch;
-  return ((b - a) / 86400000).round();
-}
-
-/// [day] moved by whole calendar days, in either direction.
-///
-/// The other way to write this is `day.add(Duration(days: n))`, and that counts
-/// *hours*: on a day the clock shortens or lengthens — Morocco steps between
-/// UTC+1 and UTC+0 for Ramadan — 720 hours lands on the day before or after the
-/// one a breeder would point at on a paper calendar. D31 says a due date is a
-/// date, so a reminder booked thirty days ahead of one, and the horizon a launch
-/// rebuilds alarms out of, are both counted here off the day number.
-DateTime shiftDays(DateTime day, int days) =>
-    DateTime(day.year, day.month, day.day + days);
+/// Whole calendar days from [fromMs] to [toMs], and every other day count in
+/// this file, live in `day_math.dart` — re-exported at the top of this one so a
+/// screen keeps importing a single file. The models ask the same question
+/// (`Vaccination.isOverdue`, `HealthTest.isExpired`) and a model cannot reach a
+/// file that imports Flutter.
 
 /// Whether a whelping's three dates tell a story that cannot have happened.
 enum LitterDateProblem { none, whelpingBeforeMating, weaningBeforeWhelping }
@@ -158,11 +138,5 @@ bool recordPrecedesBirth({required int? recordMs, required int? birthMs}) =>
 
 bool _isDayBefore(int? earlierMs, int? laterMs) {
   if (earlierMs == null || laterMs == null) return false;
-  final a = dayFromMs(earlierMs)!;
-  final b = dayFromMs(laterMs)!;
-  return DateTime(
-    a.year,
-    a.month,
-    a.day,
-  ).isBefore(DateTime(b.year, b.month, b.day));
+  return wholeDaysBetween(earlierMs, laterMs) > 0;
 }

@@ -79,6 +79,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get animalMicrochip => 'Microchip number';
 
   @override
+  String get animalMicrochipDate => 'Microchip implanted';
+
+  @override
+  String get animalLitter => 'Litter';
+
+  @override
+  String get animalNone => 'None';
+
+  @override
   String get animalRegistrationNo => 'Registry number';
 
   @override
@@ -105,8 +114,13 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String animalDeleteLittersNote(int litters, int puppies) {
+    return 'This also deletes $litters whelping record(s) she is the dam of, and $puppies of their puppies stay in your animals without the record of their mother.';
+  }
+
+  @override
   String get animalDeleteBody =>
-      'Its vaccinations, health tests, weights, visits and symptoms are deleted too, with any handover recorded for it, its photographs and the files that hold them on this phone, and, if it is a dam, its whelpings. This cannot be undone.';
+      'Its vaccinations, health tests, weights, visits and symptoms are deleted too, with any handover recorded for it, its photographs and the files that hold them on this phone. This cannot be undone.';
 
   @override
   String get animalNameRequired => 'A name is required';
@@ -316,6 +330,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get litterAdd => 'New litter';
+
+  @override
+  String get litterEditTitle => 'Edit litter';
+
+  @override
+  String get litterAddPuppies => 'Add puppies';
+
+  @override
+  String get litterHowMany => 'How many?';
 
   @override
   String get litterAddTitle => 'Register a litter';

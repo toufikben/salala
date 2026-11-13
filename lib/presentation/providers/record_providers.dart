@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/l10n/app_localizations.dart';
+import '../../core/utils/day_math.dart';
 import '../../data/models/animal.dart';
 import '../../data/models/buyer.dart';
 import '../../data/models/health_test.dart';
@@ -230,19 +231,79 @@ final buyersProvider = FutureProvider.autoDispose<List<Buyer>>(
 
 Future<Placement> savePlacement(WidgetRef ref, Placement placement) async {
   final daos = ref.read(daosProvider);
+  final Placement saved;
   if (placement.id.isEmpty) {
-    final created = await daos.placements.create(placement);
-    ref.invalidate(placementsForAnimalProvider(created.animalId));
-    return created;
+    saved = await daos.placements.create(placement);
+  } else {
+    await daos.placements.update(placement);
+    saved = placement;
   }
-  await daos.placements.update(placement);
-  ref.invalidate(placementsForAnimalProvider(placement.animalId));
-  return placement;
+  ref.invalidate(placementsForAnimalProvider(saved.animalId));
+  await _syncAnimalStatusToPlacements(ref, saved.animalId);
+  return saved;
 }
 
 Future<void> deletePlacement(WidgetRef ref, Placement placement) async {
   await ref.read(daosProvider).placements.delete(placement.id);
   ref.invalidate(placementsForAnimalProvider(placement.animalId));
+  // A handover removed is a handover that never happened, so the animal comes
+  // back into the herd if she is still marked sold and nothing else says she
+  // left. See [_syncAnimalStatusToPlacements] for why a `deceased` animal is
+  // never touched and why a future-dated handover changes nothing.
+  await _syncAnimalStatusToPlacements(
+    ref,
+    placement.animalId,
+    reactivate: true,
+  );
+}
+
+/// Keeps `animals.status` and the handover on file saying the same thing.
+///
+/// They were two answers to one question, and only one of them was ever written:
+/// the ledger read "handed over on 3 May" while the herd list still counted the
+/// dog at home, still put her on the agenda and kept her alarm in the phone.
+/// Running this after every write to `placements` is what stops the two from
+/// drifting again.
+///
+/// A handover dated in the future does not move the status: the puppy that goes
+/// to a waiting family next month is booked, not gone, and still needs her
+/// booster while she is here. [reactivate] is set only by a delete, because that
+/// is the one path where the breeder is explicitly taking the handover back —
+/// an animal marked `retired` or `deceased` by hand keeps her own status
+/// otherwise.
+Future<void> _syncAnimalStatusToPlacements(
+  WidgetRef ref,
+  String animalId, {
+  bool reactivate = false,
+}) async {
+  final daos = ref.read(daosProvider);
+  final animal = await daos.animals.findById(animalId);
+  if (animal == null) return;
+  if (animal.status == AnimalStatus.deceased) return;
+
+  final nowMs = DateTime.now().millisecondsSinceEpoch;
+  final placements = await daos.placements.forAnimal(animalId);
+  final delivered = placements.any((p) {
+    final ms = p.placedDate;
+    return ms != null && wholeDaysBetween(ms, nowMs) >= 0;
+  });
+
+  final AnimalStatus? wanted;
+  if (delivered) {
+    wanted = AnimalStatus.sold;
+  } else if (reactivate && animal.status == AnimalStatus.sold) {
+    wanted = AnimalStatus.active;
+  } else {
+    wanted = null;
+  }
+  if (wanted == null || animal.status == wanted) return;
+
+  // Written through the dao rather than through `AnimalsController.edit`, which
+  // awaits a full re-read of the herd before it answers: the handover form is
+  // waiting behind this call, and the list is rebuilt from the invalidation
+  // below on its next read anyway.
+  await daos.animals.update(animal.copyWith(status: wanted));
+  ref.invalidate(animalsProvider);
 }
 
 /// Writes a contact and returns it as stored, because the placement form that

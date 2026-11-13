@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/l10n/app_localizations.dart';
 import '../../core/utils/date_utils.dart';
+import '../../core/utils/text_input.dart';
 import '../../core/utils/gestation.dart';
 import '../../data/models/animal.dart';
 import '../../data/models/litter.dart';
@@ -16,16 +17,23 @@ import '../widgets/record_refusal.dart';
 /// The puppy count is the whole point of this screen: a breeder who has just
 /// whelped will not type six near-identical rows, and every animal that skips
 /// registration is a vaccination record that will never exist.
+///
+/// The same screen edits a whelping already in the ledger ([litterId]), because
+/// the dates it records are the ones the ledger counts from: a typo in the
+/// whelping date is every puppy's wrong birthday. Editing does not register
+/// puppies — [LitterListScreen]'s add action does that — so a correction cannot
+/// silently create animals.
 class LitterFormScreen extends ConsumerStatefulWidget {
-  const LitterFormScreen({super.key});
+  const LitterFormScreen({super.key, this.litterId});
+
+  /// Set to edit an existing whelping instead of registering a new one.
+  final String? litterId;
 
   @override
   ConsumerState<LitterFormScreen> createState() => _LitterFormScreenState();
 }
 
 class _LitterFormScreenState extends ConsumerState<LitterFormScreen> {
-  static const int _maxPuppies = 12;
-
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _name = TextEditingController();
   final TextEditingController _notes = TextEditingController();
@@ -37,6 +45,39 @@ class _LitterFormScreenState extends ConsumerState<LitterFormScreen> {
   int? _weaningDate;
   int _puppies = 0;
   bool _saving = false;
+
+  /// The row as it was when the form opened, kept so the save can tell the
+  /// database which values are still its own to rewrite.
+  Litter? _original;
+
+  /// False until an edit has read its row and filled the fields.
+  bool _prefilled = false;
+
+  bool get _isEdit => widget.litterId != null;
+
+  @override
+  void initState() {
+    super.initState();
+    if (!_isEdit) _prefilled = true;
+  }
+
+  /// Fills the form from a row already in the ledger.
+  ///
+  /// Runs inside `build`, before the fields exist: a `DropdownButtonFormField`
+  /// reads `initialValue` once, so a prefill after it was built would show the
+  /// first menu entry and save it over the breeder's dam. Guarded by
+  /// [_prefilled], so it happens exactly once.
+  void _prefill(Litter litter) {
+    _original = litter;
+    _prefilled = true;
+    _name.text = litter.name;
+    _notes.text = litter.notes ?? '';
+    _damId = litter.damId;
+    _sireId = litter.sireId;
+    _matingDate = litter.matingDate;
+    _whelpingDate = litter.whelpingDate;
+    _weaningDate = litter.weaningDate;
+  }
 
   @override
   void dispose() {
@@ -76,46 +117,74 @@ class _LitterFormScreenState extends ConsumerState<LitterFormScreen> {
       return;
     }
     final animals = ref.read(animalsProvider).value ?? const <Animal>[];
-    final dam = animals.firstWhere((a) => a.id == _damId);
     final name = _name.text.trim();
+    final notes = blankToNull(_notes.text);
 
     setState(() => _saving = true);
 
-    final litter = Litter(
-      id: '',
-      name: name,
-      damId: dam.id,
-      sireId: _sireId,
-      matingDate: _matingDate,
-      whelpingDate: _whelpingDate,
-      weaningDate: _weaningDate,
-      notes: _notes.text.trim(),
-      createdAt: 0,
-      updatedAt: 0,
-    );
+    try {
+      if (_isEdit) {
+        // Every nullable field is written explicitly, cleared or not: `copyWith`
+        // treats "not passed" as "leave it", so a date the breeder cleared would
+        // come back the next time the screen opened.
+        final original = _original!;
+        await ref
+            .read(littersProvider.notifier)
+            .edit(
+              original.copyWith(
+                name: name,
+                damId: _damId,
+                sireId: _sireId,
+                clearSireId: _sireId == null,
+                matingDate: _matingDate,
+                clearMatingDate: _matingDate == null,
+                whelpingDate: _whelpingDate,
+                clearWhelpingDate: _whelpingDate == null,
+                weaningDate: _weaningDate,
+                clearWeaningDate: _weaningDate == null,
+                notes: notes,
+                clearNotes: notes == null,
+              ),
+              previous: original,
+            );
+      } else {
+        final dam = animals.firstWhere((a) => a.id == _damId);
 
-    final puppies = <Animal>[
-      for (var index = 1; index <= _puppies; index++)
-        Animal(
+        final litter = Litter(
           id: '',
-          name: '$name $index',
-          species: dam.species,
-          breed: dam.breed,
-          sex: Sex.unknown,
-          status: AnimalStatus.active,
-          birthDate: _whelpingDate,
+          name: name,
+          damId: dam.id,
+          sireId: _sireId,
+          matingDate: _matingDate,
+          whelpingDate: _whelpingDate,
+          weaningDate: _weaningDate,
+          notes: notes,
           createdAt: 0,
           updatedAt: 0,
-        ),
-    ];
+        );
 
-    try {
-      await ref.read(littersProvider.notifier).register(litter, puppies);
+        final puppies = <Animal>[
+          for (var index = 1; index <= _puppies; index++)
+            Animal(
+              id: '',
+              name: '$name $index',
+              species: dam.species,
+              breed: dam.breed,
+              sex: Sex.unknown,
+              status: AnimalStatus.active,
+              birthDate: _whelpingDate,
+              createdAt: 0,
+              updatedAt: 0,
+            ),
+        ];
+
+        await ref.read(littersProvider.notifier).register(litter, puppies);
+      }
     } catch (error) {
       // The litter and its puppies land or do not land together — that is the
       // provider's transaction, not this screen's — so a refusal here means
       // nothing was written and the form is the place to try again.
-      debugPrint('Litter registration failed: $error');
+      debugPrint('Litter save failed: $error');
       if (mounted) _refuseSave();
       return;
     }
@@ -133,11 +202,12 @@ class _LitterFormScreenState extends ConsumerState<LitterFormScreen> {
     );
   }
 
-  /// Dates that cannot both have happened. Refused here rather than corrected
-  /// later, because a whelping has no editing screen: the row a breeder saves is
-  /// the row they live with, and every puppy's birthday is copied from the
-  /// whelping date, so a slipped pair becomes the herd's age arithmetic and the
-  /// litter's PDF prints the two dates side by side.
+  /// Dates that cannot both have happened. Refused before the write rather than
+  /// corrected later, because every puppy's birthday is copied from the whelping
+  /// date, so a slipped pair becomes the herd's age arithmetic and the litter's
+  /// PDF prints the two dates side by side. The edit screen makes the refusal
+  /// more important, not less: a corrected row is saved over the old one, and the
+  /// old dates are not kept anywhere to fall back to.
   void _refuseDates(LitterDateProblem problem) {
     final l10n = AppLocalizations.of(context);
     // Exhaustive on purpose: a third rule added to the enum has to be answered
@@ -157,6 +227,37 @@ class _LitterFormScreenState extends ConsumerState<LitterFormScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final animals = ref.watch(animalsProvider).value ?? const <Animal>[];
+    final littersAsync = ref.watch(littersProvider);
+
+    // An edit reads a row that may still be on its way (a notification or a
+    // deep link opens this screen before the list does). Showing the form first
+    // would show it empty, and a Save pressed in that moment would write the
+    // blanks over the whelping — so the screen waits, then fills, then shows.
+    if (!_prefilled) {
+      final litters = littersAsync.value ?? const <Litter>[];
+      final matches = litters.where((l) => l.id == widget.litterId);
+      if (matches.isEmpty) {
+        return Scaffold(
+          appBar: AppBar(title: Text(l10n.litterEditTitle)),
+          body: Center(
+            child: littersAsync.isLoading
+                ? const CircularProgressIndicator()
+                // A read that failed is not a deleted whelping: saying "deleted"
+                // over a database error would have the breeder believe her record
+                // is gone and register it again.
+                : littersAsync.hasError
+                ? FilledButton(
+                    onPressed: () =>
+                        ref.read(littersProvider.notifier).refresh(),
+                    child: Text(l10n.actionRetry),
+                  )
+                : Text(l10n.litterGone),
+          ),
+        );
+      }
+      _prefill(matches.first);
+    }
+
     final dams = animals
         .where((a) => a.isBreedingStock && a.sex == Sex.female)
         .toList(growable: false);
@@ -170,7 +271,9 @@ class _LitterFormScreenState extends ConsumerState<LitterFormScreen> {
     );
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.litterAddTitle)),
+      appBar: AppBar(
+        title: Text(_isEdit ? l10n.litterEditTitle : l10n.litterAddTitle),
+      ),
       body: Form(
         key: _formKey,
         // Same reason as the animal form: a lazy ListView unmounts fields
@@ -202,11 +305,23 @@ class _LitterFormScreenState extends ConsumerState<LitterFormScreen> {
                   labelText: l10n.litterDam,
                   helperText: dams.isEmpty ? l10n.litterNoDams : null,
                 ),
-                items: dams
-                    .map(
-                      (a) => DropdownMenuItem(value: a.id, child: Text(a.name)),
-                    )
-                    .toList(),
+                items: <DropdownMenuItem<String>>[
+                  for (final a in dams)
+                    DropdownMenuItem(value: a.id, child: Text(a.name)),
+                  // An existing whelping can name a dam who is no longer marked
+                  // as breeding stock, or who has died. The menu has to carry
+                  // her id all the same: `DropdownButton` throws when
+                  // `initialValue` names an item it does not hold, which would
+                  // make the whelping impossible to open, let alone correct.
+                  if (_damId != null && !dams.any((a) => a.id == _damId))
+                    DropdownMenuItem(
+                      value: _damId!,
+                      child: Text(
+                        animalById(animals, _damId)?.name ??
+                            l10n.litterDamMissing,
+                      ),
+                    ),
+                ],
                 onChanged: (value) => setState(() => _damId = value),
                 validator: (value) =>
                     value == null ? l10n.litterDamRequired : null,
@@ -222,6 +337,13 @@ class _LitterFormScreenState extends ConsumerState<LitterFormScreen> {
                   ),
                   for (final a in sires)
                     DropdownMenuItem(value: a.id, child: Text(a.name)),
+                  if (_sireId != null && !sires.any((a) => a.id == _sireId))
+                    DropdownMenuItem(
+                      value: _sireId,
+                      child: Text(
+                        animalById(animals, _sireId)?.name ?? l10n.animalGone,
+                      ),
+                    ),
                 ],
                 onChanged: (value) => setState(() => _sireId = value),
               ),
@@ -276,20 +398,25 @@ class _LitterFormScreenState extends ConsumerState<LitterFormScreen> {
                     : () => setState(() => _weaningDate = null),
               ),
               const SizedBox(height: 12),
-              DropdownButtonFormField<int>(
-                initialValue: _puppies,
-                decoration: InputDecoration(
-                  labelText: l10n.litterPuppiesToRegister,
-                  helperText: l10n.litterPuppiesHint,
+              // Only on a new whelping: a correction must not create animals,
+              // and adding puppies later is a separate action on the litter
+              // screen that knows how many are already registered.
+              if (!_isEdit) ...<Widget>[
+                DropdownButtonFormField<int>(
+                  initialValue: _puppies,
+                  decoration: InputDecoration(
+                    labelText: l10n.litterPuppiesToRegister,
+                    helperText: l10n.litterPuppiesHint,
+                  ),
+                  items: <DropdownMenuItem<int>>[
+                    for (var index = 0; index <= maxPuppiesPerLitter; index++)
+                      DropdownMenuItem(value: index, child: Text('$index')),
+                  ],
+                  onChanged: (value) =>
+                      setState(() => _puppies = value ?? _puppies),
                 ),
-                items: <DropdownMenuItem<int>>[
-                  for (var index = 0; index <= _maxPuppies; index++)
-                    DropdownMenuItem(value: index, child: Text('$index')),
-                ],
-                onChanged: (value) =>
-                    setState(() => _puppies = value ?? _puppies),
-              ),
-              const SizedBox(height: 12),
+                const SizedBox(height: 12),
+              ],
               TextFormField(
                 controller: _notes,
                 minLines: 2,

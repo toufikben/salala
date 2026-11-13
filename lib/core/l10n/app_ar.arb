@@ -28,6 +28,9 @@
   "animalBirthDate": "تاريخ الميلاد",
   "animalStatus": "الحالة",
   "animalMicrochip": "رقم الشريحة",
+  "animalMicrochipDate": "تاريخ زرع الشريحة",
+  "animalLitter": "الولادة",
+  "animalNone": "لا شيء",
   "animalRegistrationNo": "رقم التسجيل",
   "animalRegistry": "جهة التسجيل",
   "animalColor": "اللون",
@@ -36,6 +39,17 @@
   "animalAddTitle": "إضافة حيوان",
   "animalEditTitle": "تعديل الحيوان",
   "animalDeleteTitle": "حذف {name}؟",
+  "animalDeleteLittersNote": "سيُحذف أيضاً {litters} سجل ولادة هي أمّها، ويبقى {puppies} من جرائها في حيواناتك لكن دون سجل أمّهم.",
+  "@animalDeleteLittersNote": {
+    "placeholders": {
+      "litters": {
+        "type": "int"
+      },
+      "puppies": {
+        "type": "int"
+      }
+    }
+  },
   "animalDeleteBody": "سيُحذف معها أيضاً التطعيمات وفحوصات الصحة والأوزان والزيارات البيطرية والأعراض، وسجل التسليم إن وُجد، وصورها وما على هذا الهاتف من ملفات تلك الصور، والولادات التي هي أمّ لها. لا يمكن التراجع عن هذه الخطوة.",
   "animalNameRequired": "الاسم مطلوب",
   "animalSpeciesRequired": "اختر الفصيلة",
@@ -108,6 +122,9 @@
   "packRestoreFailed": "لم يمكن استرجاع الحزمة. لم يتغير شيء على هذا الهاتف.",
 
   "litterAdd": "ولادة جديدة",
+  "litterEditTitle": "تعديل الولادة",
+  "litterAddPuppies": "إضافة جراء",
+  "litterHowMany": "كم عددها؟",
   "litterAddTitle": "تسجيل ولادة",
   "litterEmptyTitle": "لا توجد ولادات بعد",
   "litterEmptyBody": "سجّل التزاوج لمتابعة الحمل وتسجيل الجراء في خطوة واحدة.",

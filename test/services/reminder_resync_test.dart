@@ -349,10 +349,13 @@ void main() {
       now: noon,
     );
 
-    test('an empty ledger re-books nothing', () async {
+    test('an empty ledger takes every alarm out of the phone', () async {
       expect(await run(), 0);
       expect(writer.written, isEmpty);
-      expect(writer.log, isEmpty);
+      // Nothing in the ledger is worth waking anyone for, so the phone is not
+      // allowed to keep a booking of its own: the wholesale clear is what
+      // reaches the alarms of records that are no longer rows at all.
+      expect(writer.log, <String>['clearAll']);
     });
 
     test(
@@ -389,7 +392,9 @@ void main() {
       await seedDose(dayAhead(reminderHorizonDays + 30));
 
       expect(await run(), 0);
-      expect(writer.log, isEmpty);
+      // Nothing in the horizon means nothing should be booked, so the phone is
+      // emptied rather than left holding what a previous ledger booked.
+      expect(writer.log, <String>['clearAll']);
     });
 
     test(
@@ -593,7 +598,7 @@ void main() {
       // as long as the animal stays sold.
       final doseId = await seedDose(dayAhead(reminderHorizonDays + 30));
       expect(await launch(), 0);
-      expect(writer.log, isEmpty);
+      expect(writer.log, <String>['clearAll']);
 
       await setStatus(AnimalStatus.sold);
       expect(await reconcile(), 0);

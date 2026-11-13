@@ -38,6 +38,9 @@
   "animalBirthDate": "Date of birth",
   "animalStatus": "Status",
   "animalMicrochip": "Microchip number",
+  "animalMicrochipDate": "Microchip implanted",
+  "animalLitter": "Litter",
+  "animalNone": "None",
   "animalRegistrationNo": "Registry number",
   "animalRegistry": "Registry",
   "animalColor": "Colour",
@@ -53,7 +56,18 @@
       }
     }
   },
-  "animalDeleteBody": "Its vaccinations, health tests, weights, visits and symptoms are deleted too, with any handover recorded for it, its photographs and the files that hold them on this phone, and, if it is a dam, its whelpings. This cannot be undone.",
+  "animalDeleteLittersNote": "This also deletes {litters} of her whelpings, and the {puppies} puppies they registered stay in your animals without the record of their mother.",
+  "@animalDeleteLittersNote": {
+    "placeholders": {
+      "litters": {
+        "type": "int"
+      },
+      "puppies": {
+        "type": "int"
+      }
+    }
+  },
+  "animalDeleteBody": "Its vaccinations, health tests, weights, visits and symptoms are deleted too, with any handover recorded for it, its photographs and the files that hold them on this phone. This cannot be undone.",
   "animalNameRequired": "A name is required",
   "animalSpeciesRequired": "Choose a species",
 
@@ -145,6 +159,9 @@
   "packRestoreFailed": "The pack could not be restored. Nothing on this phone changed.",
 
   "litterAdd": "New litter",
+  "litterEditTitle": "Edit litter",
+  "litterAddPuppies": "Add puppies",
+  "litterHowMany": "How many?",
   "litterAddTitle": "Register a litter",
   "litterEmptyTitle": "No litters yet",
   "litterEmptyBody": "Record a mating to follow the pregnancy and register the puppies in one step.",

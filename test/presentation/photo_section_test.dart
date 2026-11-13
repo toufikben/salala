@@ -121,7 +121,10 @@ void main() {
       expect(_emptyStrip(), findsOneWidget);
 
       await _tap(tester, find.widgetWithText(TextButton, 'Add photo'));
-      await _settleWrite(tester);
+      // The tile only exists once the row has landed and the strip has re-read
+      // it: waited for by that outcome, because the fixed rounds let this pass
+      // alone and fail inside a suite.
+      await settleUntil(tester, () => find.text(_blank).evaluate().isNotEmpty);
 
       expect(files.stored, <String>['$_nalaId/IMG_7.jpg-1024']);
       expect(find.text(_blank), findsOneWidget);
@@ -245,10 +248,15 @@ void main() {
     expect(find.text(_deleteBody), findsOneWidget);
 
     await tester.tap(find.widgetWithText(FilledButton, 'Delete'));
-    await _settleWrite(tester);
+    // Row first, file second, on another isolate: waited for the file call
+    // rather than for a count of frames.
+    await settleUntil(tester, () => files.deleted.isNotEmpty);
 
     expect(files.deleted, <String>['$_nalaId/shot.jpg-1024']);
     await _scrollToPhotos(tester);
+    // The strip re-reads after the row is gone: one more round trip, so the
+    // emptiness is waited for rather than assumed after a frame count.
+    await settleUntil(tester, () => _emptyStrip().evaluate().isNotEmpty);
     expect(_emptyStrip(), findsOneWidget);
     expect(find.text(_blank), findsNothing);
   });
@@ -318,7 +326,11 @@ void main() {
       await _tap(tester, find.text(_blank));
       await _tap(tester, find.widgetWithText(TextButton, 'Delete'));
       await tester.tap(find.widgetWithText(FilledButton, 'Delete'));
-      await _settleWrite(tester);
+      // The row goes, the file delete fails, and the strip reloads: three
+      // round trips, one of them on another isolate. Waited for by its outcome,
+      // because a fixed count of frames is what let this pass alone and fail in
+      // a suite.
+      await settleUntil(tester, () => _emptyStrip().evaluate().isNotEmpty);
 
       // The ledger is already right — the row is gone — and the leftover is swept
       // by the folder clear that follows the animal itself. A stray file is not a
@@ -345,7 +357,11 @@ void main() {
     await tester.tap(find.text('Delete'));
     await tester.pumpAndSettle();
     await tester.tap(find.widgetWithText(FilledButton, 'Delete'));
-    await _settleWrite(tester);
+    // The folder is cleared inside the delete, before the list is re-read, so
+    // this waits on that call rather than on a frame count — and then on the
+    // list actually losing the row, which is the second round trip.
+    await settleUntil(tester, () => files.clearedFolders.isNotEmpty);
+    await settleUntil(tester, () => find.text('Nala').evaluate().isEmpty);
 
     // The rows go with the animal in SQLite; only this app can reach the folder.
     expect(files.clearedFolders, <String>[_nalaId]);
@@ -369,7 +385,7 @@ void main() {
     await tester.tap(find.text('Delete'));
     await tester.pumpAndSettle();
     await tester.tap(find.widgetWithText(FilledButton, 'Delete'));
-    await _settleWrite(tester);
+    await settleUntil(tester, () => files.clearedFolders.isNotEmpty);
 
     expect(files.clearedFolders, <String>[_nalaId]);
   });

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/l10n/app_localizations.dart';
 import '../../core/utils/date_utils.dart';
+import '../../core/utils/text_input.dart';
 import '../../core/utils/weight.dart';
 import '../../data/models/weight_entry.dart';
 import '../providers/record_providers.dart';
@@ -82,7 +83,7 @@ class _WeightFormScreenState extends ConsumerState<WeightFormScreen> {
           animalId: widget.animalId,
           weightGrams: grams,
           measuredAt: _measuredAt,
-          note: _note.text.trim(),
+          note: blankToNull(_note.text),
         ),
       );
     } catch (error) {

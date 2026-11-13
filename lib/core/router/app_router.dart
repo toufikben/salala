@@ -49,6 +49,8 @@ class AppPaths {
       '/animals/$animalId/visits/$id';
 
   static String litter(String id) => '/litters/$id';
+
+  static String editLitter(String id) => '/litters/$id/edit';
 }
 
 /// go_router only re-runs `redirect` when this fires.
@@ -166,6 +168,11 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: 'new',
             builder: (context, state) => const LitterFormScreen(),
+          ),
+          GoRoute(
+            path: ':id/edit',
+            builder: (context, state) =>
+                LitterFormScreen(litterId: state.pathParameters['id']!),
           ),
           GoRoute(
             path: ':id',

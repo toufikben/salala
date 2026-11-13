@@ -1,11 +1,18 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/l10n/app_localizations.dart';
 import '../../core/utils/date_utils.dart';
+import '../../core/utils/text_input.dart';
 import '../../core/utils/money.dart';
+import '../../data/db/daos.dart';
 import '../../data/models/buyer.dart';
 import '../../data/models/placement.dart';
+import '../../services/reminder_resync.dart';
+import '../../services/reminder_scheduler.dart';
+import '../providers/app_providers.dart';
 import '../providers/record_providers.dart';
 import 'buyer_dialog.dart';
 import 'date_tile.dart';
@@ -163,6 +170,14 @@ class _PlacementDialogState extends ConsumerState<PlacementDialog> {
     }
     setState(() => _saving = true);
 
+    // Read before the write: the dialog pops as soon as it answers, and a
+    // disposed widget's `ref` and `context` say nothing about which language the
+    // animal's remaining alarms should be booked in.
+    final l10n = AppLocalizations.of(context);
+    final localeTag = Localizations.localeOf(context).toString();
+    final scheduler = ref.read(reminderSchedulerProvider);
+    final daos = ref.read(daosProvider);
+
     final existing = widget.existing;
     final buyers = ref.read(buyersProvider).value ?? const <Buyer>[];
     // The loaded list, or the contact this dialog wrote a moment ago. An id
@@ -171,9 +186,9 @@ class _PlacementDialogState extends ConsumerState<PlacementDialog> {
     final known = _createdBuyer != null && _createdBuyer!.id == _buyerId
         ? _createdBuyer
         : buyerById(buyers, _buyerId);
-    final guarantee = _guarantee.text.trim();
-    final notes = _notes.text.trim();
-    final currency = _currency.text.trim().toUpperCase();
+    final guarantee = blankToNull(_guarantee.text);
+    final notes = blankToNull(_notes.text);
+    final currency = blankToNull(_currency.text)?.toUpperCase();
 
     // Written whole instead of copied: `Placement.copyWith` can blank a price and
     // nothing else, and clearing a buyer or a date is a real edit here. The id
@@ -184,12 +199,12 @@ class _PlacementDialogState extends ConsumerState<PlacementDialog> {
       buyerId: known?.id,
       placedDate: _placedDate,
       price: _parsedPrice,
-      currency: currency.isEmpty ? null : currency,
-      guaranteeTerms: guarantee.isEmpty ? null : guarantee,
+      currency: currency,
+      guaranteeTerms: guarantee,
       // No file picker in this form, so a contract path a pack brought in
       // survives the edit rather than being blanked by it.
       contractFilePath: existing?.contractFilePath,
-      notes: notes.isEmpty ? null : notes,
+      notes: notes,
       createdAt: existing?.createdAt ?? 0,
       updatedAt: existing?.updatedAt ?? 0,
     );
@@ -201,7 +216,41 @@ class _PlacementDialogState extends ConsumerState<PlacementDialog> {
       if (mounted) _refuseSave();
       return;
     }
-    if (mounted) Navigator.of(context).pop();
+    if (!mounted) return;
+    Navigator.of(context).pop();
+
+    // The save may have marked the animal sold, and a sold animal's alarms are
+    // the phone's copy of a booking she no longer owns. Reconciled after the form
+    // is gone rather than in front of it: this dialog is the only path that writes
+    // a handover, so the animal form's own resync cannot know it happened, but a
+    // breeder closing a form should not wait for five reads of the ledger. Every
+    // handle below was read before the write, so nothing here touches a disposed
+    // widget.
+    unawaited(
+      _reconcileReminders(scheduler, daos, l10n, localeTag, widget.animalId),
+    );
+  }
+
+  static Future<void> _reconcileReminders(
+    ReminderScheduler scheduler,
+    Daos daos,
+    AppLocalizations l10n,
+    String localeTag,
+    String animalId,
+  ) async {
+    try {
+      await resyncAnimalReminders(
+        scheduler,
+        daos: daos,
+        animalId: animalId,
+        l10n: l10n,
+        dueDayText: (ms) => formatDayFor(localeTag, ms),
+      );
+    } catch (error) {
+      // The handover is saved, which is what was asked for. The next launch
+      // reads the herd again and takes another run at the alarms.
+      debugPrint('Reminder reconcile after a placement save failed: $error');
+    }
   }
 
   /// A write the database refused. The dialog stays open with the handover as

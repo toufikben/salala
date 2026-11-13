@@ -202,7 +202,12 @@ void main() {
       ],
     };
     for (final locale in allLocales) {
-      final body = message(arb[locale]!, 'animalDeleteBody');
+      // The warning is two sentences now: the list of stores, and — only for a
+      // dam — the count of whelpings the cascade takes with a named tag. Read
+      // together, because a breeder reads them together.
+      final body =
+          '${message(arb[locale]!, 'animalDeleteBody')}\n'
+          '${message(arb[locale]!, 'animalDeleteLittersNote')}';
       final absent = <String>[];
       for (final fragment in mustName[locale]!) {
         if (!body.contains(fragment)) absent.add(fragment);
