@@ -95,8 +95,20 @@
   "lockDisable": "إيقاف القفل",
   "lockCurrentPin": "الرمز الحالي",
   "lockChangeFailed": "رفض الهاتف تغيير قفل التطبيق.",
+  "lockChangePinDone": "تم تغيير الرمز.",
+  "lockTooManyAttempts": "محاولات خاطئة كثيرة. أعد المحاولة بعد {seconds} ثانية.",
+  "@lockTooManyAttempts": {
+    "description": "Shown while the gate refuses after repeated wrong PINs; seconds counts down to zero.",
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
 
   "settingsAppLock": "قفل التطبيق",
+  "settingsChangePin": "تغيير الرمز",
+  "settingsChangePinBody": "أدخل الرمز الحالي ثم اختر رمزًا جديدًا.",
   "settingsLanguage": "اللغة",
   "settingsLanguageSystem": "لغة النظام",
   "languageNotStored": "رفض الهاتف حفظ هذه اللغة.",

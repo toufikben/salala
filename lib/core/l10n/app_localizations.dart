@@ -283,7 +283,7 @@ abstract class AppLocalizations {
   /// No description provided for @animalDeleteLittersNote.
   ///
   /// In en, this message translates to:
-  /// **'This also deletes {litters} whelping record(s) she is the dam of, and {puppies} of their puppies stay in your animals without the record of their mother.'**
+  /// **'This also deletes {litters} of her whelpings, and the {puppies} puppies they registered stay in your animals without the record of their mother.'**
   String animalDeleteLittersNote(int litters, int puppies);
 
   /// No description provided for @animalDeleteBody.
@@ -526,11 +526,35 @@ abstract class AppLocalizations {
   /// **'The phone would not change the app lock.'**
   String get lockChangeFailed;
 
+  /// No description provided for @lockChangePinDone.
+  ///
+  /// In en, this message translates to:
+  /// **'PIN changed.'**
+  String get lockChangePinDone;
+
+  /// Shown while the gate refuses after repeated wrong PINs; seconds counts down to zero.
+  ///
+  /// In en, this message translates to:
+  /// **'Too many wrong PINs. Try again in {seconds}s.'**
+  String lockTooManyAttempts(int seconds);
+
   /// No description provided for @settingsAppLock.
   ///
   /// In en, this message translates to:
   /// **'App lock'**
   String get settingsAppLock;
+
+  /// No description provided for @settingsChangePin.
+  ///
+  /// In en, this message translates to:
+  /// **'Change PIN'**
+  String get settingsChangePin;
+
+  /// No description provided for @settingsChangePinBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the current PIN, then choose a new one.'**
+  String get settingsChangePinBody;
 
   /// No description provided for @settingsLanguage.
   ///

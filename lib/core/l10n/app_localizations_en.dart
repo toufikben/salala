@@ -115,7 +115,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String animalDeleteLittersNote(int litters, int puppies) {
-    return 'This also deletes $litters whelping record(s) she is the dam of, and $puppies of their puppies stay in your animals without the record of their mother.';
+    return 'This also deletes $litters of her whelpings, and the $puppies puppies they registered stay in your animals without the record of their mother.';
   }
 
   @override
@@ -241,7 +241,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get lockChangeFailed => 'The phone would not change the app lock.';
 
   @override
+  String get lockChangePinDone => 'PIN changed.';
+
+  @override
+  String lockTooManyAttempts(int seconds) {
+    return 'Too many wrong PINs. Try again in ${seconds}s.';
+  }
+
+  @override
   String get settingsAppLock => 'App lock';
+
+  @override
+  String get settingsChangePin => 'Change PIN';
+
+  @override
+  String get settingsChangePinBody =>
+      'Enter the current PIN, then choose a new one.';
 
   @override
   String get settingsLanguage => 'Language';

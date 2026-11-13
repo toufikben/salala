@@ -29,6 +29,7 @@ class SettingsScreen extends ConsumerWidget {
         padding: const EdgeInsets.symmetric(vertical: 8),
         children: <Widget>[
           const _AppLockTile(),
+          const _ChangePinTile(),
           const _LanguageTile(),
           const Divider(height: 32),
           const _PackTiles(),
@@ -87,6 +88,48 @@ class _AppLockTile extends ConsumerWidget {
           return;
         }
         ref.read(hasPinProvider.notifier).set(enable);
+      },
+    );
+  }
+}
+
+/// Changing the PIN, which is the one lock action that needs both digits and a
+/// new pair: current first, so a phone left unlocked on a table cannot be
+/// re-keyed by whoever picks it up.
+///
+/// Only shown once a PIN exists. Turning the lock on and off is the switch above;
+/// this row is what makes the PIN a setting rather than a life sentence.
+class _ChangePinTile extends ConsumerWidget {
+  const _ChangePinTile();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    if (!ref.watch(hasPinProvider)) return const SizedBox.shrink();
+
+    return ListTile(
+      leading: const Icon(Icons.password_outlined),
+      title: Text(l10n.settingsChangePin),
+      subtitle: Text(l10n.settingsChangePinBody),
+      onTap: () async {
+        if (!await askCurrentPin(context, ref)) return;
+        if (!context.mounted) return;
+        final pin = await showPinSetupDialog(context);
+        if (pin == null) return;
+        if (!context.mounted) return;
+        final messenger = ScaffoldMessenger.of(context);
+        try {
+          // `enable` writes the same salt-and-digest pair the switch does, with a
+          // fresh salt, so the old PIN stops matching the moment this lands.
+          await ref.read(appLockProvider).enable(pin);
+        } catch (error) {
+          debugPrint('PIN change refused: $error');
+          messenger.showSnackBar(
+            SnackBar(content: Text(l10n.lockChangeFailed)),
+          );
+          return;
+        }
+        messenger.showSnackBar(SnackBar(content: Text(l10n.lockChangePinDone)));
       },
     );
   }

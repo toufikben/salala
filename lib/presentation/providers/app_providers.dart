@@ -89,6 +89,17 @@ class HasPin extends Notifier<bool> {
 
 final hasPinProvider = NotifierProvider<HasPin, bool>(HasPin.new);
 
+/// How long the app may stay in the background before the gate comes back.
+///
+/// Android sends a phone to `paused` for a permission prompt, a share sheet, or
+/// the two seconds it takes to read a notification: relocking on every one of
+/// those would make the PIN a nuisance rather than a lock. Thirty seconds is
+/// long enough to answer a message and short enough that a phone left in a car
+/// is closed before the next person picks it up. Tests override it to zero.
+final lockGracePeriodProvider = Provider<Duration>(
+  (ref) => const Duration(seconds: 30),
+);
+
 /// `main()` overrides this with the value stored in `user_settings`, so the
 /// chosen language survives a restart without a loading flash.
 final initialLocaleProvider = Provider<Locale?>((ref) => null);

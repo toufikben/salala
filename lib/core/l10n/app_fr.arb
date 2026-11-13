@@ -95,8 +95,20 @@
   "lockDisable": "Désactiver le verrouillage",
   "lockCurrentPin": "Code actuel",
   "lockChangeFailed": "Le téléphone a refusé de modifier le verrouillage.",
+  "lockChangePinDone": "Code modifié.",
+  "lockTooManyAttempts": "Trop de codes erronés. Réessayez dans {seconds} s.",
+  "@lockTooManyAttempts": {
+    "description": "Shown while the gate refuses after repeated wrong PINs; seconds counts down to zero.",
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
 
   "settingsAppLock": "Verrouillage",
+  "settingsChangePin": "Modifier le code",
+  "settingsChangePinBody": "Saisissez le code actuel, puis choisissez-en un nouveau.",
   "settingsLanguage": "Langue",
   "settingsLanguageSystem": "Langue du système",
   "languageNotStored": "Le téléphone a refusé d'enregistrer cette langue.",

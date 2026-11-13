@@ -244,7 +244,21 @@ class AppLocalizationsAr extends AppLocalizations {
   String get lockChangeFailed => 'رفض الهاتف تغيير قفل التطبيق.';
 
   @override
+  String get lockChangePinDone => 'تم تغيير الرمز.';
+
+  @override
+  String lockTooManyAttempts(int seconds) {
+    return 'محاولات خاطئة كثيرة. أعد المحاولة بعد $seconds ثانية.';
+  }
+
+  @override
   String get settingsAppLock => 'قفل التطبيق';
+
+  @override
+  String get settingsChangePin => 'تغيير الرمز';
+
+  @override
+  String get settingsChangePinBody => 'أدخل الرمز الحالي ثم اختر رمزًا جديدًا.';
 
   @override
   String get settingsLanguage => 'اللغة';

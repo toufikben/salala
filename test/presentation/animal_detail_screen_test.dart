@@ -502,6 +502,10 @@ void main() {
     );
     await _save(tester);
 
+    // The row lands when SQLite answers, which is not the same frame as the pop:
+    // asserting straight after the save passed alone and failed in a suite. The
+    // wait is the caller's assertion still deciding — it only grants more time.
+    await settleUntil(tester, () => find.text('4.20 kg').evaluate().isNotEmpty);
     expect(find.text('4.20 kg'), findsOneWidget);
   });
 

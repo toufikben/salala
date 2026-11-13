@@ -242,7 +242,22 @@ class AppLocalizationsFr extends AppLocalizations {
       'Le téléphone a refusé de modifier le verrouillage.';
 
   @override
+  String get lockChangePinDone => 'Code modifié.';
+
+  @override
+  String lockTooManyAttempts(int seconds) {
+    return 'Trop de codes erronés. Réessayez dans $seconds s.';
+  }
+
+  @override
   String get settingsAppLock => 'Verrouillage';
+
+  @override
+  String get settingsChangePin => 'Modifier le code';
+
+  @override
+  String get settingsChangePinBody =>
+      'Saisissez le code actuel, puis choisissez-en un nouveau.';
 
   @override
   String get settingsLanguage => 'Langue';

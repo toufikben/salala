@@ -81,9 +81,16 @@ Future<void> settleRealIo(WidgetTester tester) async {
   // below and fail 19 screens later as `pumpAndSettle timed out` (run
   // 37383228340). The bound stays finite so a genuinely stuck widget still
   // fails loudly rather than hanging the suite.
+  //
+  // The bound is 120 rounds — about five real seconds — rather than four. A
+  // loaded machine can take whole seconds to answer the first query, and this
+  // helper is reached by screens whose section *does* resolve: run `run24` failed
+  // two of them on the forty-round figure while the same tests were green alone.
+  // A section that never resolves still fails, just later and with the same
+  // sentence.
   for (
     var round = 0;
-    round < 40 && tester.any(find.bySubtype<ProgressIndicator>());
+    round < 120 && tester.any(find.bySubtype<ProgressIndicator>());
     round++
   ) {
     await tester.pump(const Duration(milliseconds: 25));
@@ -207,8 +214,14 @@ Future<FakeSecureStorage> pumpSalala(
   // that wants to prove a form survives a refused insert installs a trigger here
   // rather than faking a dao.
   Future<void> Function(Database db)? beforeLaunch,
+  // How long the app may sit in the background before the PIN gate comes back.
+  // Zero for the tests that send a lifecycle event and expect the gate at once.
+  Duration lockGrace = const Duration(seconds: 30),
+  // Keystore values written before the first frame: a broken digest, a lockout
+  // that outlived the process, or an enrollment the app has to open on.
+  Map<String, String> secureSeed = const <String, String>{},
 }) async {
-  final storage = FakeSecureStorage();
+  final storage = FakeSecureStorage()..values.addAll(secureSeed);
   late Database database;
 
   // The triage table, read here instead of from inside its provider, and read
@@ -308,6 +321,7 @@ Future<FakeSecureStorage> pumpSalala(
         photoFilesProvider.overrideWithValue(photoFiles ?? FakePhotoFiles()),
         if (!resyncOnLaunch)
           remindersResyncProvider.overrideWith(AlreadyResynced.new),
+        lockGracePeriodProvider.overrideWithValue(lockGrace),
         if (locale != null) initialLocaleProvider.overrideWithValue(locale),
       ],
       child: const SalalaApp(),
