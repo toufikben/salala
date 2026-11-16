@@ -116,6 +116,38 @@ final lockGracePeriodProvider = Provider<Duration>(
 /// chosen language survives a restart without a loading flash.
 final initialLocaleProvider = Provider<Locale?>((ref) => null);
 
+/// The animal whose reminder was tapped, until the app has opened it.
+///
+/// Held rather than navigated on the spot, because the tap is not always
+/// answerable when it arrives: a cold start has no router yet, and a phone with a
+/// PIN has a gate in front of the ledger. So the tap is remembered and the shell
+/// opens it the moment both are true, which is one rule instead of three call
+/// sites agreeing with each other.
+///
+/// The payload is an animal id rather than a route, so an alert written by an
+/// older build that named nothing at all simply opens nothing.
+class PendingAnimalTap extends Notifier<String?> {
+  @override
+  String? build() => null;
+
+  void set(String? animalId) {
+    if (animalId == null || animalId.isEmpty) return;
+    state = animalId;
+  }
+
+  /// Hands the id over once and forgets it: a tap is answered once, not on every
+  /// rebuild of the shell.
+  String? take() {
+    final id = state;
+    state = null;
+    return id;
+  }
+}
+
+final pendingAnimalTapProvider = NotifierProvider<PendingAnimalTap, String?>(
+  PendingAnimalTap.new,
+);
+
 class LocaleController extends Notifier<Locale?> {
   @override
   Locale? build() => ref.watch(initialLocaleProvider);

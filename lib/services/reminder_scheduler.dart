@@ -14,7 +14,12 @@ import '../core/utils/reminders.dart';
 abstract class NotificationWriter {
   /// Creates the channel and asks for the permission Android 13+ needs before
   /// anything can be shown.
-  Future<void> initialise();
+  ///
+  /// Returns the payload of the notification that *launched* the app, if one
+  /// did: a breeder who taps a dose alert on a cold phone expects the dog, not
+  /// the herd. The live taps arrive through [onTap] instead, because by then
+  /// there is a running app to send them into.
+  Future<String?> initialise({void Function(String? payload)? onTap});
 
   Future<void> write({
     required int id,
@@ -22,6 +27,7 @@ abstract class NotificationWriter {
     required String body,
     required tz.TZDateTime at,
     required AndroidScheduleMode mode,
+    String? payload,
   });
 
   Future<void> clear(int id);
@@ -38,6 +44,12 @@ class PluginNotifications implements NotificationWriter {
 
   final FlutterLocalNotificationsPlugin _plugin;
 
+  /// The small icon, and the reason it is not the launcher icon: Android draws
+  /// a notification's small icon as a flat silhouette and throws away every
+  /// colour in it, so handing it `ic_launcher` produced a white square on a
+  /// white circle. This one is drawn as a silhouette to begin with.
+  static const String smallIcon = 'ic_notification';
+
   static const AndroidNotificationDetails _channel = AndroidNotificationDetails(
     'salala_reminders',
     'Reminders',
@@ -45,20 +57,32 @@ class PluginNotifications implements NotificationWriter {
         'Doses and screenings coming up, so a booking can be made in time.',
     importance: Importance.high,
     priority: Priority.high,
+    icon: smallIcon,
   );
 
   @override
-  Future<void> initialise() async {
+  Future<String?> initialise({void Function(String? payload)? onTap}) async {
     await _plugin.initialize(
       settings: const InitializationSettings(
-        android: AndroidInitializationSettings('@mipmap/ic_launcher'),
+        android: AndroidInitializationSettings('@drawable/$smallIcon'),
+        // Declared even though iOS is not shipped yet: without it the plugin
+        // throws on a non-Android target instead of doing nothing, and the day
+        // the app is built for iOS this line is already the right one.
+        iOS: DarwinInitializationSettings(),
       ),
+      onDidReceiveNotificationResponse: onTap == null
+          ? null
+          : (response) => onTap(response.payload),
     );
     await _plugin
         .resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin
         >()
         ?.requestNotificationsPermission();
+
+    final launch = await _plugin.getNotificationAppLaunchDetails();
+    if (launch == null || !launch.didNotificationLaunchApp) return null;
+    return launch.notificationResponse?.payload;
   }
 
   @override
@@ -68,6 +92,7 @@ class PluginNotifications implements NotificationWriter {
     required String body,
     required tz.TZDateTime at,
     required AndroidScheduleMode mode,
+    String? payload,
   }) {
     return _plugin.zonedSchedule(
       id: id,
@@ -76,6 +101,7 @@ class PluginNotifications implements NotificationWriter {
       scheduledDate: at,
       notificationDetails: const NotificationDetails(android: _channel),
       androidScheduleMode: mode,
+      payload: payload,
     );
   }
 
@@ -100,18 +126,28 @@ class ReminderScheduler {
   /// Pins the phone's own timezone before anything is scheduled. Without it the
   /// timezone package sits on UTC and a nine-in-the-morning reminder would wake
   /// a breeder at midnight local time.
-  Future<void> bootstrap() async {
+  ///
+  /// Returns the payload of the alert that launched the app, if one did — the
+  /// caller decides where a tap lands, and on a cold start it has to wait for a
+  /// router that does not exist yet.
+  Future<String?> bootstrap({void Function(String? payload)? onTap}) async {
     tz_data.initializeTimeZones();
     final zone = await FlutterTimezone.getLocalTimezone();
     tz.setLocalLocation(tz.getLocation(zone.identifier));
-    await _writer.initialise();
+    return _writer.initialise(onTap: onTap);
   }
 
   /// Replaces everything scheduled for one record with what its due date now
   /// implies. Cancelling first is what makes an edit idempotent: a dose moved a
   /// week later must not leave the old alarm behind.
+  ///
+  /// [animalId] rides along as the notification's payload, and it is the whole of
+  /// the tap: a reminder says "Rabies is due" and the breeder who taps it wants
+  /// that dog, not a list to search through. Read at tap time, so an animal
+  /// deleted in the meantime lands on the ledger's own "this animal is gone".
   Future<void> replace({
     required String recordId,
+    required String animalId,
     required int? dueMs,
     required AppLocalizations l10n,
     required String title,
@@ -142,6 +178,7 @@ class ReminderScheduler {
         // Google Play audits, for a message whose only deadline is "that
         // morning". Allow-while-idle so a phone asleep in a pocket still gets it.
         mode: AndroidScheduleMode.inexactAllowWhileIdle,
+        payload: animalId,
       );
     }
   }

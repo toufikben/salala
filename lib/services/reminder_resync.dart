@@ -14,6 +14,7 @@ import 'reminder_scheduler.dart';
 class ReminderBooking {
   const ReminderBooking({
     required this.recordId,
+    required this.animalId,
     required this.dueMs,
     required this.title,
     required this.what,
@@ -21,6 +22,11 @@ class ReminderBooking {
   });
 
   final String recordId;
+
+  /// What the notification carries as its payload: tapping the alarm opens the
+  /// animal the record belongs to.
+  final String animalId;
+
   final int dueMs;
   final String title;
   final String what;
@@ -64,6 +70,7 @@ List<ReminderBooking> bookingsFor({
     bookings.add(
       ReminderBooking(
         recordId: recordId,
+        animalId: animalId,
         dueMs: dueMs,
         title: name,
         what: what,
@@ -230,6 +237,7 @@ Future<int> reconcile(
   )) {
     await scheduler.replace(
       recordId: booking.recordId,
+      animalId: booking.animalId,
       dueMs: booking.dueMs,
       l10n: l10n,
       title: booking.title,

@@ -218,6 +218,7 @@ class _VaccinationFormScreenState extends ConsumerState<VaccinationFormScreen> {
     }
     await scheduler.replace(
       recordId: dose.id,
+      animalId: widget.animalId,
       dueMs: dose.nextDueDate,
       l10n: l10n,
       title: reminderTitle(ref, l10n, widget.animalId),

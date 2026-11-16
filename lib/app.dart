@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import 'core/l10n/app_localizations.dart';
 import 'core/router/app_router.dart';
@@ -22,16 +23,47 @@ class _SalalaAppState extends ConsumerState<SalalaApp>
   /// When the app last went to the background, or null while it is in front.
   DateTime? _leftAt;
 
+  /// The router, kept so a tapped reminder can be opened from outside the tree.
+  ///
+  /// `MaterialApp.router` builds its own `Navigator`, so there is no `context`
+  /// to push from at the moment the tap arrives — on a cold start there is not
+  /// even a frame yet. The `GoRouterState` is the one handle that survives.
+  GoRouter? _router;
+  ProviderSubscription<String?>? _tapSubscription;
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    // The launch payload is only known after `runApp`, so `main()` records it
+    // and this picks it up on the first frame — the same path a live tap takes,
+    // because by then the difference between the two has stopped mattering.
+    _tapSubscription = ref.listenManual<String?>(
+      pendingAnimalTapProvider,
+      (previous, next) => _openTappedAnimal(next),
+    );
   }
 
   @override
   void dispose() {
+    _tapSubscription?.close();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+  /// Sends a tapped reminder into the ledger, once the shell can take it.
+  ///
+  /// The animal is opened by id, so an alert for a dog deleted in the meantime
+  /// lands on the screen's own "this animal is gone" rather than on a blank
+  /// route. Called again on return from the gate: a locked phone answers the tap
+  /// with the PIN, and the alert must not be forgotten behind it.
+  void _openTappedAnimal(String? animalId) {
+    if (animalId == null) return;
+    final router = _router;
+    if (router == null) return;
+    if (ref.read(hasPinProvider) && !ref.read(lockGateProvider)) return;
+    ref.read(pendingAnimalTapProvider.notifier).take();
+    router.go(AppPaths.animal(animalId));
   }
 
   @override
@@ -63,10 +95,18 @@ class _SalalaAppState extends ConsumerState<SalalaApp>
 
   @override
   Widget build(BuildContext context) {
+    // Watched rather than read: unlocking is what makes a pending tap
+    // answerable, and the gate flips the flag without the route changing.
+    ref.listen<bool>(lockGateProvider, (previous, next) {
+      if (next) _openTappedAnimal(ref.read(pendingAnimalTapProvider));
+    });
+    final router = ref.watch(routerProvider);
+    _router = router;
+
     return MaterialApp.router(
       title: 'Salala',
       debugShowCheckedModeBanner: false,
-      routerConfig: ref.watch(routerProvider),
+      routerConfig: router,
       locale: ref.watch(localeControllerProvider),
       supportedLocales: AppLocalizations.supportedLocales,
       localizationsDelegates: AppLocalizations.localizationsDelegates,

@@ -39,6 +39,7 @@ void main() {
   Future<void> book({required String recordId, required int? dueMs}) {
     return scheduler.replace(
       recordId: recordId,
+      animalId: 'animal-nala',
       dueMs: dueMs,
       l10n: l10n,
       title: 'Nala',
@@ -150,6 +151,7 @@ void main() {
       final arabic = await AppLocalizations.delegate.load(const Locale('ar'));
       await scheduler.replace(
         recordId: '0f1e2d3c-4b5a',
+        animalId: 'animal-nala',
         dueMs: dueInSixtyDays(),
         l10n: arabic,
         title: 'نالة',
@@ -161,6 +163,18 @@ void main() {
       expect(writer.written.first.body, contains('سعار'));
       expect(writer.written.first.body, contains('٤ ديسمبر ٢٠٢٦'));
       expect(writer.written.last.body, contains('مستحق اليوم'));
+    });
+
+    test('both mornings carry the animal the alarm is about', () async {
+      await book(recordId: '0f1e2d3c-4b5a', dueMs: dueInSixtyDays());
+
+      // The payload is the whole of the tap. A reminder says "Rabies is due" and
+      // names the dog in its title; the breeder who taps it wants that dog, not
+      // a herd to search through, so both mornings hand back her id.
+      expect(writer.written.map((alarm) => alarm.payload).toList(), <String?>[
+        'animal-nala',
+        'animal-nala',
+      ]);
     });
   });
 

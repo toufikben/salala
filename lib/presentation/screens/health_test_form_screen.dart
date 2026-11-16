@@ -213,6 +213,7 @@ class _HealthTestFormScreenState extends ConsumerState<HealthTestFormScreen> {
     }
     await scheduler.replace(
       recordId: test.id,
+      animalId: widget.animalId,
       dueMs: test.validUntil,
       l10n: l10n,
       title: reminderTitle(ref, l10n, widget.animalId),
