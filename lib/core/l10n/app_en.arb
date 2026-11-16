@@ -135,7 +135,7 @@
   "settingsBuildTag": "Build",
   "settingsOfflineNote": "Everything is stored on this device. No account, no server, no tracking.",
   "settingsExport": "Export records",
-  "settingsExportBody": "One JSON file with every record on this phone",
+  "settingsExportBody": "One ZIP file with every record and picture on this phone",
   "settingsImport": "Restore from a pack",
   "settingsImportBody": "Read a pack back onto this phone",
   "packShared": "{file} is ready to send",
@@ -329,6 +329,8 @@
   "symptomDeleteBody": "The symptom is removed from this animal's history. This cannot be undone.",
 
   "photoAdd": "Add photo",
+  "photoFromGallery": "Choose from the gallery",
+  "photoFromCamera": "Take a photo",
   "photoDeleteBody": "The picture is removed from this animal's ledger, and the file with it. This cannot be undone.",
   "@photoDeleteBody": {
     "description": "A photo is the only record here whose row and bytes are two different things, so the sentence says both go."

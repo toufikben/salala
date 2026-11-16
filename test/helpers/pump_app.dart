@@ -161,14 +161,22 @@ Future<void> settleUntil(
 Future<void> waitForSchedulerCalls(
   WidgetTester tester,
   FakeNotificationWriter notifications,
-  int calls,
-) async {
-  for (var round = 0; round < 40 && notifications.log.length < calls; round++) {
+  int calls, {
+  Duration timeout = const Duration(seconds: 15),
+}) async {
+  // A real-time bound, not a round count. The alarm booking sits behind a
+  // database transaction, a resync read and a couple of preference writes, and a
+  // loaded machine can take seconds over that: forty rounds of 25 ms — one
+  // second — let this pass alone and fail inside a suite, reporting zero calls
+  // from a restore that had simply not got there yet.
+  final clock = Stopwatch()..start();
+  while (notifications.log.length < calls && clock.elapsed < timeout) {
     await tester.pump();
     await tester.runAsync(
       () => Future<void>.delayed(const Duration(milliseconds: 25)),
     );
   }
+  clock.stop();
   if (notifications.log.length < calls) {
     throw StateError(
       'the scheduler reached ${notifications.log.length} of $calls calls '

@@ -613,7 +613,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsExportBody.
   ///
   /// In en, this message translates to:
-  /// **'One JSON file with every record on this phone'**
+  /// **'One ZIP file with every record and picture on this phone'**
   String get settingsExportBody;
 
   /// No description provided for @settingsImport.
@@ -1329,6 +1329,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Add photo'**
   String get photoAdd;
+
+  /// No description provided for @photoFromGallery.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose from the gallery'**
+  String get photoFromGallery;
+
+  /// No description provided for @photoFromCamera.
+  ///
+  /// In en, this message translates to:
+  /// **'Take a photo'**
+  String get photoFromCamera;
 
   /// A photo is the only record here whose row and bytes are two different things, so the sentence says both go.
   ///

@@ -291,7 +291,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settingsExport => 'تصدير السجلات';
 
   @override
-  String get settingsExportBody => 'ملف JSON واحد فيه كل سجلات هذا الهاتف';
+  String get settingsExportBody =>
+      'ملف ZIP واحد يحمل كل سجل وصورة على هذا الهاتف';
 
   @override
   String get settingsImport => 'استرجاع من حزمة';
@@ -688,6 +689,12 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get photoAdd => 'صورة جديدة';
+
+  @override
+  String get photoFromGallery => 'اختيار من المعرض';
+
+  @override
+  String get photoFromCamera => 'التقاط صورة';
 
   @override
   String get photoDeleteBody =>

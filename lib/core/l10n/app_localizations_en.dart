@@ -290,7 +290,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsExportBody =>
-      'One JSON file with every record on this phone';
+      'One ZIP file with every record and picture on this phone';
 
   @override
   String get settingsImport => 'Restore from a pack';
@@ -690,6 +690,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get photoAdd => 'Add photo';
+
+  @override
+  String get photoFromGallery => 'Choose from the gallery';
+
+  @override
+  String get photoFromCamera => 'Take a photo';
 
   @override
   String get photoDeleteBody =>

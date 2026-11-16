@@ -8,7 +8,9 @@ import '../../core/l10n/app_localizations.dart';
 import '../../core/utils/date_utils.dart';
 import '../../data/models/photo.dart';
 import '../../services/data_pack.dart';
+import '../../services/pack_archive.dart';
 import '../../services/pack_files.dart';
+import '../../services/photo_files.dart';
 import '../../services/reminder_resync.dart';
 import '../providers/agenda_providers.dart';
 import '../providers/app_providers.dart';
@@ -248,10 +250,16 @@ Future<void> _exportPack(BuildContext context, WidgetRef ref) async {
   final messenger = ScaffoldMessenger.of(context);
 
   try {
-    final json = encodePack(await packFrom(ref.read(databaseProvider)));
+    // One file, and it carries the pictures too: a restore on a new phone gets
+    // the ledger and the images the rows name, which the JSON-only pack could
+    // not promise.
+    final bytes = await buildPackArchive(
+      ref.read(databaseProvider),
+      ref.read(photoFilesProvider),
+    );
     final name = await ref
         .read(packFilesProvider)
-        .shareBytes(packFileName(DateTime.now()), utf8.encode(json));
+        .shareBytes(packFileName(DateTime.now()), bytes);
     messenger.showSnackBar(SnackBar(content: Text(l10n.packShared(name))));
   } catch (error) {
     // A phone that refuses the share sheet still shows the ledger; the failure
@@ -267,10 +275,11 @@ Future<void> _importPack(BuildContext context, WidgetRef ref) async {
   final messenger = ScaffoldMessenger.of(context);
   final db = ref.read(databaseProvider);
   final files = ref.read(packFilesProvider);
+  final photoFiles = ref.read(photoFilesProvider);
 
-  final String? text;
+  final PickedPackFile? chosen;
   try {
-    text = await files.pick();
+    chosen = await files.pick();
   } catch (error) {
     debugPrint('Pack file could not be opened: $error');
     messenger.showSnackBar(SnackBar(content: Text(l10n.packReadFailed)));
@@ -278,11 +287,32 @@ Future<void> _importPack(BuildContext context, WidgetRef ref) async {
   }
   // Backing out of the file picker is the breeder's own decision, not a fault,
   // so it ends here without a message.
-  if (text == null) return;
+  if (chosen == null) return;
+
+  // Two containers, one reader: a ZIP carries `pack.json` and the pictures, and
+  // a plain JSON file is a pack from a version that predates them. The shape is
+  // decided by the bytes, not by the name — a renamed file still restores.
+  final PackArchive? archive;
+  final String json;
+  try {
+    if (isZipBytes(chosen.bytes)) {
+      archive = decodePackArchive(chosen.bytes);
+      json = archive.json;
+    } else {
+      archive = null;
+      json = utf8.decode(chosen.bytes);
+    }
+  } on PackReject catch (reject) {
+    messenger.showSnackBar(SnackBar(content: Text(_whyRejected(l10n, reject))));
+    return;
+  } on FormatException {
+    messenger.showSnackBar(SnackBar(content: Text(l10n.packNotAPack)));
+    return;
+  }
 
   final PackRows pack;
   try {
-    pack = parsePack(text);
+    pack = parsePack(json);
   } on PackReject catch (reject) {
     messenger.showSnackBar(SnackBar(content: Text(_whyRejected(l10n, reject))));
     return;
@@ -314,13 +344,49 @@ Future<void> _importPack(BuildContext context, WidgetRef ref) async {
   );
   if (confirmed != true) return;
 
+  // The pictures are written before the rows, and each one is remembered so a
+  // failed restore can take them back out. Rows that name files nobody wrote
+  // would be a ledger claiming pictures it does not hold; files with no rows are
+  // only strays, and strays are what the sweep below removes.
+  final written = <String>[];
+  for (final entry
+      in archive?.photos.entries ?? const <MapEntry<String, List<int>>>[]) {
+    final split = entry.key.indexOf('/');
+    if (split <= 0) continue;
+    final folder = entry.key.substring(0, split);
+    final fileName = entry.key.substring(split + 1);
+    try {
+      await photoFiles.restore(folder, fileName, entry.value);
+      written.add(entry.key);
+    } on PhotoRefused catch (refused) {
+      // One unusable picture is not a reason to refuse the ledger: the row comes
+      // back and renders as the named blank this app already shows for bytes a
+      // phone does not have.
+      debugPrint('Pack picture ${entry.key} refused: $refused');
+    } catch (error) {
+      debugPrint('Pack picture ${entry.key} could not be written: $error');
+    }
+  }
+
   final List<Photo> survivors;
   try {
     survivors = await restorePack(db, pack);
   } catch (error) {
     // The transaction is what failed, so the rows that were here are still here
-    // and the message can say so out loud.
+    // and the message can say so out loud. The pictures written above belong to
+    // the restore that did not happen, so they go too.
     debugPrint('Pack restore failed: $error');
+    for (final path in written) {
+      final split = path.indexOf('/');
+      try {
+        await photoFiles.delete(
+          path.substring(0, split),
+          path.substring(split + 1),
+        );
+      } catch (cleanup) {
+        debugPrint('Pack picture $path survived a failed restore: $cleanup');
+      }
+    }
     messenger.showSnackBar(SnackBar(content: Text(l10n.packRestoreFailed)));
     return;
   }
@@ -346,16 +412,17 @@ Future<void> _importPack(BuildContext context, WidgetRef ref) async {
     // not be reported as a failed restore.
     debugPrint('Reminder resync after a restore failed: $error');
   }
-  // A pack carries no pictures, so the animals the file did not name leave their
-  // folders on this phone with no row and no screen that can reach them — bytes
-  // D10 promised nobody else would ever hold. The rows that came through the
-  // restore are the only honest answer to which files still belong here.
+  // The folder on this phone has to match the rows that survived: a pack can
+  // name animals this phone never had, and the pictures of those animals are
+  // bytes D10 promised nobody else would ever hold. The rows the restore left
+  // standing — the pack's own when it carried pictures, this phone's own when it
+  // did not — are the only honest answer to which files still belong here.
   try {
     final kept = <String, Set<String>>{};
     for (final photo in survivors) {
       kept.putIfAbsent(photo.animalId, () => <String>{}).add(photo.fileName);
     }
-    await ref.read(photoFilesProvider).deleteUnbacked(kept);
+    await photoFiles.deleteUnbacked(kept);
   } catch (error) {
     // The ledger is restored; a folder this phone will not clear is said to the
     // log, not to the breeder, who has nothing to do about it.

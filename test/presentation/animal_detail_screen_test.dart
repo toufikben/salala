@@ -784,6 +784,14 @@ void main() {
     // Reopening it proves the amount survived the round trip through SQLite and
     // that the currency was normalised to a code, not left as typed.
     await _tap(tester, find.text('Limping on the left fore'));
+    // The form reads the row back on the database isolate and shows a spinner
+    // until it answers, so the edit title is the thing to wait for — a fixed
+    // pumpAndSettle finished before a loaded machine had read anything, and this
+    // test passed alone and failed inside the suite.
+    await settleUntil(
+      tester,
+      () => find.text('Edit vet visit').evaluate().isNotEmpty,
+    );
     expect(find.text('Edit vet visit'), findsOneWidget);
     expect(_fieldText(tester, 'Cost'), '250.5');
     expect(_fieldText(tester, 'Currency'), 'MAD');

@@ -8,6 +8,8 @@ import 'package:salala/data/models/photo.dart';
 import 'package:salala/data/models/vaccination.dart';
 import 'package:salala/presentation/widgets/animal_card.dart';
 import 'package:salala/services/data_pack.dart';
+import 'package:salala/services/pack_archive.dart';
+import 'package:salala/services/pack_files.dart';
 
 import '../helpers/fake_notification_writer.dart';
 import '../helpers/fake_pack_files.dart';
@@ -23,6 +25,7 @@ import '../helpers/pump_app.dart';
 String packJson({
   List<Map<String, Object?>> animals = const <Map<String, Object?>>[],
   List<Map<String, Object?>> vaccinations = const <Map<String, Object?>>[],
+  List<Map<String, Object?>>? photos,
   int formatVersion = packFormatVersion,
 }) {
   final rows = <String, Object?>{
@@ -30,6 +33,9 @@ String packJson({
   };
   rows['animals'] = animals;
   rows['vaccinations'] = vaccinations;
+  // Null is a pack from before pictures existed; a list is a pack whose rows
+  // travel with their bytes in the archive.
+  if (photos != null) rows['photos'] = photos;
   return jsonEncode(<String, Object?>{
     'format': packFormat,
     'formatVersion': formatVersion,
@@ -125,12 +131,50 @@ void main() {
       expect(rows['animals'], hasLength(2));
       expect(rows['vaccinations'], hasLength(1));
       // The name is the breeder's handle on the file, so it is part of what the
-      // screen promises: a pack, stamped to the minute, that says it is JSON.
+      // screen promises: a pack, stamped to the minute, in a container that says
+      // it holds pictures as well as rows.
       expect(
         files.shared.keys.single,
-        matches(r'^salala-pack-\d{8}-\d{4}\.json$'),
+        matches(r'^salala-pack-\d{8}-\d{4}\.zip$'),
       );
       expect(find.textContaining('is ready to send'), findsOneWidget);
+    });
+
+    testWidgets('the file carries the pictures as well as the rows', (
+      tester,
+    ) async {
+      final photos = FakePhotoFiles(
+        bytes: <String, List<int>>{
+          'atlas/1759000000000-4.jpg': <int>[7, 7, 7],
+        },
+      );
+      await pumpSalala(
+        tester,
+        packFiles: files,
+        photoFiles: photos,
+        seed: <Animal>[animal('Atlas')],
+        seedPhotos: <Photo>[
+          Photo(
+            id: 'p-1',
+            animalId: 'atlas',
+            fileName: '1759000000000-4.jpg',
+            createdAt: 1759000000000,
+          ),
+        ],
+      );
+      await goTo(tester, 'Settings');
+
+      await tapTile(tester, 'Export records');
+
+      // The bytes travel beside the ledger: a restore on a new phone gets the
+      // images, not just their file names.
+      expect(files.sharedPhotos, <String, List<int>>{
+        'atlas/1759000000000-4.jpg': <int>[7, 7, 7],
+      });
+      final rows =
+          (jsonDecode(files.sharedJson) as Map<String, Object?>)['rows']
+              as Map<String, Object?>;
+      expect(rows['photos'], hasLength(1));
     });
 
     testWidgets('a phone that refuses the sheet says so', (tester) async {
@@ -338,6 +382,46 @@ void main() {
         'atlas': <String>{'1759000000000-4.jpg'},
       });
     });
+
+    testWidgets(
+      'a pack with pictures puts the bytes back and keeps their rows',
+      (tester) async {
+        final photos = FakePhotoFiles();
+        files.picked = PickedPackFile(
+          name: 'salala-pack.zip',
+          bytes: encodePackArchive(
+            packJson(
+              animals: <Map<String, Object?>>[animalRow('atlas', 'Atlas')],
+              photos: <Map<String, Object?>>[
+                <String, Object?>{
+                  'id': 'p-1',
+                  'animal_id': 'atlas',
+                  'file_name': '1759000000000-4.jpg',
+                  'created_at': 1759000000000,
+                },
+              ],
+            ),
+            <String, List<int>>{
+              'atlas/1759000000000-4.jpg': <int>[7, 7, 7],
+            },
+          ),
+        );
+        await pumpSalala(tester, packFiles: files, photoFiles: photos);
+        await goTo(tester, 'Settings');
+
+        await tapTile(tester, 'Restore from a pack');
+        await tester.tap(find.widgetWithText(FilledButton, 'Replace'));
+        await settleRefusal(tester, waitingFor: 'Records restored: 2');
+
+        // The picture is written, its row comes from the pack, and the sweep keeps
+        // exactly that file — a restore that left the bytes behind would show the
+        // blank this app draws for a picture the phone does not have.
+        expect(photos.restored, <String>['atlas/1759000000000-4.jpg']);
+        expect(photos.sweeps.single, <String, Set<String>>{
+          'atlas': <String>{'1759000000000-4.jpg'},
+        });
+      },
+    );
 
     testWidgets('a phone that refuses the sweep still restored the ledger', (
       tester,

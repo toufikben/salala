@@ -14,8 +14,9 @@ void main() {
     });
   });
 
-  test('packFileName carries the stamp and no animal', () {
-    expect(packFileName(at), 'salala-pack-20261005-2041.json');
+  test('packFileName carries the stamp, no animal, and the container', () {
+    // `.zip`, because the file holds the pictures as well as the rows now.
+    expect(packFileName(at), 'salala-pack-20261005-2041.zip');
   });
 
   group('pdfFileName', () {

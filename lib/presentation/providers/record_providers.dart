@@ -12,6 +12,7 @@ import '../../data/models/symptom.dart';
 import '../../data/models/vaccination.dart';
 import '../../data/models/vet_visit.dart';
 import '../../data/models/weight_entry.dart';
+import '../../services/photo_files.dart';
 import 'agenda_providers.dart';
 import 'app_providers.dart';
 
@@ -102,9 +103,16 @@ final photoPathProvider = FutureProvider.autoDispose.family<String?, Photo>(
 ///
 /// Returns null when the breeder backed out of the picker — which is not a
 /// failure to report, and not a row to write.
-Future<Photo?> addPhoto(WidgetRef ref, String animalId) async {
+Future<Photo?> addPhoto(
+  WidgetRef ref,
+  String animalId, {
+  PhotoSource source = PhotoSource.gallery,
+}) async {
   final files = ref.read(photoFilesProvider);
-  final picked = await files.pick();
+  final picked = switch (source) {
+    PhotoSource.gallery => await files.pick(),
+    PhotoSource.camera => await files.capture(),
+  };
   if (picked == null) return null;
   final fileName = await files.store(animalId, picked);
   final Photo created;

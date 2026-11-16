@@ -285,7 +285,14 @@ void main() {
     await _tap(tester, find.widgetWithText(TextButton, 'Delete'));
     expect(find.text('Delete this record?'), findsOneWidget);
     await tester.tap(find.widgetWithText(FilledButton, 'Delete'));
-    await settleRealIo(tester);
+    // The row is deleted on the database isolate, and the symptom dialog only
+    // closes once that answers — so waiting a fixed number of rounds asserted
+    // against a dialog that was still on screen (and its label field still read
+    // "Vomiting"). The wait is the outcome the screen will show.
+    await settleUntil(
+      tester,
+      () => find.widgetWithText(FilledButton, 'Save').evaluate().isEmpty,
+    );
     await settleRealIo(tester);
 
     expect(find.text('Vomiting'), findsNothing);

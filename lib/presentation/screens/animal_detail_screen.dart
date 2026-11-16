@@ -985,11 +985,37 @@ Future<void> _addPhoto(
   String animalId,
 ) async {
   final l10n = AppLocalizations.of(context);
+
+  // Asked before the picker opens, because the two are different trips out of
+  // the app: the gallery is a document that already exists, the camera is a
+  // picture of the animal in front of the breeder. One tap decides which.
+  final source = await showModalBottomSheet<PhotoSource>(
+    context: context,
+    builder: (sheetContext) => SafeArea(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          ListTile(
+            leading: const Icon(Icons.photo_library_outlined),
+            title: Text(l10n.photoFromGallery),
+            onTap: () => Navigator.of(sheetContext).pop(PhotoSource.gallery),
+          ),
+          ListTile(
+            leading: const Icon(Icons.photo_camera_outlined),
+            title: Text(l10n.photoFromCamera),
+            onTap: () => Navigator.of(sheetContext).pop(PhotoSource.camera),
+          ),
+        ],
+      ),
+    ),
+  );
+  if (source == null || !context.mounted) return;
+
   final messenger = ScaffoldMessenger.of(context);
   try {
     // Null is the picker closed without a choice. That is a decision, not a
     // failure, and it gets no sentence and no row.
-    await addPhoto(ref, animalId);
+    await addPhoto(ref, animalId, source: source);
   } on PhotoRefused catch (refused) {
     messenger.showSnackBar(
       SnackBar(

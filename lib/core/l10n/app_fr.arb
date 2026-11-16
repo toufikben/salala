@@ -118,7 +118,7 @@
   "settingsBuildTag": "Version",
   "settingsOfflineNote": "Tout est stocké sur cet appareil. Sans compte, sans serveur, sans suivi.",
   "settingsExport": "Exporter les dossiers",
-  "settingsExportBody": "Un fichier JSON avec tous les enregistrements de ce téléphone",
+  "settingsExportBody": "Un fichier ZIP avec tous les enregistrements et toutes les photos de ce téléphone",
   "settingsImport": "Restaurer un pack",
   "settingsImportBody": "Relire un pack sur ce téléphone",
   "packShared": "{file} est prêt à envoyer",
@@ -267,6 +267,8 @@
   "symptomResolved": "Résolu",
   "symptomDeleteBody": "Le symptôme est retiré de l'historique de cet animal. Action irréversible.",
 
+  "photoFromGallery": "Choisir dans la galerie",
+  "photoFromCamera": "Prendre une photo",
   "photoAdd": "Ajouter une photo",
   "photoDeleteBody": "La photo est retirée du registre de cet animal, et le fichier avec elle. Action irréversible.",
   "photoMissing": "Absente de cet appareil",

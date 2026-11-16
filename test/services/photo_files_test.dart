@@ -204,6 +204,58 @@ void main() {
       },
     );
 
+    test(
+      'a restored picture comes back out of the folder it was written to',
+      () async {
+        final id = animalId('a');
+
+        await files().restore(id, 'incoming.jpg', <int>[9, 8, 7]);
+
+        final bytes = await files().readBytes(id, 'incoming.jpg');
+        expect(bytes, <int>[9, 8, 7]);
+        expect(await files().pathFor(id, 'incoming.jpg'), isNotNull);
+        // Nothing was written for an animal that has none.
+        expect(await files().readBytes(animalId('b'), 'incoming.jpg'), isNull);
+      },
+    );
+
+    test('a restored name is held to the row rule, not to the pack', () async {
+      final escape = p.join(root.path, 'outside.jpg');
+      File(escape).writeAsBytesSync(<int>[1, 2, 3]);
+
+      await expectLater(
+        files().restore(animalId('a'), '../outside.jpg', <int>[1]),
+        throwsA(isA<PhotoRefused>()),
+      );
+      expect(File(escape).readAsBytesSync(), <int>[1, 2, 3]);
+    });
+
+    test('a restored file that is not a picture is refused', () async {
+      await expectLater(
+        files().restore(animalId('a'), 'notes.txt', <int>[1]),
+        throwsA(isA<PhotoRefused>()),
+      );
+      await expectLater(
+        files().restore(animalId('a'), 'a.heic', <int>[1]),
+        throwsA(isA<PhotoRefused>()),
+      );
+    });
+
+    test(
+      'a restored picture over the cap is refused before it is written',
+      () async {
+        await expectLater(
+          files().restore(
+            animalId('a'),
+            'big.jpg',
+            List<int>.filled(maxPhotoBytes + 1, 0),
+          ),
+          throwsA(isA<PhotoRefused>()),
+        );
+        expect(await files().readBytes(animalId('a'), 'big.jpg'), isNull);
+      },
+    );
+
     test('deleteAll takes the folder with everything in it', () async {
       final id = animalId('a');
       await files().store(id, picked('one.jpg'));

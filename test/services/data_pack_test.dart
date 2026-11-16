@@ -178,7 +178,10 @@ void main() {
       expect(pack['formatVersion'], packFormatVersion);
       expect(pack['schemaVersion'], schemaVersion);
       expect(pack['exportedAt'], 1760000000000);
-      expect(tableRows(pack).keys.toList(), dataTables);
+      // The value tables, plus the picture rows: the archive needs those rows to
+      // know which files to carry, and a restore without them would write bytes
+      // no screen can name.
+      expect(tableRows(pack).keys.toList(), <String>[...dataTables, 'photos']);
       expect(tableRows(pack)['animals'], hasLength(2));
       expect(tableRows(pack)['user_settings'], hasLength(1));
     });

@@ -16,11 +16,12 @@ import '../data/models/photo.dart';
 /// version may add, and a format that travels table-by-table costs one line in
 /// `schema.dart` per new table instead of a branch here.
 ///
-/// Photos are **not** inside. `photos` is a [fileBackedTables] table, so a pack
-/// that names one is refused as `unknownTable` rather than quietly dropping the
-/// rows a phone cannot answer anyway: the bytes stay where they were written.
-/// A `photo_path` travels as the text it is, so restoring brings the ledger back
-/// and leaves the pictures on the old phone, and the ledger says so per row.
+/// Photos are **not** rows this module restores on their own. A `photos` row is
+/// a file name, and the bytes are what make it worth anything: the export puts
+/// the rows in the pack and the files in a ZIP beside it (`pack_archive.dart`),
+/// so a restore on a second phone gets both. A pack holding the rows but no
+/// bytes is still accepted — the pictures then render as the named blank this
+/// app already draws for a file the phone does not have.es on the old phone, and the ledger says so per row.
 /// The PDF pack is where an image belongs.
 const String packFormat = 'salala-pack';
 
@@ -89,10 +90,19 @@ class PackRows {
 /// animal it does not contain, and [restorePack]'s transaction refuses the whole
 /// thing on the foreign key, so the one restore the breeder ever needs fails on
 /// a file they believed was safe. One snapshot, or nothing.
-Future<Map<String, Object?>> packFrom(Database db, {int? exportedAtMs}) async {
+Future<Map<String, Object?>> packFrom(
+  Database db, {
+  int? exportedAtMs,
+  bool includePhotos = true,
+}) async {
+  // `photos` joins the value tables here even though it is listed as
+  // file-backed: its rows are what tell the archive which files to carry, and a
+  // restore that put the bytes back without the rows would write files no screen
+  // can reach. Declining them is only for a caller that wants the ledger alone.
+  final tables = <String>[...dataTables, if (includePhotos) 'photos'];
   final rows = await db.transaction(
     (Transaction txn) async => <String, Object?>{
-      for (final table in dataTables) table: await txn.query(table),
+      for (final table in tables) table: await txn.query(table),
     },
   );
   return <String, Object?>{
@@ -146,7 +156,10 @@ PackRows parsePack(String text) {
   final tables = <String, List<Map<String, Object?>>>{};
   for (final entry in rows.entries) {
     if (entry.key case final String table) {
-      if (!dataTables.contains(table)) {
+      // `photos` is allowed in a pack although it is not a [dataTables] table:
+      // its rows travel with the bytes in the archive, and refusing them here
+      // would leave a restored phone with pictures it cannot name.
+      if (!dataTables.contains(table) && table != 'photos') {
         throw PackReject(PackProblem.unknownTable, table);
       }
       final List<Object?> rowsOfTable;
@@ -239,12 +252,15 @@ bool _addedAfterPack(String table, int packSchema) {
 /// the rows that were on the phone before the attempt are still there and the
 /// database is still answering questions.
 ///
-/// The pictures are the one table a pack does not carry, and the restore is the
-/// one moment the ledger changes underneath a folder of files. Their rows are
-/// read back before the animals go (the cascade takes them with it, measured on
-/// a real database at run `38165892860`), and the ones whose animal the incoming
-/// file carries are put back: those bytes are still this phone's own pictures,
-/// and dropping the row would hide them behind no screen at all.
+/// The pictures are the one table whose rows and bytes can arrive separately: a
+/// pack from an older version carries no `photos` table at all, and a ZIP whose
+/// files were missing carries rows with no bytes. Their rows are read back
+/// before the animals go (the cascade takes them with it, measured on a real
+/// database at run `38165892860`), and then the incoming rows and this phone's
+/// own are merged, filtered to animals the pack kept. Neither list may lose the
+/// other: the pack's rows name the files the archive wrote beside it, and the
+/// phone's own rows name bytes nothing can recreate. Dropping either would hide
+/// a picture that is still on the disk behind no screen at all.
 ///
 /// The rows that came through are what this returns, because the caller has a
 /// folder to sweep against them — `PhotoFiles.deleteUnbacked` — and asking the
@@ -276,12 +292,28 @@ Future<List<Photo>> restorePack(Database db, PackRows pack) {
     final herd = <String>{
       for (final row in await txn.query('animals')) row['id']! as String,
     };
+    // A picture row is the one row a pack can arrive without the bytes for, so
+    // the two lists are merged rather than one replacing the other: the pack's
+    // rows name the files the archive wrote beside it, and this phone's own rows
+    // name bytes nothing can recreate. Neither list may lose the other, and the
+    // herd filter is what stops either from outliving its animal.
+    final source = <Map<String, Object?>>[
+      ...pictures,
+      ...?pack.tables['photos'],
+    ];
     final kept = <Photo>[];
-    for (final picture in pictures) {
-      if (herd.contains(picture['animal_id'])) {
-        await txn.insert('photos', picture);
-        kept.add(Photo.fromMap(picture));
+    final seen = <String>{};
+    for (final picture in source) {
+      if (!herd.contains(picture['animal_id'])) continue;
+      if (picture['id'] case final String id) {
+        if (!seen.add(id)) continue;
       }
+      await txn.insert(
+        'photos',
+        picture,
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+      kept.add(Photo.fromMap(picture));
     }
 
     final dangling = await txn.rawQuery('PRAGMA foreign_key_check');

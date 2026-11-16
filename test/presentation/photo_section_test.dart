@@ -50,6 +50,14 @@ Future<void> _tap(WidgetTester tester, Finder finder) async {
   await tester.pumpAndSettle();
 }
 
+/// Opens the source sheet and picks the gallery, which is what "add a photo"
+/// meant before the camera existed.
+Future<void> _addFromGallery(WidgetTester tester) async {
+  await _tap(tester, find.widgetWithText(TextButton, 'Add photo'));
+  await tester.tap(find.text('Choose from the gallery'));
+  await tester.pumpAndSettle();
+}
+
 /// Below the weigh-ins, so a test that means the strip has to bring it on stage.
 Future<void> _scrollToPhotos(WidgetTester tester) =>
     _scrollTo(tester, find.text('Photos'));
@@ -78,7 +86,7 @@ Finder _emptyStrip() => find.descendant(
 );
 
 /// A write that goes to the file layer, the database, and then back through the
-/// section — three round trips, one of them on another isolate.
+/// section â€” three round trips, one of them on another isolate.
 Future<void> _settleWrite(WidgetTester tester) async {
   await settleRealIo(tester);
   await settleRealIo(tester);
@@ -120,7 +128,7 @@ void main() {
 
       expect(_emptyStrip(), findsOneWidget);
 
-      await _tap(tester, find.widgetWithText(TextButton, 'Add photo'));
+      await _addFromGallery(tester);
       // The tile only exists once the row has landed and the strip has re-read
       // it: waited for by that outcome, because the fixed rounds let this pass
       // alone and fail inside a suite.
@@ -132,6 +140,28 @@ void main() {
     },
   );
 
+  testWidgets('the sheet takes a photo with the camera instead of the gallery', (
+    tester,
+  ) async {
+    _usePhoneViewport(tester);
+    final files = FakePhotoFiles()
+      ..nextCaptured = FakePhotoFiles.photo('CAM_1.jpg');
+    await pumpSalala(tester, photoFiles: files, seed: <Animal>[_nala()]);
+    await _openNala(tester);
+    await _scrollToPhotos(tester);
+
+    await _tap(tester, find.widgetWithText(TextButton, 'Add photo'));
+    await tester.tap(find.text('Take a photo'));
+    await tester.pumpAndSettle();
+
+    await settleUntil(tester, () => find.text(_blank).evaluate().isNotEmpty);
+
+    // The camera is a separate intent from the gallery, and the row proves which
+    // one answered: `capture()` was called and `pick()` would have been silent.
+    expect(files.captures, 1);
+    expect(files.stored, <String>['$_nalaId/CAM_1.jpg-1024']);
+  });
+
   testWidgets('closing the picker writes no row and stores nothing', (
     tester,
   ) async {
@@ -141,7 +171,7 @@ void main() {
     await _openNala(tester);
     await _scrollToPhotos(tester);
 
-    await _tap(tester, find.widgetWithText(TextButton, 'Add photo'));
+    await _addFromGallery(tester);
     await _settleWrite(tester);
 
     // Backing out of a gallery is a decision, not a failure: nothing is written
@@ -162,7 +192,7 @@ void main() {
       await _openNala(tester);
       await _scrollToPhotos(tester);
 
-      await _tap(tester, find.widgetWithText(TextButton, 'Add photo'));
+      await _addFromGallery(tester);
       await settleRefusal(tester, waitingFor: 'This file is not a picture');
 
       expect(
@@ -188,7 +218,7 @@ void main() {
     await _openNala(tester);
     await _scrollToPhotos(tester);
 
-    await _tap(tester, find.widgetWithText(TextButton, 'Add photo'));
+    await _addFromGallery(tester);
     await settleRefusal(tester, waitingFor: 'This picture is too big to keep');
 
     // Which gate answered, and what a real folder does with 24 MB + 1 byte, is
@@ -214,12 +244,12 @@ void main() {
     await _openNala(tester);
     await _scrollToPhotos(tester);
 
-    await _tap(tester, find.widgetWithText(TextButton, 'Add photo'));
+    await _addFromGallery(tester);
     await settleRefusal(tester, waitingFor: saveRefusalSentence);
 
     // The copy went in (`stored`), the row did not, and the sentence the screen
     // answers with claims nothing was written. Both halves have to be true of the
-    // same picture, or the folder is holding a file no ledger entry can name —
+    // same picture, or the folder is holding a file no ledger entry can name â€”
     // invisible to the delete that runs off the rows.
     expect(files.stored, hasLength(1));
     expect(files.deleted, files.stored);
@@ -332,7 +362,7 @@ void main() {
       // a suite.
       await settleUntil(tester, () => _emptyStrip().evaluate().isNotEmpty);
 
-      // The ledger is already right — the row is gone — and the leftover is swept
+      // The ledger is already right â€” the row is gone â€” and the leftover is swept
       // by the folder clear that follows the animal itself. A stray file is not a
       // sentence worth interrupting a person with, so nothing is claimed either way.
       expect(_emptyStrip(), findsOneWidget);
@@ -358,7 +388,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.widgetWithText(FilledButton, 'Delete'));
     // The folder is cleared inside the delete, before the list is re-read, so
-    // this waits on that call rather than on a frame count — and then on the
+    // this waits on that call rather than on a frame count â€” and then on the
     // list actually losing the row, which is the second round trip.
     await settleUntil(tester, () => files.clearedFolders.isNotEmpty);
     await settleUntil(tester, () => find.text('Nala').evaluate().isEmpty);
@@ -374,7 +404,7 @@ void main() {
     // The corner the row count cannot see: a copy whose insert was refused, whose
     // sweep then failed too, leaves bytes the ledger has never heard of. Clearing
     // the folder only when rows exist would keep a dead animal's photograph on
-    // the phone with no row, no screen and no way to find it — so the promise is
+    // the phone with no row, no screen and no way to find it â€” so the promise is
     // the folder going, and this test is what that choice costs in calls.
     _usePhoneViewport(tester);
     final files = FakePhotoFiles();

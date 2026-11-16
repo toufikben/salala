@@ -118,7 +118,7 @@
   "settingsBuildTag": "رقم البناء",
   "settingsOfflineNote": "كل شيء محفوظ على جهازك. بلا حساب، بلا خادم، بلا تتبع.",
   "settingsExport": "تصدير السجلات",
-  "settingsExportBody": "ملف JSON واحد فيه كل سجلات هذا الهاتف",
+  "settingsExportBody": "ملف ZIP واحد يحمل كل سجل وصورة على هذا الهاتف",
   "settingsImport": "استرجاع من حزمة",
   "settingsImportBody": "قراءة حزمة وإرجاعها إلى هذا الهاتف",
   "packShared": "{file} جاهز للإرسال",
@@ -267,6 +267,8 @@
   "symptomResolved": "زائل",
   "symptomDeleteBody": "يُحذف هذا العَرَض من سجل الحيوان. لا يمكن التراجع عن ذلك.",
 
+  "photoFromGallery": "اختيار من المعرض",
+  "photoFromCamera": "التقاط صورة",
   "photoAdd": "صورة جديدة",
   "photoDeleteBody": "تُحذف هذه الصورة من سجل الحيوان ويُحذف ملفها معها. لا يمكن التراجع عن ذلك.",
   "photoMissing": "ليست على هذا الهاتف",
