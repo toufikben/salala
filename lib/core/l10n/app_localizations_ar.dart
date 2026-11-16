@@ -19,6 +19,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get navLitters => 'الولادات';
 
   @override
+  String get navBuyers => 'المشترون';
+
+  @override
   String get navSettings => 'الإعدادات';
 
   @override
@@ -38,7 +41,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get homeAllAnimals => 'كل الحيوانات';
 
   @override
-  String get homeSearchHint => 'ابحث بالاسم أو الرقم أو الشريحة أو الملاحظة';
+  String get homeSearchHint =>
+      'ابحث بالاسم أو الرقم أو الشريحة أو الملاحظة أو المشتري';
 
   @override
   String homeNoMatches(String query) {
@@ -299,6 +303,44 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settingsImportBody => 'قراءة حزمة وإرجاعها إلى هذا الهاتف';
+
+  @override
+  String settingsLastBackup(String day) {
+    return 'آخر نسخة احتياطية: $day';
+  }
+
+  @override
+  String get settingsNeverBackedUp => 'لم تخرج نسخة احتياطية من هذا الهاتف بعد';
+
+  @override
+  String get settingsCsv => 'جدول (CSV)';
+
+  @override
+  String get settingsCsvBody =>
+      'لمحاسبك أو لاستمارة السجل أو لشريك في الملكية. يُفتح في Excel أو Numbers أو Google Sheets.';
+
+  @override
+  String get settingsCsvHerd => 'الحيوانات';
+
+  @override
+  String get settingsCsvLitters => 'الولادات';
+
+  @override
+  String get settingsCsvVaccinations => 'التحصينات';
+
+  @override
+  String get settingsCsvPlacements => 'التسليمات';
+
+  @override
+  String csvShared(String file) {
+    return '$file جاهز للإرسال';
+  }
+
+  @override
+  String get csvShareFailed => 'لم يمكن كتابة الجدول على هذا الهاتف';
+
+  @override
+  String get csvEmpty => 'لا يوجد على هذا الهاتف ما يُصدَّر بعد';
 
   @override
   String packShared(String file) {
@@ -760,6 +802,16 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get buyerCountryCode => 'رمز البلد';
+
+  @override
+  String get buyersEmptyTitle => 'لا يوجد مشترون بعد';
+
+  @override
+  String get buyersEmptyBody =>
+      'يُضاف المشتري مع تسليم، أو من هنا قبل التسليم: من اشتريت منه العام الماضي ما زال يطلب شهادة النسب.';
+
+  @override
+  String get buyersNoAnimals => 'لا يوجد حيوان مسجَّل لهذا الشخص';
 
   @override
   String buyerDeleteBody(String name) {

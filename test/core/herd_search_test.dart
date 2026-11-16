@@ -1,6 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:salala/core/utils/herd_search.dart';
 import 'package:salala/data/models/animal.dart';
+import 'package:salala/data/models/buyer.dart';
+import 'package:salala/data/models/placement.dart';
 
 /// What a query matches, and in what order it comes back.
 ///
@@ -15,6 +17,8 @@ Animal _animal(
   String? registrationNo,
   String? microchipId,
   String? notes,
+  String? damId,
+  String? sireId,
 }) => Animal(
   id: id,
   name: name,
@@ -25,6 +29,24 @@ Animal _animal(
   registrationNo: registrationNo,
   microchipId: microchipId,
   notes: notes,
+  damId: damId,
+  sireId: sireId,
+  createdAt: 1740000000000,
+  updatedAt: 1740000000000,
+);
+
+Buyer _buyer(String id, String name) => Buyer(
+  id: id,
+  name: name,
+  createdAt: 1740000000000,
+  updatedAt: 1740000000000,
+);
+
+Placement _placement(String animalId, String buyerId, {int? day}) => Placement(
+  id: 'pl-$animalId-$buyerId',
+  animalId: animalId,
+  buyerId: buyerId,
+  placedDate: day,
   createdAt: 1740000000000,
   updatedAt: 1740000000000,
 );
@@ -288,6 +310,161 @@ void main() {
         'a-1',
         'a-2',
       ]);
+    });
+  });
+
+  group('the animal remembered by the people and animals around it', () {
+    test("a mother's name finds her puppies", () {
+      // "Which of Nala's is this" is the way a breeder asks, and the answer is
+      // every puppy that carries her as dam — none of which has her name.
+      final herd = <Animal>[
+        _animal('a-1', 'Nala'),
+        _animal('a-2', 'Spring 1', damId: 'a-1'),
+        _animal('a-3', 'Spring 2', damId: 'a-1'),
+        _animal('a-4', 'Zida'),
+      ];
+
+      expect(searchHerd(herd, 'nala').map((Animal a) => a.id), <String>[
+        'a-1',
+        'a-2',
+        'a-3',
+      ]);
+    });
+
+    test("a father's name finds his puppies too", () {
+      final herd = <Animal>[
+        _animal('a-1', 'Atlas'),
+        _animal('a-2', 'Pip', sireId: 'a-1'),
+      ];
+
+      expect(searchHerd(herd, 'atlas').map((Animal a) => a.id), <String>[
+        'a-1',
+        'a-2',
+      ]);
+    });
+
+    test('a buyer name finds the animal that went home with them', () {
+      final herd = <Animal>[_animal('a-1', 'Nala'), _animal('a-2', 'Zida')];
+
+      expect(
+        searchHerd(
+          herd,
+          'martin',
+          buyers: <Buyer>[_buyer('b-1', 'Zoé Martin')],
+          placements: <Placement>[_placement('a-2', 'b-1', day: 1000)],
+        ).map((Animal a) => a.id),
+        <String>['a-2'],
+      );
+    });
+
+    test('a balance-due question survives a name typed with an accent', () {
+      final herd = <Animal>[_animal('a-1', 'Nala')];
+
+      // The buyer's name is stored accented; nobody types the accent.
+      expect(
+        searchHerd(
+          herd,
+          'zoe',
+          buyers: <Buyer>[_buyer('b-1', 'Zoé Martin')],
+          placements: <Placement>[_placement('a-1', 'b-1', day: 1000)],
+        ).single.id,
+        'a-1',
+      );
+    });
+
+    test('two handovers for one animal match the newer buyer', () {
+      final herd = <Animal>[_animal('a-1', 'Nala')];
+
+      // A dog rehomed twice: the name on the newest handover is the one the
+      // breeder is thinking of, and the older one should not also answer.
+      expect(
+        searchHerd(
+          herd,
+          'sami',
+          buyers: <Buyer>[_buyer('b-1', 'Old Owner'), _buyer('b-2', 'Sami')],
+          placements: <Placement>[
+            _placement('a-1', 'b-1', day: 5000),
+            _placement('a-1', 'b-2', day: 1000),
+          ],
+        ),
+        isEmpty,
+      );
+      expect(
+        searchHerd(
+          herd,
+          'sami',
+          buyers: <Buyer>[_buyer('b-1', 'Old Owner'), _buyer('b-2', 'Sami')],
+          placements: <Placement>[
+            _placement('a-1', 'b-1', day: 1000),
+            _placement('a-1', 'b-2', day: 5000),
+          ],
+        ).single.id,
+        'a-1',
+      );
+    });
+
+    test('a placement whose buyer was deleted matches nothing', () {
+      final herd = <Animal>[_animal('a-1', 'Nala')];
+
+      // `ON DELETE SET NULL` is not the only path: a contact can be gone while
+      // the row still names an id the list never had.
+      expect(
+        searchHerd(
+          herd,
+          'zoe',
+          buyers: const <Buyer>[],
+          placements: <Placement>[_placement('a-1', 'b-gone', day: 1000)],
+        ),
+        isEmpty,
+      );
+    });
+
+    test("the animal's own name outranks a puppy found through her mother", () {
+      // Both are name hits, but the dog actually called Nala is the better
+      // answer to "nala" than the puppy that merely carries her.
+      final herd = <Animal>[
+        _animal('a-1', 'Spring 1', damId: 'a-9'),
+        _animal('a-9', 'Nala'),
+      ];
+
+      expect(searchHerd(herd, 'nala').map((Animal a) => a.id), <String>[
+        'a-9',
+        'a-1',
+      ]);
+    });
+
+    test('a buyer hit outranks a note that merely mentions the same word', () {
+      final herd = <Animal>[
+        _animal('a-1', 'Zida', notes: 'Sold to Sami last spring'),
+        _animal('a-2', 'Nala'),
+      ];
+
+      expect(
+        searchHerd(
+          herd,
+          'sami',
+          buyers: <Buyer>[_buyer('b-1', 'Sami')],
+          placements: <Placement>[_placement('a-2', 'b-1', day: 1000)],
+        ).map((Animal a) => a.id),
+        <String>['a-2', 'a-1'],
+      );
+    });
+
+    test('a search with no contacts behaves exactly as it did before', () {
+      final herd = <Animal>[_animal('a-1', 'Zida', notes: 'limping')];
+
+      // The screens that have no contact list (the litter form) pass nothing,
+      // and must not lose the note match they always had.
+      expect(searchHerd(herd, 'limping').single.id, 'a-1');
+      expect(
+        searchHerd(
+          herd,
+          'limping',
+          buyers: const [],
+          placements: const [],
+        ).single.id,
+        'a-1',
+      );
     });
   });
 }

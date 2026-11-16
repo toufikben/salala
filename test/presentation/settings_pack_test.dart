@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:salala/data/db/schema.dart';
+import 'package:salala/core/utils/date_utils.dart';
 import 'package:salala/data/models/animal.dart';
 import 'package:salala/data/models/photo.dart';
 import 'package:salala/data/models/vaccination.dart';
@@ -535,6 +536,43 @@ void main() {
       await tapTile(tester, 'Restore from a pack');
 
       expect(find.text('That file could not be opened'), findsOneWidget);
+    });
+
+    testWidgets('a restore does not inherit the other phone\'s backup day', (
+      tester,
+    ) async {
+      files.pickedText = packJson(
+        animals: <Map<String, Object?>>[animalRow('a-1', 'Kenza')],
+      );
+      await pumpSalala(
+        tester,
+        packFiles: files,
+        seed: <Animal>[animal('Atlas')],
+        // A stamp already on this phone, so the assertion is about what the
+        // restore does to it rather than about a row that was never there.
+        beforeLaunch: (db) => db.insert('user_settings', <String, Object?>{
+          'key': 'last_pack_exported_at',
+          'value': '${DateTime(2026, 1, 1).millisecondsSinceEpoch}',
+          'updated_at': 0,
+        }),
+      );
+      await goTo(tester, 'Settings');
+
+      // The stamp from before the restore, formatted the way the row writes it.
+      final staleDay = formatDayFor(
+        'en',
+        DateTime(2026, 1, 1).millisecondsSinceEpoch,
+      );
+      expect(find.text('Last backup: $staleDay'), findsOneWidget);
+
+      await tapTile(tester, 'Restore from a pack');
+      await tester.tap(find.widgetWithText(FilledButton, 'Replace'));
+      await settleRefusal(tester, waitingFor: 'Records restored: 1');
+      await settleRealIo(tester);
+
+      // The pack came from a phone whose habit is not this phone's: a day
+      // inherited from a ledger that was never here is a claim nobody can check.
+      expect(find.text('No backup has left this phone yet'), findsOneWidget);
     });
   });
 

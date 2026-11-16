@@ -16,6 +16,15 @@ import '../../services/photo_files.dart';
 import 'agenda_providers.dart';
 import 'app_providers.dart';
 
+/// Every dose on this phone, newest first as the ledger shows them.
+///
+/// A herd-wide read, for the spreadsheet export: the CSV is one table for the
+/// accountant, not an animal's own section. The animal screens use
+/// [vaccinationsForAnimalProvider], which is a family and reads one id.
+final allVaccinationsProvider = FutureProvider.autoDispose<List<Vaccination>>(
+  (ref) => ref.read(daosProvider).vaccinations.all(),
+);
+
 /// One animal's vaccination history, newest dose first.
 ///
 /// Family + autoDispose rather than a controller per animal: a herd is open-ended
@@ -237,6 +246,16 @@ final buyersProvider = FutureProvider.autoDispose<List<Buyer>>(
   (ref) => ref.read(daosProvider).buyers.alphabetical(),
 );
 
+/// Every handover on this phone, for the two screens that ask a question about
+/// all of them at once: the contact list (which animal went to whom) and the
+/// search (an animal can be remembered by its buyer's name).
+///
+/// Not a family and not derived from [placementsForAnimalProvider]: a herd-wide
+/// read is one query, and asking it per animal would be a scan per card.
+final placementsProvider = FutureProvider.autoDispose<List<Placement>>(
+  (ref) => ref.read(daosProvider).placements.all(),
+);
+
 Future<Placement> savePlacement(WidgetRef ref, Placement placement) async {
   final daos = ref.read(daosProvider);
   final Placement saved;
@@ -247,6 +266,7 @@ Future<Placement> savePlacement(WidgetRef ref, Placement placement) async {
     saved = placement;
   }
   ref.invalidate(placementsForAnimalProvider(saved.animalId));
+  ref.invalidate(placementsProvider);
   await _syncAnimalStatusToPlacements(ref, saved.animalId);
   return saved;
 }
@@ -254,6 +274,7 @@ Future<Placement> savePlacement(WidgetRef ref, Placement placement) async {
 Future<void> deletePlacement(WidgetRef ref, Placement placement) async {
   await ref.read(daosProvider).placements.delete(placement.id);
   ref.invalidate(placementsForAnimalProvider(placement.animalId));
+  ref.invalidate(placementsProvider);
   // A handover removed is a handover that never happened, so the animal comes
   // back into the herd if she is still marked sold and nothing else says she
   // left. See [_syncAnimalStatusToPlacements] for why a `deceased` animal is

@@ -3,6 +3,7 @@
   "appTitle": "سلالة",
   "navAnimals": "الحيوانات",
   "navLitters": "الولادات",
+  "navBuyers": "المشترون",
   "navSettings": "الإعدادات",
 
   "homeEmptyTitle": "لا توجد حيوانات بعد",
@@ -10,7 +11,7 @@
   "homeAddAnimal": "إضافة حيوان",
   "homeBreedingStock": "حيوانات التربية",
   "homeAllAnimals": "كل الحيوانات",
-  "homeSearchHint": "ابحث بالاسم أو الرقم أو الشريحة أو الملاحظة",
+  "homeSearchHint": "ابحث بالاسم أو الرقم أو الشريحة أو الملاحظة أو المشتري",
   "homeNoMatches": "لا نتيجة تطابق « {query} »",
   "@homeNoMatches": {
     "placeholders": {
@@ -121,6 +122,32 @@
   "settingsExportBody": "ملف ZIP واحد يحمل كل سجل وصورة على هذا الهاتف",
   "settingsImport": "استرجاع من حزمة",
   "settingsImportBody": "قراءة حزمة وإرجاعها إلى هذا الهاتف",
+  "settingsLastBackup": "آخر نسخة احتياطية: {day}",
+  "@settingsLastBackup": {
+    "description": "تحت زر التصدير. المقصود أن يرى المربّي كم صارت نسخته الوحيدة قديمة — تطبيق لا يذكّر هو تطبيق كانت آخر نسخة فيه قبل ثمانية أشهر.",
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsNeverBackedUp": "لم تخرج نسخة احتياطية من هذا الهاتف بعد",
+  "settingsCsv": "جدول (CSV)",
+  "settingsCsvBody": "لمحاسبك أو لاستمارة السجل أو لشريك في الملكية. يُفتح في Excel أو Numbers أو Google Sheets.",
+  "settingsCsvHerd": "الحيوانات",
+  "settingsCsvLitters": "الولادات",
+  "settingsCsvVaccinations": "التحصينات",
+  "settingsCsvPlacements": "التسليمات",
+  "csvShared": "{file} جاهز للإرسال",
+  "@csvShared": {
+    "placeholders": {
+      "file": {
+        "type": "String"
+      }
+    }
+  },
+  "csvShareFailed": "لم يمكن كتابة الجدول على هذا الهاتف",
+  "csvEmpty": "لا يوجد على هذا الهاتف ما يُصدَّر بعد",
   "packShared": "{file} جاهز للإرسال",
   "packShareFailed": "لم يمكن كتابة الحزمة على هذا الهاتف",
   "packReadFailed": "لم يمكن فتح هذا الملف",
@@ -293,6 +320,9 @@
   "buyerPhone": "الهاتف",
   "buyerEmail": "البريد الإلكتروني",
   "buyerCountryCode": "رمز البلد",
+  "buyersEmptyTitle": "لا يوجد مشترون بعد",
+  "buyersEmptyBody": "يُضاف المشتري مع تسليم، أو من هنا قبل التسليم: من اشتريت منه العام الماضي ما زال يطلب شهادة النسب.",
+  "buyersNoAnimals": "لا يوجد حيوان مسجَّل لهذا الشخص",
   "buyerDeleteBody": "يُحذف {name} من جهات اتصالك. ويبقى سجل التسليم في تاريخ الحيوان دون ذكر المشتري. لا يمكن التراجع عن ذلك.",
 
   "reminderHeadsUpBody": "تنبيه: {what} مستحق في {dueDay}",

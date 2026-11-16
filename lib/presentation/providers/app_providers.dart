@@ -53,6 +53,18 @@ final settingsDaoProvider = Provider<SettingsDao>(
   (ref) => SettingsDao(ref.watch(databaseProvider)),
 );
 
+/// When a pack last left this phone, or null if none ever has.
+///
+/// A plain FutureProvider rather than a controller: the value is written by the
+/// export itself and read by one tile, so the tile owning the invalidation is
+/// simpler than a notifier that has nothing to compute.
+final lastBackupProvider = FutureProvider.autoDispose<DateTime?>((ref) async {
+  final ms = await ref
+      .read(settingsDaoProvider)
+      .readInt(SettingKeys.lastPackExportedAt);
+  return ms == null ? null : DateTime.fromMillisecondsSinceEpoch(ms);
+});
+
 final appLockProvider = Provider<AppLockService>((ref) => AppLockService());
 
 /// The share sheet and the file picker. Tests hand in a recorder, because the

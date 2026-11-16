@@ -6,6 +6,7 @@ import '../../presentation/providers/app_providers.dart';
 import '../../presentation/screens/animal_detail_screen.dart';
 import '../../presentation/screens/animal_form_screen.dart';
 import '../../presentation/screens/animal_list_screen.dart';
+import '../../presentation/screens/buyer_list_screen.dart';
 import '../../presentation/screens/health_test_form_screen.dart';
 import '../../presentation/screens/litter_form_screen.dart';
 import '../../presentation/screens/litter_list_screen.dart';
@@ -23,6 +24,7 @@ class AppPaths {
   static const String newAnimal = '/animals/new';
   static const String litters = '/litters';
   static const String newLitter = '/litters/new';
+  static const String buyers = '/buyers';
   static const String settings = '/settings';
 
   static String editAnimal(String id) => '/animals/$id/edit';
@@ -180,6 +182,10 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((ref) {
                 LitterDetailScreen(litterId: state.pathParameters['id']!),
           ),
         ],
+      ),
+      GoRoute(
+        path: AppPaths.buyers,
+        builder: (context, state) => const BuyerListScreen(),
       ),
       GoRoute(
         path: AppPaths.settings,

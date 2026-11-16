@@ -118,6 +118,12 @@ abstract class AppLocalizations {
   /// **'Litters'**
   String get navLitters;
 
+  /// No description provided for @navBuyers.
+  ///
+  /// In en, this message translates to:
+  /// **'Buyers'**
+  String get navBuyers;
+
   /// No description provided for @navSettings.
   ///
   /// In en, this message translates to:
@@ -157,7 +163,7 @@ abstract class AppLocalizations {
   /// No description provided for @homeSearchHint.
   ///
   /// In en, this message translates to:
-  /// **'Search by name, number, chip or note'**
+  /// **'Search by name, number, chip, note or buyer'**
   String get homeSearchHint;
 
   /// No description provided for @homeNoMatches.
@@ -627,6 +633,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Read a pack back onto this phone'**
   String get settingsImportBody;
+
+  /// Said under the export tile. The point is that the breeder can see how stale their only copy is — an app that never mentions it is an app where the last backup was eight months ago.
+  ///
+  /// In en, this message translates to:
+  /// **'Last backup: {day}'**
+  String settingsLastBackup(String day);
+
+  /// No description provided for @settingsNeverBackedUp.
+  ///
+  /// In en, this message translates to:
+  /// **'No backup has left this phone yet'**
+  String get settingsNeverBackedUp;
+
+  /// No description provided for @settingsCsv.
+  ///
+  /// In en, this message translates to:
+  /// **'Spreadsheet (CSV)'**
+  String get settingsCsv;
+
+  /// No description provided for @settingsCsvBody.
+  ///
+  /// In en, this message translates to:
+  /// **'For your accountant, a registry form, or a co-owner. Opens in Excel, Numbers or Google Sheets.'**
+  String get settingsCsvBody;
+
+  /// No description provided for @settingsCsvHerd.
+  ///
+  /// In en, this message translates to:
+  /// **'Animals'**
+  String get settingsCsvHerd;
+
+  /// No description provided for @settingsCsvLitters.
+  ///
+  /// In en, this message translates to:
+  /// **'Litters'**
+  String get settingsCsvLitters;
+
+  /// No description provided for @settingsCsvVaccinations.
+  ///
+  /// In en, this message translates to:
+  /// **'Vaccinations'**
+  String get settingsCsvVaccinations;
+
+  /// No description provided for @settingsCsvPlacements.
+  ///
+  /// In en, this message translates to:
+  /// **'Handovers'**
+  String get settingsCsvPlacements;
+
+  /// No description provided for @csvShared.
+  ///
+  /// In en, this message translates to:
+  /// **'{file} is ready to send'**
+  String csvShared(String file);
+
+  /// No description provided for @csvShareFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'The sheet could not be written on this phone'**
+  String get csvShareFailed;
+
+  /// No description provided for @csvEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'There is nothing on this phone to export yet'**
+  String get csvEmpty;
 
   /// No description provided for @packShared.
   ///
@@ -1467,6 +1539,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Country code'**
   String get buyerCountryCode;
+
+  /// No description provided for @buyersEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No buyers yet'**
+  String get buyersEmptyTitle;
+
+  /// No description provided for @buyersEmptyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'A buyer is added with a handover — or here, before one: the person you sold to last year still wants the pedigree.'**
+  String get buyersEmptyBody;
+
+  /// No description provided for @buyersNoAnimals.
+  ///
+  /// In en, this message translates to:
+  /// **'No animal on file for this contact'**
+  String get buyersNoAnimals;
 
   /// Said before a contact is deleted, and it has to say what survives: the placement row is kept with its buyer blanked (`ON DELETE SET NULL`), because the fact that an animal went to someone is the breeder's record, while the name and phone belong to the person who can ask for them back.
   ///

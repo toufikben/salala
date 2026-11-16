@@ -9,10 +9,13 @@ import '../../core/utils/agenda.dart';
 import '../../core/utils/date_utils.dart';
 import '../../core/utils/herd_search.dart';
 import '../../data/models/animal.dart';
+import '../../data/models/buyer.dart';
+import '../../data/models/placement.dart';
 import '../../data/models/vaccination.dart';
 import '../../services/reminder_resync.dart';
 import '../providers/agenda_providers.dart';
 import '../providers/app_providers.dart';
+import '../providers/record_providers.dart';
 import '../widgets/animal_card.dart';
 import '../widgets/salala_nav_bar.dart';
 
@@ -75,6 +78,13 @@ class _AnimalListScreenState extends ConsumerState<AnimalListScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final animals = ref.watch(animalsProvider);
+    // Two more reads, and only for the search: an animal is remembered by who
+    // took her home as often as by her own name, and a breeder who types a
+    // buyer into this box is asking a question the herd alone cannot answer.
+    // Values rather than queries, so the lazy list below never runs a read.
+    final buyers = ref.watch(buyersProvider).value ?? const <Buyer>[];
+    final placements =
+        ref.watch(placementsProvider).value ?? const <Placement>[];
     // Read here, once per rebuild: the field, the list under it and the agenda
     // all answer to one decision about the typed text, and `queryFilters` is the
     // only place that makes it. The raw text is what the list is handed, because
@@ -133,7 +143,12 @@ class _AnimalListScreenState extends ConsumerState<AnimalListScreen> {
         ),
         data: (list) {
           if (list.isEmpty) return const _EmptyBody();
-          final matches = searchHerd(list, query);
+          final matches = searchHerd(
+            list,
+            query,
+            buyers: buyers,
+            placements: placements,
+          );
           if (matches.isEmpty) return _NoMatches(query: query);
           return _AnimalGroups(
             animals: matches,

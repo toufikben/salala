@@ -6,6 +6,7 @@
   },
   "navAnimals": "Animals",
   "navLitters": "Litters",
+  "navBuyers": "Buyers",
   "navSettings": "Settings",
 
   "homeEmptyTitle": "No animals yet",
@@ -13,7 +14,7 @@
   "homeAddAnimal": "Add animal",
   "homeBreedingStock": "Breeding stock",
   "homeAllAnimals": "All animals",
-  "homeSearchHint": "Search by name, number, chip or note",
+  "homeSearchHint": "Search by name, number, chip, note or buyer",
   "homeNoMatches": "Nothing matches “{query}”",
   "@homeNoMatches": {
     "placeholders": {
@@ -138,6 +139,24 @@
   "settingsExportBody": "One ZIP file with every record and picture on this phone",
   "settingsImport": "Restore from a pack",
   "settingsImportBody": "Read a pack back onto this phone",
+  "settingsLastBackup": "Last backup: {day}",
+  "@settingsLastBackup": {
+    "description": "Said under the export tile. The point is that the breeder can see how stale their only copy is — an app that never mentions it is an app where the last backup was eight months ago.",
+    "placeholders": { "day": { "type": "String" } }
+  },
+  "settingsNeverBackedUp": "No backup has left this phone yet",
+  "settingsCsv": "Spreadsheet (CSV)",
+  "settingsCsvBody": "For your accountant, a registry form, or a co-owner. Opens in Excel, Numbers or Google Sheets.",
+  "settingsCsvHerd": "Animals",
+  "settingsCsvLitters": "Litters",
+  "settingsCsvVaccinations": "Vaccinations",
+  "settingsCsvPlacements": "Handovers",
+  "csvShared": "{file} is ready to send",
+  "@csvShared": {
+    "placeholders": { "file": { "type": "String" } }
+  },
+  "csvShareFailed": "The sheet could not be written on this phone",
+  "csvEmpty": "There is nothing on this phone to export yet",
   "packShared": "{file} is ready to send",
   "@packShared": {
     "placeholders": { "file": { "type": "String" } }
@@ -369,6 +388,9 @@
   "buyerPhone": "Phone",
   "buyerEmail": "Email",
   "buyerCountryCode": "Country code",
+  "buyersEmptyTitle": "No buyers yet",
+  "buyersEmptyBody": "A buyer is added with a handover — or here, before one: the person you sold to last year still wants the pedigree.",
+  "buyersNoAnimals": "No animal on file for this contact",
   "@buyerCountryCode": {
     "description": "The two-letter code, e.g. MA. A code rather than a country name because a name typed freely would be sorted and spelled differently every time."
   },

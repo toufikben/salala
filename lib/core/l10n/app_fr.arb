@@ -3,6 +3,7 @@
   "appTitle": "Salala",
   "navAnimals": "Animaux",
   "navLitters": "Portées",
+  "navBuyers": "Acquéreurs",
   "navSettings": "Réglages",
 
   "homeEmptyTitle": "Aucun animal pour l'instant",
@@ -10,7 +11,7 @@
   "homeAddAnimal": "Ajouter un animal",
   "homeBreedingStock": "Reproduction",
   "homeAllAnimals": "Tous les animaux",
-  "homeSearchHint": "Rechercher par nom, numéro, puce ou note",
+  "homeSearchHint": "Rechercher par nom, numéro, puce, note ou acquéreur",
   "homeNoMatches": "Aucun résultat pour « {query} »",
   "@homeNoMatches": {
     "placeholders": {
@@ -121,6 +122,24 @@
   "settingsExportBody": "Un fichier ZIP avec tous les enregistrements et toutes les photos de ce téléphone",
   "settingsImport": "Restaurer un pack",
   "settingsImportBody": "Relire un pack sur ce téléphone",
+  "settingsLastBackup": "Dernière sauvegarde : {day}",
+  "@settingsLastBackup": {
+    "description": "Sous la tuile d'export. Le but est que l'éleveur voie à quel point sa seule copie est ancienne — une application qui n'en parle jamais est une application où la dernière sauvegarde date de huit mois.",
+    "placeholders": { "day": { "type": "String" } }
+  },
+  "settingsNeverBackedUp": "Aucune sauvegarde n'a encore quitté ce téléphone",
+  "settingsCsv": "Tableur (CSV)",
+  "settingsCsvBody": "Pour votre comptable, un formulaire de registre ou un copropriétaire. S'ouvre dans Excel, Numbers ou Google Sheets.",
+  "settingsCsvHerd": "Animaux",
+  "settingsCsvLitters": "Portées",
+  "settingsCsvVaccinations": "Vaccinations",
+  "settingsCsvPlacements": "Cessions",
+  "csvShared": "{file} est prêt à envoyer",
+  "@csvShared": {
+    "placeholders": { "file": { "type": "String" } }
+  },
+  "csvShareFailed": "Le tableur n'a pas pu être écrit sur ce téléphone",
+  "csvEmpty": "Rien à exporter sur ce téléphone pour l'instant",
   "packShared": "{file} est prêt à envoyer",
   "packShareFailed": "Impossible d'écrire le pack sur ce téléphone",
   "packReadFailed": "Impossible d'ouvrir ce fichier",
@@ -293,6 +312,9 @@
   "buyerPhone": "Téléphone",
   "buyerEmail": "Courriel",
   "buyerCountryCode": "Code pays",
+  "buyersEmptyTitle": "Aucun acquéreur pour l'instant",
+  "buyersEmptyBody": "Un acquéreur s'ajoute avec un placement — ou ici, avant : la personne à qui vous avez vendu l'an dernier veut encore le pedigree.",
+  "buyersNoAnimals": "Aucun animal enregistré pour ce contact",
   "buyerDeleteBody": "{name} est supprimé de vos contacts. Le placement reste dans l'historique de l'animal, sans acquéreur nommé. Action irréversible.",
 
   "reminderHeadsUpBody": "À noter : {what} arrive à échéance le {dueDay}",

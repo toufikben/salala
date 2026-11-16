@@ -19,6 +19,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get navLitters => 'Litters';
 
   @override
+  String get navBuyers => 'Buyers';
+
+  @override
   String get navSettings => 'Settings';
 
   @override
@@ -38,7 +41,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeAllAnimals => 'All animals';
 
   @override
-  String get homeSearchHint => 'Search by name, number, chip or note';
+  String get homeSearchHint => 'Search by name, number, chip, note or buyer';
 
   @override
   String homeNoMatches(String query) {
@@ -297,6 +300,44 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsImportBody => 'Read a pack back onto this phone';
+
+  @override
+  String settingsLastBackup(String day) {
+    return 'Last backup: $day';
+  }
+
+  @override
+  String get settingsNeverBackedUp => 'No backup has left this phone yet';
+
+  @override
+  String get settingsCsv => 'Spreadsheet (CSV)';
+
+  @override
+  String get settingsCsvBody =>
+      'For your accountant, a registry form, or a co-owner. Opens in Excel, Numbers or Google Sheets.';
+
+  @override
+  String get settingsCsvHerd => 'Animals';
+
+  @override
+  String get settingsCsvLitters => 'Litters';
+
+  @override
+  String get settingsCsvVaccinations => 'Vaccinations';
+
+  @override
+  String get settingsCsvPlacements => 'Handovers';
+
+  @override
+  String csvShared(String file) {
+    return '$file is ready to send';
+  }
+
+  @override
+  String get csvShareFailed => 'The sheet could not be written on this phone';
+
+  @override
+  String get csvEmpty => 'There is nothing on this phone to export yet';
 
   @override
   String packShared(String file) {
@@ -761,6 +802,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get buyerCountryCode => 'Country code';
+
+  @override
+  String get buyersEmptyTitle => 'No buyers yet';
+
+  @override
+  String get buyersEmptyBody =>
+      'A buyer is added with a handover — or here, before one: the person you sold to last year still wants the pedigree.';
+
+  @override
+  String get buyersNoAnimals => 'No animal on file for this contact';
 
   @override
   String buyerDeleteBody(String name) {

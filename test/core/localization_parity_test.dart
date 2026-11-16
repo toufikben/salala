@@ -32,13 +32,18 @@ void main() {
   const translated = <String>['ar', 'fr'];
   const allLocales = <String>[template, ...translated];
 
-  /// French borrows these nine words unchanged, measured off the files rather
+  /// French borrows these ten words unchanged, measured off the files rather
   /// than guessed, so the list is as long as the exception is and no longer.
+  ///
+  /// `settingsCsvVaccinations` is here because *vaccination* is the French word;
+  /// the CSV tile label is the only place this app says it bare, since every
+  /// other screen writes "vaccins" as part of a sentence.
   const frenchHomographs = <String>{
     'appTitle',
     'animalNotes',
     'recordsPhotos',
     'recordsPlacements',
+    'settingsCsvVaccinations',
     'unitKg',
     'unitGrams',
     'weightNote',
@@ -237,7 +242,7 @@ void main() {
         isEmpty,
         reason:
             'these French values are the English strings, and "Notes" and "kg" '
-            'are not among the nine that legitimately are: '
+            'are not among the ten that legitimately are: '
             '${identical.toSet().difference(frenchHomographs)}',
       );
       expect(

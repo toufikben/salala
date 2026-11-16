@@ -6,7 +6,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/build_info.dart';
 import '../../core/l10n/app_localizations.dart';
 import '../../core/utils/date_utils.dart';
+import '../../data/db/settings_dao.dart';
 import '../../data/models/photo.dart';
+import '../../services/csv_export.dart';
 import '../../services/data_pack.dart';
 import '../../services/pack_archive.dart';
 import '../../services/pack_files.dart';
@@ -26,7 +28,7 @@ class SettingsScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.navSettings)),
-      bottomNavigationBar: const SalalaNavBar(index: 2),
+      bottomNavigationBar: const SalalaNavBar(index: 3),
       body: ListView(
         padding: const EdgeInsets.symmetric(vertical: 8),
         children: <Widget>[
@@ -35,6 +37,8 @@ class SettingsScreen extends ConsumerWidget {
           const _LanguageTile(),
           const Divider(height: 32),
           const _PackTiles(),
+          const Divider(height: 32),
+          const _CsvTiles(),
           const Divider(height: 32),
           ListTile(
             leading: const Icon(Icons.workspace_premium_outlined),
@@ -234,6 +238,7 @@ class _PackTiles extends ConsumerWidget {
           subtitle: Text(l10n.settingsExportBody),
           onTap: () => _exportPack(context, ref),
         ),
+        const _LastBackupRow(),
         ListTile(
           leading: const Icon(Icons.upload_file),
           title: Text(l10n.settingsImport),
@@ -242,6 +247,126 @@ class _PackTiles extends ConsumerWidget {
         ),
       ],
     );
+  }
+}
+
+/// How old the only copy of this ledger is.
+///
+/// A backup the breeder cannot date is a backup they assume is recent. The row
+/// is deliberately quiet — it is a fact, not a warning — and it reads the value
+/// out of the settings table rather than from the last export this session,
+/// because "eight months ago" survives a reinstall and a session does not.
+class _LastBackupRow extends ConsumerWidget {
+  const _LastBackupRow();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final last = ref.watch(lastBackupProvider).value;
+    final localeTag = Localizations.localeOf(context).toString();
+
+    return ListTile(
+      dense: true,
+      leading: const Icon(Icons.history),
+      title: Text(
+        last == null
+            ? l10n.settingsNeverBackedUp
+            : l10n.settingsLastBackup(
+                formatDayFor(localeTag, last.millisecondsSinceEpoch),
+              ),
+      ),
+    );
+  }
+}
+
+/// The ledger as four spreadsheets, one tap each.
+///
+/// Separate from the pack on purpose. The pack is the whole ledger with its
+/// pictures, restored whole; a CSV is one table a person other than the app is
+/// going to read — the accountant, a registry office, a co-owner — and each of
+/// those wants one table, not five.
+class _CsvTiles extends ConsumerWidget {
+  const _CsvTiles();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+
+    return ExpansionTile(
+      leading: const Icon(Icons.grid_on),
+      title: Text(l10n.settingsCsv),
+      subtitle: Text(l10n.settingsCsvBody),
+      children: <Widget>[
+        for (final table in _CsvTable.values)
+          ListTile(
+            contentPadding: const EdgeInsetsDirectional.only(
+              start: 56,
+              end: 24,
+            ),
+            title: Text(_label(l10n, table)),
+            onTap: () => _exportCsv(context, ref, table),
+          ),
+      ],
+    );
+  }
+
+  static String _label(AppLocalizations l10n, _CsvTable table) =>
+      switch (table) {
+        _CsvTable.herd => l10n.settingsCsvHerd,
+        _CsvTable.litters => l10n.settingsCsvLitters,
+        _CsvTable.vaccinations => l10n.settingsCsvVaccinations,
+        _CsvTable.placements => l10n.settingsCsvPlacements,
+      };
+}
+
+enum _CsvTable { herd, litters, vaccinations, placements }
+
+Future<void> _exportCsv(
+  BuildContext context,
+  WidgetRef ref,
+  _CsvTable table,
+) async {
+  final l10n = AppLocalizations.of(context);
+  final messenger = ScaffoldMessenger.of(context);
+  final daos = ref.read(daosProvider);
+
+  try {
+    // Read from the database, not from the lists on screen: a settings screen
+    // opened cold has watched nothing, and an export that silently depended on
+    // which tab was visited first would produce a short file nobody suspects.
+    final animals = await daos.animals.all();
+    final String text;
+    switch (table) {
+      case _CsvTable.herd:
+        text = herdCsv(animals);
+      case _CsvTable.litters:
+        text = littersCsv(await daos.litters.all(), animals);
+      case _CsvTable.vaccinations:
+        text = vaccinationsCsv(await daos.vaccinations.all(), animals);
+      case _CsvTable.placements:
+        text = placementsCsv(
+          await daos.placements.all(),
+          animals,
+          await daos.buyers.all(),
+        );
+    }
+    if (animals.isEmpty) {
+      messenger.showSnackBar(SnackBar(content: Text(l10n.csvEmpty)));
+      return;
+    }
+    final name = await ref
+        .read(packFilesProvider)
+        .shareBytes(
+          csvFileName(table.name, DateTime.now()),
+          // UTF-8 bytes, and the BOM is the first character of the string: a
+          // CSV is text, but the file on disk is bytes, and encoding here is
+          // what keeps the mark in front of the first field rather than after it.
+          utf8.encode(text),
+        );
+    messenger.showSnackBar(SnackBar(content: Text(l10n.csvShared(name))));
+  } catch (error) {
+    debugPrint('CSV export failed: $error');
+    messenger.showSnackBar(SnackBar(content: Text(l10n.csvShareFailed)));
   }
 }
 
@@ -260,6 +385,16 @@ Future<void> _exportPack(BuildContext context, WidgetRef ref) async {
     final name = await ref
         .read(packFilesProvider)
         .shareBytes(packFileName(DateTime.now()), bytes);
+    // Only after the sheet actually took the file: a share that threw is a
+    // backup that did not happen, and stamping the day anyway would turn the
+    // one honest row on this screen into a claim the breeder cannot check.
+    await ref
+        .read(settingsDaoProvider)
+        .write(
+          SettingKeys.lastPackExportedAt,
+          '${DateTime.now().millisecondsSinceEpoch}',
+        );
+    ref.invalidate(lastBackupProvider);
     messenger.showSnackBar(SnackBar(content: Text(l10n.packShared(name))));
   } catch (error) {
     // A phone that refuses the share sheet still shows the ledger; the failure
@@ -430,6 +565,15 @@ Future<void> _importPack(BuildContext context, WidgetRef ref) async {
   }
   await ref.read(animalsProvider.notifier).refresh();
   await ref.read(littersProvider.notifier).refresh();
+  // The pack carried the *other* phone's backup habit in its settings rows. This
+  // phone has never exported anything, and a freshness row inherited from
+  // someone else's habit is a claim about this device that is simply false.
+  try {
+    await ref.read(settingsDaoProvider).remove(SettingKeys.lastPackExportedAt);
+    ref.invalidate(lastBackupProvider);
+  } catch (error) {
+    debugPrint('Backup stamp could not be cleared after a restore: $error');
+  }
   // The herd agenda on the home screen is the third thing derived from these
   // rows, and the only one that is a plain read rather than a controller: it has
   // no `refresh()` to call, so the restore asks for it by name.

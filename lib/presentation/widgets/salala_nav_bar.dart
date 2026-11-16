@@ -4,11 +4,14 @@ import 'package:go_router/go_router.dart';
 import '../../core/l10n/app_localizations.dart';
 import '../../core/router/app_router.dart';
 
-/// The three top-level destinations.
+/// The four top-level destinations.
 ///
-/// Each screen carries its own bar instead of a shell route on purpose: three
+/// Each screen carries its own bar instead of a shell route on purpose: four
 /// lists do not need a preserved navigation stack per tab, and a plain bar
 /// keeps every screen independently pumpable in a widget test.
+///
+/// The order is the order a breeder works in: the herd, the whelpings that
+/// produce it, the people it goes to, and the settings that hold all of it.
 class SalalaNavBar extends StatelessWidget {
   const SalalaNavBar({super.key, required this.index});
 
@@ -17,6 +20,7 @@ class SalalaNavBar extends StatelessWidget {
   static const List<String> _paths = <String>[
     AppPaths.animals,
     AppPaths.litters,
+    AppPaths.buyers,
     AppPaths.settings,
   ];
 
@@ -36,6 +40,11 @@ class SalalaNavBar extends StatelessWidget {
           icon: const Icon(Icons.family_restroom_outlined),
           selectedIcon: const Icon(Icons.family_restroom),
           label: l10n.navLitters,
+        ),
+        NavigationDestination(
+          icon: const Icon(Icons.people_outline),
+          selectedIcon: const Icon(Icons.people),
+          label: l10n.navBuyers,
         ),
         NavigationDestination(
           icon: const Icon(Icons.settings_outlined),

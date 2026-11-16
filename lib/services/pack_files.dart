@@ -83,6 +83,16 @@ String fileStamp(DateTime at) {
 /// is what mail apps and file managers use to offer the right thing.
 String packFileName(DateTime now) => 'salala-pack-${fileStamp(now)}.zip';
 
+/// `salala-herd-20261005-2041.csv`, and the three siblings below.
+///
+/// Slugged to plain ASCII for the same reason the PDF is: the name is what lands
+/// in a Downloads folder and inside a mail attachment list, and a CSV whose name
+/// only renders on the phone that made it is a CSV the accountant cannot find.
+/// The table's own name goes in the file, not a translated word, so one export
+/// from an Arabic phone and one from a French phone compare row for row.
+String csvFileName(String table, DateTime now) =>
+    'salala-$table-${fileStamp(now)}.csv';
+
 /// `salala-nala-20261005-2041.pdf`, named for the animal it describes.
 ///
 /// The name is slugged to plain ASCII because this string is what lands in a

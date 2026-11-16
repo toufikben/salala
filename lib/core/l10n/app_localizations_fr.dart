@@ -19,6 +19,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get navLitters => 'Portées';
 
   @override
+  String get navBuyers => 'Acquéreurs';
+
+  @override
   String get navSettings => 'Réglages';
 
   @override
@@ -38,7 +41,8 @@ class AppLocalizationsFr extends AppLocalizations {
   String get homeAllAnimals => 'Tous les animaux';
 
   @override
-  String get homeSearchHint => 'Rechercher par nom, numéro, puce ou note';
+  String get homeSearchHint =>
+      'Rechercher par nom, numéro, puce, note ou acquéreur';
 
   @override
   String homeNoMatches(String query) {
@@ -299,6 +303,46 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get settingsImportBody => 'Relire un pack sur ce téléphone';
+
+  @override
+  String settingsLastBackup(String day) {
+    return 'Dernière sauvegarde : $day';
+  }
+
+  @override
+  String get settingsNeverBackedUp =>
+      'Aucune sauvegarde n\'a encore quitté ce téléphone';
+
+  @override
+  String get settingsCsv => 'Tableur (CSV)';
+
+  @override
+  String get settingsCsvBody =>
+      'Pour votre comptable, un formulaire de registre ou un copropriétaire. S\'ouvre dans Excel, Numbers ou Google Sheets.';
+
+  @override
+  String get settingsCsvHerd => 'Animaux';
+
+  @override
+  String get settingsCsvLitters => 'Portées';
+
+  @override
+  String get settingsCsvVaccinations => 'Vaccinations';
+
+  @override
+  String get settingsCsvPlacements => 'Cessions';
+
+  @override
+  String csvShared(String file) {
+    return '$file est prêt à envoyer';
+  }
+
+  @override
+  String get csvShareFailed =>
+      'Le tableur n\'a pas pu être écrit sur ce téléphone';
+
+  @override
+  String get csvEmpty => 'Rien à exporter sur ce téléphone pour l\'instant';
 
   @override
   String packShared(String file) {
@@ -764,6 +808,16 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get buyerCountryCode => 'Code pays';
+
+  @override
+  String get buyersEmptyTitle => 'Aucun acquéreur pour l\'instant';
+
+  @override
+  String get buyersEmptyBody =>
+      'Un acquéreur s\'ajoute avec un placement — ou ici, avant : la personne à qui vous avez vendu l\'an dernier veut encore le pedigree.';
+
+  @override
+  String get buyersNoAnimals => 'Aucun animal enregistré pour ce contact';
 
   @override
   String buyerDeleteBody(String name) {

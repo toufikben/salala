@@ -47,4 +47,12 @@ class SettingKeys {
   static const String preferredCurrency = 'preferred_currency';
   static const String defaultSpecies = 'default_species';
   static const String languageCode = 'language_code';
+
+  /// When a pack last left this phone, in unix milliseconds.
+  ///
+  /// Kept beside the export button rather than in the pack itself: the question
+  /// it answers — "how old is the only copy of this ledger" — is about this
+  /// device's habit, and a restored pack must not claim the new phone has been
+  /// backing up. `_importPack` clears it for exactly that reason.
+  static const String lastPackExportedAt = 'last_pack_exported_at';
 }
