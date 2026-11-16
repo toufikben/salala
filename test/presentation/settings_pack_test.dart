@@ -7,6 +7,7 @@ import 'package:salala/core/utils/date_utils.dart';
 import 'package:salala/data/models/animal.dart';
 import 'package:salala/data/models/photo.dart';
 import 'package:salala/data/models/vaccination.dart';
+import 'package:salala/presentation/screens/animal_list_screen.dart';
 import 'package:salala/presentation/widgets/animal_card.dart';
 import 'package:salala/services/data_pack.dart';
 import 'package:salala/services/pack_archive.dart';
@@ -92,6 +93,25 @@ Vaccination dose(String animalId) => Vaccination(
 
 Future<void> goTo(WidgetTester tester, String destination) async {
   await tester.tap(find.widgetWithText(NavigationDestination, destination));
+  await settleRealIo(tester);
+}
+
+/// The herd tab, scrolled until the named card has been built.
+///
+/// A card is a photograph now, so two animals are taller than a phone's screen
+/// and the list is lazy: a card below the fold does not exist yet, and looking
+/// for it without scrolling finds nothing even when the row is in the ledger.
+Future<void> scrollHerdTo(WidgetTester tester, Finder finder) async {
+  await tester.scrollUntilVisible(
+    finder,
+    240,
+    scrollable: find
+        .descendant(
+          of: find.byType(AnimalListScreen),
+          matching: find.byType(Scrollable),
+        )
+        .first,
+  );
   await settleRealIo(tester);
 }
 
@@ -287,20 +307,17 @@ void main() {
       // Scoped to the cards: a restored dose due inside a fortnight puts its
       // animal's name in the agenda above the herd too, so the restored herd is
       // two rows per animal on this screen, not one.
-      expect(
-        find.descendant(
+      //
+      // Scrolled to, one name at a time: a card is a photograph now, so the
+      // second animal sits below the fold in a lazy list.
+      for (final name in const <String>['Kenza', 'Sultan']) {
+        final card = find.descendant(
           of: find.byType(AnimalCard),
-          matching: find.text('Kenza'),
-        ),
-        findsOneWidget,
-      );
-      expect(
-        find.descendant(
-          of: find.byType(AnimalCard),
-          matching: find.text('Sultan'),
-        ),
-        findsOneWidget,
-      );
+          matching: find.text(name),
+        );
+        await scrollHerdTo(tester, card);
+        expect(card, findsOneWidget);
+      }
       expect(find.text('Atlas'), findsNothing);
     });
 

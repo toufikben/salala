@@ -37,6 +37,11 @@
   "animalBreed": "Breed",
   "animalSex": "Sex",
   "animalBirthDate": "Date of birth",
+  "animalBornOn": "Born {day}",
+  "@animalBornOn": {
+    "description": "On the animal's own page, the birth date reads as a phrase rather than as a row: it is one of the four facts in the headline under the photograph.",
+    "placeholders": { "day": { "type": "String" } }
+  },
   "animalStatus": "Status",
   "animalMicrochip": "Microchip number",
   "animalMicrochipDate": "Microchip implanted",

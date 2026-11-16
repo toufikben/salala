@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:salala/data/models/animal.dart';
 import 'package:salala/data/models/litter.dart';
 import 'package:salala/presentation/screens/litter_form_screen.dart';
+import 'package:salala/presentation/screens/animal_list_screen.dart';
 import 'package:salala/presentation/widgets/animal_card.dart';
 
 import '../helpers/pump_app.dart';
@@ -58,6 +59,26 @@ Future<void> _pickFrom(WidgetTester tester, Finder field, String option) async {
   await tester.pumpAndSettle();
   await tester.tap(item);
   await tester.pumpAndSettle();
+}
+
+/// The herd tab, scrolled until the named card has been built.
+///
+/// A card is a photograph now, which makes one card most of a phone's height.
+/// The list is lazy, so a puppy last in a herd of five does not exist until a
+/// thumb scrolls down to her — a bare finder for her name is a test that proves
+/// nothing and says so with "found 0".
+Future<void> _scrollHerdTo(WidgetTester tester, Finder finder) async {
+  await tester.scrollUntilVisible(
+    finder,
+    240,
+    scrollable: find
+        .descendant(
+          of: find.byType(AnimalListScreen),
+          matching: find.byType(Scrollable),
+        )
+        .first,
+  );
+  await settleRealIo(tester);
 }
 
 /// The name and the dam and a puppy count, which every one of these tests needs
@@ -179,10 +200,18 @@ void main() {
     await settleRealIo(tester);
 
     // The puppies are animals now: that is the point of registering them here.
-    expect(find.text('A litter 1'), findsOneWidget);
-    expect(find.text('A litter 2'), findsOneWidget);
-    expect(find.text('A litter 3'), findsOneWidget);
-    expect(find.text('Breeding stock'), findsOneWidget);
+    // The section header first, while the list is still at the top, then each
+    // puppy by scrolling to her: a card is a photograph, so three puppies plus
+    // the two parents is more than a phone's screen holds and the list is lazy.
+    expect(find.text('Breeding stock'), findsWidgets);
+    for (final name in const <String>[
+      'A litter 1',
+      'A litter 2',
+      'A litter 3',
+    ]) {
+      await _scrollHerdTo(tester, find.text(name));
+      expect(find.text(name), findsOneWidget);
+    }
   });
 
   testWidgets(
@@ -402,7 +431,19 @@ void main() {
 
     await tester.tap(find.widgetWithText(NavigationDestination, 'Animals'));
     await settleRealIo(tester);
-    expect(find.byType(AnimalCard), findsNWidgets(4));
+    // Four animals on the tab, one card at a time: a card is a photograph, so
+    // the list is taller than the screen and lazy. The last puppy is the proof
+    // that all four were written — she is only reachable once the other three
+    // have been built above her.
+    for (final name in const <String>[
+      'Nala',
+      'A litter 1',
+      'A litter 2',
+      'A litter 3',
+    ]) {
+      await _scrollHerdTo(tester, find.text(name));
+      expect(find.text(name), findsOneWidget);
+    }
   });
 
   testWidgets('an edit opens the whelping filled and saves the correction', (

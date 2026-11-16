@@ -91,6 +91,15 @@ final photosForAnimalProvider = FutureProvider.autoDispose
       (ref, animalId) => ref.read(daosProvider).photos.forAnimal(animalId),
     );
 
+/// The newest picture of every animal, keyed by animal id.
+///
+/// One read for the whole herd, and the reason the herd list can be cards with
+/// faces: a per-card query would start a database call inside the frame that
+/// built that row, which is a read in the middle of a scroll.
+final herdPhotosProvider = FutureProvider.autoDispose<Map<String, Photo>>(
+  (ref) => ref.read(daosProvider).photos.newestPerAnimal(),
+);
+
 /// Where one picture's bytes actually are, or null when they are not.
 ///
 /// Its own provider rather than a `FutureBuilder` built in `build`: a section
@@ -143,6 +152,7 @@ Future<Photo?> addPhoto(
     rethrow;
   }
   ref.invalidate(photosForAnimalProvider(animalId));
+  ref.invalidate(herdPhotosProvider);
   return created;
 }
 
@@ -154,6 +164,7 @@ Future<Photo?> addPhoto(
 Future<void> deletePhoto(WidgetRef ref, Photo photo) async {
   await ref.read(daosProvider).photos.delete(photo.id);
   ref.invalidate(photosForAnimalProvider(photo.animalId));
+  ref.invalidate(herdPhotosProvider);
   try {
     await ref.read(photoFilesProvider).delete(photo.animalId, photo.fileName);
   } catch (error) {

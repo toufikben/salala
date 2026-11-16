@@ -80,6 +80,11 @@ class AppLocalizationsAr extends AppLocalizations {
   String get animalBirthDate => 'تاريخ الميلاد';
 
   @override
+  String animalBornOn(String day) {
+    return 'وُلد في $day';
+  }
+
+  @override
   String get animalStatus => 'الحالة';
 
   @override

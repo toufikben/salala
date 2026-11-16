@@ -27,6 +27,11 @@
   "animalBreed": "Race",
   "animalSex": "Sexe",
   "animalBirthDate": "Date de naissance",
+  "animalBornOn": "Né le {day}",
+  "@animalBornOn": {
+    "description": "Sur la page de l'animal, la date de naissance se lit comme une phrase et non comme une ligne : c'est un des quatre faits de l'en-tête sous la photo.",
+    "placeholders": { "day": { "type": "String" } }
+  },
   "animalStatus": "Statut",
   "animalMicrochipDate": "Date du puçage",
   "animalLitter": "Portée",

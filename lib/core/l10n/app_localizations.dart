@@ -208,6 +208,12 @@ abstract class AppLocalizations {
   /// **'Date of birth'**
   String get animalBirthDate;
 
+  /// On the animal's own page, the birth date reads as a phrase rather than as a row: it is one of the four facts in the headline under the photograph.
+  ///
+  /// In en, this message translates to:
+  /// **'Born {day}'**
+  String animalBornOn(String day);
+
   /// No description provided for @animalStatus.
   ///
   /// In en, this message translates to:

@@ -146,6 +146,14 @@ void main() {
       '+212 600 111 222',
     );
     await tester.tap(find.widgetWithText(FilledButton, 'Save'));
+    // Keyed on the form closing: a write that landed dismisses it, and the list
+    // behind it only shows the name once the write and its refresh have both
+    // answered — which on a loaded machine can outlast the fixed rounds.
+    await settleUntil(
+      tester,
+      () =>
+          find.widgetWithText(FilledButton, 'New buyer').evaluate().isNotEmpty,
+    );
     await settleRealIo(tester);
 
     expect(find.text('Nadia Haddad'), findsOneWidget);

@@ -147,10 +147,17 @@ void main() {
     await pumpSalala(tester, seed: <Animal>[_nala()]);
     await _openNala(tester);
 
-    expect(find.text('Species: dog'), findsOneWidget);
-    expect(find.text('Breed: Border collie'), findsOneWidget);
-    expect(find.text('Dam: Not recorded'), findsOneWidget);
-
+    // The page opens on the animal rather than on a list of fields: species,
+    // breed, sex and the birth date are one headline under her photograph, and
+    // the paperwork sits underneath as label/value rows.
+    expect(
+      find.text('dog · Border collie · Female · Born May 12, 2024'),
+      findsOneWidget,
+    );
+    // A label and its value are two widgets now, not one string with a colon in
+    // it, so a long value wraps under its own label instead of drifting.
+    expect(find.text('Dam'), findsOneWidget);
+    expect(find.text('Not recorded'), findsWidgets);
     // All four record sections are there, and each one is honestly empty. The
     // ledger is a lazy list, so a section is scrolled into view before it is
     // asserted rather than counted from the top of the screen.
@@ -413,7 +420,12 @@ void main() {
     await _tap(tester, find.byIcon(Icons.delete_outline));
     await tester.tap(find.widgetWithText(FilledButton, 'Delete'));
     await waitForSchedulerCalls(tester, notifications, 1);
-    await settleRealIo(tester);
+    // Then the row itself going away — the same outcome the previous statement
+    // waits for, since this one starts by opening the ledger too.
+    await settleUntil(
+      tester,
+      () => find.byType(VaccinationFormScreen).evaluate().isEmpty,
+    );
     await settleRealIo(tester);
 
     // D34's other half: the row left on the statement before this one, so the
@@ -551,7 +563,10 @@ void main() {
 
     expect(find.text('Delete this record?'), findsOneWidget);
     await tester.tap(find.widgetWithText(FilledButton, 'Delete'));
-    await settleRealIo(tester);
+    // Waited for by the outcome, not by a fixed number of rounds: the delete
+    // lands on the database isolate and the section above re-reads itself
+    // afterwards, and on a loaded machine those two steps can outlast any count.
+    await settleUntil(tester, () => find.text('4.20 kg').evaluate().isEmpty);
     await settleRealIo(tester);
 
     expect(find.text('4.20 kg'), findsNothing);
@@ -680,7 +695,14 @@ void main() {
     await _tap(tester, find.byIcon(Icons.delete_outline));
     expect(find.text('Delete this record?'), findsOneWidget);
     await tester.tap(find.widgetWithText(FilledButton, 'Delete'));
-    await settleRealIo(tester);
+    // Keyed on the row going away rather than on a round count: the delete runs
+    // on the database isolate and the list re-reads itself after it, and the
+    // screen that is left is the one that proves both landed.
+    await settleUntil(
+      tester,
+      () => find.byType(HealthTestFormScreen).evaluate().isEmpty,
+    );
+    await settleUntil(tester, () => find.text('BAER').evaluate().isEmpty);
     await settleRealIo(tester);
 
     expect(find.text('BAER'), findsNothing);

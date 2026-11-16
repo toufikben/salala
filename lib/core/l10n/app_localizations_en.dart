@@ -76,6 +76,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get animalBirthDate => 'Date of birth';
 
   @override
+  String animalBornOn(String day) {
+    return 'Born $day';
+  }
+
+  @override
   String get animalStatus => 'Status';
 
   @override

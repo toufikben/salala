@@ -27,6 +27,15 @@
   "animalBreed": "السلالة",
   "animalSex": "الجنس",
   "animalBirthDate": "تاريخ الميلاد",
+  "animalBornOn": "وُلد في {day}",
+  "@animalBornOn": {
+    "description": "في صفحة الحيوان، يُقرأ تاريخ الميلاد كعبارة لا كسطر: هو واحد من أربع حقائق في السطر الرئيسي تحت الصورة.",
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
   "animalStatus": "الحالة",
   "animalMicrochip": "رقم الشريحة",
   "animalMicrochipDate": "تاريخ زرع الشريحة",

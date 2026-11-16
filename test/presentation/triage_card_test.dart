@@ -61,6 +61,23 @@ Future<void> _tap(WidgetTester tester, Finder finder) async {
   await tester.pumpAndSettle();
 }
 
+/// Scrolls the ledger down to a section's own button.
+///
+/// The list is lazy and the identity card now opens with a 3:2 photograph, so
+/// the sections below it start below the fold: `ensureVisible` cannot find a
+/// widget that was never built, and a bare tap on one lands on nothing.
+Future<void> _scrollLedgerTo(WidgetTester tester, Finder finder) async {
+  await tester.scrollUntilVisible(
+    finder,
+    240,
+    scrollable: find.descendant(
+      of: find.byType(AnimalDetailScreen),
+      matching: find.byType(Scrollable),
+    ),
+  );
+  await tester.pumpAndSettle();
+}
+
 Future<void> _save(WidgetTester tester) async {
   final save = find.widgetWithText(FilledButton, 'Save');
   await tester.ensureVisible(save);
@@ -187,7 +204,9 @@ void main() {
       findsOneWidget,
     );
 
-    await _tap(tester, find.widgetWithText(TextButton, 'Add weight'));
+    final addWeight = find.widgetWithText(TextButton, 'Add weight');
+    await _scrollLedgerTo(tester, addWeight);
+    await _tap(tester, addWeight);
     await tester.enterText(
       find.widgetWithText(TextFormField, 'Weight (kg)'),
       '0.8',
