@@ -25,6 +25,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get navSettings => 'الإعدادات';
 
   @override
+  String get languageName => 'العربية';
+
+  @override
   String get homeEmptyTitle => 'لا توجد حيوانات بعد';
 
   @override
@@ -346,6 +349,24 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get csvEmpty => 'لا يوجد على هذا الهاتف ما يُصدَّر بعد';
+
+  @override
+  String get csvColAnimal => 'الحيوان';
+
+  @override
+  String get csvColCountry => 'الدولة';
+
+  @override
+  String get csvColPuppies => 'الجراء';
+
+  @override
+  String get csvColBreedingStock => 'قطيع التربية';
+
+  @override
+  String get csvColYes => 'نعم';
+
+  @override
+  String get csvColNo => 'لا';
 
   @override
   String packShared(String file) {

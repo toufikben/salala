@@ -155,7 +155,13 @@ class _LanguageTile extends ConsumerStatefulWidget {
 }
 
 class _LanguageTileState extends ConsumerState<_LanguageTile> {
-  static const List<String> _codes = <String>['system', 'en', 'ar', 'fr'];
+  /// The languages the app ships, read off the generated delegate rather than
+  /// typed here: a new `.arb` file is a new language, and a list written by hand
+  /// is a second place to forget. `system` is the only entry this app adds.
+  static final List<String> _codes = <String>[
+    'system',
+    for (final locale in AppLocalizations.supportedLocales) locale.languageCode,
+  ];
 
   final MenuController _menu = MenuController();
 
@@ -206,12 +212,13 @@ class _LanguageTileState extends ConsumerState<_LanguageTile> {
     );
   }
 
-  String _endonym(String code, AppLocalizations l10n) => switch (code) {
-    'en' => 'English',
-    'ar' => 'العربية',
-    'fr' => 'Français',
-    _ => l10n.settingsLanguageSystem,
-  };
+  /// Each language names itself, and the name lives in that language's own
+  /// `.arb` file — so adding a language is one file and nothing here. Written as
+  /// a `switch` it was a second list to keep in step, and a fifth `.arb` file
+  /// shipped a language the menu called "System default".
+  String _endonym(String code, AppLocalizations l10n) => code == 'system'
+      ? l10n.settingsLanguageSystem
+      : lookupAppLocalizations(Locale(code)).languageName;
 }
 
 /// The transfer pack (Stage 2): every record on this phone out as one JSON file,
@@ -338,16 +345,17 @@ Future<void> _exportCsv(
     final String text;
     switch (table) {
       case _CsvTable.herd:
-        text = herdCsv(animals);
+        text = herdCsv(animals, l10n);
       case _CsvTable.litters:
-        text = littersCsv(await daos.litters.all(), animals);
+        text = littersCsv(await daos.litters.all(), animals, l10n);
       case _CsvTable.vaccinations:
-        text = vaccinationsCsv(await daos.vaccinations.all(), animals);
+        text = vaccinationsCsv(await daos.vaccinations.all(), animals, l10n);
       case _CsvTable.placements:
         text = placementsCsv(
           await daos.placements.all(),
           animals,
           await daos.buyers.all(),
+          l10n,
         );
     }
     if (animals.isEmpty) {

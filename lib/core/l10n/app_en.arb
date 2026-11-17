@@ -8,6 +8,10 @@
   "navLitters": "Litters",
   "navBuyers": "Buyers",
   "navSettings": "Settings",
+  "languageName": "English",
+  "@languageName": {
+    "description": "This language's own name, written in this language. The Settings menu reads each locale's value straight out of its own file, which is what makes adding a language a single .arb file and no code."
+  },
 
   "homeEmptyTitle": "No animals yet",
   "homeEmptyBody": "Add your first dog or cat to start a health and lineage record.",
@@ -162,6 +166,27 @@
   },
   "csvShareFailed": "The sheet could not be written on this phone",
   "csvEmpty": "There is nothing on this phone to export yet",
+  "csvColAnimal": "Animal",
+  "@csvColAnimal": {
+    "description": "Column heading: the animal a vaccination or a handover belongs to. Reused by every sheet that is not the herd's own, where the row already is one animal."
+  },
+  "csvColCountry": "Country",
+  "@csvColCountry": {
+    "description": "Column heading for the buyer's two-letter country code."
+  },
+  "csvColPuppies": "Puppies",
+  "@csvColPuppies": {
+    "description": "Column heading for how many puppies a whelping registered."
+  },
+  "csvColBreedingStock": "Breeding stock",
+  "@csvColBreedingStock": {
+    "description": "Column heading, answered yes or no by the two keys below. Shorter than the form's own checkbox label because it is a heading over a column of yes/no."
+  },
+  "csvColYes": "yes",
+  "@csvColYes": {
+    "description": "The answer in a yes/no column. Lower case, because it read as a word in a cell rather than as a label."
+  },
+  "csvColNo": "no",
   "packShared": "{file} is ready to send",
   "@packShared": {
     "placeholders": { "file": { "type": "String" } }

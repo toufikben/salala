@@ -29,26 +29,77 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   const arbDir = 'lib/core/l10n';
   const template = 'en';
-  const translated = <String>['ar', 'fr'];
+  const translated = <String>['ar', 'fr', 'de', 'es', 'it', 'pt', 'nl'];
   const allLocales = <String>[template, ...translated];
 
-  /// French borrows these ten words unchanged, measured off the files rather
-  /// than guessed, so the list is as long as the exception is and no longer.
+  /// Words that are spelled identically in another language and in English, and
+  /// so are not evidence of an untranslated paste.
   ///
-  /// `settingsCsvVaccinations` is here because *vaccination* is the French word;
-  /// the CSV tile label is the only place this app says it bare, since every
-  /// other screen writes "vaccins" as part of a sentence.
-  const frenchHomographs = <String>{
-    'appTitle',
-    'animalNotes',
-    'recordsPhotos',
-    'recordsPlacements',
-    'settingsCsvVaccinations',
-    'unitKg',
-    'unitGrams',
-    'weightNote',
-    'visitNoReason',
-    'pdfPlacement',
+  /// Each set is measured off the files, not guessed: `appTitle` is the product
+  /// name, `unitKg`/`unitGrams` are the SI symbols, `healthTestResultHelper` is
+  /// the certificate's own English grading on purpose, and `Screening`,
+  /// `Symptom`, `Status`, `Pedigree` and `Vaccinations` are simply the same word
+  /// in German, Dutch, Italian and Portuguese. Anything else that reads
+  /// character-for-character like the English is either a paste or a stranger
+  /// homograph — and this list is where that gets decided, deliberately.
+  const homographs = <String, Set<String>>{
+    'fr': <String>{
+      'appTitle',
+      'animalNotes',
+      'recordsPhotos',
+      'recordsPlacements',
+      'settingsCsvVaccinations',
+      'csvColAnimal',
+      'unitKg',
+      'unitGrams',
+      'weightNote',
+      'visitNoReason',
+      'pdfPlacement',
+    },
+    'de': <String>{
+      'appTitle',
+      'animalName',
+      'animalStatus',
+      'unitKg',
+      'unitGrams',
+      'healthTestType',
+      'healthTestResultHelper',
+      'symptomName',
+    },
+    'es': <String>{
+      'appTitle',
+      'csvColAnimal',
+      'csvColNo',
+      'unitKg',
+      'unitGrams',
+      'healthTestResultHelper',
+    },
+    'it': <String>{
+      'appTitle',
+      'csvColNo',
+      'unitKg',
+      'unitGrams',
+      'healthTestType',
+      'healthTestResultHelper',
+      'pdfPedigree',
+    },
+    'pt': <String>{
+      'appTitle',
+      'csvColAnimal',
+      'unitKg',
+      'unitGrams',
+      'healthTestResultHelper',
+      'pdfPedigree',
+    },
+    'nl': <String>{
+      'appTitle',
+      'animalStatus',
+      'unitKg',
+      'unitGrams',
+      'healthTestType',
+      'healthTestResultHelper',
+      'symptomState',
+    },
   };
 
   Map<String, dynamic> readArb(String locale) =>
@@ -205,6 +256,66 @@ void main() {
         'portées',
         'irréversible',
       ],
+      'de': <String>[
+        'Impfungen',
+        'Gesundheitsuntersuchungen',
+        'Gewichte',
+        'Besuche',
+        'Symptome',
+        'Vermittlung',
+        'Fotos',
+        'Dateien, die diese',
+        'Würfe',
+        'rückgängig',
+      ],
+      'es': <String>[
+        'vacunas',
+        'pruebas de salud',
+        'pesos',
+        'visitas',
+        'síntomas',
+        'entrega',
+        'fotografías',
+        'archivos que las guardan',
+        'camadas',
+        'no se puede deshacer',
+      ],
+      'it': <String>[
+        'vaccinazioni',
+        'test sanitari',
+        'pesi',
+        'visite',
+        'sintomi',
+        'cessione',
+        'fotografie',
+        'file che le conservano',
+        'cucciolate',
+        'irreversibile',
+      ],
+      'pt': <String>[
+        'vacinas',
+        'testes de saúde',
+        'pesos',
+        'visitas',
+        'sintomas',
+        'entrega',
+        'fotografias',
+        'ficheiros que as guardam',
+        'ninhadas',
+        'não pode ser anulado',
+      ],
+      'nl': <String>[
+        'inentingen',
+        'gezondheidstests',
+        'gewichten',
+        'bezoeken',
+        'symptomen',
+        'plaatsing',
+        "foto's",
+        'bestanden die deze',
+        'nestjes',
+        'ongedaan',
+      ],
     };
     for (final locale in allLocales) {
       // The warning is two sentences now: the list of stores, and — only for a
@@ -228,31 +339,31 @@ void main() {
     }
   });
 
-  test(
-    'a French message that reads exactly like the English one is on the list',
-    () {
+  test('a message that reads exactly like the English one is on the list', () {
+    for (final locale in translated) {
       final identical = <String>[];
       for (final key in keys) {
-        if (message(arb['fr']!, key) == message(arb[template]!, key)) {
+        if (message(arb[locale]!, key) == message(arb[template]!, key)) {
           identical.add(key);
         }
       }
+      final allowed = homographs[locale] ?? const <String>{};
       expect(
-        identical.toSet().difference(frenchHomographs),
+        identical.toSet().difference(allowed),
         isEmpty,
         reason:
-            'these French values are the English strings, and "Notes" and "kg" '
-            'are not among the ten that legitimately are: '
-            '${identical.toSet().difference(frenchHomographs)}',
+            'these $locale values are the English strings, and "Notes" and "kg" '
+            'are not among the ones that legitimately are: '
+            '${identical.toSet().difference(allowed)}',
       );
       expect(
-        frenchHomographs.difference(identical.toSet()),
+        allowed.difference(identical.toSet()),
         isEmpty,
         reason:
-            'these keys no longer read the same in both languages, so the list '
-            'above is stale and should shrink: '
-            '${frenchHomographs.difference(identical.toSet())}',
+            'these $locale keys no longer read the same in both languages, so '
+            'the list above is stale and should shrink: '
+            '${allowed.difference(identical.toSet())}',
       );
-    },
-  );
+    }
+  });
 }

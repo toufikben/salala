@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:salala/data/db/schema.dart';
 import 'package:salala/core/utils/date_utils.dart';
+import 'package:salala/core/l10n/app_localizations.dart';
 import 'package:salala/data/models/animal.dart';
 import 'package:salala/data/models/photo.dart';
 import 'package:salala/data/models/vaccination.dart';
@@ -390,6 +391,11 @@ void main() {
       // sentence that is: once the chain has reached the snackbar, the call below
       // it has certainly happened or certainly been refused.
       await settleRefusal(tester, waitingFor: 'Records restored: 1');
+      // And then for the sweep itself, rather than assuming it landed with the
+      // sentence: on a loaded machine the folder call is a real file-system hop
+      // after the row that announced it, and the fixed rounds above end when the
+      // snackbar appears, not when the disk answered.
+      await settleUntil(tester, () => photos.sweeps.isNotEmpty);
 
       // A pack carries no pictures, so the rows that came through are the only
       // answer to which bytes still belong on this phone. Without this call a
@@ -639,8 +645,11 @@ void main() {
 
       await tapTile(tester, 'Language');
       await tester.tap(find.text('العربية'));
-      await settleRealIo(tester);
-      await tester.pumpAndSettle();
+      // The tap writes the row and the app only repaints in the new language
+      // once that write lands, so the sentence is the thing to wait for — a
+      // fixed pair of settles passed alone and failed inside a suite, where the
+      // write was still in another isolate when the assertion ran.
+      await settleUntil(tester, () => find.text('اللغة').evaluate().isNotEmpty);
 
       expect(find.text('اللغة'), findsOneWidget);
     });
@@ -665,6 +674,53 @@ void main() {
       // with no sentence anywhere between the two to say the tap had failed.
       expect(find.text('Language'), findsOneWidget);
       expect(find.text('اللغة'), findsNothing);
+    });
+
+    testWidgets('every language the app ships is offered', (tester) async {
+      // The list in Settings used to be four codes typed by hand, which meant a
+      // fifth `.arb` file shipped a language nobody could choose. The menu is
+      // read off the delegate now, so this test is the guard on that promise:
+      // whatever `supportedLocales` holds has to be reachable from this row.
+      // Counted rather than named, so adding a language does not mean editing
+      // this test — which is the whole point of the menu reading the delegate.
+      await pumpSalala(tester, seed: <Animal>[animal('Atlas')]);
+      await goTo(tester, 'Settings');
+      await tapTile(tester, 'Language');
+
+      expect(
+        find.byType(MenuItemButton),
+        findsNWidgets(AppLocalizations.supportedLocales.length + 1),
+        reason:
+            'the menu offers ${AppLocalizations.supportedLocales.length} '
+            'language(s) plus System default, and the row drew a different '
+            'number: a shipped .arb file that cannot be chosen, or an entry '
+            'that has no .arb file behind it',
+      );
+      expect(
+        find.descendant(
+          of: find.byType(MenuItemButton),
+          matching: find.text('System default'),
+        ),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('a language added after the first three changes the app', (
+      tester,
+    ) async {
+      // Picking German rather than Arabic on purpose: the three original
+      // languages would pass this test even if the menu were still hardcoded.
+      await pumpSalala(tester, seed: <Animal>[animal('Atlas')]);
+      await goTo(tester, 'Settings');
+
+      await tapTile(tester, 'Language');
+      await tester.tap(find.text('Deutsch'));
+      await settleUntil(
+        tester,
+        () => find.text('Sprache').evaluate().isNotEmpty,
+      );
+
+      expect(find.text('Sprache'), findsOneWidget);
     });
   });
 }

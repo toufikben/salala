@@ -25,6 +25,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get navSettings => 'Réglages';
 
   @override
+  String get languageName => 'Français';
+
+  @override
   String get homeEmptyTitle => 'Aucun animal pour l\'instant';
 
   @override
@@ -348,6 +351,24 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get csvEmpty => 'Rien à exporter sur ce téléphone pour l\'instant';
+
+  @override
+  String get csvColAnimal => 'Animal';
+
+  @override
+  String get csvColCountry => 'Pays';
+
+  @override
+  String get csvColPuppies => 'Chiots';
+
+  @override
+  String get csvColBreedingStock => 'Reproducteur';
+
+  @override
+  String get csvColYes => 'oui';
+
+  @override
+  String get csvColNo => 'non';
 
   @override
   String packShared(String file) {

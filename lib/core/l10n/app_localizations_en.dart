@@ -25,6 +25,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get navSettings => 'Settings';
 
   @override
+  String get languageName => 'English';
+
+  @override
   String get homeEmptyTitle => 'No animals yet';
 
   @override
@@ -343,6 +346,24 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get csvEmpty => 'There is nothing on this phone to export yet';
+
+  @override
+  String get csvColAnimal => 'Animal';
+
+  @override
+  String get csvColCountry => 'Country';
+
+  @override
+  String get csvColPuppies => 'Puppies';
+
+  @override
+  String get csvColBreedingStock => 'Breeding stock';
+
+  @override
+  String get csvColYes => 'yes';
+
+  @override
+  String get csvColNo => 'no';
 
   @override
   String packShared(String file) {

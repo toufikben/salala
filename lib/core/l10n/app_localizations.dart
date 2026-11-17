@@ -6,8 +6,13 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart' as intl;
 
 import 'app_localizations_ar.dart';
+import 'app_localizations_de.dart';
 import 'app_localizations_en.dart';
+import 'app_localizations_es.dart';
 import 'app_localizations_fr.dart';
+import 'app_localizations_it.dart';
+import 'app_localizations_nl.dart';
+import 'app_localizations_pt.dart';
 
 // ignore_for_file: type=lint
 
@@ -96,8 +101,13 @@ abstract class AppLocalizations {
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
     Locale('ar'),
+    Locale('de'),
     Locale('en'),
+    Locale('es'),
     Locale('fr'),
+    Locale('it'),
+    Locale('nl'),
+    Locale('pt'),
   ];
 
   /// The product name; never translated.
@@ -129,6 +139,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Settings'**
   String get navSettings;
+
+  /// This language's own name, written in this language. The Settings menu reads each locale's value straight out of its own file, which is what makes adding a language a single .arb file and no code.
+  ///
+  /// In en, this message translates to:
+  /// **'English'**
+  String get languageName;
 
   /// No description provided for @homeEmptyTitle.
   ///
@@ -705,6 +721,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'There is nothing on this phone to export yet'**
   String get csvEmpty;
+
+  /// Column heading: the animal a vaccination or a handover belongs to. Reused by every sheet that is not the herd's own, where the row already is one animal.
+  ///
+  /// In en, this message translates to:
+  /// **'Animal'**
+  String get csvColAnimal;
+
+  /// Column heading for the buyer's two-letter country code.
+  ///
+  /// In en, this message translates to:
+  /// **'Country'**
+  String get csvColCountry;
+
+  /// Column heading for how many puppies a whelping registered.
+  ///
+  /// In en, this message translates to:
+  /// **'Puppies'**
+  String get csvColPuppies;
+
+  /// Column heading, answered yes or no by the two keys below. Shorter than the form's own checkbox label because it is a heading over a column of yes/no.
+  ///
+  /// In en, this message translates to:
+  /// **'Breeding stock'**
+  String get csvColBreedingStock;
+
+  /// The answer in a yes/no column. Lower case, because it read as a word in a cell rather than as a label.
+  ///
+  /// In en, this message translates to:
+  /// **'yes'**
+  String get csvColYes;
+
+  /// No description provided for @csvColNo.
+  ///
+  /// In en, this message translates to:
+  /// **'no'**
+  String get csvColNo;
 
   /// No description provided for @packShared.
   ///
@@ -1821,8 +1873,16 @@ class _AppLocalizationsDelegate
   }
 
   @override
-  bool isSupported(Locale locale) =>
-      <String>['ar', 'en', 'fr'].contains(locale.languageCode);
+  bool isSupported(Locale locale) => <String>[
+    'ar',
+    'de',
+    'en',
+    'es',
+    'fr',
+    'it',
+    'nl',
+    'pt',
+  ].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
@@ -1833,10 +1893,20 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
   switch (locale.languageCode) {
     case 'ar':
       return AppLocalizationsAr();
+    case 'de':
+      return AppLocalizationsDe();
     case 'en':
       return AppLocalizationsEn();
+    case 'es':
+      return AppLocalizationsEs();
     case 'fr':
       return AppLocalizationsFr();
+    case 'it':
+      return AppLocalizationsIt();
+    case 'nl':
+      return AppLocalizationsNl();
+    case 'pt':
+      return AppLocalizationsPt();
   }
 
   throw FlutterError(

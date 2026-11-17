@@ -1,4 +1,6 @@
+import 'package:flutter/widgets.dart' show Locale;
 import 'package:flutter_test/flutter_test.dart';
+import 'package:salala/core/l10n/app_localizations.dart';
 import 'package:salala/data/models/animal.dart';
 import 'package:salala/data/models/buyer.dart';
 import 'package:salala/data/models/litter.dart';
@@ -12,6 +14,7 @@ import 'package:salala/services/csv_export.dart';
 /// preview: Excel has to read the Arabic correctly (the mark), rows have to end
 /// where Excel expects (CRLF), and a cell must never be able to run as a formula.
 /// A test that only counted `,` would pass on all three while the file was wrong.
+late AppLocalizations l10n;
 Animal _animal(
   String id,
   String name, {
@@ -41,6 +44,10 @@ Animal _animal(
 );
 
 void main() {
+  setUp(() async {
+    l10n = await AppLocalizations.delegate.load(const Locale('en'));
+  });
+
   group('the file Excel reads', () {
     test('starts with the byte-order mark, then the header', () {
       final csv = csvFile(const <String>['Name', 'Born'], const []);
@@ -123,7 +130,7 @@ void main() {
         _animal('a-3', 'Pip', damId: 'a-1', sireId: 'a-2'),
       ];
 
-      final rows = herdCsv(animals).split('\r\n');
+      final rows = herdCsv(animals, l10n).split('\r\n');
       final pip = rows.firstWhere((row) => row.startsWith('Pip,'));
 
       // `a-3f9c…` in a Sire column means nothing on paper.
@@ -133,16 +140,55 @@ void main() {
 
     test('a parent the pack does not carry is an empty cell', () {
       final animals = <Animal>[_animal('a-3', 'Pip', damId: 'a-missing')];
-      expect(herdCsv(animals).split('\r\n')[1], startsWith('Pip,'));
-      expect(herdCsv(animals).split('\r\n')[1], isNot(contains('a-missing')));
+      expect(herdCsv(animals, l10n).split('\r\n')[1], startsWith('Pip,'));
+      expect(
+        herdCsv(animals, l10n).split('\r\n')[1],
+        isNot(contains('a-missing')),
+      );
     });
 
     test('an empty herd is still a file with its header', () {
-      final csv = herdCsv(const <Animal>[]);
-      expect(
-        csv,
-        '$csvBom${csvRow(const <String>['Name', 'Species', 'Breed', 'Sex', 'Status', 'Born', 'Died', 'Colour', 'Registration', 'Registry', 'Microchip', 'Dam', 'Sire', 'Breeding stock', 'Notes'])}',
-      );
+      // The headings come off the language now, so this asserts the shape of
+      // the header rather than its words: a column count is what a reader of
+      // the file depends on, and a heading is what a translator can change.
+      final csv = herdCsv(const <Animal>[], l10n);
+      final header =
+          csvBom +
+          csvRow(<String>[
+            l10n.animalName,
+            l10n.animalSpecies,
+            l10n.animalBreed,
+            l10n.animalSex,
+            l10n.animalStatus,
+            l10n.animalBirthDate,
+            l10n.animalDeathDate,
+            l10n.animalColor,
+            l10n.animalRegistrationNo,
+            l10n.animalRegistry,
+            l10n.animalMicrochip,
+            l10n.animalDam,
+            l10n.animalSire,
+            l10n.csvColBreedingStock,
+            l10n.animalNotes,
+          ]);
+      expect(csv, header);
+      expect(header.split(','), hasLength(15));
+    });
+
+    test('a sheet in another language has that language in its headings', () async {
+      // The bug this replaces: `herdCsv` wrote 'Name', 'Sex', 'Breeding stock'
+      // and `animal.status.name` into the file, so a French breeder who exported
+      // her herd got an English spreadsheet with `active` in a column. The
+      // heading now comes from the same `.arb` the screen does.
+      final arabic = await AppLocalizations.delegate.load(const Locale('ar'));
+      final csv = herdCsv(<Animal>[_animal('a-1', 'نالة')], arabic);
+
+      expect(csv, contains(arabic.animalBreed));
+      expect(csv, contains(arabic.animalStatus));
+      expect(csv, contains(arabic.statusActive));
+      expect(csv, contains(arabic.csvColYes));
+      expect(csv, isNot(contains('Breeding stock')));
+      expect(csv, isNot(contains('active')));
     });
   });
 
@@ -180,7 +226,7 @@ void main() {
         updatedAt: 0,
       );
 
-      final row = littersCsv(<Litter>[litter], animals).split('\r\n')[1];
+      final row = littersCsv(<Litter>[litter], animals, l10n).split('\r\n')[1];
       expect(row, startsWith('Spring,Nala,,'));
       expect(row, contains(',2,'));
     });
@@ -200,9 +246,11 @@ void main() {
         updatedAt: 0,
       );
 
-      final row = vaccinationsCsv(<Vaccination>[
-        dose,
-      ], animals).split('\r\n')[1];
+      final row = vaccinationsCsv(
+        <Vaccination>[dose],
+        animals,
+        l10n,
+      ).split('\r\n')[1];
       expect(row, startsWith('Nala,Rabies,2026-01-05,2027-01-05,'));
       expect(row, contains('B-77'));
     });
@@ -220,7 +268,11 @@ void main() {
       // The dose is still a fact about this phone; dropping it would make the
       // file disagree with the ledger about how many doses were given.
       expect(
-        vaccinationsCsv(<Vaccination>[dose], const <Animal>[]).split('\r\n')[1],
+        vaccinationsCsv(
+          <Vaccination>[dose],
+          const <Animal>[],
+          l10n,
+        ).split('\r\n')[1],
         startsWith(',Rabies,2026-01-05,,,,'),
       );
     });
@@ -251,6 +303,7 @@ void main() {
         <Placement>[placement],
         animals,
         <Buyer>[buyer],
+        l10n,
       ).split('\r\n')[1];
       expect(row, startsWith('Nala,Zoé Martin,FR,2026-02-14,2500.5,EUR,'));
     });
@@ -271,6 +324,7 @@ void main() {
           <Placement>[placement],
           animals,
           const <Buyer>[],
+          l10n,
         ).split('\r\n')[1],
         startsWith('Nala,,,,,,'),
       );

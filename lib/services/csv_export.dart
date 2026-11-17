@@ -17,6 +17,8 @@
 ///   person who asked only to look at their own dogs.
 library;
 
+import '../core/l10n/app_localizations.dart';
+import '../core/l10n/enum_labels.dart';
 import '../data/models/animal.dart';
 import '../data/models/buyer.dart';
 import '../data/models/litter.dart';
@@ -81,34 +83,40 @@ String csvDay(int? ms) {
 ///
 /// Names rather than ids because the file is read by a person other than the
 /// app: `a-3f9c…` in a "Sire" column means nothing on paper.
-String herdCsv(List<Animal> animals) {
+///
+/// Every heading is the same word the form uses for that field, taken from
+/// [l10n] rather than typed here: an export read by a co-owner in French has to
+/// be a French sheet, and a heading spelled into this file was a second place
+/// the app's own vocabulary had to be kept in step. The values follow the same
+/// rule — `status.name` would have printed `active` in every language.
+String herdCsv(List<Animal> animals, AppLocalizations l10n) {
   String nameOf(String? id) => animalById(animals, id)?.name ?? '';
 
   return csvFile(
-    const <String>[
-      'Name',
-      'Species',
-      'Breed',
-      'Sex',
-      'Status',
-      'Born',
-      'Died',
-      'Colour',
-      'Registration',
-      'Registry',
-      'Microchip',
-      'Dam',
-      'Sire',
-      'Breeding stock',
-      'Notes',
+    <String>[
+      l10n.animalName,
+      l10n.animalSpecies,
+      l10n.animalBreed,
+      l10n.animalSex,
+      l10n.animalStatus,
+      l10n.animalBirthDate,
+      l10n.animalDeathDate,
+      l10n.animalColor,
+      l10n.animalRegistrationNo,
+      l10n.animalRegistry,
+      l10n.animalMicrochip,
+      l10n.animalDam,
+      l10n.animalSire,
+      l10n.csvColBreedingStock,
+      l10n.animalNotes,
     ],
     animals.map(
       (animal) => <String?>[
         animal.name,
         animal.species,
         animal.breed,
-        animal.sex.name,
-        animal.status.name,
+        sexLabel(l10n, animal.sex),
+        statusLabel(l10n, animal.status),
         csvDay(animal.birthDate),
         csvDay(animal.deathDate),
         animal.color,
@@ -117,7 +125,7 @@ String herdCsv(List<Animal> animals) {
         animal.microchipId,
         nameOf(animal.damId),
         nameOf(animal.sireId),
-        animal.isBreedingStock ? 'yes' : 'no',
+        animal.isBreedingStock ? l10n.csvColYes : l10n.csvColNo,
         animal.notes,
       ],
     ),
@@ -125,22 +133,26 @@ String herdCsv(List<Animal> animals) {
 }
 
 /// Every whelping, newest first, with the puppies already registered counted in.
-String littersCsv(List<Litter> litters, List<Animal> animals) {
+String littersCsv(
+  List<Litter> litters,
+  List<Animal> animals,
+  AppLocalizations l10n,
+) {
   String nameOf(String? id) => animalById(animals, id)?.name ?? '';
 
   final ordered = <Litter>[...litters]
     ..sort((a, b) => (b.whelpingDate ?? 0).compareTo(a.whelpingDate ?? 0));
 
   return csvFile(
-    const <String>[
-      'Litter',
-      'Dam',
-      'Sire',
-      'Mated',
-      'Whelped',
-      'Weaned',
-      'Puppies',
-      'Notes',
+    <String>[
+      l10n.litterName,
+      l10n.litterDam,
+      l10n.litterSire,
+      l10n.litterMatingDate,
+      l10n.litterWhelpingDate,
+      l10n.litterWeaningDate,
+      l10n.csvColPuppies,
+      l10n.animalNotes,
     ],
     ordered.map(
       (litter) => <String?>[
@@ -158,23 +170,27 @@ String littersCsv(List<Litter> litters, List<Animal> animals) {
 }
 
 /// Every dose on this phone, newest first as the ledger shows them.
-String vaccinationsCsv(List<Vaccination> doses, List<Animal> animals) {
+String vaccinationsCsv(
+  List<Vaccination> doses,
+  List<Animal> animals,
+  AppLocalizations l10n,
+) {
   String nameOf(String? id) => animalById(animals, id)?.name ?? '';
 
   final ordered = <Vaccination>[...doses]
     ..sort((a, b) => b.dateAdministered.compareTo(a.dateAdministered));
 
   return csvFile(
-    const <String>[
-      'Animal',
-      'Vaccine',
-      'Given',
-      'Due',
-      'Manufacturer',
-      'Batch',
-      'Vet',
-      'Clinic',
-      'Certificate',
+    <String>[
+      l10n.csvColAnimal,
+      l10n.vaccinationName,
+      l10n.vaccinationGiven,
+      l10n.vaccinationNextDue,
+      l10n.vaccinationManufacturer,
+      l10n.vaccinationBatch,
+      l10n.vaccinationVet,
+      l10n.vaccinationClinic,
+      l10n.vaccinationCertificate,
     ],
     ordered.map(
       (dose) => <String?>[
@@ -200,6 +216,7 @@ String placementsCsv(
   List<Placement> placements,
   List<Animal> animals,
   List<Buyer> buyers,
+  AppLocalizations l10n,
 ) {
   String animalName(String id) => animalById(animals, id)?.name ?? '';
 
@@ -207,15 +224,15 @@ String placementsCsv(
     ..sort((a, b) => (b.placedDate ?? 0).compareTo(a.placedDate ?? 0));
 
   return csvFile(
-    const <String>[
-      'Animal',
-      'Buyer',
-      'Country',
-      'Placed',
-      'Price',
-      'Currency',
-      'Guarantee',
-      'Notes',
+    <String>[
+      l10n.csvColAnimal,
+      l10n.placementBuyer,
+      l10n.csvColCountry,
+      l10n.placementDate,
+      l10n.placementPrice,
+      l10n.placementCurrency,
+      l10n.placementGuarantee,
+      l10n.animalNotes,
     ],
     ordered.map((placement) {
       final buyer = buyerById(buyers, placement.buyerId);
