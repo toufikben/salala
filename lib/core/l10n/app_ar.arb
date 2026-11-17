@@ -210,6 +210,11 @@
       }
     }
   },
+  "heatCardTitle": "الشياع القادم",
+  "heatCardWindow": "بين {earliest} و{latest}",
+  "heatCardSteady": "محسوب على {count} دورات في سجلّها.",
+  "heatCardThin": "دورة واحدة فقط في السجل، لذلك النافذة واسعة. سجّل تلقيحًا آخر لتضيق.",
+  "heatCardWhelping": "التلقيح في هذه النافذة يعني ولادة حول {day}.",
   "bulkVaccineTitle": "تحصين جماعي",
   "bulkVaccineCount": "{count} حيوانًا ستأخذ الجرعة نفسها",
   "bulkVaccineAction": "حصّن البطن كله",

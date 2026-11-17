@@ -516,6 +516,28 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String get heatCardTitle => 'Próximo celo';
+
+  @override
+  String heatCardWindow(String earliest, String latest) {
+    return 'Entre el $earliest y el $latest';
+  }
+
+  @override
+  String heatCardSteady(String count) {
+    return 'Según $count ciclos de su propio registro.';
+  }
+
+  @override
+  String get heatCardThin =>
+      'Solo hay un ciclo registrado, así que la ventana es amplia. Registra otro apareamiento y se estrecha.';
+
+  @override
+  String heatCardWhelping(String day) {
+    return 'Un apareamiento en esta ventana pariría hacia el $day.';
+  }
+
+  @override
   String get bulkVaccineTitle => 'Vacunar juntos';
 
   @override

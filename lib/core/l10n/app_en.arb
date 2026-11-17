@@ -291,6 +291,36 @@
       }
     }
   },
+  "heatCardTitle": "Next heat",
+  "@heatCardTitle": {
+    "description": "Heading of the card that forecasts a dam's next season. Deliberately not the word for a medical event: a breeder is planning, not diagnosing."
+  },
+  "heatCardWindow": "Between {earliest} and {latest}",
+  "@heatCardWindow": {
+    "description": "The forecast, as a range. A window rather than a date because the cycle length varies by a fortnight between seasons even in one bitch.",
+    "placeholders": {
+      "earliest": { "type": "String" },
+      "latest": { "type": "String" }
+    }
+  },
+  "heatCardSteady": "Based on {count} cycles in her own record.",
+  "@heatCardSteady": {
+    "description": "Said when the forecast rests on more than one observed gap, so the breeder knows it came from her own record rather than a breed standard.",
+    "placeholders": {
+      "count": { "type": "String" }
+    }
+  },
+  "heatCardThin": "Only one cycle on file, so the window is wide. Record another mating and it narrows.",
+  "@heatCardThin": {
+    "description": "Said when only one gap is on file. States the weakness of the estimate plainly instead of dressing a coincidence up as a pattern."
+  },
+  "heatCardWhelping": "A mating in this window would whelp around {day}.",
+  "@heatCardWhelping": {
+    "description": "The date a mating inside the window would be expected to whelp. The reason the card exists: a breeder planning a mating is planning a whelping.",
+    "placeholders": {
+      "day": { "type": "String" }
+    }
+  },
   "bulkVaccineTitle": "Vaccinate together",
   "@bulkVaccineTitle": {
     "description": "Title of the dialog that writes one dose for several animals at once. Said when the vial is open and the breeder is holding one puppy after another, so it must read as one sitting rather than several saves."

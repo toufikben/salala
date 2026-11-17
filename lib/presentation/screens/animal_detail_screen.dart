@@ -7,6 +7,7 @@ import '../../core/l10n/app_localizations.dart';
 import '../../core/l10n/enum_labels.dart';
 import '../../core/router/app_router.dart';
 import '../../core/utils/date_utils.dart';
+import '../../core/utils/heat_cycle.dart';
 import '../../core/utils/money.dart';
 import '../../core/utils/weight.dart';
 import '../../data/models/animal.dart';
@@ -26,6 +27,7 @@ import '../../services/photo_files.dart';
 import '../providers/app_providers.dart';
 import '../providers/record_providers.dart';
 import '../providers/triage_providers.dart';
+import '../widgets/heat_cycle_card.dart';
 import '../widgets/photo_thumb.dart';
 import '../widgets/placement_dialog.dart';
 import '../widgets/record_refusal.dart';
@@ -101,6 +103,11 @@ class AnimalDetailScreen extends ConsumerWidget {
                     ),
                     data: (findings) => TriageCard(findings: findings),
                   ),
+              // Above the records and below the triage card, because it is a
+              // planning aid rather than a warning: the windows a breeder acts
+              // on before anything is wrong. A dam with fewer than two matings
+              // on file gets nothing at all, and `forecastHeat` decides that.
+              _HeatSection(animal: animal, litters: litters),
               _RecordSection(
                 title: l10n.recordsSymptoms,
                 addLabel: l10n.symptomAdd,
@@ -262,6 +269,26 @@ class AnimalDetailScreen extends ConsumerWidget {
         },
       ),
     );
+  }
+}
+
+/// The heat card, or nothing at all when the record cannot support one.
+///
+/// A separate widget rather than an `if` in the page body so the silence is one
+/// decision in one place: `forecastHeat` returns null for a male, a dam with no
+/// matings, and a dam with one — and this widget is the only caller that turns
+/// that null into "do not draw".
+class _HeatSection extends StatelessWidget {
+  const _HeatSection({required this.animal, required this.litters});
+
+  final Animal animal;
+  final List<Litter> litters;
+
+  @override
+  Widget build(BuildContext context) {
+    final forecast = forecastHeat(litters, animal);
+    if (forecast == null) return const SizedBox.shrink();
+    return HeatCycleCard(forecast: forecast, species: animal.species);
   }
 }
 

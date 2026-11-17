@@ -198,6 +198,11 @@
       }
     }
   },
+  "heatCardTitle": "Prochaines chaleurs",
+  "heatCardWindow": "Entre le {earliest} et le {latest}",
+  "heatCardSteady": "D'après {count} cycles de son propre carnet.",
+  "heatCardThin": "Un seul cycle au carnet, la fourchette reste donc large. Enregistrez une autre saillie et elle se resserre.",
+  "heatCardWhelping": "Une saillie dans cette période donnerait une naissance vers le {day}.",
   "bulkVaccineTitle": "Vacciner ensemble",
   "bulkVaccineCount": "{count} animaux reçoivent la même dose",
   "bulkVaccineAction": "Vacciner la portée",

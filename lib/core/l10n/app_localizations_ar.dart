@@ -510,6 +510,28 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get heatCardTitle => 'الشياع القادم';
+
+  @override
+  String heatCardWindow(String earliest, String latest) {
+    return 'بين $earliest و$latest';
+  }
+
+  @override
+  String heatCardSteady(String count) {
+    return 'محسوب على $count دورات في سجلّها.';
+  }
+
+  @override
+  String get heatCardThin =>
+      'دورة واحدة فقط في السجل، لذلك النافذة واسعة. سجّل تلقيحًا آخر لتضيق.';
+
+  @override
+  String heatCardWhelping(String day) {
+    return 'التلقيح في هذه النافذة يعني ولادة حول $day.';
+  }
+
+  @override
   String get bulkVaccineTitle => 'تحصين جماعي';
 
   @override

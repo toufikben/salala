@@ -520,6 +520,28 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get heatCardTitle => 'Nächste Läufigkeit';
+
+  @override
+  String heatCardWindow(String earliest, String latest) {
+    return 'Zwischen $earliest und $latest';
+  }
+
+  @override
+  String heatCardSteady(String count) {
+    return 'Aus $count Zyklen in ihrem eigenen Eintrag.';
+  }
+
+  @override
+  String get heatCardThin =>
+      'Nur ein Zyklus eingetragen, deshalb ist das Fenster weit. Eine weitere Belegung engt es ein.';
+
+  @override
+  String heatCardWhelping(String day) {
+    return 'Eine Belegung in diesem Fenster würde etwa am $day werfen.';
+  }
+
+  @override
   String get bulkVaccineTitle => 'Zusammen impfen';
 
   @override

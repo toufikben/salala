@@ -517,6 +517,28 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get heatCardTitle => 'Prochaines chaleurs';
+
+  @override
+  String heatCardWindow(String earliest, String latest) {
+    return 'Entre le $earliest et le $latest';
+  }
+
+  @override
+  String heatCardSteady(String count) {
+    return 'D\'après $count cycles de son propre carnet.';
+  }
+
+  @override
+  String get heatCardThin =>
+      'Un seul cycle au carnet, la fourchette reste donc large. Enregistrez une autre saillie et elle se resserre.';
+
+  @override
+  String heatCardWhelping(String day) {
+    return 'Une saillie dans cette période donnerait une naissance vers le $day.';
+  }
+
+  @override
   String get bulkVaccineTitle => 'Vacciner ensemble';
 
   @override

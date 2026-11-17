@@ -998,6 +998,36 @@ abstract class AppLocalizations {
   /// **'Expected whelping: {date}'**
   String litterExpected(String date);
 
+  /// Heading of the card that forecasts a dam's next season. Deliberately not the word for a medical event: a breeder is planning, not diagnosing.
+  ///
+  /// In en, this message translates to:
+  /// **'Next heat'**
+  String get heatCardTitle;
+
+  /// The forecast, as a range. A window rather than a date because the cycle length varies by a fortnight between seasons even in one bitch.
+  ///
+  /// In en, this message translates to:
+  /// **'Between {earliest} and {latest}'**
+  String heatCardWindow(String earliest, String latest);
+
+  /// Said when the forecast rests on more than one observed gap, so the breeder knows it came from her own record rather than a breed standard.
+  ///
+  /// In en, this message translates to:
+  /// **'Based on {count} cycles in her own record.'**
+  String heatCardSteady(String count);
+
+  /// Said when only one gap is on file. States the weakness of the estimate plainly instead of dressing a coincidence up as a pattern.
+  ///
+  /// In en, this message translates to:
+  /// **'Only one cycle on file, so the window is wide. Record another mating and it narrows.'**
+  String get heatCardThin;
+
+  /// The date a mating inside the window would be expected to whelp. The reason the card exists: a breeder planning a mating is planning a whelping.
+  ///
+  /// In en, this message translates to:
+  /// **'A mating in this window would whelp around {day}.'**
+  String heatCardWhelping(String day);
+
   /// Title of the dialog that writes one dose for several animals at once. Said when the vial is open and the breeder is holding one puppy after another, so it must read as one sitting rather than several saves.
   ///
   /// In en, this message translates to:

@@ -517,6 +517,28 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String get heatCardTitle => 'Volgende loopsheid';
+
+  @override
+  String heatCardWindow(String earliest, String latest) {
+    return 'Tussen $earliest en $latest';
+  }
+
+  @override
+  String heatCardSteady(String count) {
+    return 'Op basis van $count cycli in haar eigen kaart.';
+  }
+
+  @override
+  String get heatCardThin =>
+      'Er staat maar één cyclus in de kaart, dus het venster is breed. Leg nog een dekking vast en het wordt smaller.';
+
+  @override
+  String heatCardWhelping(String day) {
+    return 'Een dekking in dit venster zou rond $day werpen.';
+  }
+
+  @override
   String get bulkVaccineTitle => 'Samen vaccineren';
 
   @override

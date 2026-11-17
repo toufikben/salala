@@ -511,6 +511,28 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get heatCardTitle => 'Next heat';
+
+  @override
+  String heatCardWindow(String earliest, String latest) {
+    return 'Between $earliest and $latest';
+  }
+
+  @override
+  String heatCardSteady(String count) {
+    return 'Based on $count cycles in her own record.';
+  }
+
+  @override
+  String get heatCardThin =>
+      'Only one cycle on file, so the window is wide. Record another mating and it narrows.';
+
+  @override
+  String heatCardWhelping(String day) {
+    return 'A mating in this window would whelp around $day.';
+  }
+
+  @override
   String get bulkVaccineTitle => 'Vaccinate together';
 
   @override
