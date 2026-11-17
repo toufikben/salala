@@ -72,7 +72,6 @@ class _BulkVaccinationDialogState
     final l10n = AppLocalizations.of(context);
     final messenger = ScaffoldMessenger.of(context);
     final navigator = Navigator.of(context);
-
     setState(() => _saving = true);
 
     final administered = _administered;
@@ -168,7 +167,7 @@ class _BulkVaccinationDialogState
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Text(
-                l10n.bulkVaccineCount(widget.animals.length),
+                l10n.bulkVaccineCount('${widget.animals.length}'),
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
@@ -179,7 +178,7 @@ class _BulkVaccinationDialogState
                 textCapitalization: TextCapitalization.sentences,
                 decoration: InputDecoration(labelText: l10n.vaccinationName),
                 validator: (value) => (value ?? '').trim().isEmpty
-                    ? l10n.validationRequired
+                    ? l10n.vaccinationNameRequired
                     : null,
               ),
               const SizedBox(height: 8),

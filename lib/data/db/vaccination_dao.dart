@@ -42,7 +42,7 @@ class VaccinationDao extends RecordDao<Vaccination> {
     int? nowMs,
   }) async {
     if (records.isEmpty) return const <Vaccination>[];
-    final stamp = nowMs ?? _nowMs();
+    final stamp = nowMs ?? DateTime.now().toUtc().millisecondsSinceEpoch;
     return db.transaction((txn) async {
       final written = <Vaccination>[];
       for (final record in records) {

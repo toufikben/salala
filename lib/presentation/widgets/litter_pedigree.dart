@@ -17,6 +17,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/l10n/app_localizations.dart';
+import '../../core/l10n/enum_labels.dart';
 import '../../core/router/app_router.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/utils/date_utils.dart';
@@ -169,21 +170,22 @@ class _ParentBranch extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
-    if (parent == null) {
+    final Animal? animal = parent;
+    if (animal == null) {
       return _Chip(label: role, caption: l10n.valueUnknown);
     }
 
-    final dam = animalById(animals, parent.damId);
-    final sire = animalById(animals, parent.sireId);
+    final dam = animalById(animals, animal.damId);
+    final sire = animalById(animals, animal.sireId);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         _Chip(
-          label: parent.name,
+          label: animal.name,
           caption: role,
           photo: photo,
-          onTap: () => context.push(AppPaths.animal(parent.id)),
+          onTap: () => context.push(AppPaths.animal(animal.id)),
         ),
         // The grandparents are text rather than chips: four tap targets in an
         // eighth of a phone's width is a target nobody can hit, and each
