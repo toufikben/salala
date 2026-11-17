@@ -998,6 +998,30 @@ abstract class AppLocalizations {
   /// **'Expected whelping: {date}'**
   String litterExpected(String date);
 
+  /// Title of the dialog that writes one dose for several animals at once. Said when the vial is open and the breeder is holding one puppy after another, so it must read as one sitting rather than several saves.
+  ///
+  /// In en, this message translates to:
+  /// **'Vaccinate together'**
+  String get bulkVaccineTitle;
+
+  /// How many animals are about to receive the dose. Shown above the names so a wrong litter is caught before nine rows are written.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} animals get the same dose'**
+  String bulkVaccineCount(String count);
+
+  /// The button that opens the bulk dialog from a litter's page.
+  ///
+  /// In en, this message translates to:
+  /// **'Vaccinate the litter'**
+  String get bulkVaccineAction;
+
+  /// Said after a bulk write succeeded. States how many rows landed, because that count is what the breeder will check against the puppies in front of her.
+  ///
+  /// In en, this message translates to:
+  /// **'Recorded for {count} animals'**
+  String bulkVaccineDone(String count);
+
   /// Heading of the tree card on a litter's page: two parents, the litter, the puppies. Short, because it sits above a drawing rather than a table.
   ///
   /// In en, this message translates to:

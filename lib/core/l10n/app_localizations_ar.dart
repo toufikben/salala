@@ -510,6 +510,22 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get bulkVaccineTitle => 'تحصين جماعي';
+
+  @override
+  String bulkVaccineCount(String count) {
+    return '$count حيوانًا ستأخذ الجرعة نفسها';
+  }
+
+  @override
+  String get bulkVaccineAction => 'حصّن البطن كله';
+
+  @override
+  String bulkVaccineDone(String count) {
+    return 'سُجّلت لـ $count حيوانًا';
+  }
+
+  @override
   String get pedigreeTitle => 'شجرة النسب';
 
   @override

@@ -514,6 +514,22 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String get bulkVaccineTitle => 'Vacinar em conjunto';
+
+  @override
+  String bulkVaccineCount(String count) {
+    return '$count animais recebem a mesma dose';
+  }
+
+  @override
+  String get bulkVaccineAction => 'Vacinar a ninhada';
+
+  @override
+  String bulkVaccineDone(String count) {
+    return 'Registado para $count animais';
+  }
+
+  @override
   String get pedigreeTitle => 'Pedigree';
 
   @override

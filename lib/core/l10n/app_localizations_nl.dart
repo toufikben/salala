@@ -517,6 +517,22 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String get bulkVaccineTitle => 'Samen vaccineren';
+
+  @override
+  String bulkVaccineCount(String count) {
+    return '$count dieren krijgen dezelfde dosis';
+  }
+
+  @override
+  String get bulkVaccineAction => 'Het nest vaccineren';
+
+  @override
+  String bulkVaccineDone(String count) {
+    return 'Vastgelegd voor $count dieren';
+  }
+
+  @override
   String get pedigreeTitle => 'Stamboom';
 
   @override

@@ -520,6 +520,22 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get bulkVaccineTitle => 'Zusammen impfen';
+
+  @override
+  String bulkVaccineCount(String count) {
+    return '$count Tiere bekommen dieselbe Dosis';
+  }
+
+  @override
+  String get bulkVaccineAction => 'Den Wurf impfen';
+
+  @override
+  String bulkVaccineDone(String count) {
+    return 'Für $count Tiere eingetragen';
+  }
+
+  @override
   String get pedigreeTitle => 'Ahnentafel';
 
   @override

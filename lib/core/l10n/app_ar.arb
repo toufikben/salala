@@ -210,6 +210,10 @@
       }
     }
   },
+  "bulkVaccineTitle": "تحصين جماعي",
+  "bulkVaccineCount": "{count} حيوانًا ستأخذ الجرعة نفسها",
+  "bulkVaccineAction": "حصّن البطن كله",
+  "bulkVaccineDone": "سُجّلت لـ {count} حيوانًا",
   "pedigreeTitle": "شجرة النسب",
   "litterPuppyCount": "{count, plural, =0{لا توجد جراء مسجلة} =1{جرو واحد} =2{جروان} few{{count} جراء} many{{count} جروًا} other{{count} جرو}}",
   "@litterPuppyCount": {
