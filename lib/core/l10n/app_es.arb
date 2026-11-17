@@ -155,6 +155,7 @@
   "litterWhelpingBeforeMating": "La fecha del parto es anterior a la del apareamiento.",
   "litterWeaningBeforeWhelping": "La fecha del destete es anterior a la del parto.",
   "litterExpected": "Parto previsto: {date}",
+  "pedigreeTitle": "Pedigrí",
   "litterPuppyCount": "{count, plural, =0{Ningún cachorro registrado} =1{1 cachorro} other{{count} cachorros}}",
   "litterPuppiesToRegister": "Cachorros nacidos",
   "litterPuppiesHint": "Cada cachorro se añade a sus animales y lleva el nombre de la camada",

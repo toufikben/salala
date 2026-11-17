@@ -291,6 +291,10 @@
       }
     }
   },
+  "pedigreeTitle": "Pedigree",
+  "@pedigreeTitle": {
+    "description": "Heading of the tree card on a litter's page: two parents, the litter, the puppies. Short, because it sits above a drawing rather than a table."
+  },
   "litterPuppyCount": "{count, plural, =0{No puppies registered} =1{1 puppy} other{{count} puppies}}",
   "@litterPuppyCount": {
     "placeholders": {

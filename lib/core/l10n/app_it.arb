@@ -155,6 +155,7 @@
   "litterWhelpingBeforeMating": "La data del parto precede quella dell'accoppiamento.",
   "litterWeaningBeforeWhelping": "La data dello svezzamento precede quella del parto.",
   "litterExpected": "Parto previsto: {date}",
+  "pedigreeTitle": "Pedigree",
   "litterPuppyCount": "{count, plural, =0{Nessun cucciolo registrato} =1{1 cucciolo} other{{count} cuccioli}}",
   "litterPuppiesToRegister": "Cuccioli nati",
   "litterPuppiesHint": "Ogni cucciolo viene aggiunto ai tuoi animali, con il nome della cucciolata",

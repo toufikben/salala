@@ -58,6 +58,8 @@ void main() {
       // "Version" is the French word and the English one, and the placeholder
       // carries the only part that could differ.
       'aboutVersion',
+      // The tree's heading is spelled "Pedigree" in French too.
+      'pedigreeTitle',
     },
     'de': <String>{
       'appTitle',
@@ -91,6 +93,8 @@ void main() {
       // Italian app uses for this page.
       'privacyTitle',
       'settingsPrivacy',
+      // "Pedigree" is the Italian word for the chart as well as the English one.
+      'pedigreeTitle',
     },
     'pt': <String>{
       'appTitle',
@@ -99,6 +103,7 @@ void main() {
       'unitGrams',
       'healthTestResultHelper',
       'pdfPedigree',
+      'pedigreeTitle',
     },
     'nl': <String>{
       'appTitle',

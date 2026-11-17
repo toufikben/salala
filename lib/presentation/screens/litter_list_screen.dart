@@ -13,7 +13,9 @@ import '../../services/litter_pdf.dart';
 import '../../services/pack_files.dart';
 import '../../services/pdf_layout.dart';
 import '../providers/app_providers.dart';
+import '../providers/record_providers.dart';
 import '../widgets/animal_card.dart';
+import '../widgets/litter_pedigree.dart';
 import '../widgets/record_refusal.dart';
 import '../widgets/salala_nav_bar.dart';
 
@@ -203,6 +205,18 @@ class LitterDetailScreen extends ConsumerWidget {
                     ],
                   ],
                 ),
+              ),
+              // The same three facts as above, drawn as their shape. The lines are
+              // kept because the tree names things and the lines date them; a
+              // breeder reading a pedigree wants both, and the tree is what makes
+              // "which line is this puppy from" answerable at a glance.
+              LitterPedigree(
+                litter: litter,
+                dam: dam,
+                sire: animalById(animals, litter.sireId),
+                puppies: puppies,
+                animals: animals,
+                coverFor: ref.watch(herdPhotosProvider).value,
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),

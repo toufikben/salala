@@ -198,6 +198,7 @@
       }
     }
   },
+  "pedigreeTitle": "Pedigree",
   "litterPuppyCount": "{count, plural, =0{Aucun chiot déclaré} =1{1 chiot} other{{count} chiots}}",
   "@litterPuppyCount": {
     "placeholders": {

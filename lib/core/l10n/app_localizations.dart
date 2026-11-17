@@ -998,6 +998,12 @@ abstract class AppLocalizations {
   /// **'Expected whelping: {date}'**
   String litterExpected(String date);
 
+  /// Heading of the tree card on a litter's page: two parents, the litter, the puppies. Short, because it sits above a drawing rather than a table.
+  ///
+  /// In en, this message translates to:
+  /// **'Pedigree'**
+  String get pedigreeTitle;
+
   /// No description provided for @litterPuppyCount.
   ///
   /// In en, this message translates to:

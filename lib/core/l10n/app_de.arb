@@ -155,6 +155,7 @@
   "litterWhelpingBeforeMating": "Das Wurfdatum liegt vor dem Deckdatum.",
   "litterWeaningBeforeWhelping": "Das Entwöhnungsdatum liegt vor dem Wurfdatum.",
   "litterExpected": "Erwarteter Wurf: {date}",
+  "pedigreeTitle": "Ahnentafel",
   "litterPuppyCount": "{count, plural, =0{Keine Welpen eingetragen} =1{1 Welpe} other{{count} Welpen}}",
   "litterPuppiesToRegister": "Geborene Welpen",
   "litterPuppiesHint": "Jeder Welpe kommt zu Ihren Tieren und wird nach dem Wurf benannt",

@@ -315,15 +315,15 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settingsAbout => 'Über die App';
 
   @override
-  String get settingsTrial => 'Free trial';
+  String get settingsTrial => 'Kostenlose Testphase';
 
   @override
   String settingsTrialRemaining(String days) {
-    return '$days days left';
+    return 'Noch $days Tage';
   }
 
   @override
-  String get settingsTrialOver => 'The trial has ended';
+  String get settingsTrialOver => 'Die Testphase ist vorbei';
 
   @override
   String get settingsBuildTag => 'Version';
@@ -518,6 +518,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String litterExpected(String date) {
     return 'Erwarteter Wurf: $date';
   }
+
+  @override
+  String get pedigreeTitle => 'Ahnentafel';
 
   @override
   String litterPuppyCount(int count) {
