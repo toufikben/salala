@@ -422,6 +422,27 @@ class _IdentityCard extends ConsumerWidget {
                     ),
                   ),
                 ],
+                // One quiet line at the foot of the page, and the only warmth on
+                // it. Two different sentences because the animal who has died
+                // does not want a sentence about her ongoing story — and an app
+                // that keeps saying it anyway is an app that has not read its own
+                // ledger. Placed after the notes so it reads as a closing line
+                // rather than as a caption on the photograph.
+                Padding(
+                  padding: const EdgeInsets.only(top: 14),
+                  child: Text(
+                    animal.deathDate != null
+                        ? l10n.detailDiedLine
+                        : l10n.detailStoryLine,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant.withValues(
+                        alpha: 0.85,
+                      ),
+                      fontStyle: FontStyle.italic,
+                      height: 1.5,
+                    ),
+                  ),
+                ),
               ],
             ),
           ),

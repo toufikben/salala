@@ -71,7 +71,13 @@ void main() {
         writer.written.first.body,
         'Heads up: Rabies is due on 4 Dec 2026',
       );
-      expect(writer.written.last.body, 'Rabies is due today');
+      // The morning-of alarm says the task is small, because a breeder reading a
+      // bare due date at six in the morning reads it as another thing she is
+      // behind on.
+      expect(
+        writer.written.last.body,
+        'Rabies is due today. Two minutes is enough',
+      );
     });
 
     test('both alarms are inexact on purpose', () async {
@@ -162,7 +168,7 @@ void main() {
       expect(writer.written.first.title, 'نالة');
       expect(writer.written.first.body, contains('سعار'));
       expect(writer.written.first.body, contains('٤ ديسمبر ٢٠٢٦'));
-      expect(writer.written.last.body, contains('مستحق اليوم'));
+      expect(writer.written.last.body, contains('موعدها اليوم'));
     });
 
     test('both mornings carry the animal the alarm is about', () async {

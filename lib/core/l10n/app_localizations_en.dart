@@ -32,7 +32,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get homeEmptyBody =>
-      'Add your first dog or cat to start a health and lineage record.';
+      'A herd begins with one. Give her a name, and her record starts here.';
 
   @override
   String get homeAddAnimal => 'Add animal';
@@ -185,6 +185,27 @@ class AppLocalizationsEn extends AppLocalizations {
   String get recordsEmpty => 'Nothing recorded yet.';
 
   @override
+  String get detailStoryLine => 'Every entry here is part of her story.';
+
+  @override
+  String get detailDiedLine => 'Her record stays as it was.';
+
+  @override
+  String placedFarewell(String name) {
+    return '$name has gone to a new home. The record stays with you.';
+  }
+
+  @override
+  String reminderHeadsUpBody(String what, String dueDay) {
+    return 'Heads up: $what is due on $dueDay';
+  }
+
+  @override
+  String reminderDueBody(String what) {
+    return '$what is due today. Two minutes is enough';
+  }
+
+  @override
   String get actionSave => 'Save';
 
   @override
@@ -288,6 +309,17 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsAbout => 'About';
+
+  @override
+  String get settingsTrial => 'Free trial';
+
+  @override
+  String settingsTrialRemaining(String days) {
+    return '$days days left';
+  }
+
+  @override
+  String get settingsTrialOver => 'The trial has ended';
 
   @override
   String get settingsBuildTag => 'Build';
@@ -845,16 +877,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String reminderHeadsUpBody(String what, String dueDay) {
-    return 'Heads up: $what is due on $dueDay';
-  }
-
-  @override
-  String reminderDueBody(String what) {
-    return '$what is due today';
-  }
-
-  @override
   String get pdfAction => 'PDF pack';
 
   @override
@@ -941,6 +963,11 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String triageDoseDueSoon(String name, String days) {
     return '$name is due in $days';
+  }
+
+  @override
+  String triageDoseToday(String what) {
+    return '$what is due today';
   }
 
   @override

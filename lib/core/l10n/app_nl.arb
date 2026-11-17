@@ -8,7 +8,7 @@
   "languageName": "Nederlands",
 
   "homeEmptyTitle": "Nog geen dieren",
-  "homeEmptyBody": "Voeg uw eerste hond of kat toe om een gezondheids- en afstammingsdossier te beginnen.",
+  "homeEmptyBody": "Een groep begint met één. Geef hem een naam, en zijn kaart begint hier.",
   "homeAddAnimal": "Dier toevoegen",
   "homeBreedingStock": "Fokdieren",
   "homeAllAnimals": "Alle dieren",
@@ -58,6 +58,9 @@
   "recordsPlacements": "Plaatsingen",
   "recordsEmpty": "Nog niets vastgelegd.",
 
+  "detailStoryLine": "Elke regel hier hoort bij zijn verhaal.",
+  "detailDiedLine": "Zijn kaart blijft zoals hij was.",
+  "placedFarewell": "{name} is naar een nieuw huis gegaan. De kaart blijft bij jou.",
   "actionSave": "Opslaan",
   "actionCancel": "Annuleren",
   "actionDelete": "Verwijderen",
@@ -273,7 +276,7 @@
   "buyerDeleteBody": "{name} verdwijnt uit uw contacten. De plaatsing blijft in de geschiedenis van het dier, zonder genoemde koper. Dit kan niet ongedaan worden gemaakt.",
 
   "reminderHeadsUpBody": "Herinnering: {what} verloopt op {dueDay}",
-  "reminderDueBody": "{what} verloopt vandaag",
+  "reminderDueBody": "{what} is vandaag aan de beurt. Twee minuten is genoeg",
 
   "pdfAction": "PDF-dossier",
   "pdfFailed": "De PDF kon niet worden gemaakt",
@@ -301,6 +304,7 @@
   "triageNotDiagnosis": "Salala leest alleen wat u hier hebt ingevoerd. Dit is geen diergeneeskundige diagnose.",
   "triageNoDoseYoung": "Geen inenting vastgelegd, op {days}",
   "triageDoseOverdue": "{name} was {days} geleden aan de beurt",
+  "triageDoseToday": "{what} verloopt vandaag",
   "triageDoseDueSoon": "{name} is over {days} aan de beurt",
   "triageWeightLossPuppy": "Een jong dier is sinds de laatste weging {percent}% van zijn gewicht kwijt",
   "triageWeightLoss": "Het gewicht is sinds de laatste weging {percent}% gedaald",

@@ -8,7 +8,7 @@
   "languageName": "Français",
 
   "homeEmptyTitle": "Aucun animal pour l'instant",
-  "homeEmptyBody": "Ajoutez votre premier chien ou chat pour commencer le dossier santé et les origines.",
+  "homeEmptyBody": "Un troupeau commence par un seul. Donnez-lui un nom, et sa fiche commence ici.",
   "homeAddAnimal": "Ajouter un animal",
   "homeBreedingStock": "Reproduction",
   "homeAllAnimals": "Tous les animaux",
@@ -79,6 +79,9 @@
   "recordsPlacements": "Placements",
   "recordsEmpty": "Rien d'enregistré.",
 
+  "detailStoryLine": "Chaque ligne ici fait partie de son histoire.",
+  "detailDiedLine": "Sa fiche reste telle qu'elle était.",
+  "placedFarewell": "{name} est parti dans un nouveau foyer. La fiche reste avec vous.",
   "actionSave": "Enregistrer",
   "actionCancel": "Annuler",
   "actionDelete": "Supprimer",
@@ -336,7 +339,7 @@
       "dueDay": { "type": "String" }
     }
   },
-  "reminderDueBody": "{what} arrive à échéance aujourd'hui",
+  "reminderDueBody": "{what} arrive aujourd'hui. Deux minutes suffisent",
   "@reminderDueBody": {
     "placeholders": {
       "what": { "type": "String" }
@@ -369,6 +372,7 @@
   "triageNotDiagnosis": "Salala ne lit que ce que vous avez saisi ici. Ceci n'est pas un diagnostic vétérinaire.",
   "triageNoDoseYoung": "Aucune vaccination enregistrée, à {days}",
   "triageDoseOverdue": "{name} en retard de {days}",
+  "triageDoseToday": "{what} arrive à échéance aujourd'hui",
   "triageDoseDueSoon": "{name} prévu dans {days}",
   "triageWeightLossPuppy": "Le jeune animal a perdu {percent}% de poids depuis la dernière pesée",
   "triageWeightLoss": "Perte de {percent}% depuis la dernière pesée",

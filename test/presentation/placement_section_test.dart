@@ -83,7 +83,20 @@ Future<void> _openAnimal(WidgetTester tester, String name) async {
 Future<void> _tap(WidgetTester tester, Finder finder) async {
   await tester.ensureVisible(finder);
   await tester.pumpAndSettle();
+  await _letFarewellExpire(tester);
   await tester.tap(finder);
+  await tester.pumpAndSettle();
+}
+
+/// Waits out a farewell message sitting over the bottom of the screen.
+///
+/// Saving a handover now says one sentence there, and it is drawn over the
+/// ledger — which is exactly where the next tap after a save wants to land.
+/// Four seconds of a message nobody in this test is asking about is worth
+/// waiting for, and much better than a tap that quietly hits the snackbar.
+Future<void> _letFarewellExpire(WidgetTester tester) async {
+  if (find.byType(SnackBar).evaluate().isEmpty) return;
+  await tester.pump(const Duration(seconds: 5));
   await tester.pumpAndSettle();
 }
 
@@ -100,7 +113,10 @@ Future<void> _scrollTo(WidgetTester tester, Finder finder) async {
       matching: find.byType(Scrollable),
     ),
   );
-  await tester.pumpAndSettle();
+  // `settleRealIo`, not `pumpAndSettle`: scrolling to a section can land on one
+  // that is still reading the ledger, and its indeterminate bar never settles —
+  // the helper waits for the bar instead of timing out on it.
+  await settleRealIo(tester);
 }
 
 /// Taps the Save button of one open dialog.
@@ -263,6 +279,14 @@ void main() {
       );
 
       expect(find.text('Log a placement'), findsNothing);
+      // The handover closed with one sentence about the animal rather than about
+      // the record: what a breeder needs to hear after sending a dog away is
+      // that the ledger did not go with her.
+      expect(
+        find.text('Nala has gone to a new home. The record stays with you.'),
+        findsOneWidget,
+      );
+      await _letFarewellExpire(tester);
       await _scrollTo(tester, find.text('Aicha'));
       expect(find.text('Aicha'), findsOneWidget);
       // The amount is printed ungrouped with the code upper-cased by the form,

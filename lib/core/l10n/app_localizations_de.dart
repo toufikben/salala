@@ -32,7 +32,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get homeEmptyBody =>
-      'Fügen Sie Ihren ersten Hund oder Ihre erste Katze hinzu, um Gesundheits- und Abstammungsdaten zu führen.';
+      'Eine Herde beginnt mit einem. Gib ihr einen Namen, und ihr Eintrag beginnt hier.';
 
   @override
   String get homeAddAnimal => 'Tier hinzufügen';
@@ -186,6 +186,28 @@ class AppLocalizationsDe extends AppLocalizations {
   String get recordsEmpty => 'Noch nichts erfasst.';
 
   @override
+  String get detailStoryLine =>
+      'Jeder Eintrag hier gehört zu seiner Geschichte.';
+
+  @override
+  String get detailDiedLine => 'Sein Eintrag bleibt, wie er war.';
+
+  @override
+  String placedFarewell(String name) {
+    return '$name ist in ein neues Zuhause gegangen. Der Eintrag bleibt bei dir.';
+  }
+
+  @override
+  String reminderHeadsUpBody(String what, String dueDay) {
+    return 'Zur Erinnerung: $what ist am $dueDay fällig';
+  }
+
+  @override
+  String reminderDueBody(String what) {
+    return '$what ist heute fällig. Zwei Minuten reichen';
+  }
+
+  @override
   String get actionSave => 'Speichern';
 
   @override
@@ -291,6 +313,17 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get settingsAbout => 'Über die App';
+
+  @override
+  String get settingsTrial => 'Free trial';
+
+  @override
+  String settingsTrialRemaining(String days) {
+    return '$days days left';
+  }
+
+  @override
+  String get settingsTrialOver => 'The trial has ended';
 
   @override
   String get settingsBuildTag => 'Version';
@@ -854,16 +887,6 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String reminderHeadsUpBody(String what, String dueDay) {
-    return 'Zur Erinnerung: $what ist am $dueDay fällig';
-  }
-
-  @override
-  String reminderDueBody(String what) {
-    return '$what ist heute fällig';
-  }
-
-  @override
   String get pdfAction => 'PDF-Dossier';
 
   @override
@@ -951,6 +974,11 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String triageDoseDueSoon(String name, String days) {
     return '$name ist in $days fällig';
+  }
+
+  @override
+  String triageDoseToday(String what) {
+    return '$what ist heute fällig';
   }
 
   @override

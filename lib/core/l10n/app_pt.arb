@@ -8,7 +8,7 @@
   "languageName": "Português",
 
   "homeEmptyTitle": "Ainda sem animais",
-  "homeEmptyBody": "Adicione o seu primeiro cão ou gato para começar um registo de saúde e linhagem.",
+  "homeEmptyBody": "Um efetivo começa com um. Dê-lhe um nome, e o registo começa aqui.",
   "homeAddAnimal": "Adicionar animal",
   "homeBreedingStock": "Reprodutores",
   "homeAllAnimals": "Todos os animais",
@@ -58,6 +58,9 @@
   "recordsPlacements": "Entregas",
   "recordsEmpty": "Ainda nada registado.",
 
+  "detailStoryLine": "Cada linha aqui faz parte da sua história.",
+  "detailDiedLine": "O registo fica como estava.",
+  "placedFarewell": "{name} foi para um novo lar. O registo fica consigo.",
   "actionSave": "Guardar",
   "actionCancel": "Cancelar",
   "actionDelete": "Eliminar",
@@ -273,7 +276,7 @@
   "buyerDeleteBody": "{name} é removido dos seus contactos. A entrega fica no histórico do animal, sem comprador indicado. Isto não pode ser anulado.",
 
   "reminderHeadsUpBody": "Aviso: {what} vence a {dueDay}",
-  "reminderDueBody": "{what} vence hoje",
+  "reminderDueBody": "{what} é hoje. Dois minutos chegam",
 
   "pdfAction": "Dossiê PDF",
   "pdfFailed": "Não foi possível criar o PDF",
@@ -301,6 +304,7 @@
   "triageNotDiagnosis": "O Salala lê apenas o que escreveu aqui. Isto não é um diagnóstico veterinário.",
   "triageNoDoseYoung": "Sem vacina registada, aos {days}",
   "triageDoseOverdue": "{name} era devido há {days}",
+  "triageDoseToday": "{what} vence hoje",
   "triageDoseDueSoon": "{name} é devido dentro de {days}",
   "triageWeightLossPuppy": "Um animal jovem perdeu {percent}% do seu peso desde a última pesagem",
   "triageWeightLoss": "O peso caiu {percent}% desde a última pesagem",

@@ -32,7 +32,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get homeEmptyBody =>
-      'Ajoutez votre premier chien ou chat pour commencer le dossier santé et les origines.';
+      'Un troupeau commence par un seul. Donnez-lui un nom, et sa fiche commence ici.';
 
   @override
   String get homeAddAnimal => 'Ajouter un animal';
@@ -186,6 +186,27 @@ class AppLocalizationsFr extends AppLocalizations {
   String get recordsEmpty => 'Rien d\'enregistré.';
 
   @override
+  String get detailStoryLine => 'Chaque ligne ici fait partie de son histoire.';
+
+  @override
+  String get detailDiedLine => 'Sa fiche reste telle qu\'elle était.';
+
+  @override
+  String placedFarewell(String name) {
+    return '$name est parti dans un nouveau foyer. La fiche reste avec vous.';
+  }
+
+  @override
+  String reminderHeadsUpBody(String what, String dueDay) {
+    return 'À noter : $what arrive à échéance le $dueDay';
+  }
+
+  @override
+  String reminderDueBody(String what) {
+    return '$what arrive aujourd\'hui. Deux minutes suffisent';
+  }
+
+  @override
   String get actionSave => 'Enregistrer';
 
   @override
@@ -291,6 +312,17 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get settingsAbout => 'À propos';
+
+  @override
+  String get settingsTrial => 'Free trial';
+
+  @override
+  String settingsTrialRemaining(String days) {
+    return '$days days left';
+  }
+
+  @override
+  String get settingsTrialOver => 'The trial has ended';
 
   @override
   String get settingsBuildTag => 'Version';
@@ -851,16 +883,6 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String reminderHeadsUpBody(String what, String dueDay) {
-    return 'À noter : $what arrive à échéance le $dueDay';
-  }
-
-  @override
-  String reminderDueBody(String what) {
-    return '$what arrive à échéance aujourd\'hui';
-  }
-
-  @override
   String get pdfAction => 'Fiche PDF';
 
   @override
@@ -947,6 +969,11 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String triageDoseDueSoon(String name, String days) {
     return '$name prévu dans $days';
+  }
+
+  @override
+  String triageDoseToday(String what) {
+    return '$what arrive à échéance aujourd\'hui';
   }
 
   @override

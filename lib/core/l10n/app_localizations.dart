@@ -155,7 +155,7 @@ abstract class AppLocalizations {
   /// No description provided for @homeEmptyBody.
   ///
   /// In en, this message translates to:
-  /// **'Add your first dog or cat to start a health and lineage record.'**
+  /// **'A herd begins with one. Give her a name, and her record starts here.'**
   String get homeEmptyBody;
 
   /// No description provided for @homeAddAnimal.
@@ -422,6 +422,36 @@ abstract class AppLocalizations {
   /// **'Nothing recorded yet.'**
   String get recordsEmpty;
 
+  /// One quiet line under the animal's facts on her own page. Said once, never on every card: a herd of forty dogs does not want forty mottoes. Deliberately not an instruction and not an exclamation.
+  ///
+  /// In en, this message translates to:
+  /// **'Every entry here is part of her story.'**
+  String get detailStoryLine;
+
+  /// Shown in place of the story line on an animal whose death date is recorded. Quiet, not consoling: the app is not the person to grieve with, and a longer sentence here reads as sympathy the app has not earned.
+  ///
+  /// In en, this message translates to:
+  /// **'Her record stays as it was.'**
+  String get detailDiedLine;
+
+  /// Shown once, after a handover is saved. Respects the move rather than celebrating a sale — a placed breeding dog is a loss to the kennel as much as a transaction.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} has gone to a new home. The record stays with you.'**
+  String placedFarewell(String name);
+
+  /// The month-ahead alarm. {what} is the dose or screening name as the breeder typed it, {dueDay} a localised date. The tone is a nudge between equals: no 'Don't forget', no exclamation mark, and the word 'heads up' rather than 'reminder' because a reminder implies the breeder would have forgotten.
+  ///
+  /// In en, this message translates to:
+  /// **'Heads up: {what} is due on {dueDay}'**
+  String reminderHeadsUpBody(String what, String dueDay);
+
+  /// The morning-of alarm. The second half is the whole point of the sentence: it says the task is small, because a breeder who reads a bare due-date at six in the morning reads it as another thing she is behind on.
+  ///
+  /// In en, this message translates to:
+  /// **'{what} is due today. Two minutes is enough'**
+  String reminderDueBody(String what);
+
   /// No description provided for @actionSave.
   ///
   /// In en, this message translates to:
@@ -619,6 +649,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'About'**
   String get settingsAbout;
+
+  /// The row's title on Settings. Rendered only when kBillingEnabled is true, so a free install never sees the word trial at all.
+  ///
+  /// In en, this message translates to:
+  /// **'Free trial'**
+  String get settingsTrial;
+
+  /// Days left in the trial. Whole days, never a countdown, because a clock that ticks on a settings row is a pressure the breeder did not ask for.
+  ///
+  /// In en, this message translates to:
+  /// **'{days} days left'**
+  String settingsTrialRemaining(String days);
+
+  /// Said once the trial has run out. Deliberately not a call to buy: the export that used to work still opens, and the sentence is a fact rather than a pitch.
+  ///
+  /// In en, this message translates to:
+  /// **'The trial has ended'**
+  String get settingsTrialOver;
 
   /// No description provided for @settingsBuildTag.
   ///
@@ -1622,18 +1670,6 @@ abstract class AppLocalizations {
   /// **'{name} is removed from your contacts. The handover stays in the animal\'s history, with no buyer named. This cannot be undone.'**
   String buyerDeleteBody(String name);
 
-  /// The month-ahead alarm. {what} is the dose or screening name as the breeder typed it, {dueDay} a localised date.
-  ///
-  /// In en, this message translates to:
-  /// **'Heads up: {what} is due on {dueDay}'**
-  String reminderHeadsUpBody(String what, String dueDay);
-
-  /// No description provided for @reminderDueBody.
-  ///
-  /// In en, this message translates to:
-  /// **'{what} is due today'**
-  String reminderDueBody(String what);
-
   /// No description provided for @pdfAction.
   ///
   /// In en, this message translates to:
@@ -1789,6 +1825,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{name} is due in {days}'**
   String triageDoseDueSoon(String name, String days);
+
+  /// The triage card's wording for a dose whose day is today. Deliberately the bare sentence, unlike the notification: this card sits in a column of findings, and a reassurance repeated down the column stops being one. The card already carries its urgency and its action.
+  ///
+  /// In en, this message translates to:
+  /// **'{what} is due today'**
+  String triageDoseToday(String what);
 
   /// No description provided for @triageWeightLossPuppy.
   ///

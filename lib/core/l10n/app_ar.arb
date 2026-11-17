@@ -8,7 +8,7 @@
   "languageName": "العربية",
 
   "homeEmptyTitle": "لا توجد حيوانات بعد",
-  "homeEmptyBody": "أضف كلبك أو قطتك الأول لتبدأ سجل الصحة والأنساب.",
+  "homeEmptyBody": "القطيع يبدأ بواحد. سمّها، وابدأ سجلّها من هنا.",
   "homeAddAnimal": "إضافة حيوان",
   "homeBreedingStock": "حيوانات التربية",
   "homeAllAnimals": "كل الحيوانات",
@@ -83,6 +83,9 @@
   "recordsPlacements": "التسليم",
   "recordsEmpty": "لا يوجد سجل بعد.",
 
+  "detailStoryLine": "كل سجل هنا جزء من قصتها.",
+  "detailDiedLine": "سجلّها يبقى كما كان.",
+  "placedFarewell": "{name} انتقل إلى بيت جديد. السجل بقي معك.",
   "actionSave": "حفظ",
   "actionCancel": "إلغاء",
   "actionDelete": "حذف",
@@ -348,7 +351,7 @@
       "dueDay": { "type": "String" }
     }
   },
-  "reminderDueBody": "{what} مستحق اليوم",
+  "reminderDueBody": "{what} موعدها اليوم. دقيقتان تكفيان",
   "@reminderDueBody": {
     "placeholders": {
       "what": { "type": "String" }
@@ -381,6 +384,7 @@
   "triageNotDiagnosis": "لا تقرأ سلالة إلا ما كتبته هنا، وهذا ليس تشخيصًا بيطريًا.",
   "triageNoDoseYoung": "لم يُسجَّل أي تلقيح والعمر {days}",
   "triageDoseOverdue": "{name} كان مستحقًا منذ {days}",
+  "triageDoseToday": "{what} مستحق اليوم",
   "triageDoseDueSoon": "{name} مستحق خلال {days}",
   "triageWeightLossPuppy": "فقد الحيوان الصغير {percent}% من وزنه منذ آخر وزن",
   "triageWeightLoss": "انخفض الوزن {percent}% منذ آخر وزن",

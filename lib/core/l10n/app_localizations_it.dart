@@ -32,7 +32,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get homeEmptyBody =>
-      'Aggiungi il tuo primo cane o gatto per iniziare una scheda sanitaria e genealogica.';
+      'Un gruppo comincia da uno. Dagli un nome, e la sua scheda parte da qui.';
 
   @override
   String get homeAddAnimal => 'Aggiungi animale';
@@ -186,6 +186,27 @@ class AppLocalizationsIt extends AppLocalizations {
   String get recordsEmpty => 'Ancora nulla di registrato.';
 
   @override
+  String get detailStoryLine => 'Ogni voce qui fa parte della sua storia.';
+
+  @override
+  String get detailDiedLine => 'La sua scheda resta com\'era.';
+
+  @override
+  String placedFarewell(String name) {
+    return '$name è andato in una nuova casa. La scheda resta con te.';
+  }
+
+  @override
+  String reminderHeadsUpBody(String what, String dueDay) {
+    return 'Promemoria: $what scade il $dueDay';
+  }
+
+  @override
+  String reminderDueBody(String what) {
+    return '$what scade oggi. Due minuti bastano';
+  }
+
+  @override
   String get actionSave => 'Salva';
 
   @override
@@ -290,6 +311,17 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get settingsAbout => 'Informazioni';
+
+  @override
+  String get settingsTrial => 'Free trial';
+
+  @override
+  String settingsTrialRemaining(String days) {
+    return '$days days left';
+  }
+
+  @override
+  String get settingsTrialOver => 'The trial has ended';
 
   @override
   String get settingsBuildTag => 'Versione';
@@ -854,16 +886,6 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
-  String reminderHeadsUpBody(String what, String dueDay) {
-    return 'Promemoria: $what scade il $dueDay';
-  }
-
-  @override
-  String reminderDueBody(String what) {
-    return '$what scade oggi';
-  }
-
-  @override
   String get pdfAction => 'Dossier PDF';
 
   @override
@@ -951,6 +973,11 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String triageDoseDueSoon(String name, String days) {
     return '$name è dovuto fra $days';
+  }
+
+  @override
+  String triageDoseToday(String what) {
+    return '$what scade oggi';
   }
 
   @override

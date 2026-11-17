@@ -14,7 +14,7 @@
   },
 
   "homeEmptyTitle": "No animals yet",
-  "homeEmptyBody": "Add your first dog or cat to start a health and lineage record.",
+  "homeEmptyBody": "A herd begins with one. Give her a name, and her record starts here.",
   "homeAddAnimal": "Add animal",
   "homeBreedingStock": "Breeding stock",
   "homeAllAnimals": "All animals",
@@ -99,6 +99,35 @@
   "recordsPlacements": "Placements",
   "recordsEmpty": "Nothing recorded yet.",
 
+  "detailStoryLine": "Every entry here is part of her story.",
+  "@detailStoryLine": {
+    "description": "One quiet line under the animal's facts on her own page. Said once, never on every card: a herd of forty dogs does not want forty mottoes. Deliberately not an instruction and not an exclamation."
+  },
+  "detailDiedLine": "Her record stays as it was.",
+  "@detailDiedLine": {
+    "description": "Shown in place of the story line on an animal whose death date is recorded. Quiet, not consoling: the app is not the person to grieve with, and a longer sentence here reads as sympathy the app has not earned."
+  },
+  "placedFarewell": "{name} has gone to a new home. The record stays with you.",
+  "@placedFarewell": {
+    "description": "Shown once, after a handover is saved. Respects the move rather than celebrating a sale — a placed breeding dog is a loss to the kennel as much as a transaction.",
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "reminderHeadsUpBody": "Heads up: {what} is due on {dueDay}",
+  "@reminderHeadsUpBody": {
+    "description": "The month-ahead alarm. {what} is the dose or screening name as the breeder typed it, {dueDay} a localised date. The tone is a nudge between equals: no 'Don't forget', no exclamation mark, and the word 'heads up' rather than 'reminder' because a reminder implies the breeder would have forgotten.",
+    "placeholders": {
+      "what": { "type": "String" },
+      "dueDay": { "type": "String" }
+    }
+  },
+  "reminderDueBody": "{what} is due today. Two minutes is enough",
+  "@reminderDueBody": {
+    "description": "The morning-of alarm. The second half is the whole point of the sentence: it says the task is small, because a breeder who reads a bare due-date at six in the morning reads it as another thing she is behind on.",
+    "placeholders": {
+      "what": { "type": "String" }
+    }
+  },
+
   "actionSave": "Save",
   "actionCancel": "Cancel",
   "actionDelete": "Delete",
@@ -142,6 +171,21 @@
   "startupFailedTitle": "Salala could not open the ledger on this phone.",
   "startupFailedBody": "Your records are still in the file. Close the app and open it again.",
   "settingsAbout": "About",
+  "settingsTrial": "Free trial",
+  "@settingsTrial": {
+    "description": "The row's title on Settings. Rendered only when kBillingEnabled is true, so a free install never sees the word trial at all."
+  },
+  "settingsTrialRemaining": "{days} days left",
+  "@settingsTrialRemaining": {
+    "description": "Days left in the trial. Whole days, never a countdown, because a clock that ticks on a settings row is a pressure the breeder did not ask for.",
+    "placeholders": {
+      "days": { "type": "String" }
+    }
+  },
+  "settingsTrialOver": "The trial has ended",
+  "@settingsTrialOver": {
+    "description": "Said once the trial has run out. Deliberately not a call to buy: the export that used to work still opens, and the sentence is a fact rather than a pitch."
+  },
   "settingsBuildTag": "Build",
   "settingsOfflineNote": "Everything is stored on this device. No account, no server, no tracking.",
   "settingsExport": "Export records",
@@ -432,21 +476,6 @@
     }
   },
 
-  "reminderHeadsUpBody": "Heads up: {what} is due on {dueDay}",
-  "@reminderHeadsUpBody": {
-    "description": "The month-ahead alarm. {what} is the dose or screening name as the breeder typed it, {dueDay} a localised date.",
-    "placeholders": {
-      "what": { "type": "String" },
-      "dueDay": { "type": "String" }
-    }
-  },
-  "reminderDueBody": "{what} is due today",
-  "@reminderDueBody": {
-    "placeholders": {
-      "what": { "type": "String" }
-    }
-  },
-
   "pdfAction": "PDF pack",
   "pdfFailed": "The PDF could not be made",
   "pdfTitle": "Health and lineage record",
@@ -493,6 +522,13 @@
     "placeholders": {
       "name": { "type": "String" },
       "days": { "type": "String" }
+    }
+  },
+  "triageDoseToday": "{what} is due today",
+  "@triageDoseToday": {
+    "description": "The triage card's wording for a dose whose day is today. Deliberately the bare sentence, unlike the notification: this card sits in a column of findings, and a reassurance repeated down the column stops being one. The card already carries its urgency and its action.",
+    "placeholders": {
+      "what": { "type": "String" }
     }
   },
   "triageWeightLossPuppy": "A young animal has lost {percent}% of its weight since the last weigh-in",

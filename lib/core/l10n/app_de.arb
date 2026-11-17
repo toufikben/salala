@@ -8,7 +8,7 @@
   "languageName": "Deutsch",
 
   "homeEmptyTitle": "Noch keine Tiere",
-  "homeEmptyBody": "Fügen Sie Ihren ersten Hund oder Ihre erste Katze hinzu, um Gesundheits- und Abstammungsdaten zu führen.",
+  "homeEmptyBody": "Eine Herde beginnt mit einem. Gib ihr einen Namen, und ihr Eintrag beginnt hier.",
   "homeAddAnimal": "Tier hinzufügen",
   "homeBreedingStock": "Zuchttiere",
   "homeAllAnimals": "Alle Tiere",
@@ -58,6 +58,9 @@
   "recordsPlacements": "Vermittlungen",
   "recordsEmpty": "Noch nichts erfasst.",
 
+  "detailStoryLine": "Jeder Eintrag hier gehört zu seiner Geschichte.",
+  "detailDiedLine": "Sein Eintrag bleibt, wie er war.",
+  "placedFarewell": "{name} ist in ein neues Zuhause gegangen. Der Eintrag bleibt bei dir.",
   "actionSave": "Speichern",
   "actionCancel": "Abbrechen",
   "actionDelete": "Löschen",
@@ -273,7 +276,7 @@
   "buyerDeleteBody": "{name} wird aus Ihren Kontakten entfernt. Die Übergabe bleibt in der Vorgeschichte des Tieres, ohne benannten Käufer. Das lässt sich nicht rückgängig machen.",
 
   "reminderHeadsUpBody": "Zur Erinnerung: {what} ist am {dueDay} fällig",
-  "reminderDueBody": "{what} ist heute fällig",
+  "reminderDueBody": "{what} ist heute fällig. Zwei Minuten reichen",
 
   "pdfAction": "PDF-Dossier",
   "pdfFailed": "Das PDF konnte nicht erstellt werden",
@@ -301,6 +304,7 @@
   "triageNotDiagnosis": "Salala liest nur, was Sie hier eingetragen haben. Das ist keine tierärztliche Diagnose.",
   "triageNoDoseYoung": "Keine Impfung erfasst, mit {days}",
   "triageDoseOverdue": "{name} war vor {days} fällig",
+  "triageDoseToday": "{what} ist heute fällig",
   "triageDoseDueSoon": "{name} ist in {days} fällig",
   "triageWeightLossPuppy": "Ein junges Tier hat seit der letzten Wägung {percent} % seines Gewichts verloren",
   "triageWeightLoss": "Das Gewicht ist seit der letzten Wägung um {percent} % gefallen",

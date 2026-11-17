@@ -8,6 +8,7 @@ import '../../core/utils/date_utils.dart';
 import '../../core/utils/text_input.dart';
 import '../../core/utils/money.dart';
 import '../../data/db/daos.dart';
+import '../../data/models/animal.dart';
 import '../../data/models/buyer.dart';
 import '../../data/models/placement.dart';
 import '../../services/reminder_resync.dart';
@@ -180,6 +181,11 @@ class _PlacementDialogState extends ConsumerState<PlacementDialog> {
 
     final existing = widget.existing;
     final buyers = ref.read(buyersProvider).value ?? const <Buyer>[];
+    // Read before the write for the same reason the language is: the farewell
+    // sentence needs the animal's own name and the dialog is about to be gone.
+    final animals = ref.read(animalsProvider).value ?? const <Animal>[];
+    final animalName = animalById(animals, widget.animalId)?.name;
+    final messenger = ScaffoldMessenger.of(context);
     // The loaded list, or the contact this dialog wrote a moment ago. An id
     // neither answers to is dropped rather than written, so a buyer deleted
     // while this form was open still cannot become a dangling foreign key.
@@ -218,6 +224,18 @@ class _PlacementDialogState extends ConsumerState<PlacementDialog> {
     }
     if (!mounted) return;
     Navigator.of(context).pop();
+
+    // The one warm sentence in the app that is about a leaving, and it is said
+    // after the form is gone rather than inside it: a note pinned to the form is
+    // a note about the form, and this is about the animal. The record stays —
+    // that is the half a breeder needs to hear, because a handover reads like a
+    // deletion and is not one. Silence for a correction: the breeder who fixed a
+    // price did not send the dog anywhere.
+    if (!_isEdit && animalName != null && animalName.isNotEmpty) {
+      messenger.showSnackBar(
+        SnackBar(content: Text(l10n.placedFarewell(animalName))),
+      );
+    }
 
     // The save may have marked the animal sold, and a sold animal's alarms are
     // the phone's copy of a booking she no longer owns. Reconciled after the form

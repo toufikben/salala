@@ -32,7 +32,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get homeEmptyBody =>
-      'Voeg uw eerste hond of kat toe om een gezondheids- en afstammingsdossier te beginnen.';
+      'Een groep begint met één. Geef hem een naam, en zijn kaart begint hier.';
 
   @override
   String get homeAddAnimal => 'Dier toevoegen';
@@ -185,6 +185,27 @@ class AppLocalizationsNl extends AppLocalizations {
   String get recordsEmpty => 'Nog niets vastgelegd.';
 
   @override
+  String get detailStoryLine => 'Elke regel hier hoort bij zijn verhaal.';
+
+  @override
+  String get detailDiedLine => 'Zijn kaart blijft zoals hij was.';
+
+  @override
+  String placedFarewell(String name) {
+    return '$name is naar een nieuw huis gegaan. De kaart blijft bij jou.';
+  }
+
+  @override
+  String reminderHeadsUpBody(String what, String dueDay) {
+    return 'Herinnering: $what verloopt op $dueDay';
+  }
+
+  @override
+  String reminderDueBody(String what) {
+    return '$what is vandaag aan de beurt. Twee minuten is genoeg';
+  }
+
+  @override
   String get actionSave => 'Opslaan';
 
   @override
@@ -290,6 +311,17 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get settingsAbout => 'Over de app';
+
+  @override
+  String get settingsTrial => 'Free trial';
+
+  @override
+  String settingsTrialRemaining(String days) {
+    return '$days days left';
+  }
+
+  @override
+  String get settingsTrialOver => 'The trial has ended';
 
   @override
   String get settingsBuildTag => 'Versie';
@@ -852,16 +884,6 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
-  String reminderHeadsUpBody(String what, String dueDay) {
-    return 'Herinnering: $what verloopt op $dueDay';
-  }
-
-  @override
-  String reminderDueBody(String what) {
-    return '$what verloopt vandaag';
-  }
-
-  @override
   String get pdfAction => 'PDF-dossier';
 
   @override
@@ -948,6 +970,11 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String triageDoseDueSoon(String name, String days) {
     return '$name is over $days aan de beurt';
+  }
+
+  @override
+  String triageDoseToday(String what) {
+    return '$what verloopt vandaag';
   }
 
   @override

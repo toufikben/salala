@@ -31,8 +31,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get homeEmptyTitle => 'لا توجد حيوانات بعد';
 
   @override
-  String get homeEmptyBody =>
-      'أضف كلبك أو قطتك الأول لتبدأ سجل الصحة والأنساب.';
+  String get homeEmptyBody => 'القطيع يبدأ بواحد. سمّها، وابدأ سجلّها من هنا.';
 
   @override
   String get homeAddAnimal => 'إضافة حيوان';
@@ -189,6 +188,27 @@ class AppLocalizationsAr extends AppLocalizations {
   String get recordsEmpty => 'لا يوجد سجل بعد.';
 
   @override
+  String get detailStoryLine => 'كل سجل هنا جزء من قصتها.';
+
+  @override
+  String get detailDiedLine => 'سجلّها يبقى كما كان.';
+
+  @override
+  String placedFarewell(String name) {
+    return '$name انتقل إلى بيت جديد. السجل بقي معك.';
+  }
+
+  @override
+  String reminderHeadsUpBody(String what, String dueDay) {
+    return 'تنبيه: $what مستحق في $dueDay';
+  }
+
+  @override
+  String reminderDueBody(String what) {
+    return '$what موعدها اليوم. دقيقتان تكفيان';
+  }
+
+  @override
   String get actionSave => 'حفظ';
 
   @override
@@ -291,6 +311,17 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settingsAbout => 'حول التطبيق';
+
+  @override
+  String get settingsTrial => 'Free trial';
+
+  @override
+  String settingsTrialRemaining(String days) {
+    return '$days days left';
+  }
+
+  @override
+  String get settingsTrialOver => 'The trial has ended';
 
   @override
   String get settingsBuildTag => 'رقم البناء';
@@ -845,16 +876,6 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String reminderHeadsUpBody(String what, String dueDay) {
-    return 'تنبيه: $what مستحق في $dueDay';
-  }
-
-  @override
-  String reminderDueBody(String what) {
-    return '$what مستحق اليوم';
-  }
-
-  @override
   String get pdfAction => 'ملف PDF';
 
   @override
@@ -941,6 +962,11 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String triageDoseDueSoon(String name, String days) {
     return '$name مستحق خلال $days';
+  }
+
+  @override
+  String triageDoseToday(String what) {
+    return '$what مستحق اليوم';
   }
 
   @override

@@ -92,7 +92,9 @@ Future<void> _scrollTo(WidgetTester tester, Finder finder) async {
       matching: find.byType(Scrollable),
     ),
   );
-  await tester.pumpAndSettle();
+  // `settleRealIo`, not `pumpAndSettle`: a section scrolled into view may still
+  // be reading the ledger, and its indeterminate bar never settles.
+  await settleRealIo(tester);
 }
 
 Future<void> _save(WidgetTester tester) async {
@@ -171,6 +173,47 @@ void main() {
       expect(find.text(title), findsOneWidget);
       expect(find.text('Nothing recorded yet.'), findsWidgets);
     }
+  });
+
+  testWidgets('her own page closes with a line about her story', (tester) async {
+    _usePhoneViewport(tester);
+    await pumpSalala(tester, seed: <Animal>[_nala()]);
+    await _openNala(tester);
+
+    // The identity card is the page's first item, so the sentence is on screen
+    // without scrolling — this test is about which sentence, not about layout.
+    expect(find.text('Every entry here is part of her story.'), findsOneWidget);
+    expect(find.text('Her record stays as it was.'), findsNothing);
+  });
+
+  testWidgets('a deceased animal is not told her story is continuing', (
+    tester,
+  ) async {
+    _usePhoneViewport(tester);
+    await pumpSalala(
+      tester,
+      seed: <Animal>[
+        Animal(
+          id: _nalaId,
+          name: 'Nala',
+          species: 'dog',
+          breed: 'Border collie',
+          sex: Sex.female,
+          status: AnimalStatus.deceased,
+          birthDate: DateTime(2024, 5, 12).millisecondsSinceEpoch,
+          deathDate: DateTime(2026, 3, 2).millisecondsSinceEpoch,
+          createdAt: 0,
+          updatedAt: 0,
+        ),
+      ],
+    );
+    await _openNala(tester);
+
+    // The ledger knows the date, so the app has no excuse for the other sentence:
+    // telling a breeder her dead dog's story continues is an app that has not
+    // read its own record.
+    expect(find.text('Her record stays as it was.'), findsOneWidget);
+    expect(find.text('Every entry here is part of her story.'), findsNothing);
   });
 
   testWidgets('logging a vaccination writes the dose and shows it', (
@@ -461,6 +504,10 @@ void main() {
     );
     await _openNala(tester);
 
+    // The identity card grew a closing line, so the ledger starts a little lower
+    // than it used to and the first section has to be scrolled into view before
+    // it is built: the detail page is a lazy list.
+    await _scrollTo(tester, find.text('Rabies'));
     expect(find.text('Rabies'), findsOneWidget);
     expect(find.text('Distemper'), findsOneWidget);
     expect(find.text('Overdue'), findsOneWidget);

@@ -85,7 +85,7 @@ String _days(AppLocalizations l10n, TriageFinding finding) =>
 /// other.
 String _dueSoon(AppLocalizations l10n, TriageFinding finding) {
   final days = finding.days ?? 0;
-  if (days == 0) return l10n.reminderDueBody(_subject(finding));
+  if (days == 0) return l10n.triageDoseToday(_subject(finding));
   return l10n.triageDoseDueSoon(_subject(finding), daysPhrase(l10n, days));
 }
 
