@@ -997,6 +997,224 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get onboardingSlide1Title => 'سجل واحد لكل حيوان';
+
+  @override
+  String get onboardingSlide1Body =>
+      'كلب أو قطة، سلالته، تاريخ ميلاده، ومن أين جاء. الأول لا يأخذ دقيقة.';
+
+  @override
+  String get onboardingSlide2Title => 'صحته، بالترتيب';
+
+  @override
+  String get onboardingSlide2Body =>
+      'التطعيمات بموعد جرعتها القادمة، الأوزان، الفحوصات، والزيارات البيطرية. سالالة يحجز التذكير عنك.';
+
+  @override
+  String get onboardingSlide3Title => 'قصته تسافر معه';
+
+  @override
+  String get onboardingSlide3Body =>
+      'ملف PDF أو جدول للمشتري، وحزمة ZIP واحدة تحمل كل سجل وصورة إلى هاتف جديد.';
+
+  @override
+  String get onboardingSkip => 'تخطٍّ';
+
+  @override
+  String get onboardingNext => 'التالي';
+
+  @override
+  String get onboardingStart => 'أضف أول حيوان';
+
+  @override
+  String get settingsOnboarding => 'أعد عرض المقدمة';
+
+  @override
+  String get settingsHelp => 'المساعدة';
+
+  @override
+  String get settingsRate => 'قيّم سالالة';
+
+  @override
+  String get settingsRateBody => 'يفتح بطاقة التقييم من المتجر.';
+
+  @override
+  String get settingsWhatsNew => 'ما الجديد';
+
+  @override
+  String get settingsPrivacy => 'الخصوصية';
+
+  @override
+  String get settingsTerms => 'شروط الاستخدام';
+
+  @override
+  String get settingsLicenses => 'رخص البرمجيات المفتوحة';
+
+  @override
+  String get rateUnavailable => 'هذا الهاتف لا يستطيع عرض بطاقة التقييم الآن.';
+
+  @override
+  String get aboutTitle => 'حول سالالة';
+
+  @override
+  String get aboutBody =>
+      'دفتر محلي لمربٍّ صغير. لا حساب، لا خادم، لا تتبع — السجلات تسكن هذا الهاتف ولا تخرج إلا بيدك.';
+
+  @override
+  String aboutVersion(String version) {
+    return 'الإصدار $version';
+  }
+
+  @override
+  String get privacyTitle => 'الخصوصية';
+
+  @override
+  String get privacyIntro =>
+      'سالالة تحتفظ بنوع واحد من البيانات: ما كتبته عن حيواناتك. هذه الصفحة تقول أين تسكن وماذا يمكن أن يُخرجها من هذا الهاتف.';
+
+  @override
+  String get privacyStoredHeading => 'ما يُخزَّن';
+
+  @override
+  String get privacyStoredBody =>
+      'كل حيوان، جرعة، وزن، فحص، زيارة، عرض، تسليم وجهة اتصال — والصور التي أرفقتها — في قاعدة بيانات ومجلد صور داخل مساحة التطبيق الخاصة. أندرويد يمنع التطبيقات الأخرى من الوصول إلى ذلك المجلد، والملفات غير مشفّرة بعد ذلك.';
+
+  @override
+  String get privacyBackupHeading => 'ما يخرج من هذا الهاتف';
+
+  @override
+  String get privacyBackupBody =>
+      'فقط ما تصدّره: حزمة ZIP فيها كل سجل وصورة، جدول CSV واحد، أو PDF لحيوان واحد. كل ملف يذهب حيث ترسله، وبالتالي الحزمة تحمل أسماء مشتريك وأرقام هواتفهم — عامل الملف كما تعامل الورق الذي يحل مكانه. شغّل قفل التطبيق إن كان الهاتف يسافر.';
+
+  @override
+  String get privacyCollectHeading => 'ما يُجمع عنك';
+
+  @override
+  String get privacyCollectBody =>
+      'لا شيء. لا تحليلات، لا تقارير أعطال، لا معرّف إعلاني، ولا اتصال شبكي في هذا التطبيق.';
+
+  @override
+  String get privacyRemoveHeading => 'كيف تمسحه';
+
+  @override
+  String get privacyRemoveBody =>
+      'إزالة التطبيق تزيل قاعدة البيانات ومجلد الصور معه. لا توجد نسخة في مكان آخر، فصدّر حزمة أولًا إن كانت السجلات تهمك — وتذكّر أن رقم قفل التطبيق لا يُستعاد أيضًا.';
+
+  @override
+  String get termsTitle => 'شروط الاستخدام';
+
+  @override
+  String get termsUseHeading => 'لماذا هذا التطبيق';
+
+  @override
+  String get termsUseBody =>
+      'للاحتفاظ بسجلاتك عن الحيوانات التي في رعايتك. رخصة واحدة لكل شخص؛ ثبّته على الهواتف التي تستخدمها.';
+
+  @override
+  String get termsDataHeading => 'بياناتك لك';
+
+  @override
+  String get termsDataBody =>
+      'لا نحتفظ بنسخة منها ولا نستطيع استعادتها. النسخ الاحتياطي مسؤوليتك، وزر التصدير في الإعدادات هو الآلية كلها.';
+
+  @override
+  String get termsAdviceHeading => 'ليس استشارة بيطرية';
+
+  @override
+  String get termsAdviceBody =>
+      'سالالة يعيد ما كتبته ويجري حسابًا على التواريخ والأوزان. لا يشخّص، والتذكير موعد في تقويم لا رأي سريري. اتصل بطبيب بيطري.';
+
+  @override
+  String get termsWarrantyHeading => 'بلا ضمان';
+
+  @override
+  String get termsWarrantyBody =>
+      'يُقدَّم التطبيق كما هو. وفي حدود ما يسمح به القانون، لا تُقبل مسؤولية عن سجل ضائع أو تذكير فائت أو قرار اتُّخذ بناء على ما هو مكتوب هنا.';
+
+  @override
+  String get helpTitle => 'المساعدة';
+
+  @override
+  String get helpQ1 => 'كيف أنسخ احتياطيًا؟';
+
+  @override
+  String get helpA1 =>
+      'الإعدادات، ثم تصدير السجلات. ملف ZIP يحمل كل صف وكل صورة؛ أرسله لنفسك واحتفظ به. الاستعادة تقرأ الملف نفسه على أي هاتف.';
+
+  @override
+  String get helpQ2 => 'نسيت رقمي السري';
+
+  @override
+  String get helpA2 =>
+      'لا يُستعاد، لأن المحفوظ بصمة له فقط. إزالة التطبيق تمسح القفل والدفتر معه، فإن كان لديك حزمة حديثة استعدها بعد ذلك.';
+
+  @override
+  String get helpQ3 => 'فقدت هاتفي';
+
+  @override
+  String get helpA3 =>
+      'لا شيء على خادم، فلا شيء يمكن إعادته. حزمة صدّرتها سابقًا تعيد الدفتر على هاتف جديد؛ وحزمة لم تصدّرها ضاعت.';
+
+  @override
+  String get helpQ4 => 'من أين تأتي التذكيرات؟';
+
+  @override
+  String get helpA4 =>
+      'من تواريخ الجرعة القادمة التي كتبتها. سالالة يحجز تنبيهًا قبل شهر وتنبيهًا في الصباح نفسه؛ وإن كانت الإشعارات موقوفة للتطبيق، تبقى التواريخ ظاهرة في أجندة القطيع.';
+
+  @override
+  String get helpQ5 => 'لماذا تقول صورة إنها ليست على هذا الهاتف؟';
+
+  @override
+  String get helpA5 =>
+      'الصف بقي والملف لم يبقَ — غالبًا بعد استعادة من حزمة بلا صور. إضافة الصورة مرة أخرى تكفي.';
+
+  @override
+  String get helpQ6 => 'هل أستطيع تسليم سجل الحيوان؟';
+
+  @override
+  String get helpA6 =>
+      'نعم. افتح الحيوان وصدّر ملف PDF: مستند ثابت يحتفظ به المشتري دون هذا التطبيق. والتسليم نفسه يُسجَّل في الصفحة نفسها.';
+
+  @override
+  String get helpQ7 => 'ما اللغات المتوفرة؟';
+
+  @override
+  String get helpA7 =>
+      'الإنجليزية، العربية، الفرنسية، الألمانية، الإسبانية، الإيطالية، البرتغالية، الهولندية. الإعدادات ثم اللغة — التغيير يُطبَّق فورًا.';
+
+  @override
+  String get helpQ8 => 'هناك خطأ في التطبيق';
+
+  @override
+  String get helpA8 =>
+      'اكتب لنا وقل ماذا كنت تفعل حين حدث. الإصدار في صفحة «حول».';
+
+  @override
+  String get helpContactHeading => 'اكتب لنا';
+
+  @override
+  String get whatsNewTitle => 'ما الجديد';
+
+  @override
+  String get whatsNew1 =>
+      'صور على بطاقات القطيع، وتصميم أوسع وأدفأ في كل الشاشات.';
+
+  @override
+  String get whatsNew2 => 'نقرة التذكير تفتح الحيوان الذي يخصّه.';
+
+  @override
+  String get whatsNew3 => 'تصدير الجدول صار بلغة التطبيق التي تقرأها.';
+
+  @override
+  String get whatsNew4 =>
+      'خمس لغات إضافية: الألمانية، الإسبانية، الإيطالية، البرتغالية، الهولندية.';
+
+  @override
+  String get whatsNew5 =>
+      'صفحات الخصوصية والشروط والمساعدة، وزر تقييم في الإعدادات.';
+
+  @override
   String daysPlural(String n) {
     return '$n أيام';
   }

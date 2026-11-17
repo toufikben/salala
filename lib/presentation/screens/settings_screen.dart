@@ -2,9 +2,11 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../core/build_info.dart';
 import '../../core/l10n/app_localizations.dart';
+import '../../core/router/app_router.dart';
 import '../../core/utils/date_utils.dart';
 import '../../data/db/settings_dao.dart';
 import '../../data/models/photo.dart';
@@ -40,11 +42,9 @@ class SettingsScreen extends ConsumerWidget {
           const Divider(height: 32),
           const _CsvTiles(),
           const Divider(height: 32),
-          ListTile(
-            leading: const Icon(Icons.workspace_premium_outlined),
-            title: Text(l10n.settingsAbout),
-            subtitle: Text(l10n.settingsOfflineNote),
-          ),
+          const _HelpTiles(),
+          const Divider(height: 32),
+          const _AboutTiles(),
           // Only a CI build carries a tag, so this row is the device-side proof
           // that the APK on the phone is the one just verified.
           if (buildTag.isNotEmpty)
@@ -601,3 +601,131 @@ String _whyRejected(AppLocalizations l10n, PackReject reject) =>
       PackProblem.danglingReference => l10n.packRestoreFailed,
       PackProblem.unreadable || PackProblem.notAPack => l10n.packNotAPack,
     };
+
+/// The four pages a breeder reads once and the two rows that ask the store for
+/// something.
+///
+/// One group rather than five dividers: they are all "the app talking about
+/// itself", and a settings screen whose rows are separated by a rule every two
+/// lines stops reading as groups at all.
+class _HelpTiles extends ConsumerWidget {
+  const _HelpTiles();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+
+    return Column(
+      children: <Widget>[
+        ListTile(
+          leading: const Icon(Icons.help_outline),
+          title: Text(l10n.settingsHelp),
+          onTap: () => context.push(AppPaths.help),
+        ),
+        ListTile(
+          leading: const Icon(Icons.auto_stories_outlined),
+          title: Text(l10n.settingsOnboarding),
+          onTap: () => context.push(
+            // `from` sends Done back here rather than to the herd: a breeder who
+            // reopened the slides from Settings was not starting over.
+            '${AppPaths.onboarding}?from=${Uri.encodeComponent(AppPaths.settings)}',
+          ),
+        ),
+        ListTile(
+          leading: const Icon(Icons.new_releases_outlined),
+          title: Text(l10n.settingsWhatsNew),
+          onTap: () => context.push(AppPaths.whatsNew),
+        ),
+        const _RateTile(),
+      ],
+    );
+  }
+}
+
+/// The rating row, which is a fallback rather than a nag.
+///
+/// No timing heuristic, no "are you enjoying the app?" pre-question and no
+/// counter of saves: Android already rate-limits its own card, and an app that
+/// decides when to ask is an app that has decided to interrupt. The row waits to
+/// be tapped, and says so when the phone has no card to give.
+class _RateTile extends ConsumerStatefulWidget {
+  const _RateTile();
+
+  @override
+  ConsumerState<_RateTile> createState() => _RateTileState();
+}
+
+class _RateTileState extends ConsumerState<_RateTile> {
+  /// The tap is a channel call, and a double tap on a slow phone would ask twice.
+  bool _asking = false;
+
+  Future<void> _rate() async {
+    if (_asking) return;
+    setState(() => _asking = true);
+    final l10n = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      final shown = await ref.read(reviewServiceProvider).request();
+      // The store page was opened instead, which is still what the breeder
+      // asked for — so the only outcome worth a sentence is the one where
+      // neither happened.
+      if (!shown && !mounted) return;
+    } catch (error) {
+      debugPrint('Rating row failed: $error');
+      messenger.showSnackBar(SnackBar(content: Text(l10n.rateUnavailable)));
+    } finally {
+      if (mounted) setState(() => _asking = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
+    return ListTile(
+      leading: const Icon(Icons.star_outline),
+      title: Text(l10n.settingsRate),
+      subtitle: Text(l10n.settingsRateBody),
+      trailing: _asking
+          ? const SizedBox(
+              width: 18,
+              height: 18,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            )
+          : null,
+      onTap: _asking ? null : _rate,
+    );
+  }
+}
+
+/// About, privacy, terms — and the one honest sentence about the whole app,
+/// which now sits on the page that has room for it.
+class _AboutTiles extends StatelessWidget {
+  const _AboutTiles();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
+    return Column(
+      children: <Widget>[
+        ListTile(
+          leading: const Icon(Icons.workspace_premium_outlined),
+          title: Text(l10n.settingsAbout),
+          subtitle: Text(l10n.settingsOfflineNote),
+          onTap: () => context.push(AppPaths.about),
+        ),
+        ListTile(
+          leading: const Icon(Icons.shield_outlined),
+          title: Text(l10n.settingsPrivacy),
+          onTap: () => context.push(AppPaths.privacy),
+        ),
+        ListTile(
+          leading: const Icon(Icons.gavel_outlined),
+          title: Text(l10n.settingsTerms),
+          onTap: () => context.push(AppPaths.terms),
+        ),
+      ],
+    );
+  }
+}

@@ -1001,6 +1001,226 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String get onboardingSlide1Title => 'Um registo por animal';
+
+  @override
+  String get onboardingSlide1Body =>
+      'Um cão ou um gato, a raça, a data de nascimento e de onde veio. O primeiro leva menos de um minuto.';
+
+  @override
+  String get onboardingSlide2Title => 'A saúde, por ordem';
+
+  @override
+  String get onboardingSlide2Body =>
+      'Vacinas com a próxima data, pesagens, testes e visitas. O Salala agenda o lembrete por si.';
+
+  @override
+  String get onboardingSlide3Title => 'A história viaja com ele';
+
+  @override
+  String get onboardingSlide3Body =>
+      'Um PDF ou uma folha de cálculo para o comprador, e um único ZIP que leva cada registo e cada fotografia para um telefone novo.';
+
+  @override
+  String get onboardingSkip => 'Saltar';
+
+  @override
+  String get onboardingNext => 'Seguinte';
+
+  @override
+  String get onboardingStart => 'Adicionar o primeiro animal';
+
+  @override
+  String get settingsOnboarding => 'Ver a introdução outra vez';
+
+  @override
+  String get settingsHelp => 'Ajuda';
+
+  @override
+  String get settingsRate => 'Avaliar o Salala';
+
+  @override
+  String get settingsRateBody => 'Abre o cartão de avaliação da loja.';
+
+  @override
+  String get settingsWhatsNew => 'Novidades';
+
+  @override
+  String get settingsPrivacy => 'Privacidade';
+
+  @override
+  String get settingsTerms => 'Termos de utilização';
+
+  @override
+  String get settingsLicenses => 'Licenças de código aberto';
+
+  @override
+  String get rateUnavailable =>
+      'Este telefone não consegue mostrar o cartão de avaliação agora.';
+
+  @override
+  String get aboutTitle => 'Acerca do Salala';
+
+  @override
+  String get aboutBody =>
+      'Um registo offline para uma criação pequena. Sem conta, sem servidor, sem rastreio — os registos vivem neste telefone e só saem pelas suas mãos.';
+
+  @override
+  String aboutVersion(String version) {
+    return 'Versão $version';
+  }
+
+  @override
+  String get privacyTitle => 'Privacidade';
+
+  @override
+  String get privacyIntro =>
+      'O Salala guarda uma só coisa: o que escreveu sobre os seus animais. Esta página diz onde está e o que o pode tirar deste telefone.';
+
+  @override
+  String get privacyStoredHeading => 'O que é guardado';
+
+  @override
+  String get privacyStoredBody =>
+      'Cada animal, vacina, pesagem, teste, visita, sintoma, entrega e contacto de comprador — e as fotografias anexadas — numa base de dados e numa pasta de imagens dentro do armazenamento privado da aplicação. O Android mantém essa pasta fora do alcance de outras aplicações, e os ficheiros não são cifrados além disso.';
+
+  @override
+  String get privacyBackupHeading => 'O que sai deste telefone';
+
+  @override
+  String get privacyBackupBody =>
+      'Apenas o que exporta: um ZIP com todos os registos e imagens, um CSV de uma tabela, ou um PDF de um animal. Cada um vai para onde o enviar, por isso uma cópia leva nomes e telefones dos seus compradores — trate o ficheiro como o papel que substitui. Ligue o bloqueio se o telefone viajar.';
+
+  @override
+  String get privacyCollectHeading => 'O que é recolhido sobre si';
+
+  @override
+  String get privacyCollectBody =>
+      'Nada. Não há analítica, nem relatórios de falhas, nem identificador publicitário, nem qualquer chamada de rede nesta aplicação.';
+
+  @override
+  String get privacyRemoveHeading => 'Como apagar';
+
+  @override
+  String get privacyRemoveBody =>
+      'Desinstalar remove a base de dados e a pasta de imagens. Não há cópia em lado nenhum, por isso exporte um pacote primeiro se os registos importam — e o PIN do bloqueio também não é recuperável.';
+
+  @override
+  String get termsTitle => 'Termos de utilização';
+
+  @override
+  String get termsUseHeading => 'Para que serve esta aplicação';
+
+  @override
+  String get termsUseBody =>
+      'Manter os seus próprios registos sobre os animais à sua guarda. Uma licença por pessoa; instale-a nos telefones que usa.';
+
+  @override
+  String get termsDataHeading => 'Os seus dados são seus';
+
+  @override
+  String get termsDataBody =>
+      'Não guardamos cópia e não podemos restaurar nada. As cópias são da sua responsabilidade, e o botão de exportar nas Definições é todo o mecanismo.';
+
+  @override
+  String get termsAdviceHeading => 'Não é conselho veterinário';
+
+  @override
+  String get termsAdviceBody =>
+      'O Salala repete o que escreveu e faz aritmética com datas e pesos. Não diagnostica, e um lembrete é uma entrada de calendário, não uma opinião clínica. Ligue a um veterinário.';
+
+  @override
+  String get termsWarrantyHeading => 'Sem garantia';
+
+  @override
+  String get termsWarrantyBody =>
+      'A aplicação é fornecida tal como está. Na medida em que a lei o permite, não se aceita responsabilidade por um registo perdido, um lembrete falhado ou uma decisão tomada com base no que aqui está escrito.';
+
+  @override
+  String get helpTitle => 'Ajuda';
+
+  @override
+  String get helpQ1 => 'Como faço uma cópia?';
+
+  @override
+  String get helpA1 =>
+      'Definições, depois Exportar registos. O ZIP leva cada linha e cada fotografia; envie-o para si e guarde-o. Restaurar relê o mesmo ficheiro em qualquer telefone.';
+
+  @override
+  String get helpQ2 => 'Esqueci-me do PIN';
+
+  @override
+  String get helpA2 =>
+      'Não é recuperável, porque só se guarda um hash. Desinstalar apaga o bloqueio e com ele o registo, por isso se tiver um pacote recente restaure-o depois.';
+
+  @override
+  String get helpQ3 => 'Perdi o telefone';
+
+  @override
+  String get helpA3 =>
+      'Nada está num servidor, por isso nada pode voltar. Um pacote exportado antes restaura o registo num telefone novo; um que nunca exportou está perdido.';
+
+  @override
+  String get helpQ4 => 'De onde vêm os lembretes?';
+
+  @override
+  String get helpA4 =>
+      'Das próximas datas que escreveu. O Salala marca um alarme um mês antes e outro na própria manhã; se as notificações estiverem desligadas, as datas continuam na agenda do efetivo.';
+
+  @override
+  String get helpQ5 => 'Porque diz uma fotografia que não está neste telefone?';
+
+  @override
+  String get helpA5 =>
+      'A linha sobreviveu e o ficheiro não — normalmente depois de restaurar um pacote sem fotografias. Adicionar a fotografia outra vez resolve.';
+
+  @override
+  String get helpQ6 => 'Posso entregar o registo do animal?';
+
+  @override
+  String get helpA6 =>
+      'Sim. Abra o animal e exporte o PDF: um documento fixo que o comprador guarda sem esta aplicação. A entrega em si fica registada na mesma página.';
+
+  @override
+  String get helpQ7 => 'Que línguas existem?';
+
+  @override
+  String get helpA7 =>
+      'Inglês, árabe, francês, alemão, espanhol, italiano, português e neerlandês. Definições, depois Idioma — a mudança aplica-se de imediato.';
+
+  @override
+  String get helpQ8 => 'Algo está errado na aplicação';
+
+  @override
+  String get helpA8 =>
+      'Escreva-nos e diga o que estava a fazer quando aconteceu. A versão está na página Acerca.';
+
+  @override
+  String get helpContactHeading => 'Escreva-nos';
+
+  @override
+  String get whatsNewTitle => 'Novidades';
+
+  @override
+  String get whatsNew1 =>
+      'Fotografias nos cartões do efetivo, e um desenho mais quente e amplo em todo o lado.';
+
+  @override
+  String get whatsNew2 => 'Um lembrete tocado abre o animal a que se refere.';
+
+  @override
+  String get whatsNew3 =>
+      'A exportação da folha de cálculo fala a língua que está a ler.';
+
+  @override
+  String get whatsNew4 =>
+      'Mais cinco línguas: alemão, espanhol, italiano, português e neerlandês.';
+
+  @override
+  String get whatsNew5 =>
+      'Páginas de privacidade, termos e ajuda, e uma linha de avaliação nas Definições.';
+
+  @override
   String daysPlural(String n) {
     return '$n dias';
   }

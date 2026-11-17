@@ -997,6 +997,226 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get onboardingSlide1Title => 'One record per animal';
+
+  @override
+  String get onboardingSlide1Body =>
+      'A dog or a cat, its breed, its birth date and where it came from. The first one takes under a minute.';
+
+  @override
+  String get onboardingSlide2Title => 'Its health, in order';
+
+  @override
+  String get onboardingSlide2Body =>
+      'Vaccinations with their next due date, weigh-ins, screenings and vet visits. Salala books the reminder for you.';
+
+  @override
+  String get onboardingSlide3Title => 'Its story travels with it';
+
+  @override
+  String get onboardingSlide3Body =>
+      'A PDF or a spreadsheet for the buyer, and one ZIP that carries every record and picture to a new phone.';
+
+  @override
+  String get onboardingSkip => 'Skip';
+
+  @override
+  String get onboardingNext => 'Next';
+
+  @override
+  String get onboardingStart => 'Add my first animal';
+
+  @override
+  String get settingsOnboarding => 'Show the introduction again';
+
+  @override
+  String get settingsHelp => 'Help';
+
+  @override
+  String get settingsRate => 'Rate Salala';
+
+  @override
+  String get settingsRateBody => 'Opens this store\'s own review card.';
+
+  @override
+  String get settingsWhatsNew => 'What\'s new';
+
+  @override
+  String get settingsPrivacy => 'Privacy';
+
+  @override
+  String get settingsTerms => 'Terms of use';
+
+  @override
+  String get settingsLicenses => 'Open-source licences';
+
+  @override
+  String get rateUnavailable =>
+      'This phone cannot show the review card right now.';
+
+  @override
+  String get aboutTitle => 'About Salala';
+
+  @override
+  String get aboutBody =>
+      'An offline ledger for a small kennel or cattery. No account, no server, no tracking — the records live on this phone and leave it only through your own hands.';
+
+  @override
+  String aboutVersion(String version) {
+    return 'Version $version';
+  }
+
+  @override
+  String get privacyTitle => 'Privacy';
+
+  @override
+  String get privacyIntro =>
+      'Salala holds one kind of data: what you typed about your animals. This page says where it sits and what can take it off this phone.';
+
+  @override
+  String get privacyStoredHeading => 'What is stored';
+
+  @override
+  String get privacyStoredBody =>
+      'Every animal, dose, weigh-in, screening, visit, symptom, handover and buyer contact — and the photographs you attached — in a database and a picture folder inside this app\'s private storage. Android keeps that folder out of reach of other apps, and the files are not encrypted beyond that.';
+
+  @override
+  String get privacyBackupHeading => 'What leaves this phone';
+
+  @override
+  String get privacyBackupBody =>
+      'Only what you export: a ZIP with every record and picture, a CSV of one table, or a PDF of one animal. Each goes wherever you send it, so a backup carries your buyers\' names and phone numbers — treat the file the way you would the paper it replaces. Turn on the app lock if the phone travels.';
+
+  @override
+  String get privacyCollectHeading => 'What is collected about you';
+
+  @override
+  String get privacyCollectBody =>
+      'Nothing. There is no analytics, no crash reporting, no advertising identifier and no network call in this app.';
+
+  @override
+  String get privacyRemoveHeading => 'How to erase it';
+
+  @override
+  String get privacyRemoveBody =>
+      'Uninstalling removes the database and the picture folder with it. There is no copy anywhere else, so export a pack first if the records matter — and remember that the app lock\'s PIN cannot be recovered either.';
+
+  @override
+  String get termsTitle => 'Terms of use';
+
+  @override
+  String get termsUseHeading => 'What this app is for';
+
+  @override
+  String get termsUseBody =>
+      'Keeping your own records about the animals in your care. One licence per person; install it on the phones you use.';
+
+  @override
+  String get termsDataHeading => 'Your data is yours';
+
+  @override
+  String get termsDataBody =>
+      'We hold no copy of it and cannot restore it. Backups are your responsibility, and the export tile in Settings is the whole mechanism.';
+
+  @override
+  String get termsAdviceHeading => 'Not veterinary advice';
+
+  @override
+  String get termsAdviceBody =>
+      'Salala repeats what you typed and applies arithmetic to dates and weights. It does not diagnose, and a reminder is a calendar entry, not a clinical opinion. Call a veterinarian.';
+
+  @override
+  String get termsWarrantyHeading => 'No warranty';
+
+  @override
+  String get termsWarrantyBody =>
+      'The app is provided as it is. To the extent the law allows, no liability is accepted for a lost record, a missed reminder or a decision taken on what is written here.';
+
+  @override
+  String get helpTitle => 'Help';
+
+  @override
+  String get helpQ1 => 'How do I back up?';
+
+  @override
+  String get helpA1 =>
+      'Settings, then Export records. The ZIP file carries every row and every picture; send it to yourself and keep it. Restoring reads the same file back on any phone.';
+
+  @override
+  String get helpQ2 => 'I forgot my PIN';
+
+  @override
+  String get helpA2 =>
+      'It cannot be recovered, because only a hash of it is stored. Uninstalling the app clears the lock and the ledger with it, so if you have a recent pack, restore that afterwards.';
+
+  @override
+  String get helpQ3 => 'I lost my phone';
+
+  @override
+  String get helpA3 =>
+      'Nothing is on a server, so nothing can be sent back. A pack you exported earlier restores the ledger on a new phone; one you never exported is gone.';
+
+  @override
+  String get helpQ4 => 'Where do the reminders come from?';
+
+  @override
+  String get helpA4 =>
+      'From the next-due dates you typed. Salala books an alarm a month ahead and one on the morning itself; if notifications are switched off for the app, the dates still show in the herd\'s agenda.';
+
+  @override
+  String get helpQ5 => 'Why does a picture say it is not on this phone?';
+
+  @override
+  String get helpA5 =>
+      'The row survived and the file did not — usually after a restore from a pack that carried no pictures. Adding the photo again fixes it.';
+
+  @override
+  String get helpQ6 => 'Can I hand over the animal\'s record?';
+
+  @override
+  String get helpA6 =>
+      'Yes. Open the animal and export its PDF: a fixed document the buyer can keep without this app. The handover itself is recorded on the same page.';
+
+  @override
+  String get helpQ7 => 'Which languages are there?';
+
+  @override
+  String get helpA7 =>
+      'English, Arabic, French, German, Spanish, Italian, Portuguese and Dutch. Settings, then Language — the change applies immediately.';
+
+  @override
+  String get helpQ8 => 'Something is wrong with the app';
+
+  @override
+  String get helpA8 =>
+      'Write to us and say what you were doing when it happened. The version is on the About page.';
+
+  @override
+  String get helpContactHeading => 'Write to us';
+
+  @override
+  String get whatsNewTitle => 'What\'s new';
+
+  @override
+  String get whatsNew1 =>
+      'Photographs on the herd cards, and a warmer, roomier layout throughout.';
+
+  @override
+  String get whatsNew2 => 'A tapped reminder opens the animal it is about.';
+
+  @override
+  String get whatsNew3 =>
+      'The spreadsheet export speaks the language you are reading.';
+
+  @override
+  String get whatsNew4 =>
+      'Five more languages: German, Spanish, Italian, Portuguese and Dutch.';
+
+  @override
+  String get whatsNew5 =>
+      'Privacy, terms and help pages, and a rating row in Settings.';
+
+  @override
   String daysPlural(String n) {
     return '$n days';
   }

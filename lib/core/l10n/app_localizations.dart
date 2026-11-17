@@ -1856,6 +1856,390 @@ abstract class AppLocalizations {
   /// **'{n} days'**
   String daysDual(String n);
 
+  /// No description provided for @onboardingSlide1Title.
+  ///
+  /// In en, this message translates to:
+  /// **'One record per animal'**
+  String get onboardingSlide1Title;
+
+  /// No description provided for @onboardingSlide1Body.
+  ///
+  /// In en, this message translates to:
+  /// **'A dog or a cat, its breed, its birth date and where it came from. The first one takes under a minute.'**
+  String get onboardingSlide1Body;
+
+  /// No description provided for @onboardingSlide2Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Its health, in order'**
+  String get onboardingSlide2Title;
+
+  /// No description provided for @onboardingSlide2Body.
+  ///
+  /// In en, this message translates to:
+  /// **'Vaccinations with their next due date, weigh-ins, screenings and vet visits. Salala books the reminder for you.'**
+  String get onboardingSlide2Body;
+
+  /// No description provided for @onboardingSlide3Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Its story travels with it'**
+  String get onboardingSlide3Title;
+
+  /// No description provided for @onboardingSlide3Body.
+  ///
+  /// In en, this message translates to:
+  /// **'A PDF or a spreadsheet for the buyer, and one ZIP that carries every record and picture to a new phone.'**
+  String get onboardingSlide3Body;
+
+  /// No description provided for @onboardingSkip.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip'**
+  String get onboardingSkip;
+
+  /// No description provided for @onboardingNext.
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get onboardingNext;
+
+  /// No description provided for @onboardingStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Add my first animal'**
+  String get onboardingStart;
+
+  /// No description provided for @settingsOnboarding.
+  ///
+  /// In en, this message translates to:
+  /// **'Show the introduction again'**
+  String get settingsOnboarding;
+
+  /// No description provided for @settingsHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Help'**
+  String get settingsHelp;
+
+  /// No description provided for @settingsRate.
+  ///
+  /// In en, this message translates to:
+  /// **'Rate Salala'**
+  String get settingsRate;
+
+  /// No description provided for @settingsRateBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Opens this store\'s own review card.'**
+  String get settingsRateBody;
+
+  /// No description provided for @settingsWhatsNew.
+  ///
+  /// In en, this message translates to:
+  /// **'What\'s new'**
+  String get settingsWhatsNew;
+
+  /// No description provided for @settingsPrivacy.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy'**
+  String get settingsPrivacy;
+
+  /// No description provided for @settingsTerms.
+  ///
+  /// In en, this message translates to:
+  /// **'Terms of use'**
+  String get settingsTerms;
+
+  /// No description provided for @settingsLicenses.
+  ///
+  /// In en, this message translates to:
+  /// **'Open-source licences'**
+  String get settingsLicenses;
+
+  /// No description provided for @rateUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'This phone cannot show the review card right now.'**
+  String get rateUnavailable;
+
+  /// No description provided for @aboutTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'About Salala'**
+  String get aboutTitle;
+
+  /// No description provided for @aboutBody.
+  ///
+  /// In en, this message translates to:
+  /// **'An offline ledger for a small kennel or cattery. No account, no server, no tracking — the records live on this phone and leave it only through your own hands.'**
+  String get aboutBody;
+
+  /// No description provided for @aboutVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'Version {version}'**
+  String aboutVersion(String version);
+
+  /// No description provided for @privacyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy'**
+  String get privacyTitle;
+
+  /// No description provided for @privacyIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Salala holds one kind of data: what you typed about your animals. This page says where it sits and what can take it off this phone.'**
+  String get privacyIntro;
+
+  /// No description provided for @privacyStoredHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'What is stored'**
+  String get privacyStoredHeading;
+
+  /// No description provided for @privacyStoredBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Every animal, dose, weigh-in, screening, visit, symptom, handover and buyer contact — and the photographs you attached — in a database and a picture folder inside this app\'s private storage. Android keeps that folder out of reach of other apps, and the files are not encrypted beyond that.'**
+  String get privacyStoredBody;
+
+  /// No description provided for @privacyBackupHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'What leaves this phone'**
+  String get privacyBackupHeading;
+
+  /// No description provided for @privacyBackupBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Only what you export: a ZIP with every record and picture, a CSV of one table, or a PDF of one animal. Each goes wherever you send it, so a backup carries your buyers\' names and phone numbers — treat the file the way you would the paper it replaces. Turn on the app lock if the phone travels.'**
+  String get privacyBackupBody;
+
+  /// No description provided for @privacyCollectHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'What is collected about you'**
+  String get privacyCollectHeading;
+
+  /// No description provided for @privacyCollectBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing. There is no analytics, no crash reporting, no advertising identifier and no network call in this app.'**
+  String get privacyCollectBody;
+
+  /// No description provided for @privacyRemoveHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'How to erase it'**
+  String get privacyRemoveHeading;
+
+  /// No description provided for @privacyRemoveBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Uninstalling removes the database and the picture folder with it. There is no copy anywhere else, so export a pack first if the records matter — and remember that the app lock\'s PIN cannot be recovered either.'**
+  String get privacyRemoveBody;
+
+  /// No description provided for @termsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Terms of use'**
+  String get termsTitle;
+
+  /// No description provided for @termsUseHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'What this app is for'**
+  String get termsUseHeading;
+
+  /// No description provided for @termsUseBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Keeping your own records about the animals in your care. One licence per person; install it on the phones you use.'**
+  String get termsUseBody;
+
+  /// No description provided for @termsDataHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Your data is yours'**
+  String get termsDataHeading;
+
+  /// No description provided for @termsDataBody.
+  ///
+  /// In en, this message translates to:
+  /// **'We hold no copy of it and cannot restore it. Backups are your responsibility, and the export tile in Settings is the whole mechanism.'**
+  String get termsDataBody;
+
+  /// No description provided for @termsAdviceHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Not veterinary advice'**
+  String get termsAdviceHeading;
+
+  /// No description provided for @termsAdviceBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Salala repeats what you typed and applies arithmetic to dates and weights. It does not diagnose, and a reminder is a calendar entry, not a clinical opinion. Call a veterinarian.'**
+  String get termsAdviceBody;
+
+  /// No description provided for @termsWarrantyHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'No warranty'**
+  String get termsWarrantyHeading;
+
+  /// No description provided for @termsWarrantyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The app is provided as it is. To the extent the law allows, no liability is accepted for a lost record, a missed reminder or a decision taken on what is written here.'**
+  String get termsWarrantyBody;
+
+  /// No description provided for @helpTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Help'**
+  String get helpTitle;
+
+  /// No description provided for @helpQ1.
+  ///
+  /// In en, this message translates to:
+  /// **'How do I back up?'**
+  String get helpQ1;
+
+  /// No description provided for @helpA1.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings, then Export records. The ZIP file carries every row and every picture; send it to yourself and keep it. Restoring reads the same file back on any phone.'**
+  String get helpA1;
+
+  /// No description provided for @helpQ2.
+  ///
+  /// In en, this message translates to:
+  /// **'I forgot my PIN'**
+  String get helpQ2;
+
+  /// No description provided for @helpA2.
+  ///
+  /// In en, this message translates to:
+  /// **'It cannot be recovered, because only a hash of it is stored. Uninstalling the app clears the lock and the ledger with it, so if you have a recent pack, restore that afterwards.'**
+  String get helpA2;
+
+  /// No description provided for @helpQ3.
+  ///
+  /// In en, this message translates to:
+  /// **'I lost my phone'**
+  String get helpQ3;
+
+  /// No description provided for @helpA3.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing is on a server, so nothing can be sent back. A pack you exported earlier restores the ledger on a new phone; one you never exported is gone.'**
+  String get helpA3;
+
+  /// No description provided for @helpQ4.
+  ///
+  /// In en, this message translates to:
+  /// **'Where do the reminders come from?'**
+  String get helpQ4;
+
+  /// No description provided for @helpA4.
+  ///
+  /// In en, this message translates to:
+  /// **'From the next-due dates you typed. Salala books an alarm a month ahead and one on the morning itself; if notifications are switched off for the app, the dates still show in the herd\'s agenda.'**
+  String get helpA4;
+
+  /// No description provided for @helpQ5.
+  ///
+  /// In en, this message translates to:
+  /// **'Why does a picture say it is not on this phone?'**
+  String get helpQ5;
+
+  /// No description provided for @helpA5.
+  ///
+  /// In en, this message translates to:
+  /// **'The row survived and the file did not — usually after a restore from a pack that carried no pictures. Adding the photo again fixes it.'**
+  String get helpA5;
+
+  /// No description provided for @helpQ6.
+  ///
+  /// In en, this message translates to:
+  /// **'Can I hand over the animal\'s record?'**
+  String get helpQ6;
+
+  /// No description provided for @helpA6.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes. Open the animal and export its PDF: a fixed document the buyer can keep without this app. The handover itself is recorded on the same page.'**
+  String get helpA6;
+
+  /// No description provided for @helpQ7.
+  ///
+  /// In en, this message translates to:
+  /// **'Which languages are there?'**
+  String get helpQ7;
+
+  /// No description provided for @helpA7.
+  ///
+  /// In en, this message translates to:
+  /// **'English, Arabic, French, German, Spanish, Italian, Portuguese and Dutch. Settings, then Language — the change applies immediately.'**
+  String get helpA7;
+
+  /// No description provided for @helpQ8.
+  ///
+  /// In en, this message translates to:
+  /// **'Something is wrong with the app'**
+  String get helpQ8;
+
+  /// No description provided for @helpA8.
+  ///
+  /// In en, this message translates to:
+  /// **'Write to us and say what you were doing when it happened. The version is on the About page.'**
+  String get helpA8;
+
+  /// No description provided for @helpContactHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Write to us'**
+  String get helpContactHeading;
+
+  /// No description provided for @whatsNewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What\'s new'**
+  String get whatsNewTitle;
+
+  /// No description provided for @whatsNew1.
+  ///
+  /// In en, this message translates to:
+  /// **'Photographs on the herd cards, and a warmer, roomier layout throughout.'**
+  String get whatsNew1;
+
+  /// No description provided for @whatsNew2.
+  ///
+  /// In en, this message translates to:
+  /// **'A tapped reminder opens the animal it is about.'**
+  String get whatsNew2;
+
+  /// No description provided for @whatsNew3.
+  ///
+  /// In en, this message translates to:
+  /// **'The spreadsheet export speaks the language you are reading.'**
+  String get whatsNew3;
+
+  /// No description provided for @whatsNew4.
+  ///
+  /// In en, this message translates to:
+  /// **'Five more languages: German, Spanish, Italian, Portuguese and Dutch.'**
+  String get whatsNew4;
+
+  /// No description provided for @whatsNew5.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy, terms and help pages, and a rating row in Settings.'**
+  String get whatsNew5;
+
   /// No description provided for @daysPlural.
   ///
   /// In en, this message translates to:

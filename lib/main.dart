@@ -43,6 +43,11 @@ Future<void> _launch() async {
 
   final languageCode = await SettingsDao(db).read(SettingKeys.languageCode);
   final hasPin = await AppLockService().isLocked();
+  // Read before the first frame for the same reason the language is: the launch
+  // screen has to be decided once, not painted as the herd and then replaced with
+  // three slides. A first launch has no row at all, which reads as `not seen`.
+  final onboardingSeen = await SettingsDao(db)
+      .readBool(SettingKeys.onboardingSeen);
 
   // Bootstrapped before the first frame so the permission prompt and the
   // timezone pin are both settled by the time a dose can be saved. The single
@@ -62,6 +67,7 @@ Future<void> _launch() async {
             ? null
             : Locale(languageCode),
       ),
+      initialOnboardingSeenProvider.overrideWithValue(onboardingSeen),
     ],
   );
   try {

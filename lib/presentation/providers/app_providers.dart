@@ -10,6 +10,7 @@ import '../../services/app_lock_service.dart';
 import '../../services/pack_files.dart';
 import '../../services/photo_files.dart';
 import '../../services/reminder_scheduler.dart';
+import '../../services/review_service.dart';
 
 /// The opened database. `main()` overrides this after `ensureInitialized`, and
 /// tests override it with a temporary file database — which is why nothing here
@@ -76,6 +77,32 @@ final packFilesProvider = Provider<PackFiles>((ref) => const SystemPackFiles());
 final photoFilesProvider = Provider<PhotoFiles>(
   (ref) => const SystemPhotoFiles(),
 );
+
+/// The store's review card. A recorder in tests, because the real one talks to
+/// Play and a widget test has no store.
+final reviewServiceProvider = Provider<ReviewService>(
+  (ref) => const StoreReviewService(),
+);
+
+/// Whether the introduction has been seen on this device.
+///
+/// A notifier rather than a read-only value because two things change it: the
+/// slides their own Done button, and Settings can send the breeder back through
+/// them. `main()` seeds it from the settings row, and the router both reads it and
+/// listens to it — a plain `Provider` would need a restart to notice.
+class OnboardingSeen extends Notifier<bool> {
+  @override
+  bool build() => ref.watch(initialOnboardingSeenProvider);
+
+  void markSeen() => state = true;
+}
+
+final onboardingSeenProvider = NotifierProvider<OnboardingSeen, bool>(
+  OnboardingSeen.new,
+);
+
+/// The stored value, read once at launch. Overridden by `main()` and by tests.
+final initialOnboardingSeenProvider = Provider<bool>((ref) => true);
 
 /// True once the PIN gate has been satisfied (or never armed). The router
 /// redirects on this, so it is a synchronous flag, not the async digest check.

@@ -55,4 +55,12 @@ class SettingKeys {
   /// device's habit, and a restored pack must not claim the new phone has been
   /// backing up. `_importPack` clears it for exactly that reason.
   static const String lastPackExportedAt = 'last_pack_exported_at';
+
+  /// Whether the three introductory slides have been seen.
+  ///
+  /// A row rather than a `shared_preferences` first-run flag, for the same reason
+  /// `lastPackExportedAt` is one: it is a setting of this device, it can be
+  /// cleared by a restore of someone else's pack, and Settings offers a row that
+  /// shows the slides again — which is a thing no first-run flag can do.
+  static const String onboardingSeen = 'onboarding_seen';
 }

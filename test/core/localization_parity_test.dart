@@ -55,6 +55,9 @@ void main() {
       'weightNote',
       'visitNoReason',
       'pdfPlacement',
+      // "Version" is the French word and the English one, and the placeholder
+      // carries the only part that could differ.
+      'aboutVersion',
     },
     'de': <String>{
       'appTitle',
@@ -65,6 +68,7 @@ void main() {
       'healthTestType',
       'healthTestResultHelper',
       'symptomName',
+      'aboutVersion',
     },
     'es': <String>{
       'appTitle',
@@ -82,6 +86,11 @@ void main() {
       'healthTestType',
       'healthTestResultHelper',
       'pdfPedigree',
+      // Italian uses the English "privacy" for the concept, which is the word
+      // the Garante itself prints; the alternative "riservatezza" is a word no
+      // Italian app uses for this page.
+      'privacyTitle',
+      'settingsPrivacy',
     },
     'pt': <String>{
       'appTitle',
@@ -99,6 +108,12 @@ void main() {
       'healthTestType',
       'healthTestResultHelper',
       'symptomState',
+      // Dutch keeps "privacy" and "help" as loanwords in software; both are what
+      // a Dutch settings screen says.
+      'privacyTitle',
+      'settingsPrivacy',
+      'helpTitle',
+      'settingsHelp',
     },
   };
 

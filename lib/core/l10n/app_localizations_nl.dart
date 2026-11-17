@@ -1004,6 +1004,227 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String get onboardingSlide1Title => 'Eén kaart per dier';
+
+  @override
+  String get onboardingSlide1Body =>
+      'Een hond of kat, het ras, de geboortedatum en waar hij vandaan komt. De eerste kost minder dan een minuut.';
+
+  @override
+  String get onboardingSlide2Title => 'Zijn gezondheid, op volgorde';
+
+  @override
+  String get onboardingSlide2Body =>
+      'Inentingen met de volgende datum, wegingen, onderzoeken en bezoeken. Salala zet de herinnering voor je klaar.';
+
+  @override
+  String get onboardingSlide3Title => 'Zijn verhaal reist mee';
+
+  @override
+  String get onboardingSlide3Body =>
+      'Een pdf of een spreadsheet voor de koper, en één ZIP die elke kaart en elke foto naar een nieuwe telefoon brengt.';
+
+  @override
+  String get onboardingSkip => 'Overslaan';
+
+  @override
+  String get onboardingNext => 'Volgende';
+
+  @override
+  String get onboardingStart => 'Mijn eerste dier toevoegen';
+
+  @override
+  String get settingsOnboarding => 'Inleiding opnieuw tonen';
+
+  @override
+  String get settingsHelp => 'Help';
+
+  @override
+  String get settingsRate => 'Salala beoordelen';
+
+  @override
+  String get settingsRateBody => 'Opent de beoordelingskaart van de winkel.';
+
+  @override
+  String get settingsWhatsNew => 'Nieuw';
+
+  @override
+  String get settingsPrivacy => 'Privacy';
+
+  @override
+  String get settingsTerms => 'Gebruiksvoorwaarden';
+
+  @override
+  String get settingsLicenses => 'Open-sourcelicenties';
+
+  @override
+  String get rateUnavailable =>
+      'Deze telefoon kan de beoordelingskaart nu niet tonen.';
+
+  @override
+  String get aboutTitle => 'Over Salala';
+
+  @override
+  String get aboutBody =>
+      'Een offline register voor een kleine fokkerij. Geen account, geen server, geen tracking — de kaarten staan op deze telefoon en verlaten hem alleen door jouw handen.';
+
+  @override
+  String aboutVersion(String version) {
+    return 'Versie $version';
+  }
+
+  @override
+  String get privacyTitle => 'Privacy';
+
+  @override
+  String get privacyIntro =>
+      'Salala bewaart één ding: wat je over je dieren hebt ingevuld. Deze pagina zegt waar het staat en wat het van deze telefoon kan halen.';
+
+  @override
+  String get privacyStoredHeading => 'Wat er wordt bewaard';
+
+  @override
+  String get privacyStoredBody =>
+      'Elk dier, elke inenting, weging, onderzoek, bezoek, elk symptoom, elke plaatsing en elk kopercontact — en de foto\'s die je toevoegde — in een database en een fotomap in de privéopslag van de app. Android houdt die map buiten bereik van andere apps, en de bestanden zijn daarbuiten niet versleuteld.';
+
+  @override
+  String get privacyBackupHeading => 'Wat deze telefoon verlaat';
+
+  @override
+  String get privacyBackupBody =>
+      'Alleen wat je exporteert: een ZIP met elke kaart en foto, een CSV van één tabel, of een pdf van één dier. Elk bestand gaat waar je het heen stuurt, dus een back-up bevat namen en telefoonnummers van je kopers — behandel het bestand zoals het papier dat het vervangt. Zet de app-vergrendeling aan als de telefoon reist.';
+
+  @override
+  String get privacyCollectHeading => 'Wat er over jou wordt verzameld';
+
+  @override
+  String get privacyCollectBody =>
+      'Niets. Geen analytics, geen crashrapporten, geen advertentie-id en geen enkele netwerkaanroep in deze app.';
+
+  @override
+  String get privacyRemoveHeading => 'Hoe je het wist';
+
+  @override
+  String get privacyRemoveBody =>
+      'Verwijderen ruimt de database en de fotomap op. Er is nergens een kopie, dus exporteer eerst een pakket als de kaarten belangrijk zijn — en de pincode van de vergrendeling is ook niet te herstellen.';
+
+  @override
+  String get termsTitle => 'Gebruiksvoorwaarden';
+
+  @override
+  String get termsUseHeading => 'Waar deze app voor is';
+
+  @override
+  String get termsUseBody =>
+      'Je eigen gegevens bijhouden over de dieren die je verzorgt. Eén licentie per persoon; installeer hem op de telefoons die je gebruikt.';
+
+  @override
+  String get termsDataHeading => 'Jouw gegevens zijn van jou';
+
+  @override
+  String get termsDataBody =>
+      'Wij bewaren geen kopie en kunnen niets terugzetten. Back-ups zijn jouw verantwoordelijkheid, en de exportknop in Instellingen is het hele mechanisme.';
+
+  @override
+  String get termsAdviceHeading => 'Geen diergeneeskundig advies';
+
+  @override
+  String get termsAdviceBody =>
+      'Salala herhaalt wat je hebt ingevuld en rekent met datums en gewichten. Het stelt geen diagnose, en een herinnering is een agenda-item, geen klinische mening. Bel een dierenarts.';
+
+  @override
+  String get termsWarrantyHeading => 'Geen garantie';
+
+  @override
+  String get termsWarrantyBody =>
+      'De app wordt geleverd zoals hij is. Voor zover de wet dat toestaat, wordt geen aansprakelijkheid aanvaard voor een verloren kaart, een gemiste herinnering of een beslissing op basis van wat hier staat.';
+
+  @override
+  String get helpTitle => 'Help';
+
+  @override
+  String get helpQ1 => 'Hoe maak ik een back-up?';
+
+  @override
+  String get helpA1 =>
+      'Instellingen, dan Dossiers exporteren. De ZIP bevat elke rij en elke foto; stuur hem naar jezelf en bewaar hem. Herstellen leest hetzelfde bestand op elke telefoon.';
+
+  @override
+  String get helpQ2 => 'Ik ben mijn pincode kwijt';
+
+  @override
+  String get helpA2 =>
+      'Die is niet te herstellen, want er wordt alleen een hash bewaard. Verwijderen wist de vergrendeling en daarmee het register, dus herstel daarna een recent pakket als je dat hebt.';
+
+  @override
+  String get helpQ3 => 'Ik ben mijn telefoon kwijt';
+
+  @override
+  String get helpA3 =>
+      'Niets staat op een server, dus niets kan worden teruggestuurd. Een eerder geëxporteerd pakket zet het register terug op een nieuwe telefoon; een pakket dat je nooit exporteerde is weg.';
+
+  @override
+  String get helpQ4 => 'Waar komen de herinneringen vandaan?';
+
+  @override
+  String get helpA4 =>
+      'Uit de volgende datums die je hebt ingevuld. Salala zet een alarm een maand vooruit en een op de ochtend zelf; staan meldingen uit, dan blijven de datums in de agenda van de groep.';
+
+  @override
+  String get helpQ5 =>
+      'Waarom zegt een foto dat hij niet op deze telefoon staat?';
+
+  @override
+  String get helpA5 =>
+      'De rij bleef, het bestand niet — meestal na een herstel uit een pakket zonder foto\'s. De foto opnieuw toevoegen lost het op.';
+
+  @override
+  String get helpQ6 => 'Kan ik de kaart van het dier overdragen?';
+
+  @override
+  String get helpA6 =>
+      'Ja. Open het dier en exporteer zijn pdf: een vast document dat de koper bewaart zonder deze app. De plaatsing zelf wordt op dezelfde pagina vastgelegd.';
+
+  @override
+  String get helpQ7 => 'Welke talen zijn er?';
+
+  @override
+  String get helpA7 =>
+      'Engels, Arabisch, Frans, Duits, Spaans, Italiaans, Portugees en Nederlands. Instellingen, dan Taal — de wijziging geldt meteen.';
+
+  @override
+  String get helpQ8 => 'Er is iets mis met de app';
+
+  @override
+  String get helpA8 =>
+      'Schrijf ons en zeg wat je aan het doen was toen het gebeurde. De versie staat op de pagina Over.';
+
+  @override
+  String get helpContactHeading => 'Schrijf ons';
+
+  @override
+  String get whatsNewTitle => 'Nieuw';
+
+  @override
+  String get whatsNew1 =>
+      'Foto\'s op de kaarten van de groep, en een warmer en ruimer ontwerp in het hele scherm.';
+
+  @override
+  String get whatsNew2 =>
+      'Een aangetikte herinnering opent het dier waar hij over gaat.';
+
+  @override
+  String get whatsNew3 => 'De spreadsheet-export spreekt de taal die je leest.';
+
+  @override
+  String get whatsNew4 =>
+      'Vijf talen erbij: Duits, Spaans, Italiaans, Portugees en Nederlands.';
+
+  @override
+  String get whatsNew5 =>
+      'Pagina\'s voor privacy, voorwaarden en help, en een beoordelingsregel in Instellingen.';
+
+  @override
   String daysPlural(String n) {
     return '$n dagen';
   }

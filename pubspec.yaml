@@ -61,6 +61,12 @@ dependencies:
   # holds no camera code — the written file comes back as bytes.
   image_picker: ^1.2.0
 
+  # The rating row in Settings. Android's own in-app review sheet, which is a
+  # Play Core dialog rather than a page of ours: it has no dismiss button of our
+  # own to get wrong, and on a phone without Play it reports itself unavailable
+  # and the row falls back to the store listing.
+  in_app_review: ^2.0.12
+
   # Buyer pack (Stage 2). `pdf` writes the record a breeder hands to a buyer: a
   # fixed-layout document that survives a phone change, an app the buyer does
   # not have, and a printed piece of paper. It has no server side and no

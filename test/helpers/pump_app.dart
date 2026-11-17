@@ -29,6 +29,7 @@ import 'package:timezone/timezone.dart' as tz;
 import 'fake_notification_writer.dart';
 import 'fake_pack_files.dart';
 import 'fake_photo_files.dart';
+import 'fake_review_service.dart';
 import 'fake_secure_storage.dart';
 import 'test_db.dart';
 
@@ -206,6 +207,14 @@ Future<FakeSecureStorage> pumpSalala(
   // also be handed the alarms that opening the list booked for it. The launch
   // path switches this on and tests itself.
   bool resyncOnLaunch = false,
+  // Whether this install has already been introduced to itself. Defaults to
+  // true, because almost every test is about the app rather than about arriving
+  // in it — a suite where every screen is behind three slides would be a suite
+  // about slides. The onboarding tests pass false.
+  bool onboardingSeen = true,
+  // The store's review card, which no test runner has. A recorder in its place
+  // is what lets the rating row be proved to call it and to answer a refusal.
+  FakeReviewService? review,
   List<Animal> seed = const <Animal>[],
   List<Vaccination> seedVaccinations = const <Vaccination>[],
   List<WeightEntry> seedWeights = const <WeightEntry>[],
@@ -331,6 +340,8 @@ Future<FakeSecureStorage> pumpSalala(
           remindersResyncProvider.overrideWith(AlreadyResynced.new),
         lockGracePeriodProvider.overrideWithValue(lockGrace),
         if (locale != null) initialLocaleProvider.overrideWithValue(locale),
+        initialOnboardingSeenProvider.overrideWithValue(onboardingSeen),
+        if (review != null) reviewServiceProvider.overrideWithValue(review),
       ],
       child: const SalalaApp(),
     ),

@@ -1007,6 +1007,227 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get onboardingSlide1Title => 'Ein Eintrag pro Tier';
+
+  @override
+  String get onboardingSlide1Body =>
+      'Hund oder Katze, Rasse, Geburtsdatum und Herkunft. Das erste dauert keine Minute.';
+
+  @override
+  String get onboardingSlide2Title => 'Seine Gesundheit, der Reihe nach';
+
+  @override
+  String get onboardingSlide2Body =>
+      'Impfungen mit der nächsten Fälligkeit, Wägungen, Screenings und Tierarztbesuche. Salala stellt die Erinnerung für Sie.';
+
+  @override
+  String get onboardingSlide3Title => 'Seine Geschichte reist mit';
+
+  @override
+  String get onboardingSlide3Body =>
+      'Ein PDF oder eine Tabelle für den Käufer, und ein ZIP, das jeden Eintrag und jedes Foto auf ein neues Telefon bringt.';
+
+  @override
+  String get onboardingSkip => 'Überspringen';
+
+  @override
+  String get onboardingNext => 'Weiter';
+
+  @override
+  String get onboardingStart => 'Erstes Tier hinzufügen';
+
+  @override
+  String get settingsOnboarding => 'Einführung erneut zeigen';
+
+  @override
+  String get settingsHelp => 'Hilfe';
+
+  @override
+  String get settingsRate => 'Salala bewerten';
+
+  @override
+  String get settingsRateBody => 'Öffnet die Bewertungskarte des Stores.';
+
+  @override
+  String get settingsWhatsNew => 'Neu in dieser Version';
+
+  @override
+  String get settingsPrivacy => 'Datenschutz';
+
+  @override
+  String get settingsTerms => 'Nutzungsbedingungen';
+
+  @override
+  String get settingsLicenses => 'Open-Source-Lizenzen';
+
+  @override
+  String get rateUnavailable =>
+      'Dieses Telefon kann die Bewertungskarte gerade nicht anzeigen.';
+
+  @override
+  String get aboutTitle => 'Über Salala';
+
+  @override
+  String get aboutBody =>
+      'Ein Offline-Verzeichnis für eine kleine Zucht. Kein Konto, kein Server, kein Tracking — die Einträge liegen auf diesem Telefon und verlassen es nur durch Ihre Hand.';
+
+  @override
+  String aboutVersion(String version) {
+    return 'Version $version';
+  }
+
+  @override
+  String get privacyTitle => 'Datenschutz';
+
+  @override
+  String get privacyIntro =>
+      'Salala hält nur eines: was Sie über Ihre Tiere eingetragen haben. Diese Seite sagt, wo es liegt und was es von diesem Telefon entfernen kann.';
+
+  @override
+  String get privacyStoredHeading => 'Was gespeichert wird';
+
+  @override
+  String get privacyStoredBody =>
+      'Jedes Tier, jede Impfung, Wägung, jedes Screening, jeder Besuch, jedes Symptom, jede Vermittlung und jeder Käuferkontakt — und die angehängten Fotos — in einer Datenbank und einem Bildordner im privaten Speicher der App. Android hält diesen Ordner von anderen Apps fern, und die Dateien sind darüber hinaus nicht verschlüsselt.';
+
+  @override
+  String get privacyBackupHeading => 'Was dieses Telefon verlässt';
+
+  @override
+  String get privacyBackupBody =>
+      'Nur was Sie exportieren: ein ZIP mit allen Einträgen und Bildern, eine CSV einer Tabelle oder ein PDF eines Tieres. Jedes geht dorthin, wohin Sie es schicken, also trägt eine Sicherung Namen und Telefonnummern Ihrer Käufer — behandeln Sie die Datei wie das Papier, das sie ersetzt. Schalten Sie die App-Sperre ein, wenn das Telefon reist.';
+
+  @override
+  String get privacyCollectHeading => 'Was über Sie gesammelt wird';
+
+  @override
+  String get privacyCollectBody =>
+      'Nichts. Keine Analyse, keine Absturzberichte, keine Werbe-ID und kein Netzwerkaufruf in dieser App.';
+
+  @override
+  String get privacyRemoveHeading => 'Wie man es löscht';
+
+  @override
+  String get privacyRemoveBody =>
+      'Deinstallieren entfernt die Datenbank und den Bildordner. Anderswo gibt es keine Kopie, also exportieren Sie zuerst ein Paket, wenn die Einträge zählen — und die PIN der App-Sperre ist ebenfalls nicht wiederherstellbar.';
+
+  @override
+  String get termsTitle => 'Nutzungsbedingungen';
+
+  @override
+  String get termsUseHeading => 'Wofür diese App gedacht ist';
+
+  @override
+  String get termsUseBody =>
+      'Eigene Aufzeichnungen über die Tiere in Ihrer Obhut zu führen. Eine Lizenz pro Person; installieren Sie sie auf den Telefonen, die Sie nutzen.';
+
+  @override
+  String get termsDataHeading => 'Ihre Daten gehören Ihnen';
+
+  @override
+  String get termsDataBody =>
+      'Wir halten keine Kopie und können nichts wiederherstellen. Sicherungen sind Ihre Verantwortung, und die Exportzeile in den Einstellungen ist der ganze Mechanismus.';
+
+  @override
+  String get termsAdviceHeading => 'Keine tierärztliche Beratung';
+
+  @override
+  String get termsAdviceBody =>
+      'Salala wiederholt, was Sie eingetragen haben, und rechnet mit Daten und Gewichten. Es diagnostiziert nicht, und eine Erinnerung ist ein Kalendereintrag, keine klinische Meinung. Rufen Sie eine Tierärztin an.';
+
+  @override
+  String get termsWarrantyHeading => 'Keine Gewährleistung';
+
+  @override
+  String get termsWarrantyBody =>
+      'Die App wird so bereitgestellt, wie sie ist. Soweit das Recht es zulässt, wird keine Haftung für einen verlorenen Eintrag, eine verpasste Erinnerung oder eine auf diese Angaben gestützte Entscheidung übernommen.';
+
+  @override
+  String get helpTitle => 'Hilfe';
+
+  @override
+  String get helpQ1 => 'Wie sichere ich?';
+
+  @override
+  String get helpA1 =>
+      'Einstellungen, dann Daten exportieren. Das ZIP trägt jede Zeile und jedes Foto; schicken Sie es sich selbst und heben Sie es auf. Wiederherstellen liest dieselbe Datei auf jedem Telefon.';
+
+  @override
+  String get helpQ2 => 'Ich habe meine PIN vergessen';
+
+  @override
+  String get helpA2 =>
+      'Sie ist nicht wiederherstellbar, weil nur ein Hash gespeichert ist. Deinstallieren löscht die Sperre und mit ihr das Verzeichnis, also stellen Sie danach ein aktuelles Paket wieder her.';
+
+  @override
+  String get helpQ3 => 'Ich habe mein Telefon verloren';
+
+  @override
+  String get helpA3 =>
+      'Nichts liegt auf einem Server, also kann nichts zurückgeschickt werden. Ein früher exportiertes Paket stellt das Verzeichnis auf einem neuen Telefon wieder her; ein nie exportiertes ist verloren.';
+
+  @override
+  String get helpQ4 => 'Woher kommen die Erinnerungen?';
+
+  @override
+  String get helpA4 =>
+      'Aus den Fälligkeitsdaten, die Sie eingetragen haben. Salala stellt einen Alarm einen Monat vorher und einen am Morgen selbst; sind Benachrichtigungen aus, stehen die Daten weiterhin in der Agenda der Herde.';
+
+  @override
+  String get helpQ5 => 'Warum sagt ein Foto, es sei nicht auf diesem Telefon?';
+
+  @override
+  String get helpA5 =>
+      'Die Zeile blieb, die Datei nicht — meist nach einer Wiederherstellung aus einem Paket ohne Bilder. Das Foto erneut hinzuzufügen behebt es.';
+
+  @override
+  String get helpQ6 => 'Kann ich den Eintrag des Tieres weitergeben?';
+
+  @override
+  String get helpA6 =>
+      'Ja. Öffnen Sie das Tier und exportieren Sie sein PDF: ein festes Dokument, das der Käufer ohne diese App behält. Die Vermittlung selbst wird auf derselben Seite festgehalten.';
+
+  @override
+  String get helpQ7 => 'Welche Sprachen gibt es?';
+
+  @override
+  String get helpA7 =>
+      'Englisch, Arabisch, Französisch, Deutsch, Spanisch, Italienisch, Portugiesisch und Niederländisch. Einstellungen, dann Sprache — die Änderung gilt sofort.';
+
+  @override
+  String get helpQ8 => 'Etwas stimmt nicht';
+
+  @override
+  String get helpA8 =>
+      'Schreiben Sie uns und sagen Sie, was Sie gerade taten. Die Version steht auf der Seite „Über“.';
+
+  @override
+  String get helpContactHeading => 'Schreiben Sie uns';
+
+  @override
+  String get whatsNewTitle => 'Neu in dieser Version';
+
+  @override
+  String get whatsNew1 =>
+      'Fotos auf den Herdenkarten und ein wärmeres, großzügigeres Layout.';
+
+  @override
+  String get whatsNew2 =>
+      'Ein angetippter Reminder öffnet das Tier, um das es geht.';
+
+  @override
+  String get whatsNew3 =>
+      'Der Tabellenexport spricht die Sprache, die Sie lesen.';
+
+  @override
+  String get whatsNew4 =>
+      'Fünf weitere Sprachen: Deutsch, Spanisch, Italienisch, Portugiesisch und Niederländisch.';
+
+  @override
+  String get whatsNew5 =>
+      'Seiten für Datenschutz, Bedingungen und Hilfe, und eine Bewertungszeile in den Einstellungen.';
+
+  @override
   String daysPlural(String n) {
     return '$n Tage';
   }
