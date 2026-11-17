@@ -16,6 +16,7 @@ import '../../services/pack_archive.dart';
 import '../../services/pack_files.dart';
 import '../../services/photo_files.dart';
 import '../../services/reminder_resync.dart';
+import '../../services/trial.dart';
 import '../providers/agenda_providers.dart';
 import '../providers/app_providers.dart';
 import '../widgets/pin_dialogs.dart';
@@ -39,6 +40,10 @@ class SettingsScreen extends ConsumerWidget {
           const _LanguageTile(),
           const Divider(height: 32),
           const _PackTiles(),
+          // Dormant until the app sells something: a free install never sees the
+          // word "trial", and the row that counts down is the one place that
+          // would otherwise nag a breeder who owes nothing.
+          if (kBillingEnabled) const _TrialTile(),
           const Divider(height: 32),
           const _CsvTiles(),
           const Divider(height: 32),
@@ -700,6 +705,39 @@ class _RateTileState extends ConsumerState<_RateTile> {
 
 /// About, privacy, terms — and the one honest sentence about the whole app,
 /// which now sits on the page that has room for it.
+/// The trial, stated rather than sold.
+///
+/// Only rendered when `kBillingEnabled` is true, so the row itself is the switch:
+/// a free build shows nothing, and the day billing is turned on the count appears
+/// without a single other change. It is a `FutureProvider` because the start day
+/// is a database row, and the row is deliberately not a countdown — a clock
+/// ticking on a settings screen is a pressure nobody asked for.
+final trialStateProvider = FutureProvider.autoDispose<TrialState>((ref) {
+  return TrialService(settings: ref.watch(settingsDaoProvider)).state();
+});
+
+class _TrialTile extends ConsumerWidget {
+  const _TrialTile();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final state = ref.watch(trialStateProvider).value;
+
+    return ListTile(
+      leading: const Icon(Icons.hourglass_bottom),
+      title: Text(l10n.settingsTrial),
+      subtitle: Text(
+        state == null
+            ? ''
+            : state.expired
+            ? l10n.settingsTrialOver
+            : l10n.settingsTrialRemaining('${state.daysLeft}'),
+      ),
+    );
+  }
+}
+
 class _AboutTiles extends StatelessWidget {
   const _AboutTiles();
 

@@ -63,4 +63,12 @@ class SettingKeys {
   /// cleared by a restore of someone else's pack, and Settings offers a row that
   /// shows the slides again — which is a thing no first-run flag can do.
   static const String onboardingSeen = 'onboarding_seen';
+
+  /// The day the free trial began, in unix milliseconds, written once at the
+  /// first launch and never moved.
+  ///
+  /// In the settings table rather than the keystore on purpose: a keystore a
+  /// restore could not carry would look like a fresh install, and a breeder who
+  /// brought her ledger to a new phone would be handed a second trial for it.
+  static const String trialStartedAt = 'trial_started_at';
 }
