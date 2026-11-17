@@ -72,6 +72,10 @@ class _BulkVaccinationDialogState
     final l10n = AppLocalizations.of(context);
     final messenger = ScaffoldMessenger.of(context);
     final navigator = Navigator.of(context);
+    // Read here, once: the reminder loop below runs after two awaits, and a
+    // `context` that has gone away cannot say which language the alarm's date
+    // should be written in.
+    final localeTag = Localizations.localeOf(context).toString();
     setState(() => _saving = true);
 
     final administered = _administered;
@@ -126,7 +130,7 @@ class _BulkVaccinationDialogState
               l10n: l10n,
               title: reminderTitle(ref, l10n, dose.animalId),
               what: dose.vaccineName,
-              dueDay: formatDay(context, dose.nextDueDate),
+              dueDay: formatDayFor(localeTag, dose.nextDueDate),
             );
       } catch (error) {
         debugPrint('Reminder after a bulk dose failed: $error');

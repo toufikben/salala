@@ -9,7 +9,6 @@ import '../../core/utils/date_utils.dart';
 import '../../core/utils/gestation.dart';
 import '../../data/models/animal.dart';
 import '../../data/models/litter.dart';
-import '../../data/models/vaccination.dart';
 import '../../services/litter_pdf.dart';
 import '../../services/pack_files.dart';
 import '../../services/pdf_layout.dart';
