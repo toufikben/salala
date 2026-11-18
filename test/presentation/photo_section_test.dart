@@ -78,7 +78,10 @@ Future<void> _scrollTo(WidgetTester tester, Finder finder) async {
       matching: find.byType(Scrollable),
     ),
   );
-  await tester.pumpAndSettle();
+  // `settleRealIo`, not `pumpAndSettle`: a section scrolled into view may still
+  // be reading the ledger, and its indeterminate bar never settles — the helper
+  // waits for the bar instead of timing out on it.
+  await settleRealIo(tester);
 }
 
 /// The picture strip's own emptiness, not the sentence.
