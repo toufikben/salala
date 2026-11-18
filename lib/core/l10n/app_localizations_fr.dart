@@ -132,7 +132,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get animalDeleteBody =>
-      'Ses vaccinations, tests de santé, pesées, visites et symptômes sont aussi supprimés, avec toute cession enregistrée, ses photos et les fichiers qui les gardent sur ce téléphone, ainsi que le contrat joint à cette cession. Cette action est irréversible.';
+      'Ses vaccins, tests de santé, pesées, visites et symptômes sont aussi supprimés, avec toute cession enregistrée, ses photos et les fichiers qui les gardent sur ce téléphone, ainsi que le contrat joint à cette cession. Cette action est irréversible.';
 
   @override
   String get animalNameRequired => 'Le nom est obligatoire';

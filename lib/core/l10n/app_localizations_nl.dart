@@ -131,7 +131,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get animalDeleteBody =>
-      'Ook zijn vaccinaties, gezondheidstests, gewichten, bezoeken en symptomen worden verwijderd, samen met elke vastgelegde plaatsing, de foto\'s en de bestanden die deze op dit toestel bewaren, en het aan die plaatsing gekoppelde contract. Dit kan niet ongedaan worden gemaakt.';
+      'Ook haar inentingen, gezondheidstests, gewichten, bezoeken en symptomen worden verwijderd, samen met elke vastgelegde plaatsing, haar foto\'s en de bestanden die deze op dit toestel bewaren, en het aan die plaatsing gekoppelde contract. Dit kan niet ongedaan worden gemaakt.';
 
   @override
   String get animalNameRequired => 'Een naam is verplicht';

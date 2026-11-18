@@ -36,7 +36,7 @@
   "animalEditTitle": "Dier bewerken",
   "animalDeleteTitle": "{name} verwijderen?",
   "animalDeleteLittersNote": "Hiermee verdwijnen ook {litters} van haar nestjes, en de {puppies} puppy's die daarin staan blijven bij uw dieren maar zonder de gegevens van hun moeder.",
-  "animalDeleteBody": "Ook zijn vaccinaties, gezondheidstests, gewichten, bezoeken en symptomen worden verwijderd, samen met elke vastgelegde plaatsing, de foto's en de bestanden die deze op dit toestel bewaren, en het aan die plaatsing gekoppelde contract. Dit kan niet ongedaan worden gemaakt.",
+  "animalDeleteBody": "Ook haar inentingen, gezondheidstests, gewichten, bezoeken en symptomen worden verwijderd, samen met elke vastgelegde plaatsing, haar foto's en de bestanden die deze op dit toestel bewaren, en het aan die plaatsing gekoppelde contract. Dit kan niet ongedaan worden gemaakt.",
   "animalNameRequired": "Een naam is verplicht",
   "animalSpeciesRequired": "Kies een soort",
 

@@ -268,7 +268,7 @@ void main() {
         'صورها',
         'ملفات تلك الصور',
         'العقد',
-        'الولادات',
+        'سجل ولادة',
         'لا يمكن التراجع',
       ],
       'fr': <String>[
@@ -281,7 +281,7 @@ void main() {
         'photos',
         'fichiers qui les gardent',
         'contrat',
-        'portées',
+        'portée',
         'irréversible',
       ],
       'de': <String>[
