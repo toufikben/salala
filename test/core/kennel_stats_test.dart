@@ -215,8 +215,9 @@ void main() {
         withinDays: 400,
       );
 
-      // 29 May 2027, not "two days ago".
-      expect(found.single.days, 362);
+      // 30 May 2027 — 363 days off, not "two days ago". June is 30 days long, so
+      // a year from 1 June lands on 1 June and two days come off that.
+      expect(found.single.days, 363);
       expect(found.single.turning, 8);
     });
 
