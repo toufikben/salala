@@ -10,6 +10,7 @@ import '../../presentation/screens/about_screen.dart';
 import '../../presentation/screens/buyer_list_screen.dart';
 import '../../presentation/screens/health_test_form_screen.dart';
 import '../../presentation/screens/help_screen.dart';
+import '../../presentation/screens/kennel_stats_screen.dart';
 import '../../presentation/screens/litter_form_screen.dart';
 import '../../presentation/screens/litter_list_screen.dart';
 import '../../presentation/screens/lock_screen.dart';
@@ -38,6 +39,7 @@ class AppPaths {
   static const String terms = '/settings/terms';
   static const String help = '/settings/help';
   static const String whatsNew = '/settings/whats-new';
+  static const String stats = '/settings/stats';
 
   static String editAnimal(String id) => '/animals/$id/edit';
 
@@ -250,6 +252,10 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: 'whats-new',
             builder: (context, state) => const WhatsNewScreen(),
+          ),
+          GoRoute(
+            path: 'stats',
+            builder: (context, state) => const KennelStatsScreen(),
           ),
         ],
       ),

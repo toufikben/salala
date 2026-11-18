@@ -641,6 +641,11 @@ class _HelpTiles extends ConsumerWidget {
           title: Text(l10n.settingsWhatsNew),
           onTap: () => context.push(AppPaths.whatsNew),
         ),
+        ListTile(
+          leading: const Icon(Icons.insights_outlined),
+          title: Text(l10n.settingsStats),
+          onTap: () => context.push(AppPaths.stats),
+        ),
         const _RateTile(),
       ],
     );

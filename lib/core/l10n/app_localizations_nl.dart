@@ -517,6 +517,81 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String get statsTitle => 'Het kennel in cijfers';
+
+  @override
+  String get settingsStats => 'Het kennel in cijfers';
+
+  @override
+  String get statsHerdGroup => 'Wie er zijn';
+
+  @override
+  String get statsBreedingGroup => 'Nesten en pups';
+
+  @override
+  String get statsMoneyGroup => 'Plaatsingen';
+
+  @override
+  String get statsAtHome => 'Dieren thuis';
+
+  @override
+  String get statsBreedingStock => 'Fokdieren';
+
+  @override
+  String get statsFemales => 'Teven thuis';
+
+  @override
+  String get statsMales => 'Reuen thuis';
+
+  @override
+  String get statsEverRecorded => 'Ooit vastgelegd';
+
+  @override
+  String get statsWhelpings => 'Nesten in de kaart';
+
+  @override
+  String get statsPuppies => 'Pups uit jouw nesten';
+
+  @override
+  String statsPuppiesThisYear(String year) {
+    return 'Pups geboren in $year';
+  }
+
+  @override
+  String get statsPlacements => 'Plaatsingen';
+
+  @override
+  String get statsUnnamedCurrency => 'Geen valuta opgegeven';
+
+  @override
+  String statsHandoverCount(String count) {
+    return '$count daarvan betaald';
+  }
+
+  @override
+  String get statsNoRevenue => 'Geen prijs vastgelegd';
+
+  @override
+  String get statsFooter =>
+      'Geteld uit je eigen kaart, op dit toestel. Niets hiervan verlaat het.';
+
+  @override
+  String get birthdayTitle => 'Binnenkort';
+
+  @override
+  String get birthdayToday => 'vandaag';
+
+  @override
+  String birthdayIn(String days) {
+    return 'over $days';
+  }
+
+  @override
+  String birthdayTurning(String name, String years) {
+    return '$name wordt $years';
+  }
+
+  @override
   String get heatCardTitle => 'Volgende loopsheid';
 
   @override

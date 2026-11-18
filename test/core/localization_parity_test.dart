@@ -71,6 +71,9 @@ void main() {
       'healthTestResultHelper',
       'symptomName',
       'aboutVersion',
+      // "in {days}" is the German phrase and the English one, and the
+      // placeholder carries the only part that could differ.
+      'birthdayIn',
     },
     'es': <String>{
       'appTitle',

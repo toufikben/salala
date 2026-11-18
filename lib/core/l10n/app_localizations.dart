@@ -998,6 +998,138 @@ abstract class AppLocalizations {
   /// **'Expected whelping: {date}'**
   String litterExpected(String date);
 
+  /// Title of the page that adds the whole ledger up.
+  ///
+  /// In en, this message translates to:
+  /// **'The kennel in numbers'**
+  String get statsTitle;
+
+  /// The Settings row that opens the statistics page.
+  ///
+  /// In en, this message translates to:
+  /// **'The kennel in numbers'**
+  String get settingsStats;
+
+  /// Heading over the counts of animals currently kept.
+  ///
+  /// In en, this message translates to:
+  /// **'Who is here'**
+  String get statsHerdGroup;
+
+  /// Heading over the whelping and puppy counts.
+  ///
+  /// In en, this message translates to:
+  /// **'Whelpings and puppies'**
+  String get statsBreedingGroup;
+
+  /// Heading over the handover counts and the money taken.
+  ///
+  /// In en, this message translates to:
+  /// **'Handovers'**
+  String get statsMoneyGroup;
+
+  /// How many animals are currently kept, including retired ones.
+  ///
+  /// In en, this message translates to:
+  /// **'Animals at home'**
+  String get statsAtHome;
+
+  /// How many animals are flagged as breeding stock.
+  ///
+  /// In en, this message translates to:
+  /// **'Breeding stock'**
+  String get statsBreedingStock;
+
+  /// How many females are currently kept.
+  ///
+  /// In en, this message translates to:
+  /// **'Females at home'**
+  String get statsFemales;
+
+  /// How many males are currently kept.
+  ///
+  /// In en, this message translates to:
+  /// **'Males at home'**
+  String get statsMales;
+
+  /// Every animal row the ledger holds, including sold and dead ones.
+  ///
+  /// In en, this message translates to:
+  /// **'Ever recorded'**
+  String get statsEverRecorded;
+
+  /// How many litters have a whelping date on file.
+  ///
+  /// In en, this message translates to:
+  /// **'Whelpings on file'**
+  String get statsWhelpings;
+
+  /// How many animals in the ledger were born into one of these litters.
+  ///
+  /// In en, this message translates to:
+  /// **'Puppies from your litters'**
+  String get statsPuppies;
+
+  /// Puppies whose birth date falls in the current calendar year.
+  ///
+  /// In en, this message translates to:
+  /// **'Puppies born in {year}'**
+  String statsPuppiesThisYear(String year);
+
+  /// How many handovers are on file.
+  ///
+  /// In en, this message translates to:
+  /// **'Handovers'**
+  String get statsPlacements;
+
+  /// Label for a total whose handovers had no currency typed. Never guessed.
+  ///
+  /// In en, this message translates to:
+  /// **'No currency named'**
+  String get statsUnnamedCurrency;
+
+  /// How many of the handovers carried a price.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} of them paid'**
+  String statsHandoverCount(String count);
+
+  /// Said instead of a total when no handover has a price.
+  ///
+  /// In en, this message translates to:
+  /// **'No price recorded'**
+  String get statsNoRevenue;
+
+  /// Closing line: the numbers were computed from the local ledger and never leave the phone.
+  ///
+  /// In en, this message translates to:
+  /// **'Counted from your own ledger, on this phone. Nothing here leaves it.'**
+  String get statsFooter;
+
+  /// Heading of the card listing animals whose birthday is close.
+  ///
+  /// In en, this message translates to:
+  /// **'Coming up'**
+  String get birthdayTitle;
+
+  /// A birthday that is today.
+  ///
+  /// In en, this message translates to:
+  /// **'today'**
+  String get birthdayToday;
+
+  /// How far away a birthday is.
+  ///
+  /// In en, this message translates to:
+  /// **'in {days}'**
+  String birthdayIn(String days);
+
+  /// An animal's name and the age she turns.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} turns {years}'**
+  String birthdayTurning(String name, String years);
+
   /// Heading of the card that forecasts a dam's next season. Deliberately not the word for a medical event: a breeder is planning, not diagnosing.
   ///
   /// In en, this message translates to:

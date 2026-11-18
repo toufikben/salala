@@ -511,6 +511,81 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get statsTitle => 'The kennel in numbers';
+
+  @override
+  String get settingsStats => 'The kennel in numbers';
+
+  @override
+  String get statsHerdGroup => 'Who is here';
+
+  @override
+  String get statsBreedingGroup => 'Whelpings and puppies';
+
+  @override
+  String get statsMoneyGroup => 'Handovers';
+
+  @override
+  String get statsAtHome => 'Animals at home';
+
+  @override
+  String get statsBreedingStock => 'Breeding stock';
+
+  @override
+  String get statsFemales => 'Females at home';
+
+  @override
+  String get statsMales => 'Males at home';
+
+  @override
+  String get statsEverRecorded => 'Ever recorded';
+
+  @override
+  String get statsWhelpings => 'Whelpings on file';
+
+  @override
+  String get statsPuppies => 'Puppies from your litters';
+
+  @override
+  String statsPuppiesThisYear(String year) {
+    return 'Puppies born in $year';
+  }
+
+  @override
+  String get statsPlacements => 'Handovers';
+
+  @override
+  String get statsUnnamedCurrency => 'No currency named';
+
+  @override
+  String statsHandoverCount(String count) {
+    return '$count of them paid';
+  }
+
+  @override
+  String get statsNoRevenue => 'No price recorded';
+
+  @override
+  String get statsFooter =>
+      'Counted from your own ledger, on this phone. Nothing here leaves it.';
+
+  @override
+  String get birthdayTitle => 'Coming up';
+
+  @override
+  String get birthdayToday => 'today';
+
+  @override
+  String birthdayIn(String days) {
+    return 'in $days';
+  }
+
+  @override
+  String birthdayTurning(String name, String years) {
+    return '$name turns $years';
+  }
+
+  @override
   String get heatCardTitle => 'Next heat';
 
   @override

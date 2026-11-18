@@ -17,6 +17,7 @@ import '../providers/agenda_providers.dart';
 import '../providers/app_providers.dart';
 import '../providers/record_providers.dart';
 import '../widgets/animal_card.dart';
+import '../widgets/birthday_card.dart';
 import '../widgets/salala_nav_bar.dart';
 
 class AnimalListScreen extends ConsumerStatefulWidget {
@@ -212,6 +213,13 @@ class _AnimalGroups extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.fromLTRB(8, 8, 8, 96),
       children: <Widget>[
+        // Above the agenda on purpose: the first card on this screen is the one
+        // that is not a chore. It hides itself when nothing is close, so the
+        // agenda still gets the first line on an ordinary week.
+        BirthdayCard(
+          animals: animals,
+          nowMs: DateTime.now().millisecondsSinceEpoch,
+        ),
         if (showAgenda)
           _HerdAgenda(animals: animals, agenda: agenda, onRetry: onAgendaRetry),
         if (breeding.isNotEmpty) ...<Widget>[

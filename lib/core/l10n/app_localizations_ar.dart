@@ -510,6 +510,81 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get statsTitle => 'الكنل بالأرقام';
+
+  @override
+  String get settingsStats => 'الكنل بالأرقام';
+
+  @override
+  String get statsHerdGroup => 'من هنا';
+
+  @override
+  String get statsBreedingGroup => 'البطون والجراء';
+
+  @override
+  String get statsMoneyGroup => 'التسليمات';
+
+  @override
+  String get statsAtHome => 'حيوانات موجودة';
+
+  @override
+  String get statsBreedingStock => 'قطيع التربية';
+
+  @override
+  String get statsFemales => 'إناث هنا';
+
+  @override
+  String get statsMales => 'ذكور هنا';
+
+  @override
+  String get statsEverRecorded => 'كل ما سُجّل';
+
+  @override
+  String get statsWhelpings => 'بطون في السجل';
+
+  @override
+  String get statsPuppies => 'جراء من بطونك';
+
+  @override
+  String statsPuppiesThisYear(String year) {
+    return 'جراء وُلدوا في $year';
+  }
+
+  @override
+  String get statsPlacements => 'تسليمات';
+
+  @override
+  String get statsUnnamedCurrency => 'بلا عملة محددة';
+
+  @override
+  String statsHandoverCount(String count) {
+    return '$count منها مدفوعة';
+  }
+
+  @override
+  String get statsNoRevenue => 'لا سعر مسجّل';
+
+  @override
+  String get statsFooter =>
+      'محسوبة من سجلك أنت، على هذا الهاتف. لا شيء منها يخرج عنه.';
+
+  @override
+  String get birthdayTitle => 'قريبًا';
+
+  @override
+  String get birthdayToday => 'اليوم';
+
+  @override
+  String birthdayIn(String days) {
+    return 'بعد $days';
+  }
+
+  @override
+  String birthdayTurning(String name, String years) {
+    return '$name يبلغ $years';
+  }
+
+  @override
   String get heatCardTitle => 'الشياع القادم';
 
   @override

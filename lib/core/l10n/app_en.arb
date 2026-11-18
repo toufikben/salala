@@ -291,6 +291,107 @@
       }
     }
   },
+  "statsTitle": "The kennel in numbers",
+  "@statsTitle": {
+    "description": "Title of the page that adds the whole ledger up."
+  },
+  "settingsStats": "The kennel in numbers",
+  "@settingsStats": {
+    "description": "The Settings row that opens the statistics page."
+  },
+  "statsHerdGroup": "Who is here",
+  "@statsHerdGroup": {
+    "description": "Heading over the counts of animals currently kept."
+  },
+  "statsBreedingGroup": "Whelpings and puppies",
+  "@statsBreedingGroup": {
+    "description": "Heading over the whelping and puppy counts."
+  },
+  "statsMoneyGroup": "Handovers",
+  "@statsMoneyGroup": {
+    "description": "Heading over the handover counts and the money taken."
+  },
+  "statsAtHome": "Animals at home",
+  "@statsAtHome": {
+    "description": "How many animals are currently kept, including retired ones."
+  },
+  "statsBreedingStock": "Breeding stock",
+  "@statsBreedingStock": {
+    "description": "How many animals are flagged as breeding stock."
+  },
+  "statsFemales": "Females at home",
+  "@statsFemales": {
+    "description": "How many females are currently kept."
+  },
+  "statsMales": "Males at home",
+  "@statsMales": {
+    "description": "How many males are currently kept."
+  },
+  "statsEverRecorded": "Ever recorded",
+  "@statsEverRecorded": {
+    "description": "Every animal row the ledger holds, including sold and dead ones."
+  },
+  "statsWhelpings": "Whelpings on file",
+  "@statsWhelpings": {
+    "description": "How many litters have a whelping date on file."
+  },
+  "statsPuppies": "Puppies from your litters",
+  "@statsPuppies": {
+    "description": "How many animals in the ledger were born into one of these litters."
+  },
+  "statsPuppiesThisYear": "Puppies born in {year}",
+  "@statsPuppiesThisYear": {
+    "description": "Puppies whose birth date falls in the current calendar year.",
+    "placeholders": {
+      "year": { "type": "String" }
+    }
+  },
+  "statsPlacements": "Handovers",
+  "@statsPlacements": {
+    "description": "How many handovers are on file."
+  },
+  "statsUnnamedCurrency": "No currency named",
+  "@statsUnnamedCurrency": {
+    "description": "Label for a total whose handovers had no currency typed. Never guessed."
+  },
+  "statsHandoverCount": "{count} of them paid",
+  "@statsHandoverCount": {
+    "description": "How many of the handovers carried a price.",
+    "placeholders": {
+      "count": { "type": "String" }
+    }
+  },
+  "statsNoRevenue": "No price recorded",
+  "@statsNoRevenue": {
+    "description": "Said instead of a total when no handover has a price."
+  },
+  "statsFooter": "Counted from your own ledger, on this phone. Nothing here leaves it.",
+  "@statsFooter": {
+    "description": "Closing line: the numbers were computed from the local ledger and never leave the phone."
+  },
+  "birthdayTitle": "Coming up",
+  "@birthdayTitle": {
+    "description": "Heading of the card listing animals whose birthday is close."
+  },
+  "birthdayToday": "today",
+  "@birthdayToday": {
+    "description": "A birthday that is today."
+  },
+  "birthdayIn": "in {days}",
+  "@birthdayIn": {
+    "description": "How far away a birthday is.",
+    "placeholders": {
+      "days": { "type": "String" }
+    }
+  },
+  "birthdayTurning": "{name} turns {years}",
+  "@birthdayTurning": {
+    "description": "An animal's name and the age she turns.",
+    "placeholders": {
+      "name": { "type": "String" },
+      "years": { "type": "String" }
+    }
+  },
   "heatCardTitle": "Next heat",
   "@heatCardTitle": {
     "description": "Heading of the card that forecasts a dam's next season. Deliberately not the word for a medical event: a breeder is planning, not diagnosing."
