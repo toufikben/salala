@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:salala/data/models/animal.dart';
+import 'package:salala/presentation/screens/animal_detail_screen.dart';
 import 'package:salala/data/models/health_test.dart';
 import 'package:salala/data/models/placement.dart';
 import 'package:salala/data/models/vaccination.dart';
@@ -33,6 +34,20 @@ void _usePhoneViewport(WidgetTester tester) {
   tester.view.devicePixelRatio = 2.625;
   addTearDown(tester.view.resetPhysicalSize);
   addTearDown(tester.view.resetDevicePixelRatio);
+}
+
+/// Brings a row of the ledger on stage: the page is a lazy list, so a section
+/// below the fold has not been built yet.
+Future<void> _scrollTo(WidgetTester tester, Finder finder) async {
+  await tester.scrollUntilVisible(
+    finder,
+    240,
+    scrollable: find.descendant(
+      of: find.byType(AnimalDetailScreen),
+      matching: find.byType(Scrollable),
+    ),
+  );
+  await settleRealIo(tester);
 }
 
 Future<void> _openAnimal(WidgetTester tester, String name) async {
@@ -165,12 +180,16 @@ void main() {
     await _openAnimal(tester, 'Nala');
 
     final card = find.byType(AnimalTimelineCard);
-    // The handover section still names the amount; the timeline does not, because
-    // a row nobody dated cannot be put in order.
+    // The card at the top of the page, where every dated row would be, does not
+    // carry the amount: a row nobody dated cannot be put in order.
     expect(
       find.descendant(of: card, matching: find.textContaining('2500')),
       findsNothing,
     );
+
+    // And the handover section further down still names it, which is the other
+    // half of the promise — the row is not hidden, it is only out of the list.
+    await _scrollTo(tester, find.textContaining('2500'));
     expect(find.textContaining('2500'), findsWidgets);
   });
 
@@ -227,6 +246,10 @@ void main() {
       // the hidden part, so nothing is silently dropped.
       expect(tester.widget<Text>(showAll).data, 'Show all 8');
 
+      // The button sits under six rows, so it is off the bottom of the phone: a
+      // tap without bringing it on stage lands on whatever is there instead.
+      await tester.ensureVisible(showAll);
+      await tester.pumpAndSettle();
       await tester.tap(showAll);
       await tester.pumpAndSettle();
 

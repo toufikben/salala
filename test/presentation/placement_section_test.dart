@@ -85,6 +85,12 @@ Future<void> _openAnimal(WidgetTester tester, String name) async {
 }
 
 Future<void> _tap(WidgetTester tester, Finder finder) async {
+  // A row below the fold does not exist yet: the ledger is a lazy list,
+  // and the timeline card above the sections moved everything down, so the
+  // scroll comes before the `ensureVisible` that used to be enough alone.
+  if (finder.evaluate().isEmpty) {
+    await _scrollTo(tester, finder);
+  }
   await tester.ensureVisible(finder);
   await tester.pumpAndSettle();
   await _letFarewellExpire(tester);

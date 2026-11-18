@@ -74,6 +74,12 @@ Future<void> _openNala(WidgetTester tester) async {
 }
 
 Future<void> _tap(WidgetTester tester, Finder finder) async {
+  // A row below the fold does not exist yet: the ledger is a lazy list and the
+  // timeline card above the sections pushed everything down, so the scroll comes
+  // before the `ensureVisible` that used to be enough on its own.
+  if (finder.evaluate().isEmpty) {
+    await _scrollTo(tester, finder);
+  }
   await tester.ensureVisible(finder);
   await tester.pumpAndSettle();
   await tester.tap(finder);
