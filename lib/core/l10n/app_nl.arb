@@ -427,5 +427,20 @@
   "whatsNew3": "De spreadsheet-export spreekt de taal die je leest.",
   "whatsNew4": "Vijf talen erbij: Duits, Spaans, Italiaans, Portugees en Nederlands.",
   "whatsNew5": "Pagina's voor privacy, voorwaarden en help, en een beoordelingsregel in Instellingen.",
-  "daysPlural": "{n} dagen"
+  "whatsNew6": "Eén lijst per dier: elke inenting, weging, bezoek en plaatsing op datum.",
+  "daysPlural": "{n} dagen",
+  "timelineTitle": "Wat er gebeurde",
+  "timelineEmpty": "Nog niets met een datum.",
+  "timelineShowAll": "Alle {count} tonen",
+  "timelineShowLess": "Minder tonen",
+  "timelineKindBorn": "Geboorte",
+  "timelineKindDied": "Overlijden",
+  "timelineKindWhelped": "Nestje",
+  "timelineKindVaccination": "Inenting",
+  "timelineKindHealthTest": "Gezondheidstest",
+  "timelineKindVisit": "Dierenartsbezoek",
+  "timelineKindSymptom": "Symptoom",
+  "timelineKindWeight": "Weging",
+  "timelineKindPhoto": "Foto",
+  "timelineKindPlacement": "Plaatsing"
 }

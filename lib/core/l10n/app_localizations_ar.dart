@@ -1384,6 +1384,54 @@ class AppLocalizationsAr extends AppLocalizations {
       'صفحات الخصوصية والشروط والمساعدة، وزر تقييم في الإعدادات.';
 
   @override
+  String get whatsNew6 =>
+      'قائمة واحدة لكل حيوان: كل تطعيم ووزن وزيارة وتسليم بترتيب التاريخ.';
+
+  @override
+  String get timelineTitle => 'ما حدث';
+
+  @override
+  String get timelineEmpty => 'لا شيء مؤرّخ بعد.';
+
+  @override
+  String timelineShowAll(String count) {
+    return 'عرض الكل $count';
+  }
+
+  @override
+  String get timelineShowLess => 'عرض أقل';
+
+  @override
+  String get timelineKindBorn => 'الميلاد';
+
+  @override
+  String get timelineKindDied => 'الوفاة';
+
+  @override
+  String get timelineKindWhelped => 'ولادة';
+
+  @override
+  String get timelineKindVaccination => 'تطعيم';
+
+  @override
+  String get timelineKindHealthTest => 'فحص صحي';
+
+  @override
+  String get timelineKindVisit => 'زيارة بيطرية';
+
+  @override
+  String get timelineKindSymptom => 'عرض';
+
+  @override
+  String get timelineKindWeight => 'وزن';
+
+  @override
+  String get timelineKindPhoto => 'صورة';
+
+  @override
+  String get timelineKindPlacement => 'تسليم';
+
+  @override
   String daysPlural(String n) {
     return '$n أيام';
   }

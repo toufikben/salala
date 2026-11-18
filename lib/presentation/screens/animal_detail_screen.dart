@@ -27,6 +27,7 @@ import '../../services/photo_files.dart';
 import '../providers/app_providers.dart';
 import '../providers/record_providers.dart';
 import '../providers/triage_providers.dart';
+import '../widgets/animal_timeline_card.dart';
 import '../widgets/heat_cycle_card.dart';
 import '../widgets/photo_thumb.dart';
 import '../widgets/placement_dialog.dart';
@@ -108,6 +109,19 @@ class AnimalDetailScreen extends ConsumerWidget {
               // on before anything is wrong. A dam with fewer than two matings
               // on file gets nothing at all, and `forecastHeat` decides that.
               _HeatSection(animal: animal, litters: litters),
+              // Above the records and below the heat card: the one card on this
+              // page that answers *when*, so it sits where the eye arrives
+              // before the six sections that answer *what*. It cannot fail on
+              // its own — every list it reads is one the sections below read —
+              // so an error here is drawn as empty rather than as a retry the
+              // breeder would press to no effect.
+              ref
+                  .watch(animalTimelineProvider(animal.id))
+                  .when(
+                    loading: () => const _SectionLoading(),
+                    error: (error, stack) => const SizedBox.shrink(),
+                    data: (events) => AnimalTimelineCard(events: events),
+                  ),
               _RecordSection(
                 title: l10n.recordsSymptoms,
                 addLabel: l10n.symptomAdd,

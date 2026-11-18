@@ -427,5 +427,20 @@
   "whatsNew3": "A exportação da folha de cálculo fala a língua que está a ler.",
   "whatsNew4": "Mais cinco línguas: alemão, espanhol, italiano, português e neerlandês.",
   "whatsNew5": "Páginas de privacidade, termos e ajuda, e uma linha de avaliação nas Definições.",
-  "daysPlural": "{n} dias"
+  "whatsNew6": "Uma só lista por animal: cada vacina, pesagem, visita e entrega por data.",
+  "daysPlural": "{n} dias",
+  "timelineTitle": "O que aconteceu",
+  "timelineEmpty": "Ainda nada com data.",
+  "timelineShowAll": "Mostrar tudo ({count})",
+  "timelineShowLess": "Mostrar menos",
+  "timelineKindBorn": "Nascimento",
+  "timelineKindDied": "Falecimento",
+  "timelineKindWhelped": "Ninhada",
+  "timelineKindVaccination": "Vacina",
+  "timelineKindHealthTest": "Teste de saúde",
+  "timelineKindVisit": "Visita ao veterinário",
+  "timelineKindSymptom": "Sintoma",
+  "timelineKindWeight": "Pesagem",
+  "timelineKindPhoto": "Foto",
+  "timelineKindPlacement": "Entrega"
 }

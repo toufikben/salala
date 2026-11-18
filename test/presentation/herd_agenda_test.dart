@@ -5,6 +5,7 @@ import 'package:salala/data/models/vaccination.dart';
 import 'package:salala/presentation/screens/animal_detail_screen.dart';
 
 import '../helpers/pump_app.dart';
+import '../helpers/section_finder.dart';
 
 const int _day = 86400000;
 
@@ -228,8 +229,8 @@ void main() {
     await tester.tap(_agendaRow('Rabies was due 3 days ago'));
     await settleRealIo(tester);
 
-    await _scrollLedgerTo(tester, find.text('Rabies'));
-    await tester.tap(find.text('Rabies'));
+    await _scrollLedgerTo(tester, sectionText('Rabies'));
+    await tester.tap(sectionText('Rabies'));
     await settleRealIo(tester);
 
     await tester.tap(find.byIcon(Icons.delete_outline));

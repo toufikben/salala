@@ -427,5 +427,20 @@
   "whatsNew3": "Der Tabellenexport spricht die Sprache, die Sie lesen.",
   "whatsNew4": "Fünf weitere Sprachen: Deutsch, Spanisch, Italienisch, Portugiesisch und Niederländisch.",
   "whatsNew5": "Seiten für Datenschutz, Bedingungen und Hilfe, und eine Bewertungszeile in den Einstellungen.",
-  "daysPlural": "{n} Tage"
+  "whatsNew6": "Eine Liste je Tier: jede Impfung, jedes Gewicht, jeder Besuch und jede Vermittlung nach Datum.",
+  "daysPlural": "{n} Tage",
+  "timelineTitle": "Was geschehen ist",
+  "timelineEmpty": "Noch nichts mit Datum.",
+  "timelineShowAll": "Alle {count} anzeigen",
+  "timelineShowLess": "Weniger anzeigen",
+  "timelineKindBorn": "Geburt",
+  "timelineKindDied": "Tod",
+  "timelineKindWhelped": "Wurf",
+  "timelineKindVaccination": "Impfung",
+  "timelineKindHealthTest": "Gesundheitsuntersuchung",
+  "timelineKindVisit": "Tierarztbesuch",
+  "timelineKindSymptom": "Symptom",
+  "timelineKindWeight": "Gewicht",
+  "timelineKindPhoto": "Foto",
+  "timelineKindPlacement": "Vermittlung"
 }

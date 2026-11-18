@@ -1399,6 +1399,54 @@ class AppLocalizationsDe extends AppLocalizations {
       'Seiten für Datenschutz, Bedingungen und Hilfe, und eine Bewertungszeile in den Einstellungen.';
 
   @override
+  String get whatsNew6 =>
+      'Eine Liste je Tier: jede Impfung, jedes Gewicht, jeder Besuch und jede Vermittlung nach Datum.';
+
+  @override
+  String get timelineTitle => 'Was geschehen ist';
+
+  @override
+  String get timelineEmpty => 'Noch nichts mit Datum.';
+
+  @override
+  String timelineShowAll(String count) {
+    return 'Alle $count anzeigen';
+  }
+
+  @override
+  String get timelineShowLess => 'Weniger anzeigen';
+
+  @override
+  String get timelineKindBorn => 'Geburt';
+
+  @override
+  String get timelineKindDied => 'Tod';
+
+  @override
+  String get timelineKindWhelped => 'Wurf';
+
+  @override
+  String get timelineKindVaccination => 'Impfung';
+
+  @override
+  String get timelineKindHealthTest => 'Gesundheitsuntersuchung';
+
+  @override
+  String get timelineKindVisit => 'Tierarztbesuch';
+
+  @override
+  String get timelineKindSymptom => 'Symptom';
+
+  @override
+  String get timelineKindWeight => 'Gewicht';
+
+  @override
+  String get timelineKindPhoto => 'Foto';
+
+  @override
+  String get timelineKindPlacement => 'Vermittlung';
+
+  @override
   String daysPlural(String n) {
     return '$n Tage';
   }

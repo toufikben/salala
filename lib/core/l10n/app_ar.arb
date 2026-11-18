@@ -507,5 +507,20 @@
   "whatsNew3": "تصدير الجدول صار بلغة التطبيق التي تقرأها.",
   "whatsNew4": "خمس لغات إضافية: الألمانية، الإسبانية، الإيطالية، البرتغالية، الهولندية.",
   "whatsNew5": "صفحات الخصوصية والشروط والمساعدة، وزر تقييم في الإعدادات.",
-  "daysPlural": "{n} أيام"
+  "whatsNew6": "قائمة واحدة لكل حيوان: كل تطعيم ووزن وزيارة وتسليم بترتيب التاريخ.",
+  "daysPlural": "{n} أيام",
+  "timelineTitle": "ما حدث",
+  "timelineEmpty": "لا شيء مؤرّخ بعد.",
+  "timelineShowAll": "عرض الكل {count}",
+  "timelineShowLess": "عرض أقل",
+  "timelineKindBorn": "الميلاد",
+  "timelineKindDied": "الوفاة",
+  "timelineKindWhelped": "ولادة",
+  "timelineKindVaccination": "تطعيم",
+  "timelineKindHealthTest": "فحص صحي",
+  "timelineKindVisit": "زيارة بيطرية",
+  "timelineKindSymptom": "عرض",
+  "timelineKindWeight": "وزن",
+  "timelineKindPhoto": "صورة",
+  "timelineKindPlacement": "تسليم"
 }

@@ -7,6 +7,7 @@ import 'package:salala/services/photo_files.dart';
 
 import '../helpers/fake_photo_files.dart';
 import '../helpers/pump_app.dart';
+import '../helpers/section_finder.dart';
 
 const String _nalaId = 'animal-nala';
 const String _blank = 'Not on this phone';
@@ -39,7 +40,7 @@ void _usePhoneViewport(WidgetTester tester) {
 }
 
 Future<void> _openNala(WidgetTester tester) async {
-  await tester.tap(find.text('Nala'));
+  await tester.tap(sectionText('Nala'));
   await settleRealIo(tester);
 }
 
@@ -54,13 +55,13 @@ Future<void> _tap(WidgetTester tester, Finder finder) async {
 /// meant before the camera existed.
 Future<void> _addFromGallery(WidgetTester tester) async {
   await _tap(tester, find.widgetWithText(TextButton, 'Add photo'));
-  await tester.tap(find.text('Choose from the gallery'));
+  await tester.tap(sectionText('Choose from the gallery'));
   await tester.pumpAndSettle();
 }
 
 /// Below the weigh-ins, so a test that means the strip has to bring it on stage.
 Future<void> _scrollToPhotos(WidgetTester tester) =>
-    _scrollTo(tester, find.text('Photos'));
+    _scrollTo(tester, sectionText('Photos'));
 
 Future<void> _scrollTo(WidgetTester tester, Finder finder) async {
   await tester.scrollUntilVisible(
@@ -82,7 +83,7 @@ Future<void> _scrollTo(WidgetTester tester, Finder finder) async {
 /// `findsOneWidget` mean *this strip*.
 Finder _emptyStrip() => find.descendant(
   of: find.widgetWithText(Card, 'Photos'),
-  matching: find.text(_empty),
+  matching: sectionText(_empty),
 );
 
 /// A write that goes to the file layer, the database, and then back through the
@@ -109,7 +110,7 @@ void main() {
     await _openNala(tester);
     await _scrollToPhotos(tester);
 
-    expect(find.text(_blank), findsOneWidget);
+    expect(sectionText(_blank), findsOneWidget);
     // The name the row carries is the name the screen asked the folder for: this
     // is the one assertion here that the ledger and the file layer are talking
     // about the same picture.
@@ -132,10 +133,13 @@ void main() {
       // The tile only exists once the row has landed and the strip has re-read
       // it: waited for by that outcome, because the fixed rounds let this pass
       // alone and fail inside a suite.
-      await settleUntil(tester, () => find.text(_blank).evaluate().isNotEmpty);
+      await settleUntil(
+        tester,
+        () => sectionText(_blank).evaluate().isNotEmpty,
+      );
 
       expect(files.stored, <String>['$_nalaId/IMG_7.jpg-1024']);
-      expect(find.text(_blank), findsOneWidget);
+      expect(sectionText(_blank), findsOneWidget);
       expect(files.pathsAsked.last, files.stored.first);
     },
   );
@@ -151,10 +155,10 @@ void main() {
     await _scrollToPhotos(tester);
 
     await _tap(tester, find.widgetWithText(TextButton, 'Add photo'));
-    await tester.tap(find.text('Take a photo'));
+    await tester.tap(sectionText('Take a photo'));
     await tester.pumpAndSettle();
 
-    await settleUntil(tester, () => find.text(_blank).evaluate().isNotEmpty);
+    await settleUntil(tester, () => sectionText(_blank).evaluate().isNotEmpty);
 
     // The camera is a separate intent from the gallery, and the row proves which
     // one answered: `capture()` was called and `pick()` would have been silent.
@@ -198,7 +202,7 @@ void main() {
       expect(
         find.descendant(
           of: find.byType(SnackBar),
-          matching: find.text('This file is not a picture'),
+          matching: sectionText('This file is not a picture'),
         ),
         findsOneWidget,
       );
@@ -270,12 +274,12 @@ void main() {
     await _openNala(tester);
     await _scrollToPhotos(tester);
 
-    await _tap(tester, find.text(_blank));
+    await _tap(tester, sectionText(_blank));
     expect(find.widgetWithText(TextButton, 'Close'), findsOneWidget);
 
     await _tap(tester, find.widgetWithText(TextButton, 'Delete'));
-    expect(find.text('Delete this record?'), findsOneWidget);
-    expect(find.text(_deleteBody), findsOneWidget);
+    expect(sectionText('Delete this record?'), findsOneWidget);
+    expect(sectionText(_deleteBody), findsOneWidget);
 
     await tester.tap(find.widgetWithText(FilledButton, 'Delete'));
     // Row first, file second, on another isolate: waited for the file call
@@ -288,7 +292,7 @@ void main() {
     // emptiness is waited for rather than assumed after a frame count.
     await settleUntil(tester, () => _emptyStrip().evaluate().isNotEmpty);
     expect(_emptyStrip(), findsOneWidget);
-    expect(find.text(_blank), findsNothing);
+    expect(sectionText(_blank), findsNothing);
   });
 
   testWidgets('cancelling the second question takes nothing at all', (
@@ -305,12 +309,12 @@ void main() {
     await _openNala(tester);
     await _scrollToPhotos(tester);
 
-    await _tap(tester, find.text(_blank));
+    await _tap(tester, sectionText(_blank));
     await _tap(tester, find.widgetWithText(TextButton, 'Delete'));
     await _tap(tester, find.widgetWithText(TextButton, 'Cancel'));
 
     expect(files.deleted, isEmpty);
-    expect(find.text(_blank), findsOneWidget);
+    expect(sectionText(_blank), findsOneWidget);
   });
 
   testWidgets('a picture the database refuses to delete stays on the strip', (
@@ -328,7 +332,7 @@ void main() {
     await _openNala(tester);
     await _scrollToPhotos(tester);
 
-    await _tap(tester, find.text(_blank));
+    await _tap(tester, sectionText(_blank));
     await _tap(tester, find.widgetWithText(TextButton, 'Delete'));
     await tester.tap(find.widgetWithText(FilledButton, 'Delete'));
     await settleRefusal(tester, waitingFor: deleteRefusalSentence);
@@ -336,7 +340,7 @@ void main() {
     // Row first, file second: SQLite said no, so the bytes are exactly where they
     // were and the strip still shows the picture the breeder did not lose.
     expect(files.deleted, isEmpty);
-    expect(find.text(_blank), findsOneWidget);
+    expect(sectionText(_blank), findsOneWidget);
   });
 
   testWidgets(
@@ -353,7 +357,7 @@ void main() {
       await _openNala(tester);
       await _scrollToPhotos(tester);
 
-      await _tap(tester, find.text(_blank));
+      await _tap(tester, sectionText(_blank));
       await _tap(tester, find.widgetWithText(TextButton, 'Delete'));
       await tester.tap(find.widgetWithText(FilledButton, 'Delete'));
       // The row goes, the file delete fails, and the strip reloads: three
@@ -384,18 +388,18 @@ void main() {
 
     await tester.tap(find.byIcon(Icons.more_vert));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Delete'));
+    await tester.tap(sectionText('Delete'));
     await tester.pumpAndSettle();
     await tester.tap(find.widgetWithText(FilledButton, 'Delete'));
     // The folder is cleared inside the delete, before the list is re-read, so
     // this waits on that call rather than on a frame count â€” and then on the
     // list actually losing the row, which is the second round trip.
     await settleUntil(tester, () => files.clearedFolders.isNotEmpty);
-    await settleUntil(tester, () => find.text('Nala').evaluate().isEmpty);
+    await settleUntil(tester, () => sectionText('Nala').evaluate().isEmpty);
 
     // The rows go with the animal in SQLite; only this app can reach the folder.
     expect(files.clearedFolders, <String>[_nalaId]);
-    expect(find.text('Nala'), findsNothing);
+    expect(sectionText('Nala'), findsNothing);
   });
 
   testWidgets('an animal with no rows still loses the picture folder', (
@@ -412,7 +416,7 @@ void main() {
 
     await tester.tap(find.byIcon(Icons.more_vert));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Delete'));
+    await tester.tap(sectionText('Delete'));
     await tester.pumpAndSettle();
     await tester.tap(find.widgetWithText(FilledButton, 'Delete'));
     await settleUntil(tester, () => files.clearedFolders.isNotEmpty);
@@ -431,9 +435,9 @@ void main() {
       seedPhotos: <Photo>[_picture()],
     );
     await _openNala(tester);
-    await _scrollTo(tester, find.text('الصور'));
+    await _scrollTo(tester, sectionText('الصور'));
 
-    expect(find.text('الصور'), findsOneWidget);
-    expect(find.text('ليست على هذا الهاتف'), findsOneWidget);
+    expect(sectionText('الصور'), findsOneWidget);
+    expect(sectionText('ليست على هذا الهاتف'), findsOneWidget);
   });
 }

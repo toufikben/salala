@@ -16,6 +16,7 @@ import 'package:salala/presentation/widgets/animal_card.dart';
 
 import '../helpers/fake_notification_writer.dart';
 import '../helpers/pump_app.dart';
+import '../helpers/section_finder.dart';
 
 /// An animal with a fixed id: the record rows seed under it by foreign key, so
 /// the test has to know the id it points at.
@@ -67,7 +68,7 @@ Future<void> _openNala(WidgetTester tester) async {
   // home screen — once by the agenda above the herd, once by its own card — so an
   // unscoped `find.text('Nala')` answers with two rows and `tap()` cannot choose.
   await tester.tap(
-    find.descendant(of: find.byType(AnimalCard), matching: find.text('Nala')),
+    find.descendant(of: find.byType(AnimalCard), matching: sectionText('Nala')),
   );
   await settleRealIo(tester);
 }
@@ -153,13 +154,13 @@ void main() {
     // breed, sex and the birth date are one headline under her photograph, and
     // the paperwork sits underneath as label/value rows.
     expect(
-      find.text('dog · Border collie · Female · Born May 12, 2024'),
+      sectionText('dog · Border collie · Female · Born May 12, 2024'),
       findsOneWidget,
     );
     // A label and its value are two widgets now, not one string with a colon in
     // it, so a long value wraps under its own label instead of drifting.
-    expect(find.text('Dam'), findsOneWidget);
-    expect(find.text('Not recorded'), findsWidgets);
+    expect(sectionText('Dam'), findsOneWidget);
+    expect(sectionText('Not recorded'), findsWidgets);
     // All four record sections are there, and each one is honestly empty. The
     // ledger is a lazy list, so a section is scrolled into view before it is
     // asserted rather than counted from the top of the screen.
@@ -169,21 +170,26 @@ void main() {
       'Vet visits',
       'Weights',
     ]) {
-      await _scrollTo(tester, find.text(title));
-      expect(find.text(title), findsOneWidget);
-      expect(find.text('Nothing recorded yet.'), findsWidgets);
+      await _scrollTo(tester, sectionText(title));
+      expect(sectionText(title), findsOneWidget);
+      expect(sectionText('Nothing recorded yet.'), findsWidgets);
     }
   });
 
-  testWidgets('her own page closes with a line about her story', (tester) async {
+  testWidgets('her own page closes with a line about her story', (
+    tester,
+  ) async {
     _usePhoneViewport(tester);
     await pumpSalala(tester, seed: <Animal>[_nala()]);
     await _openNala(tester);
 
     // The identity card is the page's first item, so the sentence is on screen
     // without scrolling — this test is about which sentence, not about layout.
-    expect(find.text('Every entry here is part of her story.'), findsOneWidget);
-    expect(find.text('Her record stays as it was.'), findsNothing);
+    expect(
+      sectionText('Every entry here is part of her story.'),
+      findsOneWidget,
+    );
+    expect(sectionText('Her record stays as it was.'), findsNothing);
   });
 
   testWidgets('a deceased animal is not told her story is continuing', (
@@ -212,8 +218,8 @@ void main() {
     // The ledger knows the date, so the app has no excuse for the other sentence:
     // telling a breeder her dead dog's story continues is an app that has not
     // read its own record.
-    expect(find.text('Her record stays as it was.'), findsOneWidget);
-    expect(find.text('Every entry here is part of her story.'), findsNothing);
+    expect(sectionText('Her record stays as it was.'), findsOneWidget);
+    expect(sectionText('Every entry here is part of her story.'), findsNothing);
   });
 
   testWidgets('logging a vaccination writes the dose and shows it', (
@@ -229,7 +235,7 @@ void main() {
     await _openNala(tester);
 
     await _tap(tester, find.widgetWithText(TextButton, 'Add vaccination'));
-    expect(find.text('Log a vaccination'), findsOneWidget);
+    expect(sectionText('Log a vaccination'), findsOneWidget);
 
     await tester.enterText(
       find.widgetWithText(TextFormField, 'Vaccine'),
@@ -240,9 +246,9 @@ void main() {
     // is the proof it reached the scheduler; nothing more was written.
     await waitForSchedulerCalls(tester, notifications, _callsFor(0));
 
-    expect(find.text('DHPP'), findsOneWidget);
+    expect(sectionText('DHPP'), findsOneWidget);
     // A dose given today with no next-due date is not overdue.
-    expect(find.text('Overdue'), findsNothing);
+    expect(sectionText('Overdue'), findsNothing);
 
     // And it gets no alarm either: a reminder needs a date to be early about.
     expect(notifications.written, isEmpty);
@@ -267,7 +273,7 @@ void main() {
     );
     await _openNala(tester);
 
-    await _tap(tester, find.text('Distemper'));
+    await _tap(tester, sectionText('Distemper'));
     await _save(tester);
     await waitForSchedulerCalls(tester, notifications, _callsFor(1));
 
@@ -305,7 +311,7 @@ void main() {
     );
     await _openNala(tester);
 
-    await _tap(tester, find.text('Parvo'));
+    await _tap(tester, sectionText('Parvo'));
     await _save(tester);
     await waitForSchedulerCalls(tester, notifications, _callsFor(2));
 
@@ -335,7 +341,7 @@ void main() {
     );
     await _openNala(tester);
 
-    await _tap(tester, find.text('Distemper'));
+    await _tap(tester, sectionText('Distemper'));
     await _save(tester);
     await waitForSchedulerCalls(tester, notifications, _callsFor(0));
 
@@ -347,7 +353,7 @@ void main() {
     // booster, and a 09:00 about it in this barn is a message about a booking
     // that is no longer here.
     expect(find.byType(VaccinationFormScreen), findsNothing);
-    expect(find.text('Distemper'), findsOneWidget);
+    expect(sectionText('Distemper'), findsOneWidget);
     expect(notifications.log, <String>['clear', 'clear']);
     _expectOneRecordPair(notifications.cleared);
     expect(notifications.written, isEmpty);
@@ -372,7 +378,7 @@ void main() {
     );
     await _openNala(tester);
 
-    await _tap(tester, find.text('Lepto'));
+    await _tap(tester, sectionText('Lepto'));
     await _save(tester);
     await waitForSchedulerCalls(tester, notifications, _callsFor(2));
     // Saving clears the record's own ids before writing them again, so the ids
@@ -380,15 +386,15 @@ void main() {
     final booked = notifications.written.map((a) => a.id).toList();
     expect(booked, hasLength(2));
 
-    await _tap(tester, find.text('Lepto'));
+    await _tap(tester, sectionText('Lepto'));
     await _tap(tester, find.byIcon(Icons.delete_outline));
-    expect(find.text('Delete this record?'), findsOneWidget);
+    expect(sectionText('Delete this record?'), findsOneWidget);
     await tester.tap(find.widgetWithText(FilledButton, 'Delete'));
     // Four calls from the booking just above, plus the delete's two clears and
     // no write of its own.
     await waitForSchedulerCalls(tester, notifications, 6);
 
-    expect(find.text('Lepto'), findsNothing);
+    expect(sectionText('Lepto'), findsNothing);
     // The row is gone, so an alarm for it would be a message about nothing — and
     // the delete reaches exactly the two alarms the booking wrote, no others.
     expect(
@@ -417,7 +423,7 @@ void main() {
     );
     await _openNala(tester);
 
-    await _tap(tester, find.text('Distemper'));
+    await _tap(tester, sectionText('Distemper'));
     await _save(tester);
     // The two clears a replace always makes, then the write the phone refused.
     await waitForSchedulerCalls(tester, notifications, 2);
@@ -429,14 +435,14 @@ void main() {
     // `try` around both would be sitting here on "nothing was written" over a
     // dose that is in the ledger — and the breeder would save it a second time.
     expect(find.byType(VaccinationFormScreen), findsNothing);
-    expect(find.text(saveRefusalSentence), findsNothing);
+    expect(sectionText(saveRefusalSentence), findsNothing);
     // Not merely "no alarm was written" — the fake records the attempt before it
     // throws, so `written` alone would stay empty even if the form never reached
     // the alarm at all. These three calls are the proof it tried and swallowed
     // the refusal: a dose that landed, an alarm the phone would not take.
     expect(notifications.log, <String>['clear', 'clear', 'write']);
     expect(notifications.written, isEmpty);
-    expect(find.text('Distemper'), findsOneWidget);
+    expect(sectionText('Distemper'), findsOneWidget);
   });
 
   testWidgets('a dose the phone will not unremind is still deleted', (
@@ -459,7 +465,7 @@ void main() {
     );
     await _openNala(tester);
 
-    await _tap(tester, find.text('Lepto'));
+    await _tap(tester, sectionText('Lepto'));
     await _tap(tester, find.byIcon(Icons.delete_outline));
     await tester.tap(find.widgetWithText(FilledButton, 'Delete'));
     await waitForSchedulerCalls(tester, notifications, 1);
@@ -476,8 +482,8 @@ void main() {
     // that failed. A single `try` would hold the form open, on a dose that has
     // already gone, telling the breeder it is still there.
     expect(find.byType(VaccinationFormScreen), findsNothing);
-    expect(find.text(deleteRefusalSentence), findsNothing);
-    expect(find.text('Lepto'), findsNothing);
+    expect(sectionText(deleteRefusalSentence), findsNothing);
+    expect(sectionText('Lepto'), findsNothing);
     // The row went first, so the cancel the phone refused is the only call this
     // screen ever made — and it refused on the first of the two.
     expect(notifications.log, <String>['clear']);
@@ -507,10 +513,10 @@ void main() {
     // The identity card grew a closing line, so the ledger starts a little lower
     // than it used to and the first section has to be scrolled into view before
     // it is built: the detail page is a lazy list.
-    await _scrollTo(tester, find.text('Rabies'));
-    expect(find.text('Rabies'), findsOneWidget);
-    expect(find.text('Distemper'), findsOneWidget);
-    expect(find.text('Overdue'), findsOneWidget);
+    await _scrollTo(tester, sectionText('Rabies'));
+    expect(sectionText('Rabies'), findsOneWidget);
+    expect(sectionText('Distemper'), findsOneWidget);
+    expect(sectionText('Overdue'), findsOneWidget);
   });
 
   testWidgets('a dose is correctable from its own row', (tester) async {
@@ -524,8 +530,8 @@ void main() {
     );
     await _openNala(tester);
 
-    await _tap(tester, find.text('DHPP'));
-    expect(find.text('Edit vaccination'), findsOneWidget);
+    await _tap(tester, sectionText('DHPP'));
+    expect(sectionText('Edit vaccination'), findsOneWidget);
 
     await tester.enterText(
       find.widgetWithText(TextFormField, 'Vaccine'),
@@ -533,7 +539,7 @@ void main() {
     );
     await _save(tester);
 
-    expect(find.text('DHPP + Lepto'), findsOneWidget);
+    expect(sectionText('DHPP + Lepto'), findsOneWidget);
   });
 
   testWidgets('a weigh-in is typed in kilograms and shown in kilograms', (
@@ -550,7 +556,7 @@ void main() {
     // The form is the only place a breeder looks for an edit that does not
     // exist, so it has to say the weigh-in is append-only.
     expect(
-      find.text(
+      sectionText(
         "Weigh-ins are never edited. Measured wrong? Delete it and weigh again.",
       ),
       findsOneWidget,
@@ -564,8 +570,11 @@ void main() {
     // The row lands when SQLite answers, which is not the same frame as the pop:
     // asserting straight after the save passed alone and failed in a suite. The
     // wait is the caller's assertion still deciding — it only grants more time.
-    await settleUntil(tester, () => find.text('4.20 kg').evaluate().isNotEmpty);
-    expect(find.text('4.20 kg'), findsOneWidget);
+    await settleUntil(
+      tester,
+      () => sectionText('4.20 kg').evaluate().isNotEmpty,
+    );
+    expect(sectionText('4.20 kg'), findsOneWidget);
   });
 
   testWidgets('a puppy under a kilogram is shown in grams, newest first', (
@@ -578,13 +587,13 @@ void main() {
       seedWeights: <WeightEntry>[_weigh(300, 9), _weigh(4200, 2)],
     );
     await _openNala(tester);
-    await _scrollTo(tester, find.text('300 g'));
+    await _scrollTo(tester, sectionText('300 g'));
 
-    expect(find.text('300 g'), findsOneWidget);
-    expect(find.text('4.20 kg'), findsOneWidget);
+    expect(sectionText('300 g'), findsOneWidget);
+    expect(sectionText('4.20 kg'), findsOneWidget);
     expect(
-      tester.getTopLeft(find.text('4.20 kg')).dy,
-      lessThan(tester.getTopLeft(find.text('300 g')).dy),
+      tester.getTopLeft(sectionText('4.20 kg')).dy,
+      lessThan(tester.getTopLeft(sectionText('300 g')).dy),
     );
   });
 
@@ -604,20 +613,20 @@ void main() {
     // Scroll to the row's own text, not to the delete icon: both weigh-ins are
     // on screen by the time the scroll ends, and scrollUntilVisible finishes by
     // asking for the single element it was given. Two icons, one answer.
-    await _scrollTo(tester, find.text('4.20 kg'));
+    await _scrollTo(tester, sectionText('4.20 kg'));
     await tester.tap(find.byIcon(Icons.delete_outline).first);
     await tester.pumpAndSettle();
 
-    expect(find.text('Delete this record?'), findsOneWidget);
+    expect(sectionText('Delete this record?'), findsOneWidget);
     await tester.tap(find.widgetWithText(FilledButton, 'Delete'));
     // Waited for by the outcome, not by a fixed number of rounds: the delete
     // lands on the database isolate and the section above re-reads itself
     // afterwards, and on a loaded machine those two steps can outlast any count.
-    await settleUntil(tester, () => find.text('4.20 kg').evaluate().isEmpty);
+    await settleUntil(tester, () => sectionText('4.20 kg').evaluate().isEmpty);
     await settleRealIo(tester);
 
-    expect(find.text('4.20 kg'), findsNothing);
-    expect(find.text('300 g'), findsOneWidget);
+    expect(sectionText('4.20 kg'), findsNothing);
+    expect(sectionText('300 g'), findsOneWidget);
   });
 
   testWidgets('a screening whose certificate lapsed is badged expired', (
@@ -633,25 +642,25 @@ void main() {
       ],
     );
     await _openNala(tester);
-    await _scrollTo(tester, find.text('OFA hips'));
+    await _scrollTo(tester, sectionText('OFA hips'));
 
-    expect(find.text('OFA hips'), findsOneWidget);
+    expect(sectionText('OFA hips'), findsOneWidget);
     // Only the lapsed one is flagged; a permanent OFA grade is not a claim
     // running out.
-    expect(find.text('Expired'), findsOneWidget);
-    await _scrollTo(tester, find.text('BAER'));
-    expect(find.text('BAER'), findsOneWidget);
-    expect(find.text('Expired'), findsOneWidget);
+    expect(sectionText('Expired'), findsOneWidget);
+    await _scrollTo(tester, sectionText('BAER'));
+    expect(sectionText('BAER'), findsOneWidget);
+    expect(sectionText('Expired'), findsOneWidget);
   });
 
   testWidgets('logging a screening writes the row', (tester) async {
     _usePhoneViewport(tester);
     await pumpSalala(tester, seed: <Animal>[_nala()]);
     await _openNala(tester);
-    await _scrollTo(tester, find.text('Health tests'));
+    await _scrollTo(tester, sectionText('Health tests'));
 
     await _tap(tester, find.widgetWithText(TextButton, 'Add test'));
-    expect(find.text('Log a health test'), findsOneWidget);
+    expect(sectionText('Log a health test'), findsOneWidget);
 
     await tester.enterText(
       find.widgetWithText(TextFormField, 'Screening'),
@@ -663,7 +672,7 @@ void main() {
     );
     await _save(tester);
 
-    expect(find.text('Echocardiography'), findsOneWidget);
+    expect(sectionText('Echocardiography'), findsOneWidget);
     expect(find.textContaining('Normal'), findsWidgets);
   });
 
@@ -671,7 +680,7 @@ void main() {
     _usePhoneViewport(tester);
     await pumpSalala(tester, seed: <Animal>[_nala()]);
     await _openNala(tester);
-    await _scrollTo(tester, find.text('Health tests'));
+    await _scrollTo(tester, sectionText('Health tests'));
 
     await _tap(tester, find.widgetWithText(TextButton, 'Add test'));
     await tester.enterText(
@@ -680,11 +689,11 @@ void main() {
     );
     await _save(tester);
 
-    expect(find.text('Enter the result'), findsOneWidget);
+    expect(sectionText('Enter the result'), findsOneWidget);
     // Still on the form. The typed name is sitting in the field, so asserting
     // the row is absent would prove nothing — the route not popping is the
     // evidence that nothing was written.
-    expect(find.text('Log a health test'), findsOneWidget);
+    expect(sectionText('Log a health test'), findsOneWidget);
 
     // Adding the missing result now lets the very same save through, which
     // shows the refusal was about the result and not a broken form.
@@ -694,9 +703,9 @@ void main() {
     );
     await _save(tester);
 
-    expect(find.text('Log a health test'), findsNothing);
-    await _scrollTo(tester, find.text('BAER'));
-    expect(find.text('BAER'), findsOneWidget);
+    expect(sectionText('Log a health test'), findsNothing);
+    await _scrollTo(tester, sectionText('BAER'));
+    expect(sectionText('BAER'), findsOneWidget);
   });
 
   testWidgets('a screening is correctable from its own row', (tester) async {
@@ -709,10 +718,10 @@ void main() {
       ],
     );
     await _openNala(tester);
-    await _scrollTo(tester, find.text('OFA hips'));
+    await _scrollTo(tester, sectionText('OFA hips'));
 
-    await _tap(tester, find.text('OFA hips'));
-    expect(find.text('Edit health test'), findsOneWidget);
+    await _tap(tester, sectionText('OFA hips'));
+    expect(sectionText('Edit health test'), findsOneWidget);
 
     await tester.enterText(
       find.widgetWithText(TextFormField, 'Result'),
@@ -736,11 +745,11 @@ void main() {
       ],
     );
     await _openNala(tester);
-    await _scrollTo(tester, find.text('BAER'));
+    await _scrollTo(tester, sectionText('BAER'));
 
-    await _tap(tester, find.text('BAER'));
+    await _tap(tester, sectionText('BAER'));
     await _tap(tester, find.byIcon(Icons.delete_outline));
-    expect(find.text('Delete this record?'), findsOneWidget);
+    expect(sectionText('Delete this record?'), findsOneWidget);
     await tester.tap(find.widgetWithText(FilledButton, 'Delete'));
     // Keyed on the row going away rather than on a round count: the delete runs
     // on the database isolate and the list re-reads itself after it, and the
@@ -749,11 +758,11 @@ void main() {
       tester,
       () => find.byType(HealthTestFormScreen).evaluate().isEmpty,
     );
-    await settleUntil(tester, () => find.text('BAER').evaluate().isEmpty);
+    await settleUntil(tester, () => sectionText('BAER').evaluate().isEmpty);
     await settleRealIo(tester);
 
-    expect(find.text('BAER'), findsNothing);
-    expect(find.text('OFA hips'), findsOneWidget);
+    expect(sectionText('BAER'), findsNothing);
+    expect(sectionText('OFA hips'), findsOneWidget);
   });
 
   testWidgets('saving a screening books its expiry warnings on the phone', (
@@ -770,9 +779,9 @@ void main() {
       ],
     );
     await _openNala(tester);
-    await _scrollTo(tester, find.text('PENNFID'));
+    await _scrollTo(tester, sectionText('PENNFID'));
 
-    await _tap(tester, find.text('PENNFID'));
+    await _tap(tester, sectionText('PENNFID'));
     await _save(tester);
     await waitForSchedulerCalls(tester, notifications, _callsFor(2));
 
@@ -809,9 +818,9 @@ void main() {
       ],
     );
     await _openNala(tester);
-    await _scrollTo(tester, find.text('PENNFID'));
+    await _scrollTo(tester, sectionText('PENNFID'));
 
-    await _tap(tester, find.text('PENNFID'));
+    await _tap(tester, sectionText('PENNFID'));
     await _save(tester);
     await waitForSchedulerCalls(tester, notifications, _callsFor(0));
 
@@ -819,7 +828,7 @@ void main() {
     // phone: whoever took her on reads the same date off the same row, and a
     // 09:00 about it here is a message about someone else's booking.
     expect(find.byType(HealthTestFormScreen), findsNothing);
-    expect(find.text('PENNFID'), findsOneWidget);
+    expect(sectionText('PENNFID'), findsOneWidget);
     expect(notifications.log, <String>['clear', 'clear']);
     _expectOneRecordPair(notifications.cleared);
     expect(notifications.written, isEmpty);
@@ -831,7 +840,7 @@ void main() {
     _usePhoneViewport(tester);
     await pumpSalala(tester, seed: <Animal>[_nala()]);
     await _openNala(tester);
-    await _scrollTo(tester, find.text('Vet visits'));
+    await _scrollTo(tester, sectionText('Vet visits'));
 
     await _tap(tester, find.widgetWithText(TextButton, 'Add visit'));
     await tester.enterText(
@@ -848,20 +857,20 @@ void main() {
     );
     await _save(tester);
 
-    expect(find.text('Limping on the left fore'), findsOneWidget);
+    expect(sectionText('Limping on the left fore'), findsOneWidget);
 
     // Reopening it proves the amount survived the round trip through SQLite and
     // that the currency was normalised to a code, not left as typed.
-    await _tap(tester, find.text('Limping on the left fore'));
+    await _tap(tester, sectionText('Limping on the left fore'));
     // The form reads the row back on the database isolate and shows a spinner
     // until it answers, so the edit title is the thing to wait for — a fixed
     // pumpAndSettle finished before a loaded machine had read anything, and this
     // test passed alone and failed inside the suite.
     await settleUntil(
       tester,
-      () => find.text('Edit vet visit').evaluate().isNotEmpty,
+      () => sectionText('Edit vet visit').evaluate().isNotEmpty,
     );
-    expect(find.text('Edit vet visit'), findsOneWidget);
+    expect(sectionText('Edit vet visit'), findsOneWidget);
     expect(_fieldText(tester, 'Cost'), '250.5');
     expect(_fieldText(tester, 'Currency'), 'MAD');
   });
@@ -885,9 +894,9 @@ void main() {
       ],
     );
     await _openNala(tester);
-    await _scrollTo(tester, find.text('Atlas Veterinary'));
+    await _scrollTo(tester, sectionText('Atlas Veterinary'));
 
-    expect(find.text('Atlas Veterinary'), findsOneWidget);
+    expect(sectionText('Atlas Veterinary'), findsOneWidget);
   });
 
   testWidgets('the ledger keeps its section order in Arabic', (tester) async {
@@ -915,12 +924,12 @@ void main() {
     // Each finder is scrolled to before it is asserted: the ledger is lazy, and
     // a row above the fold has already been dropped by the time the next one is
     // reached.
-    await _scrollTo(tester, find.text('فحوصات الصحة'));
-    expect(find.text('فحوصات الصحة'), findsOneWidget);
-    await _scrollTo(tester, find.text('OFA hips'));
-    expect(find.text('OFA hips'), findsOneWidget);
-    await _scrollTo(tester, find.text('عرج'));
-    expect(find.text('عرج'), findsOneWidget);
+    await _scrollTo(tester, sectionText('فحوصات الصحة'));
+    expect(sectionText('فحوصات الصحة'), findsOneWidget);
+    await _scrollTo(tester, sectionText('OFA hips'));
+    expect(sectionText('OFA hips'), findsOneWidget);
+    await _scrollTo(tester, sectionText('عرج'));
+    expect(sectionText('عرج'), findsOneWidget);
   });
 
   testWidgets(
@@ -985,9 +994,9 @@ void main() {
       final booked = notifications.log.length;
 
       await _openNala(tester);
-      await _scrollTo(tester, find.text('DHPP'));
+      await _scrollTo(tester, sectionText('DHPP'));
 
-      await _tap(tester, find.text('DHPP'));
+      await _tap(tester, sectionText('DHPP'));
       await _tap(tester, find.byIcon(Icons.delete_outline));
       await tester.tap(find.widgetWithText(FilledButton, 'Delete'));
       await settleRefusal(tester, waitingFor: deleteRefusalSentence);
@@ -995,7 +1004,7 @@ void main() {
       // The form stayed open on a dose that is still in the ledger, and nothing
       // was handed to the alarm manager: a row that survived keeps its reminder,
       // which is the half of this path a silent failure would have got wrong.
-      expect(find.text(deleteRefusalSentence), findsOneWidget);
+      expect(sectionText(deleteRefusalSentence), findsOneWidget);
       expect(find.byType(VaccinationFormScreen), findsOneWidget);
       expect(
         tester
@@ -1029,14 +1038,14 @@ void main() {
       beforeLaunch: refuseUpdatesOf('vaccinations'),
     );
     await _openNala(tester);
-    await _scrollTo(tester, find.text('DHPP'));
-    await _tap(tester, find.text('DHPP'));
+    await _scrollTo(tester, sectionText('DHPP'));
+    await _tap(tester, sectionText('DHPP'));
 
     await tapSaveAndGetAnswer(tester, waitingFor: doseDueBeforeDoseSentence);
 
-    expect(find.text(doseDueBeforeDoseSentence), findsOneWidget);
+    expect(sectionText(doseDueBeforeDoseSentence), findsOneWidget);
     expect(
-      find.text(saveRefusalSentence),
+      sectionText(saveRefusalSentence),
       findsNothing,
       reason:
           'the trigger this test installs is what turns that absence into '
@@ -1068,8 +1077,8 @@ void main() {
       beforeLaunch: refuseUpdatesOf('vaccinations'),
     );
     await _openNala(tester);
-    await _scrollTo(tester, find.text('DHPP'));
-    await _tap(tester, find.text('DHPP'));
+    await _scrollTo(tester, sectionText('DHPP'));
+    await _tap(tester, sectionText('DHPP'));
 
     await tapSaveAndGetAnswer(tester);
 
@@ -1084,7 +1093,7 @@ void main() {
       text: 'DHPP',
       notifications: notifications,
     );
-    expect(find.text(doseDueBeforeDoseSentence), findsNothing);
+    expect(sectionText(doseDueBeforeDoseSentence), findsNothing);
   });
 
   testWidgets(
@@ -1099,7 +1108,7 @@ void main() {
         beforeLaunch: refuseWritesTo('health_tests'),
       );
       await _openNala(tester);
-      await _scrollTo(tester, find.text('Health tests'));
+      await _scrollTo(tester, sectionText('Health tests'));
 
       await _tap(tester, find.widgetWithText(TextButton, 'Add test'));
       await tester.enterText(
@@ -1133,7 +1142,7 @@ void main() {
         beforeLaunch: refuseWritesTo('vet_visits'),
       );
       await _openNala(tester);
-      await _scrollTo(tester, find.text('Vet visits'));
+      await _scrollTo(tester, sectionText('Vet visits'));
 
       await _tap(tester, find.widgetWithText(TextButton, 'Add visit'));
       await tester.enterText(
@@ -1218,9 +1227,9 @@ void main() {
 
       await tapSaveAndGetAnswer(tester, waitingFor: beforeBirthSentence);
 
-      expect(find.text(beforeBirthSentence), findsOneWidget);
+      expect(sectionText(beforeBirthSentence), findsOneWidget);
       expect(
-        find.text(saveRefusalSentence),
+        sectionText(saveRefusalSentence),
         findsNothing,
         reason:
             'a weigh-in is append-only, so the insert trigger is the whole of '
@@ -1263,14 +1272,14 @@ void main() {
         beforeLaunch: refuseUpdatesOf('vaccinations'),
       );
       await _openNala(tester);
-      await _scrollTo(tester, find.text('DHPP'));
-      await _tap(tester, find.text('DHPP'));
+      await _scrollTo(tester, sectionText('DHPP'));
+      await _tap(tester, sectionText('DHPP'));
 
       await tapSaveAndGetAnswer(tester, waitingFor: beforeBirthSentence);
 
-      expect(find.text(beforeBirthSentence), findsOneWidget);
+      expect(sectionText(beforeBirthSentence), findsOneWidget);
       expect(
-        find.text(saveRefusalSentence),
+        sectionText(saveRefusalSentence),
         findsNothing,
         reason:
             'the dose is edited with an UPDATE, not an INSERT, which is why '
@@ -1307,14 +1316,14 @@ void main() {
       beforeLaunch: refuseUpdatesOf('health_tests'),
     );
     await _openNala(tester);
-    await _scrollTo(tester, find.text('OFA hips'));
-    await _tap(tester, find.text('OFA hips'));
+    await _scrollTo(tester, sectionText('OFA hips'));
+    await _tap(tester, sectionText('OFA hips'));
 
     await tapSaveAndGetAnswer(tester, waitingFor: beforeBirthSentence);
 
-    expect(find.text(beforeBirthSentence), findsOneWidget);
+    expect(sectionText(beforeBirthSentence), findsOneWidget);
     expect(
-      find.text(saveRefusalSentence),
+      sectionText(saveRefusalSentence),
       findsNothing,
       reason: 'see the dose test above: same trigger kind, same pairing',
     );
@@ -1352,17 +1361,17 @@ void main() {
         beforeLaunch: refuseUpdatesOf('health_tests'),
       );
       await _openNala(tester);
-      await _scrollTo(tester, find.text('OFA hips'));
-      await _tap(tester, find.text('OFA hips'));
+      await _scrollTo(tester, sectionText('OFA hips'));
+      await _tap(tester, sectionText('OFA hips'));
 
       await tapSaveAndGetAnswer(
         tester,
         waitingFor: certificateBeforeTestSentence,
       );
 
-      expect(find.text(certificateBeforeTestSentence), findsOneWidget);
+      expect(sectionText(certificateBeforeTestSentence), findsOneWidget);
       expect(
-        find.text(saveRefusalSentence),
+        sectionText(saveRefusalSentence),
         findsNothing,
         reason:
             'the predicate answered before SQLite was asked, so the UPDATE '
@@ -1385,7 +1394,7 @@ void main() {
         text: 'OFA hips',
       );
       expect(
-        find.text(certificateBeforeTestSentence),
+        sectionText(certificateBeforeTestSentence),
         findsNothing,
         reason:
             'one field apart on the same row against the same trigger: this '
@@ -1415,14 +1424,14 @@ void main() {
         beforeLaunch: refuseUpdatesOf('vet_visits'),
       );
       await _openNala(tester);
-      await _scrollTo(tester, find.text('Atlas Veterinary'));
-      await _tap(tester, find.text('Atlas Veterinary'));
+      await _scrollTo(tester, sectionText('Atlas Veterinary'));
+      await _tap(tester, sectionText('Atlas Veterinary'));
 
       await tapSaveAndGetAnswer(tester, waitingFor: beforeBirthSentence);
 
-      expect(find.text(beforeBirthSentence), findsOneWidget);
+      expect(sectionText(beforeBirthSentence), findsOneWidget);
       expect(
-        find.text(saveRefusalSentence),
+        sectionText(saveRefusalSentence),
         findsNothing,
         reason: 'see the dose test above: same trigger kind, same pairing',
       );

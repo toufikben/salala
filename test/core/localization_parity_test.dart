@@ -60,6 +60,8 @@ void main() {
       'aboutVersion',
       // The tree's heading is spelled "Pedigree" in French too.
       'pedigreeTitle',
+      // "Photo" is the French word for the thing as well as the English one.
+      'timelineKindPhoto',
     },
     'de': <String>{
       'appTitle',
@@ -71,6 +73,8 @@ void main() {
       'healthTestResultHelper',
       'symptomName',
       'aboutVersion',
+      // "Symptom" is the German word for the thing as well as the English one.
+      'timelineKindSymptom',
       // "in {days}" is the German phrase and the English one, and the
       // placeholder carries the only part that could differ.
       'birthdayIn',

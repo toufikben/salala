@@ -495,5 +495,20 @@
   "whatsNew3": "L'export tableur parle la langue que vous lisez.",
   "whatsNew4": "Cinq langues de plus : allemand, espagnol, italien, portugais et néerlandais.",
   "whatsNew5": "Pages confidentialité, conditions et aide, et une ligne de notation dans les Réglages.",
-  "daysPlural": "{n} jours"
+  "whatsNew6": "Une seule liste par animal : chaque vaccin, pesée, visite et cession dans l'ordre des dates.",
+  "daysPlural": "{n} jours",
+  "timelineTitle": "Ce qui s'est passé",
+  "timelineEmpty": "Rien de daté pour l'instant.",
+  "timelineShowAll": "Afficher tout ({count})",
+  "timelineShowLess": "Afficher moins",
+  "timelineKindBorn": "Naissance",
+  "timelineKindDied": "Décès",
+  "timelineKindWhelped": "Mise bas",
+  "timelineKindVaccination": "Vaccin",
+  "timelineKindHealthTest": "Test de santé",
+  "timelineKindVisit": "Visite vétérinaire",
+  "timelineKindSymptom": "Symptôme",
+  "timelineKindWeight": "Pesée",
+  "timelineKindPhoto": "Photo",
+  "timelineKindPlacement": "Cession"
 }

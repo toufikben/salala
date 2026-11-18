@@ -821,6 +821,28 @@
   "whatsNew3": "The spreadsheet export speaks the language you are reading.",
   "whatsNew4": "Five more languages: German, Spanish, Italian, Portuguese and Dutch.",
   "whatsNew5": "Privacy, terms and help pages, and a rating row in Settings.",
+  "whatsNew6": "One list per animal: every dose, weigh-in, visit and handover in date order.",
+  "timelineTitle": "What happened",
+  "timelineEmpty": "Nothing dated yet.",
+  "timelineShowAll": "Show all {count}",
+  "@timelineShowAll": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "timelineShowLess": "Show fewer",
+  "timelineKindBorn": "Born",
+  "timelineKindDied": "Died",
+  "timelineKindWhelped": "Whelped",
+  "timelineKindVaccination": "Vaccination",
+  "timelineKindHealthTest": "Health test",
+  "timelineKindVisit": "Vet visit",
+  "timelineKindSymptom": "Symptom",
+  "timelineKindWeight": "Weigh-in",
+  "timelineKindPhoto": "Photo",
+  "timelineKindPlacement": "Handed over",
   "daysPlural": "{n} days",
   "@daysPlural": { "placeholders": { "n": { "type": "String" } } }
 }

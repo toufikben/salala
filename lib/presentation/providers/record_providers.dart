@@ -3,9 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/l10n/app_localizations.dart';
 import '../../core/utils/day_math.dart';
+import '../../core/utils/timeline.dart';
 import '../../data/models/animal.dart';
 import '../../data/models/buyer.dart';
 import '../../data/models/health_test.dart';
+import '../../data/models/litter.dart';
 import '../../data/models/photo.dart';
 import '../../data/models/placement.dart';
 import '../../data/models/symptom.dart';
@@ -84,6 +86,64 @@ Future<void> deleteWeight(WidgetRef ref, WeightEntry entry) async {
   await ref.read(daosProvider).weights.delete(entry.id);
   ref.invalidate(weightsForAnimalProvider(entry.animalId));
 }
+
+/// One animal's life, newest first, read from the six sections already loaded.
+///
+/// A family over the same rows rather than a table of its own: the timeline is a
+/// second *reading* of records that other screens own, so it costs the queries
+/// the page was going to make anyway and can never disagree with them.
+///
+/// The seven lists are awaited one after another rather than in parallel, which
+/// is deliberate: Riverpod hands each of them back already resolved once its own
+/// query has landed, so the cost is the slowest query and not their sum — and a
+/// `Future.wait` over families would have to cast every result back out of
+/// `Object` to pass it on. A missing animal is an empty list: the page above
+/// already says the animal is gone.
+final animalTimelineProvider = FutureProvider.autoDispose
+    .family<List<TimelineEvent>, String>((ref, animalId) async {
+      final herd = await ref.watch(animalsProvider.future);
+      Animal? animal;
+      for (final candidate in herd) {
+        if (candidate.id == animalId) {
+          animal = candidate;
+          break;
+        }
+      }
+      if (animal == null) return const <TimelineEvent>[];
+
+      final doses = await ref.watch(
+        vaccinationsForAnimalProvider(animalId).future,
+      );
+      final tests = await ref.watch(
+        healthTestsForAnimalProvider(animalId).future,
+      );
+      final visits = await ref.watch(visitsForAnimalProvider(animalId).future);
+      final weights = await ref.watch(
+        weightsForAnimalProvider(animalId).future,
+      );
+      final symptoms = await ref.watch(
+        symptomsForAnimalProvider(animalId).future,
+      );
+      final photos = await ref.watch(photosForAnimalProvider(animalId).future);
+      final placements = await ref.watch(
+        placementsForAnimalProvider(animalId).future,
+      );
+
+      return animalTimeline(
+        animal: animal,
+        vaccinations: doses,
+        healthTests: tests,
+        visits: visits,
+        weights: weights,
+        symptoms: symptoms,
+        photos: photos,
+        placements: placements,
+        // Her own whelpings come from the herd-wide list the page already
+        // watches: `litters` is one small table, and asking it per animal would
+        // be a scan per card on the herd list.
+        litters: ref.watch(littersProvider).value ?? const <Litter>[],
+      );
+    });
 
 /// One animal's pictures, oldest first — the order a growth strip reads in.
 final photosForAnimalProvider = FutureProvider.autoDispose

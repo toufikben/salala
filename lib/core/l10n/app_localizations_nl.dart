@@ -1395,6 +1395,54 @@ class AppLocalizationsNl extends AppLocalizations {
       'Pagina\'s voor privacy, voorwaarden en help, en een beoordelingsregel in Instellingen.';
 
   @override
+  String get whatsNew6 =>
+      'Eén lijst per dier: elke inenting, weging, bezoek en plaatsing op datum.';
+
+  @override
+  String get timelineTitle => 'Wat er gebeurde';
+
+  @override
+  String get timelineEmpty => 'Nog niets met een datum.';
+
+  @override
+  String timelineShowAll(String count) {
+    return 'Alle $count tonen';
+  }
+
+  @override
+  String get timelineShowLess => 'Minder tonen';
+
+  @override
+  String get timelineKindBorn => 'Geboorte';
+
+  @override
+  String get timelineKindDied => 'Overlijden';
+
+  @override
+  String get timelineKindWhelped => 'Nestje';
+
+  @override
+  String get timelineKindVaccination => 'Inenting';
+
+  @override
+  String get timelineKindHealthTest => 'Gezondheidstest';
+
+  @override
+  String get timelineKindVisit => 'Dierenartsbezoek';
+
+  @override
+  String get timelineKindSymptom => 'Symptoom';
+
+  @override
+  String get timelineKindWeight => 'Weging';
+
+  @override
+  String get timelineKindPhoto => 'Foto';
+
+  @override
+  String get timelineKindPlacement => 'Plaatsing';
+
+  @override
   String daysPlural(String n) {
     return '$n dagen';
   }

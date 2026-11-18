@@ -8,6 +8,7 @@ import 'package:salala/presentation/widgets/symptom_dialog.dart';
 import 'package:salala/presentation/widgets/triage_card.dart';
 
 import '../helpers/pump_app.dart';
+import '../helpers/section_finder.dart';
 
 const String _nalaId = 'animal-nala';
 
@@ -48,7 +49,7 @@ void _usePhoneViewport(WidgetTester tester) {
 }
 
 Future<void> _openNala(WidgetTester tester) async {
-  await tester.tap(find.text('Nala'));
+  await tester.tap(sectionText('Nala'));
   await settleRealIo(tester);
 }
 
@@ -149,12 +150,12 @@ void main() {
         seedSymptoms: <Symptom>[_sighting(observedAt: _seenOn)],
       );
       await _openNala(tester);
-      await _scrollTo(tester, find.text('Vomiting'));
+      await _scrollTo(tester, sectionText('Vomiting'));
 
-      expect(find.text('Symptoms'), findsOneWidget);
-      expect(find.text('Vomiting'), findsOneWidget);
+      expect(sectionText('Symptoms'), findsOneWidget);
+      expect(sectionText('Vomiting'), findsOneWidget);
       expect(
-        find.text(
+        sectionText(
           _tileSubtitle(
             severity: 'Severe',
             state: 'Still happening',
@@ -178,12 +179,12 @@ void main() {
       await _openNala(tester);
 
       expect(
-        find.text('Nothing in this record calls for a next step'),
+        sectionText('Nothing in this record calls for a next step'),
         findsOneWidget,
       );
 
       await _tap(tester, find.widgetWithText(TextButton, 'Add symptom'));
-      expect(find.text('Log a symptom'), findsOneWidget);
+      expect(sectionText('Log a symptom'), findsOneWidget);
 
       await tester.enterText(
         find.widgetWithText(TextFormField, 'Symptom'),
@@ -194,17 +195,17 @@ void main() {
 
       await _scrollToTop(tester);
       expect(
-        find.text('Act now'),
+        sectionText('Act now'),
         findsOneWidget,
         reason: _cardReading(tester),
       );
       expect(
-        find.text('Vomiting was recorded as severe and is still happening'),
+        sectionText('Vomiting was recorded as severe and is still happening'),
         findsOneWidget,
         reason: _cardReading(tester),
       );
-      await _scrollTo(tester, find.text('Vomiting'));
-      expect(find.text('Vomiting'), findsOneWidget);
+      await _scrollTo(tester, sectionText('Vomiting'));
+      expect(sectionText('Vomiting'), findsOneWidget);
     },
   );
 
@@ -222,38 +223,38 @@ void main() {
     // lazy list, and an expect that only runs after the scroll cannot tell a
     // finding that never fired from a card the page stopped building.
     expect(
-      find.text('Act now'),
+      sectionText('Act now'),
       findsOneWidget,
       reason: 'before the scroll: ${_cardReading(tester)}',
     );
-    await _scrollTo(tester, find.text('Vomiting'));
+    await _scrollTo(tester, sectionText('Vomiting'));
     await _scrollToTop(tester);
     expect(
-      find.text('Act now'),
+      sectionText('Act now'),
       findsOneWidget,
       reason: 'back at the top: ${_cardReading(tester)}',
     );
-    await _scrollTo(tester, find.text('Vomiting'));
+    await _scrollTo(tester, sectionText('Vomiting'));
 
-    await _tap(tester, find.text('Vomiting'));
-    expect(find.text('Edit symptom'), findsOneWidget);
+    await _tap(tester, sectionText('Vomiting'));
+    expect(sectionText('Edit symptom'), findsOneWidget);
 
     await _tap(tester, find.byType(Switch));
     await _save(tester);
 
     await _scrollToTop(tester);
     expect(
-      find.text('Nothing in this record calls for a next step'),
+      sectionText('Nothing in this record calls for a next step'),
       findsOneWidget,
       reason: _cardReading(tester),
     );
-    expect(find.text('Act now'), findsNothing, reason: _cardReading(tester));
+    expect(sectionText('Act now'), findsNothing, reason: _cardReading(tester));
     // The fact survives as history; only the alarm stops. The row reads
     // "resolved" now, in the same joined subtitle it is shown in when open.
-    await _scrollTo(tester, find.text('Vomiting'));
-    expect(find.text('Vomiting'), findsOneWidget);
+    await _scrollTo(tester, sectionText('Vomiting'));
+    expect(sectionText('Vomiting'), findsOneWidget);
     expect(
-      find.text(
+      sectionText(
         _tileSubtitle(
           severity: 'Severe',
           state: 'Resolved',
@@ -275,15 +276,15 @@ void main() {
     );
     await _openNala(tester);
     expect(
-      find.text('Act now'),
+      sectionText('Act now'),
       findsOneWidget,
       reason: 'before the scroll: ${_cardReading(tester)}',
     );
-    await _scrollTo(tester, find.text('Vomiting'));
+    await _scrollTo(tester, sectionText('Vomiting'));
 
-    await _tap(tester, find.text('Vomiting'));
+    await _tap(tester, sectionText('Vomiting'));
     await _tap(tester, find.widgetWithText(TextButton, 'Delete'));
-    expect(find.text('Delete this record?'), findsOneWidget);
+    expect(sectionText('Delete this record?'), findsOneWidget);
     await tester.tap(find.widgetWithText(FilledButton, 'Delete'));
     // The row is deleted on the database isolate, and the symptom dialog only
     // closes once that answers — so waiting a fixed number of rounds asserted
@@ -295,18 +296,18 @@ void main() {
     );
     await settleRealIo(tester);
 
-    expect(find.text('Vomiting'), findsNothing);
+    expect(sectionText('Vomiting'), findsNothing);
     await _scrollToTop(tester);
     expect(
-      find.text('Nothing in this record calls for a next step'),
+      sectionText('Nothing in this record calls for a next step'),
       findsOneWidget,
       reason: _cardReading(tester),
     );
-    expect(find.text('Act now'), findsNothing, reason: _cardReading(tester));
+    expect(sectionText('Act now'), findsNothing, reason: _cardReading(tester));
     // Downward from the top, which is the direction this page is known to
     // scroll in: the emptied section is above where the row just was.
-    await _scrollTo(tester, find.text('Symptoms'));
-    expect(find.text('Nothing recorded yet.'), findsWidgets);
+    await _scrollTo(tester, sectionText('Symptoms'));
+    expect(sectionText('Nothing recorded yet.'), findsWidgets);
   });
 
   testWidgets('an empty label is refused and the dialog stays open', (
@@ -319,19 +320,19 @@ void main() {
     await _tap(tester, find.widgetWithText(TextButton, 'Add symptom'));
     await _save(tester);
 
-    expect(find.text('Say what you saw'), findsOneWidget);
-    expect(find.text('Log a symptom'), findsOneWidget);
+    expect(sectionText('Say what you saw'), findsOneWidget);
+    expect(sectionText('Log a symptom'), findsOneWidget);
     await _scrollToTop(tester);
     // The card is read from the top, where the page builds it, and the sentence
     // that says nothing is due is the proof it is there at all: a bare
     // `findsNothing` on `Act now` passes just as happily when the card has
     // scrolled out of the tree.
     expect(
-      find.text('Nothing in this record calls for a next step'),
+      sectionText('Nothing in this record calls for a next step'),
       findsOneWidget,
       reason: _cardReading(tester),
     );
-    expect(find.text('Act now'), findsNothing, reason: _cardReading(tester));
+    expect(sectionText('Act now'), findsNothing, reason: _cardReading(tester));
   });
 
   testWidgets('the Arabic ledger renders the symptom date in Latin digits', (
@@ -352,9 +353,9 @@ void main() {
     expect(RegExp(r'[0-9]').hasMatch(day), isTrue);
     expect(RegExp('[\u0660-\u0669]').hasMatch(day), isFalse);
 
-    await _scrollTo(tester, find.text('استسقاء'));
+    await _scrollTo(tester, sectionText('استسقاء'));
     expect(
-      find.text(
+      sectionText(
         _tileSubtitle(severity: 'شديد', state: 'ما زال مستمرًا', day: day),
       ),
       findsOneWidget,
@@ -371,7 +372,7 @@ void main() {
         beforeLaunch: refuseWritesTo('symptoms'),
       );
       await _openNala(tester);
-      await _scrollTo(tester, find.text('Symptoms'));
+      await _scrollTo(tester, sectionText('Symptoms'));
 
       await _tap(tester, find.widgetWithText(TextButton, 'Add symptom'));
       await tester.enterText(
@@ -402,9 +403,9 @@ void main() {
         beforeLaunch: refuseDeletesOf('symptoms'),
       );
       await _openNala(tester);
-      await _scrollTo(tester, find.text('Vomiting'));
+      await _scrollTo(tester, sectionText('Vomiting'));
 
-      await _tap(tester, find.text('Vomiting'));
+      await _tap(tester, sectionText('Vomiting'));
       await _tap(tester, find.widgetWithText(TextButton, 'Delete'));
       await tester.tap(find.widgetWithText(FilledButton, 'Delete'));
       await settleRefusal(tester, waitingFor: deleteRefusalSentence);
@@ -413,11 +414,11 @@ void main() {
       // could not remove, and the triage card still alarms: an `ongoing` sighting
       // the ledger still holds is still a sign the breeder has to act on. A
       // Delete that answered with silence would have said the opposite.
-      expect(find.text(deleteRefusalSentence), findsOneWidget);
+      expect(sectionText(deleteRefusalSentence), findsOneWidget);
       expect(find.byType(SymptomDialog), findsOneWidget);
       await _scrollToTop(tester);
       expect(
-        find.text('Act now'),
+        sectionText('Act now'),
         findsOneWidget,
         reason: _cardReading(tester),
       );
@@ -438,7 +439,7 @@ void main() {
         beforeLaunch: refuseWritesTo('symptoms'),
       );
       await _openNala(tester);
-      await _scrollTo(tester, find.text('Symptoms'));
+      await _scrollTo(tester, sectionText('Symptoms'));
 
       await _tap(tester, find.widgetWithText(TextButton, 'Add symptom'));
       await tester.enterText(
@@ -458,9 +459,9 @@ void main() {
         waitingFor: beforeBirthSentence,
       );
 
-      expect(find.text(beforeBirthSentence), findsOneWidget);
+      expect(sectionText(beforeBirthSentence), findsOneWidget);
       expect(
-        find.text(saveRefusalSentence),
+        sectionText(saveRefusalSentence),
         findsNothing,
         reason:
             'the insert trigger is what makes this absence mean anything: a '

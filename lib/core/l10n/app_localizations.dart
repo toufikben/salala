@@ -2528,6 +2528,96 @@ abstract class AppLocalizations {
   /// **'Privacy, terms and help pages, and a rating row in Settings.'**
   String get whatsNew5;
 
+  /// No description provided for @whatsNew6.
+  ///
+  /// In en, this message translates to:
+  /// **'One list per animal: every dose, weigh-in, visit and handover in date order.'**
+  String get whatsNew6;
+
+  /// No description provided for @timelineTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What happened'**
+  String get timelineTitle;
+
+  /// No description provided for @timelineEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing dated yet.'**
+  String get timelineEmpty;
+
+  /// No description provided for @timelineShowAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Show all {count}'**
+  String timelineShowAll(String count);
+
+  /// No description provided for @timelineShowLess.
+  ///
+  /// In en, this message translates to:
+  /// **'Show fewer'**
+  String get timelineShowLess;
+
+  /// No description provided for @timelineKindBorn.
+  ///
+  /// In en, this message translates to:
+  /// **'Born'**
+  String get timelineKindBorn;
+
+  /// No description provided for @timelineKindDied.
+  ///
+  /// In en, this message translates to:
+  /// **'Died'**
+  String get timelineKindDied;
+
+  /// No description provided for @timelineKindWhelped.
+  ///
+  /// In en, this message translates to:
+  /// **'Whelped'**
+  String get timelineKindWhelped;
+
+  /// No description provided for @timelineKindVaccination.
+  ///
+  /// In en, this message translates to:
+  /// **'Vaccination'**
+  String get timelineKindVaccination;
+
+  /// No description provided for @timelineKindHealthTest.
+  ///
+  /// In en, this message translates to:
+  /// **'Health test'**
+  String get timelineKindHealthTest;
+
+  /// No description provided for @timelineKindVisit.
+  ///
+  /// In en, this message translates to:
+  /// **'Vet visit'**
+  String get timelineKindVisit;
+
+  /// No description provided for @timelineKindSymptom.
+  ///
+  /// In en, this message translates to:
+  /// **'Symptom'**
+  String get timelineKindSymptom;
+
+  /// No description provided for @timelineKindWeight.
+  ///
+  /// In en, this message translates to:
+  /// **'Weigh-in'**
+  String get timelineKindWeight;
+
+  /// No description provided for @timelineKindPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo'**
+  String get timelineKindPhoto;
+
+  /// No description provided for @timelineKindPlacement.
+  ///
+  /// In en, this message translates to:
+  /// **'Handed over'**
+  String get timelineKindPlacement;
+
   /// No description provided for @daysPlural.
   ///
   /// In en, this message translates to:

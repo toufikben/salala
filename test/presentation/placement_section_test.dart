@@ -9,6 +9,7 @@ import 'package:salala/presentation/widgets/placement_dialog.dart';
 
 import '../helpers/fake_contract_files.dart';
 import '../helpers/pump_app.dart';
+import '../helpers/section_finder.dart';
 
 /// Fixed ids, for the same reason the symptom section's are: a placement rows
 /// under an animal by foreign key and names a buyer by one, so the test has to
@@ -79,7 +80,7 @@ void _usePhoneViewport(WidgetTester tester) {
 }
 
 Future<void> _openAnimal(WidgetTester tester, String name) async {
-  await tester.tap(find.text(name));
+  await tester.tap(sectionText(name));
   await settleRealIo(tester);
 }
 
@@ -157,7 +158,7 @@ Future<void> _saveIn(WidgetTester tester, String dialogTitle) async {
 /// handover is still a person whose phone number is in the app.
 Future<void> _editBuyer(WidgetTester tester) async {
   await _tap(tester, find.byTooltip('Edit buyer'));
-  expect(find.text('Edit buyer'), findsOneWidget);
+  expect(sectionText('Edit buyer'), findsOneWidget);
 }
 
 /// Taps the contact form's Delete action and stops on the confirmation, so the
@@ -170,7 +171,7 @@ Future<void> _askToDeleteBuyer(WidgetTester tester) async {
       matching: find.widgetWithText(TextButton, 'Delete'),
     ),
   );
-  expect(find.text('Delete this record?'), findsOneWidget);
+  expect(sectionText('Delete this record?'), findsOneWidget);
 }
 
 Future<void> _answerDeletePrompt(WidgetTester tester, String action) async {
@@ -201,7 +202,7 @@ Future<void> _cancelDialog(WidgetTester tester, String dialogTitle) async {
 /// with that contact selected.
 Future<void> _createBuyer(WidgetTester tester, String name) async {
   await _tap(tester, find.byTooltip('New buyer'));
-  expect(find.text('Add a buyer'), findsOneWidget);
+  expect(sectionText('Add a buyer'), findsOneWidget);
   await tester.enterText(find.widgetWithText(TextFormField, 'Name'), name);
   await _saveIn(tester, 'Add a buyer');
 }
@@ -241,20 +242,20 @@ void main() {
     _usePhoneViewport(tester);
     await pumpSalala(tester, seed: <Animal>[_animal(_nalaId, 'Nala')]);
     await _openAnimal(tester, 'Nala');
-    await _scrollTo(tester, find.text('Placements'));
+    await _scrollTo(tester, sectionText('Placements'));
 
-    expect(find.text('Placements'), findsOneWidget);
-    expect(find.text('Add placement'), findsOneWidget);
+    expect(sectionText('Placements'), findsOneWidget);
+    expect(sectionText('Add placement'), findsOneWidget);
     expect(
       find.descendant(
         of: find.widgetWithText(Card, 'Placements'),
-        matching: find.text('Nothing recorded yet.'),
+        matching: sectionText('Nothing recorded yet.'),
       ),
       findsOneWidget,
     );
     // The absence is the row's own wording, so an empty section cannot be
     // confused for a placement whose buyer was never named.
-    expect(find.text('Buyer not recorded'), findsNothing);
+    expect(sectionText('Buyer not recorded'), findsNothing);
   });
 
   testWidgets(
@@ -263,15 +264,15 @@ void main() {
       _usePhoneViewport(tester);
       await pumpSalala(tester, seed: <Animal>[_animal(_nalaId, 'Nala')]);
       await _openAnimal(tester, 'Nala');
-      await _scrollTo(tester, find.text('Placements'));
+      await _scrollTo(tester, sectionText('Placements'));
 
       await _tap(tester, find.widgetWithText(TextButton, 'Add placement'));
-      expect(find.text('Log a placement'), findsOneWidget);
+      expect(sectionText('Log a placement'), findsOneWidget);
 
       await _createBuyer(tester, 'Aicha');
       // The contact form closed and the handover form is holding the buyer it
       // just wrote — the id the dao assigned, not one typed by hand.
-      expect(find.text('Aicha'), findsOneWidget);
+      expect(sectionText('Aicha'), findsOneWidget);
 
       await _priceAndSave(
         tester,
@@ -281,20 +282,20 @@ void main() {
         guarantee: 'Health guarantee for 15 days',
       );
 
-      expect(find.text('Log a placement'), findsNothing);
+      expect(sectionText('Log a placement'), findsNothing);
       // The handover closed with one sentence about the animal rather than about
       // the record: what a breeder needs to hear after sending a dog away is
       // that the ledger did not go with her.
       expect(
-        find.text('Nala has gone to a new home. The record stays with you.'),
+        sectionText('Nala has gone to a new home. The record stays with you.'),
         findsOneWidget,
       );
       await _letFarewellExpire(tester);
-      await _scrollTo(tester, find.text('Aicha'));
-      expect(find.text('Aicha'), findsOneWidget);
+      await _scrollTo(tester, sectionText('Aicha'));
+      expect(sectionText('Aicha'), findsOneWidget);
       // The amount is printed ungrouped with the code upper-cased by the form,
       // and the day defaults to the one it was written on.
-      expect(find.textContaining('2500 MAD'), findsOneWidget);
+      expect(sectionTextContaining('2500 MAD'), findsOneWidget);
 
       // Back to the herd and into the same ledger again: the row has to come
       // off SQLite, not out of a provider the screen happened to keep.
@@ -303,10 +304,10 @@ void main() {
       expect(find.byType(AnimalDetailScreen), findsNothing);
 
       await _openAnimal(tester, 'Nala');
-      await _scrollTo(tester, find.text('Aicha'));
-      expect(find.text('Aicha'), findsOneWidget);
+      await _scrollTo(tester, sectionText('Aicha'));
+      expect(sectionText('Aicha'), findsOneWidget);
       expect(
-        find.textContaining('Health guarantee for 15 days'),
+        sectionTextContaining('Health guarantee for 15 days'),
         findsOneWidget,
       );
     },
@@ -321,34 +322,34 @@ void main() {
       seed: <Animal>[_animal(_nalaId, 'Nala'), _animal(_atlasId, 'Atlas')],
     );
     await _openAnimal(tester, 'Nala');
-    await _scrollTo(tester, find.text('Placements'));
+    await _scrollTo(tester, sectionText('Placements'));
 
     await _tap(tester, find.widgetWithText(TextButton, 'Add placement'));
     await _createBuyer(tester, 'Aicha');
     await _saveIn(tester, 'Log a placement');
-    await _scrollTo(tester, find.text('Aicha'));
-    expect(find.text('Aicha'), findsOneWidget);
+    await _scrollTo(tester, sectionText('Aicha'));
+    expect(sectionText('Aicha'), findsOneWidget);
 
     await tester.tap(find.byIcon(Icons.arrow_back));
     await settleRealIo(tester);
     await _openAnimal(tester, 'Atlas');
-    await _scrollTo(tester, find.text('Placements'));
+    await _scrollTo(tester, sectionText('Placements'));
 
     await _tap(tester, find.widgetWithText(TextButton, 'Add placement'));
     await _tap(tester, find.byType(DropdownButtonFormField<String?>));
     // A contact list, not a per-animal field: the same family takes the second
     // litter, and the name typed for Nala is a choice here without being
     // typed again.
-    expect(find.text('Aicha'), findsOneWidget);
-    await _tap(tester, find.text('Aicha'));
+    expect(sectionText('Aicha'), findsOneWidget);
+    await _tap(tester, sectionText('Aicha'));
     await _saveIn(tester, 'Log a placement');
 
-    await _scrollTo(tester, find.text('Aicha'));
+    await _scrollTo(tester, sectionText('Aicha'));
     // On Atlas's ledger, with the form closed: the contact came back out of
     // SQLite after the first screen was thrown away, not out of a provider
     // this route kept.
     expect(find.byType(AlertDialog), findsNothing);
-    expect(find.text('Aicha'), findsOneWidget);
+    expect(sectionText('Aicha'), findsOneWidget);
   });
 
   testWidgets('tapping a row edits it and the row changes', (tester) async {
@@ -368,10 +369,10 @@ void main() {
       ],
     );
     await _openAnimal(tester, 'Nala');
-    await _scrollTo(tester, find.text('Aicha'));
+    await _scrollTo(tester, sectionText('Aicha'));
 
     expect(
-      find.text(
+      sectionText(
         _rowDetails(
           localeTag: 'en',
           placed: _placedOn,
@@ -382,17 +383,17 @@ void main() {
       findsOneWidget,
     );
 
-    await _tap(tester, find.text('Aicha'));
-    expect(find.text('Edit placement'), findsOneWidget);
+    await _tap(tester, sectionText('Aicha'));
+    expect(sectionText('Edit placement'), findsOneWidget);
     // The stored values are in the fields already, so correcting one row does
     // not mean retyping the rest of it.
-    expect(find.text('Health guarantee for 15 days'), findsWidgets);
+    expect(sectionText('Health guarantee for 15 days'), findsWidgets);
 
     await _priceAndSave(tester, 'Edit placement', price: '1800');
 
-    await _scrollTo(tester, find.textContaining('1800 MAD'));
+    await _scrollTo(tester, sectionTextContaining('1800 MAD'));
     expect(
-      find.text(
+      sectionText(
         _rowDetails(
           localeTag: 'en',
           placed: _placedOn,
@@ -402,7 +403,7 @@ void main() {
       ),
       findsOneWidget,
     );
-    expect(find.textContaining('2500 MAD'), findsNothing);
+    expect(sectionTextContaining('2500 MAD'), findsNothing);
   });
 
   testWidgets('deleting one placement leaves the other handover', (
@@ -428,14 +429,14 @@ void main() {
     await _openAnimal(tester, 'Nala');
     // The undated-in-advance row is the newest one, so it is the row this scroll
     // targets: the ledger is lazy and the second tile does not exist yet.
-    await _scrollTo(tester, find.text('Buyer not recorded'));
+    await _scrollTo(tester, sectionText('Buyer not recorded'));
 
-    expect(find.text('Buyer not recorded'), findsOneWidget);
+    expect(sectionText('Buyer not recorded'), findsOneWidget);
 
-    await _tap(tester, find.text('Buyer not recorded'));
-    expect(find.text('Edit placement'), findsOneWidget);
+    await _tap(tester, sectionText('Buyer not recorded'));
+    expect(sectionText('Edit placement'), findsOneWidget);
     await _tap(tester, find.widgetWithText(TextButton, 'Delete'));
-    expect(find.text('Delete this record?'), findsOneWidget);
+    expect(sectionText('Delete this record?'), findsOneWidget);
     await tester.tap(find.widgetWithText(FilledButton, 'Delete'));
     // A placement delete pops the dialog, rewrites the animal's status, and
     // re-reads two lists before the row leaves the screen. Waiting for the
@@ -448,9 +449,9 @@ void main() {
     await settleRealIo(tester);
 
     expect(find.byType(AlertDialog), findsNothing);
-    expect(find.text('Buyer not recorded'), findsNothing);
-    await _scrollTo(tester, find.text('Aicha'));
-    expect(find.text('Aicha'), findsOneWidget);
+    expect(sectionText('Buyer not recorded'), findsNothing);
+    await _scrollTo(tester, sectionText('Aicha'));
+    expect(sectionText('Aicha'), findsOneWidget);
   });
 
   testWidgets('the Arabic ledger prints the placement price in Latin digits', (
@@ -474,10 +475,10 @@ void main() {
       ],
     );
     await _openAnimal(tester, 'نلة');
-    await _scrollTo(tester, find.text('عائشة'));
+    await _scrollTo(tester, sectionText('عائشة'));
 
-    expect(find.text('التسليم'), findsOneWidget);
-    final details = find.text(
+    expect(sectionText('التسليم'), findsOneWidget);
+    final details = sectionText(
       _rowDetails(localeTag: 'ar', placed: _placedOn, amount: '2500 MAD'),
     );
     expect(details, findsOneWidget);
@@ -499,7 +500,7 @@ void main() {
         beforeLaunch: refuseWritesTo('placements'),
       );
       await _openAnimal(tester, 'Nala');
-      await _scrollTo(tester, find.text('Placements'));
+      await _scrollTo(tester, sectionText('Placements'));
 
       await _tap(tester, find.widgetWithText(TextButton, 'Add placement'));
       await tester.enterText(
@@ -529,7 +530,7 @@ void main() {
         beforeLaunch: refuseWritesTo('buyers'),
       );
       await _openAnimal(tester, 'Nala');
-      await _scrollTo(tester, find.text('Placements'));
+      await _scrollTo(tester, sectionText('Placements'));
 
       await _tap(tester, find.widgetWithText(TextButton, 'Add placement'));
       await _tap(tester, find.byTooltip('New buyer'));
@@ -572,7 +573,7 @@ void main() {
       beforeLaunch: refuseWritesTo('placements'),
     );
     await _openAnimal(tester, 'Nala');
-    await _scrollTo(tester, find.text('Placements'));
+    await _scrollTo(tester, sectionText('Placements'));
 
     await _tap(tester, find.widgetWithText(TextButton, 'Add placement'));
     await tester.enterText(find.widgetWithText(TextFormField, 'Price'), '2500');
@@ -589,9 +590,9 @@ void main() {
       waitingFor: beforeBirthSentence,
     );
 
-    expect(find.text(beforeBirthSentence), findsOneWidget);
+    expect(sectionText(beforeBirthSentence), findsOneWidget);
     expect(
-      find.text(saveRefusalSentence),
+      sectionText(saveRefusalSentence),
       findsNothing,
       reason:
           'the trigger is what turns this absence into evidence: a handover '
@@ -639,10 +640,10 @@ void main() {
       ],
     );
     await _openAnimal(tester, 'Nala');
-    await _scrollTo(tester, find.text('Aicha'));
+    await _scrollTo(tester, sectionText('Aicha'));
 
-    await _tap(tester, find.text('Aicha'));
-    expect(find.text('Edit placement'), findsOneWidget);
+    await _tap(tester, sectionText('Aicha'));
+    expect(sectionText('Edit placement'), findsOneWidget);
     await _editBuyer(tester);
     // The form opened on the row the ledger holds, so the name in the box is the
     // name being deleted — not whatever was typed last.
@@ -674,18 +675,18 @@ void main() {
     expect(find.widgetWithText(AlertDialog, 'Edit placement'), findsOneWidget);
     await _cancelDialog(tester, 'Edit placement');
 
-    await _scrollTo(tester, find.text('Buyer not recorded'));
-    expect(find.text('Buyer not recorded'), findsOneWidget);
-    expect(find.text('Aicha'), findsNothing);
+    await _scrollTo(tester, sectionText('Buyer not recorded'));
+    expect(sectionText('Buyer not recorded'), findsOneWidget);
+    expect(sectionText('Aicha'), findsNothing);
 
     // Off the ledger and back into it: the row printed below is SQLite's, so the
     // handover did not go with the contact and neither did its amount.
     await tester.tap(find.byIcon(Icons.arrow_back));
     await settleRealIo(tester);
     await _openAnimal(tester, 'Nala');
-    await _scrollTo(tester, find.text('Buyer not recorded'));
-    expect(find.text('Buyer not recorded'), findsOneWidget);
-    expect(find.textContaining('2500 MAD'), findsOneWidget);
+    await _scrollTo(tester, sectionText('Buyer not recorded'));
+    expect(sectionText('Buyer not recorded'), findsOneWidget);
+    expect(sectionTextContaining('2500 MAD'), findsOneWidget);
   });
 
   testWidgets(
@@ -699,7 +700,7 @@ void main() {
       _usePhoneViewport(tester);
       await pumpSalala(tester, seed: <Animal>[_animal(_nalaId, 'Nala')]);
       await _openAnimal(tester, 'Nala');
-      await _scrollTo(tester, find.text('Placements'));
+      await _scrollTo(tester, sectionText('Placements'));
 
       await _tap(tester, find.widgetWithText(TextButton, 'Add placement'));
       await _createBuyer(tester, 'Aicha');
@@ -719,7 +720,7 @@ void main() {
       expect(
         find.descendant(
           of: find.widgetWithText(AlertDialog, 'Log a placement'),
-          matching: find.text('Buyer not recorded'),
+          matching: sectionText('Buyer not recorded'),
         ),
         findsOneWidget,
       );
@@ -733,13 +734,13 @@ void main() {
 
       expect(find.widgetWithText(AlertDialog, 'Log a placement'), findsNothing);
       expect(
-        find.text(saveRefusalSentence),
+        sectionText(saveRefusalSentence),
         findsNothing,
         reason: 'the handover has no buyer left to name, so SQLite has nothing to refuse',
       );
-      await _scrollTo(tester, find.textContaining('2500 MAD'));
-      expect(find.text('Buyer not recorded'), findsOneWidget);
-      expect(find.text('Aicha'), findsNothing);
+      await _scrollTo(tester, sectionTextContaining('2500 MAD'));
+      expect(sectionText('Buyer not recorded'), findsOneWidget);
+      expect(sectionText('Aicha'), findsNothing);
     },
   );
 
@@ -757,15 +758,15 @@ void main() {
         beforeLaunch: refuseDeletesOf('buyers'),
       );
       await _openAnimal(tester, 'Nala');
-      await _scrollTo(tester, find.text('Aicha'));
+      await _scrollTo(tester, sectionText('Aicha'));
 
-      await _tap(tester, find.text('Aicha'));
+      await _tap(tester, sectionText('Aicha'));
       await _editBuyer(tester);
       await _askToDeleteBuyer(tester);
       await _answerDeletePrompt(tester, 'Delete');
       await settleRefusal(tester, waitingFor: deleteRefusalSentence);
 
-      expect(find.text(deleteRefusalSentence), findsOneWidget);
+      expect(sectionText(deleteRefusalSentence), findsOneWidget);
       final editBuyer = find.widgetWithText(AlertDialog, 'Edit buyer');
       // A person SQLite kept stays the form's to show: it did not close on a delete
       // that never happened, the name is still in the box, and the button answers a
@@ -801,8 +802,8 @@ void main() {
       await tester.pump(const Duration(seconds: 5));
       await _cancelDialog(tester, 'Edit buyer');
       await _cancelDialog(tester, 'Edit placement');
-      expect(find.text('Aicha'), findsOneWidget);
-      expect(find.text('Buyer not recorded'), findsNothing);
+      expect(sectionText('Aicha'), findsOneWidget);
+      expect(sectionText('Buyer not recorded'), findsNothing);
     },
   );
 
@@ -817,9 +818,9 @@ void main() {
       ],
     );
     await _openAnimal(tester, 'Nala');
-    await _scrollTo(tester, find.text('Aicha'));
+    await _scrollTo(tester, sectionText('Aicha'));
 
-    await _tap(tester, find.text('Aicha'));
+    await _tap(tester, sectionText('Aicha'));
     await _editBuyer(tester);
     await _askToDeleteBuyer(tester);
     await _answerDeletePrompt(tester, 'Cancel');
@@ -827,12 +828,12 @@ void main() {
 
     // The question was asked once and the answer was no: the contact form is back
     // where it was, and the ledger still has the buyer behind it.
-    expect(find.text('Delete this record?'), findsNothing);
+    expect(sectionText('Delete this record?'), findsNothing);
     expect(find.widgetWithText(AlertDialog, 'Edit buyer'), findsOneWidget);
     await _cancelDialog(tester, 'Edit buyer');
     await _cancelDialog(tester, 'Edit placement');
-    expect(find.text('Aicha'), findsOneWidget);
-    expect(find.text('Buyer not recorded'), findsNothing);
+    expect(sectionText('Aicha'), findsOneWidget);
+    expect(sectionText('Buyer not recorded'), findsNothing);
   });
 
   testWidgets('a contact being created offers no delete', (tester) async {
@@ -842,11 +843,11 @@ void main() {
     _usePhoneViewport(tester);
     await pumpSalala(tester, seed: <Animal>[_animal(_nalaId, 'Nala')]);
     await _openAnimal(tester, 'Nala');
-    await _scrollTo(tester, find.text('Placements'));
+    await _scrollTo(tester, sectionText('Placements'));
 
     await _tap(tester, find.widgetWithText(TextButton, 'Add placement'));
     await _tap(tester, find.byTooltip('New buyer'));
-    expect(find.text('Add a buyer'), findsOneWidget);
+    expect(sectionText('Add a buyer'), findsOneWidget);
     expect(
       find.descendant(
         of: find.widgetWithText(AlertDialog, 'Add a buyer'),
@@ -860,74 +861,81 @@ void main() {
     /// The form's attach row, in the state it starts in.
     Finder attachRow() => find.widgetWithText(ListTile, 'Attach a contract');
 
-    testWidgets('a chosen document is written, named on the row, and openable', (
-      tester,
-    ) async {
-      _usePhoneViewport(tester);
-      final contracts = FakeContractFiles()
-        ..nextPicked = FakeContractFiles.contract('signed.pdf', bytes: 64);
-      await pumpSalala(
-        tester,
-        seed: <Animal>[_animal(_nalaId, 'Nala')],
-        contractFiles: contracts,
-      );
-      await _openAnimal(tester, 'Nala');
-      await _scrollTo(tester, find.text('Placements'));
+    testWidgets(
+      'a chosen document is written, named on the row, and openable',
+      (tester) async {
+        _usePhoneViewport(tester);
+        final contracts = FakeContractFiles()
+          ..nextPicked = FakeContractFiles.contract('signed.pdf', bytes: 64);
+        await pumpSalala(
+          tester,
+          seed: <Animal>[_animal(_nalaId, 'Nala')],
+          contractFiles: contracts,
+        );
+        await _openAnimal(tester, 'Nala');
+        await _scrollTo(tester, sectionText('Placements'));
 
-      await _tap(tester, find.widgetWithText(TextButton, 'Add placement'));
-      await _tap(tester, attachRow());
-      // Nothing is on the disk yet: the bytes are held in the form until Save, so
-      // a breeder who backs out leaves no file behind.
-      expect(contracts.stored, isEmpty);
-      expect(find.text('Contract attached'), findsOneWidget);
-      expect(find.text('signed.pdf'), findsOneWidget);
+        await _tap(tester, find.widgetWithText(TextButton, 'Add placement'));
+        await _tap(tester, attachRow());
+        // Nothing is on the disk yet: the bytes are held in the form until Save, so
+        // a breeder who backs out leaves no file behind.
+        expect(contracts.stored, isEmpty);
+        expect(sectionText('Contract attached'), findsOneWidget);
+        expect(sectionText('signed.pdf'), findsOneWidget);
 
-      await _saveIn(tester, 'Log a placement');
-      expect(contracts.stored, <String>['$_nalaId/signed.pdf-64']);
+        await _saveIn(tester, 'Log a placement');
+        expect(contracts.stored, <String>['$_nalaId/signed.pdf-64']);
 
-      await _letFarewellExpire(tester);
-      await _scrollTo(tester, find.text('Buyer not recorded'));
-      // The row grew its own control: this handover has a document behind it.
-      expect(find.byTooltip('Open the contract'), findsOneWidget);
+        await _letFarewellExpire(tester);
+        await _scrollTo(tester, sectionText('Buyer not recorded'));
+        // The row grew its own control: this handover has a document behind it.
+        expect(find.byTooltip('Open the contract'), findsOneWidget);
 
-      await _tap(tester, find.byTooltip('Open the contract'));
-      expect(contracts.opened, <String>['$_nalaId/signed.pdf-64']);
-    });
+        await _tap(tester, find.byTooltip('Open the contract'));
+        expect(contracts.opened, <String>['$_nalaId/signed.pdf-64']);
+      },
+    );
 
-    testWidgets('a document that is not on this phone says so instead of opening', (
-      tester,
-    ) async {
-      // The state a restored ledger is in: the row travelled, the file did not.
-      _usePhoneViewport(tester);
-      final contracts = FakeContractFiles();
-      await pumpSalala(
-        tester,
-        seed: <Animal>[_animal(_nalaId, 'Nala')],
-        seedPlacements: <Placement>[
-          _handover(
-            id: 'p-1',
-            placed: _placedOn,
-            buyerId: null,
-            contract: 'gone.pdf',
-          ),
-        ],
-        contractFiles: contracts,
-      );
-      await _openAnimal(tester, 'Nala');
-      await _scrollTo(tester, find.byTooltip('Open the contract'));
+    testWidgets(
+      'a document that is not on this phone says so instead of opening',
+      (tester) async {
+        // The state a restored ledger is in: the row travelled, the file did not.
+        _usePhoneViewport(tester);
+        final contracts = FakeContractFiles();
+        await pumpSalala(
+          tester,
+          seed: <Animal>[_animal(_nalaId, 'Nala')],
+          seedPlacements: <Placement>[
+            _handover(
+              id: 'p-1',
+              placed: _placedOn,
+              buyerId: null,
+              contract: 'gone.pdf',
+            ),
+          ],
+          contractFiles: contracts,
+        );
+        await _openAnimal(tester, 'Nala');
+        await _scrollTo(tester, find.byTooltip('Open the contract'));
 
-      await _tap(tester, find.byTooltip('Open the contract'));
+        await _tap(tester, find.byTooltip('Open the contract'));
 
-      expect(find.text('That document is not on this phone'), findsOneWidget);
-      expect(contracts.opened, <String>['$_nalaId/gone.pdf']);
-    });
+        expect(
+          sectionText('That document is not on this phone'),
+          findsOneWidget,
+        );
+        expect(contracts.opened, <String>['$_nalaId/gone.pdf']);
+      },
+    );
 
     testWidgets('removing the contract deletes the file the row used to name', (
       tester,
     ) async {
       _usePhoneViewport(tester);
       final contracts = FakeContractFiles(
-        bytes: <String, List<int>>{'$_nalaId/old.pdf-8': <int>[1, 2, 3]},
+        bytes: <String, List<int>>{
+          '$_nalaId/old.pdf-8': <int>[1, 2, 3],
+        },
       );
       await pumpSalala(
         tester,
@@ -943,13 +951,13 @@ void main() {
         contractFiles: contracts,
       );
       await _openAnimal(tester, 'Nala');
-      await _scrollTo(tester, find.text('Buyer not recorded'));
+      await _scrollTo(tester, sectionText('Buyer not recorded'));
 
-      await _tap(tester, find.text('Buyer not recorded'));
-      expect(find.text('Contract attached'), findsOneWidget);
+      await _tap(tester, sectionText('Buyer not recorded'));
+      expect(sectionText('Contract attached'), findsOneWidget);
 
       await _tap(tester, find.byTooltip('Remove the contract'));
-      expect(find.text('Attach a contract'), findsOneWidget);
+      expect(sectionText('Attach a contract'), findsOneWidget);
       await _saveIn(tester, 'Edit placement');
 
       // Written after the row landed, never before: a save that failed would
@@ -961,7 +969,9 @@ void main() {
     testWidgets('backing out of the form removes nothing', (tester) async {
       _usePhoneViewport(tester);
       final contracts = FakeContractFiles(
-        bytes: <String, List<int>>{'$_nalaId/old.pdf-8': <int>[1, 2, 3]},
+        bytes: <String, List<int>>{
+          '$_nalaId/old.pdf-8': <int>[1, 2, 3],
+        },
       );
       await pumpSalala(
         tester,
@@ -977,9 +987,9 @@ void main() {
         contractFiles: contracts,
       );
       await _openAnimal(tester, 'Nala');
-      await _scrollTo(tester, find.text('Buyer not recorded'));
+      await _scrollTo(tester, sectionText('Buyer not recorded'));
 
-      await _tap(tester, find.text('Buyer not recorded'));
+      await _tap(tester, sectionText('Buyer not recorded'));
       await _tap(tester, find.byTooltip('Remove the contract'));
       await _cancelDialog(tester, 'Edit placement');
 
@@ -988,7 +998,9 @@ void main() {
       expect(find.byTooltip('Open the contract'), findsOneWidget);
     });
 
-    testWidgets('a picker that refuses says so and changes nothing', (tester) async {
+    testWidgets('a picker that refuses says so and changes nothing', (
+      tester,
+    ) async {
       _usePhoneViewport(tester);
       final contracts = FakeContractFiles()
         ..pickFailure = StateError('no picker');
@@ -998,13 +1010,13 @@ void main() {
         contractFiles: contracts,
       );
       await _openAnimal(tester, 'Nala');
-      await _scrollTo(tester, find.text('Placements'));
+      await _scrollTo(tester, sectionText('Placements'));
 
       await _tap(tester, find.widgetWithText(TextButton, 'Add placement'));
       await _tap(tester, attachRow());
 
-      expect(find.text('No document could be chosen'), findsOneWidget);
-      expect(find.text('Attach a contract'), findsOneWidget);
+      expect(sectionText('No document could be chosen'), findsOneWidget);
+      expect(sectionText('Attach a contract'), findsOneWidget);
     });
   });
 }

@@ -20,6 +20,7 @@ class WhatsNewScreen extends StatelessWidget {
     return InfoPage(
       title: l10n.whatsNewTitle,
       bullets: <String>[
+        l10n.whatsNew6,
         l10n.whatsNew1,
         l10n.whatsNew2,
         l10n.whatsNew3,

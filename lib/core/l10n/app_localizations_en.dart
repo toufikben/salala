@@ -1387,6 +1387,54 @@ class AppLocalizationsEn extends AppLocalizations {
       'Privacy, terms and help pages, and a rating row in Settings.';
 
   @override
+  String get whatsNew6 =>
+      'One list per animal: every dose, weigh-in, visit and handover in date order.';
+
+  @override
+  String get timelineTitle => 'What happened';
+
+  @override
+  String get timelineEmpty => 'Nothing dated yet.';
+
+  @override
+  String timelineShowAll(String count) {
+    return 'Show all $count';
+  }
+
+  @override
+  String get timelineShowLess => 'Show fewer';
+
+  @override
+  String get timelineKindBorn => 'Born';
+
+  @override
+  String get timelineKindDied => 'Died';
+
+  @override
+  String get timelineKindWhelped => 'Whelped';
+
+  @override
+  String get timelineKindVaccination => 'Vaccination';
+
+  @override
+  String get timelineKindHealthTest => 'Health test';
+
+  @override
+  String get timelineKindVisit => 'Vet visit';
+
+  @override
+  String get timelineKindSymptom => 'Symptom';
+
+  @override
+  String get timelineKindWeight => 'Weigh-in';
+
+  @override
+  String get timelineKindPhoto => 'Photo';
+
+  @override
+  String get timelineKindPlacement => 'Handed over';
+
+  @override
   String daysPlural(String n) {
     return '$n days';
   }

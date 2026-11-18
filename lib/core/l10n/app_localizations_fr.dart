@@ -1393,6 +1393,54 @@ class AppLocalizationsFr extends AppLocalizations {
       'Pages confidentialité, conditions et aide, et une ligne de notation dans les Réglages.';
 
   @override
+  String get whatsNew6 =>
+      'Une seule liste par animal : chaque vaccin, pesée, visite et cession dans l\'ordre des dates.';
+
+  @override
+  String get timelineTitle => 'Ce qui s\'est passé';
+
+  @override
+  String get timelineEmpty => 'Rien de daté pour l\'instant.';
+
+  @override
+  String timelineShowAll(String count) {
+    return 'Afficher tout ($count)';
+  }
+
+  @override
+  String get timelineShowLess => 'Afficher moins';
+
+  @override
+  String get timelineKindBorn => 'Naissance';
+
+  @override
+  String get timelineKindDied => 'Décès';
+
+  @override
+  String get timelineKindWhelped => 'Mise bas';
+
+  @override
+  String get timelineKindVaccination => 'Vaccin';
+
+  @override
+  String get timelineKindHealthTest => 'Test de santé';
+
+  @override
+  String get timelineKindVisit => 'Visite vétérinaire';
+
+  @override
+  String get timelineKindSymptom => 'Symptôme';
+
+  @override
+  String get timelineKindWeight => 'Pesée';
+
+  @override
+  String get timelineKindPhoto => 'Photo';
+
+  @override
+  String get timelineKindPlacement => 'Cession';
+
+  @override
   String daysPlural(String n) {
     return '$n jours';
   }
