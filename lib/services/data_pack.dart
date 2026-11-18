@@ -102,7 +102,8 @@ Future<Map<String, Object?>> packFrom(
   final tables = <String>[...dataTables, if (includePhotos) 'photos'];
   final rows = await db.transaction(
     (Transaction txn) async => <String, Object?>{
-      for (final table in tables) table: await txn.query(table),
+      for (final table in tables)
+        table: _readyForTravel(table, await txn.query(table)),
     },
   );
   return <String, Object?>{
@@ -118,6 +119,43 @@ Future<Map<String, Object?>> packFrom(
 /// looking for one animal's name, not parsing bytes.
 String encodePack(Map<String, Object?> pack) =>
     const JsonEncoder.withIndent('  ').convert(pack);
+
+/// Columns that name a file on the phone that wrote the pack, per table.
+///
+/// These are **dropped** on the way out rather than carried, and the reason is the
+/// one fact a backup cannot promise: a path is a pointer into a filesystem that
+/// belongs to one device. `animals.photo_path` has never been written by anything
+/// — pictures live in their own table with their own folder — and
+/// `placements.contract_file_path` is a bare file name inside this app's folder
+/// for the same reason.
+///
+/// Carrying a contract's *name* would be fine on its own, but it would arrive on
+/// the second phone naming a file that phone does not hold, and the screen would
+/// say "open the contract" about nothing. So the column travels as null: the
+/// handover keeps its price, its buyer and its date, and says plainly that the
+/// document itself did not come with the pack. Nobody is told a file exists that
+/// does not.
+const Map<String, List<String>> _pathsNotWorthCarrying =
+    <String, List<String>>{
+      'animals': <String>['photo_path'],
+      'placements': <String>['contract_file_path'],
+    };
+
+/// One table's rows, with the columns above blanked.
+List<Map<String, Object?>> _readyForTravel(
+  String table,
+  List<Map<String, Object?>> rows,
+) {
+  final drop = _pathsNotWorthCarrying[table];
+  if (drop == null) return rows;
+  return <Map<String, Object?>>[
+    for (final row in rows)
+      <String, Object?>{
+        for (final entry in row.entries)
+          entry.key: drop.contains(entry.key) ? null : entry.value,
+      },
+  ];
+}
 
 /// Reads a pack and proves it is a whole one before any row is written.
 ///

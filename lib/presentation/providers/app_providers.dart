@@ -7,6 +7,7 @@ import '../../data/db/settings_dao.dart';
 import '../../data/models/animal.dart';
 import '../../data/models/litter.dart';
 import '../../services/app_lock_service.dart';
+import '../../services/contract_files.dart';
 import '../../services/pack_files.dart';
 import '../../services/photo_files.dart';
 import '../../services/reminder_scheduler.dart';
@@ -71,6 +72,11 @@ final appLockProvider = Provider<AppLockService>((ref) => AppLockService());
 /// The share sheet and the file picker. Tests hand in a recorder, because the
 /// real one talks to Android.
 final packFilesProvider = Provider<PackFiles>((ref) => const SystemPackFiles());
+
+/// Files a handover can point at: a signed contract, a deposit slip.
+final contractFilesProvider = Provider<ContractFiles>(
+  (ref) => const SystemContractFiles(),
+);
 
 /// The photo folder and the image picker. Same seam for the same reason: the
 /// real one talks to Android, so the screens are tested against a recorder.
@@ -217,11 +223,12 @@ class AnimalsController extends AsyncNotifier<List<Animal>> {
     await _rereadAfter('change');
   }
 
-  /// Deleting an animal takes its picture folder with it.
+  /// Deleting an animal takes its picture folder with it — and its contracts.
   ///
   /// The foreign key removes the rows; only this app can reach the bytes. A
   /// delete that left them behind would keep a dead animal's photographs on the
-  /// phone with no row, no screen and no way to find them again.
+  /// phone with no row, no screen and no way to find them again. A signed
+  /// contract is worse: it carries a buyer's name and signature.
   ///
   /// So this clears the folder whether or not any row survived to be counted: the
   /// one state where the ledger says "no pictures" and the folder disagrees is a
@@ -235,6 +242,11 @@ class AnimalsController extends AsyncNotifier<List<Animal>> {
       await ref.read(photoFilesProvider).deleteAll(id);
     } catch (error) {
       debugPrint('Photo folder for deleted animal $id not removed: $error');
+    }
+    try {
+      await ref.read(contractFilesProvider).deleteAll(id);
+    } catch (error) {
+      debugPrint('Contract folder for deleted animal $id not removed: $error');
     }
     await _rereadAfter('delete');
   }

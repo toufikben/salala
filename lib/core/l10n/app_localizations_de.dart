@@ -132,7 +132,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get animalDeleteBody =>
-      'Auch ihre Impfungen, Gesundheitsuntersuchungen, Gewichte, Besuche und Symptome werden gelöscht, ebenso jede für sie erfasste Vermittlung, ihre Fotos und die Dateien, die diese auf diesem Telefon halten. Das lässt sich nicht rückgängig machen.';
+      'Auch seine Impfungen, Gesundheitsuntersuchungen, Gewichte, Besuche und Symptome werden gelöscht, dazu jede erfasste Vermittlung, seine Fotos und die Dateien, die diese auf diesem Gerät halten, sowie der zu dieser Vermittlung angehängte Vertrag. Das lässt sich nicht rückgängig machen.';
 
   @override
   String get animalNameRequired => 'Ein Name ist erforderlich';
@@ -964,6 +964,33 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get placementGuarantee => 'Garantiebedingungen';
+
+  @override
+  String get contractAttach => 'Vertrag anhängen';
+
+  @override
+  String get contractAttached => 'Vertrag angehängt';
+
+  @override
+  String get contractStoredName => 'Ein früher angehängtes Dokument';
+
+  @override
+  String get contractRemove => 'Vertrag entfernen';
+
+  @override
+  String get contractOpen => 'Vertrag öffnen';
+
+  @override
+  String get contractMissing => 'Dieses Dokument ist nicht auf diesem Gerät';
+
+  @override
+  String get contractOpenFailed => 'Das Dokument konnte nicht geöffnet werden';
+
+  @override
+  String get contractPickFailed => 'Es konnte kein Dokument gewählt werden';
+
+  @override
+  String get contractTooLarge => 'Diese Datei ist zu groß zum Aufbewahren';
 
   @override
   String get placementDeleteBody =>

@@ -32,6 +32,7 @@
         <exclude domain="sharedpref" path="FlutterSecureStorage.xml" />
         <exclude domain="sharedpref" path="FlutterSecureKeyStorage.xml" />
         <exclude domain="root" path="app_flutter/photos" />
+        <exclude domain="root" path="app_flutter/contracts" />
     </cloud-backup>
     <device-transfer>
         <exclude domain="database" path="salala.db" />
@@ -41,5 +42,6 @@
         <exclude domain="sharedpref" path="FlutterSecureStorage.xml" />
         <exclude domain="sharedpref" path="FlutterSecureKeyStorage.xml" />
         <exclude domain="root" path="app_flutter/photos" />
+        <exclude domain="root" path="app_flutter/contracts" />
     </device-transfer>
 </data-extraction-rules>

@@ -131,7 +131,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get animalDeleteBody =>
-      'Its vaccinations, health tests, weights, visits and symptoms are deleted too, with any handover recorded for it, its photographs and the files that hold them on this phone. This cannot be undone.';
+      'Its vaccinations, health tests, weights, visits and symptoms are deleted too, with any handover recorded for it, its photographs and the files that hold them on this phone, and the contract attached to that handover. This cannot be undone.';
 
   @override
   String get animalNameRequired => 'A name is required';
@@ -954,6 +954,33 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get placementGuarantee => 'Guarantee terms';
+
+  @override
+  String get contractAttach => 'Attach a contract';
+
+  @override
+  String get contractAttached => 'Contract attached';
+
+  @override
+  String get contractStoredName => 'A document you attached earlier';
+
+  @override
+  String get contractRemove => 'Remove the contract';
+
+  @override
+  String get contractOpen => 'Open the contract';
+
+  @override
+  String get contractMissing => 'That document is not on this phone';
+
+  @override
+  String get contractOpenFailed => 'The document could not be opened';
+
+  @override
+  String get contractPickFailed => 'No document could be chosen';
+
+  @override
+  String get contractTooLarge => 'That file is too big to keep';
 
   @override
   String get placementDeleteBody =>

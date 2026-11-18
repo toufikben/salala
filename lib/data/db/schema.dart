@@ -175,13 +175,13 @@ const List<String> createStatements = <String>[
   ''',
   createSymptomsTable,
   createPhotosTable,
-  // `contract_file_path` is a path, and paths are the one kind of value a pack
-  // cannot promise to make good on (see [fileBackedTables] and the note on
-  // `animals.photo_path` above). Nothing writes it today, so a placement
-  // exports null and the dormant column costs nothing. The day a screen can
-  // attach a contract, that column stops being a value and joins the pictures:
-  // excluded from the pack, and named out loud in the delete warning that
-  // destroys it (D43) — not left to point at a file on the phone it came from.
+  // `contract_file_path` is a bare file name inside this app's folder, and like
+  // `animals.photo_path` above it is the one kind of value a pack cannot promise
+  // to make good on: a name that arrives on a second phone names a file that
+  // phone does not hold. So the export blanks the column (`_pathsNotWorthCarrying`
+  // in `data_pack.dart`) and the handover keeps its price, buyer and date while
+  // saying plainly that the document did not travel. A contract's bytes are
+  // deleted with the animal, and the delete warning names them.
   '''
   CREATE TABLE buyers (
     id TEXT PRIMARY KEY,

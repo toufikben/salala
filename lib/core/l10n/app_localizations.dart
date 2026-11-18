@@ -317,7 +317,7 @@ abstract class AppLocalizations {
   /// No description provided for @animalDeleteBody.
   ///
   /// In en, this message translates to:
-  /// **'Its vaccinations, health tests, weights, visits and symptoms are deleted too, with any handover recorded for it, its photographs and the files that hold them on this phone. This cannot be undone.'**
+  /// **'Its vaccinations, health tests, weights, visits and symptoms are deleted too, with any handover recorded for it, its photographs and the files that hold them on this phone, and the contract attached to that handover. This cannot be undone.'**
   String get animalDeleteBody;
 
   /// No description provided for @animalNameRequired.
@@ -1795,6 +1795,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Guarantee terms'**
   String get placementGuarantee;
+
+  /// The row that attaches a document to a handover, when none is attached yet.
+  ///
+  /// In en, this message translates to:
+  /// **'Attach a contract'**
+  String get contractAttach;
+
+  /// Said once a document is attached to the handover.
+  ///
+  /// In en, this message translates to:
+  /// **'Contract attached'**
+  String get contractAttached;
+
+  /// Shown instead of a file name for a document attached on an earlier visit, whose original name was not kept.
+  ///
+  /// In en, this message translates to:
+  /// **'A document you attached earlier'**
+  String get contractStoredName;
+
+  /// Tooltip of the button that detaches the contract.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove the contract'**
+  String get contractRemove;
+
+  /// Tooltip of the button that hands the stored document to another app.
+  ///
+  /// In en, this message translates to:
+  /// **'Open the contract'**
+  String get contractOpen;
+
+  /// The row names a document, but the file is not on this phone - the usual case after restoring a backup on a second phone.
+  ///
+  /// In en, this message translates to:
+  /// **'That document is not on this phone'**
+  String get contractMissing;
+
+  /// The document exists but could not be read or handed on.
+  ///
+  /// In en, this message translates to:
+  /// **'The document could not be opened'**
+  String get contractOpenFailed;
+
+  /// The phone's file picker refused or threw.
+  ///
+  /// In en, this message translates to:
+  /// **'No document could be chosen'**
+  String get contractPickFailed;
+
+  /// The chosen file is larger than the app will store.
+  ///
+  /// In en, this message translates to:
+  /// **'That file is too big to keep'**
+  String get contractTooLarge;
 
   /// No description provided for @placementDeleteBody.
   ///

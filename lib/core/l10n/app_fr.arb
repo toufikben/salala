@@ -57,7 +57,7 @@
       }
     }
   },
-  "animalDeleteBody": "Ses vaccins, tests de santé, pesées, visites et symptômes seront supprimés aussi, ainsi que la cession enregistrée, ses photos et les fichiers qui les gardent sur cet appareil, et les portées dont cet animal est la mère. Action irréversible.",
+  "animalDeleteBody": "Ses vaccinations, tests de santé, pesées, visites et symptômes sont aussi supprimés, avec toute cession enregistrée, ses photos et les fichiers qui les gardent sur ce téléphone, ainsi que le contrat joint à cette cession. Cette action est irréversible.",
   "animalNameRequired": "Le nom est obligatoire",
   "animalSpeciesRequired": "Choisissez une espèce",
 
@@ -354,6 +354,15 @@
   "placementPriceInvalid": "Saisissez un montant comme 2500",
   "placementCurrency": "Devise",
   "placementGuarantee": "Conditions de garantie",
+  "contractAttach": "Joindre un contrat",
+  "contractAttached": "Contrat joint",
+  "contractStoredName": "Un document joint plus tôt",
+  "contractRemove": "Retirer le contrat",
+  "contractOpen": "Ouvrir le contrat",
+  "contractMissing": "Ce document n'est pas sur ce téléphone",
+  "contractOpenFailed": "Le document n'a pas pu être ouvert",
+  "contractPickFailed": "Aucun document n'a pu être choisi",
+  "contractTooLarge": "Ce fichier est trop lourd pour être conservé",
   "placementDeleteBody": "Le placement est retiré de l'historique de cet animal. L'acquéreur reste dans vos contacts. Action irréversible.",
 
   "buyerAdd": "Nouvel acquéreur",

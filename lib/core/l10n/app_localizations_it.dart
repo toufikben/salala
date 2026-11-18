@@ -132,7 +132,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get animalDeleteBody =>
-      'Vengono eliminati anche le sue vaccinazioni, i test sanitari, i pesi, le visite e i sintomi, insieme a ogni cessione registrata, alle sue fotografie e ai file che le conservano su questo telefono. L\'operazione è irreversibile.';
+      'Vengono eliminati anche vaccinazioni, test sanitari, pesi, visite e sintomi, insieme a ogni cessione registrata, alle sue fotografie e ai file che le conservano su questo telefono, e al contratto allegato a quella cessione. L\'operazione non è reversibile.';
 
   @override
   String get animalNameRequired => 'Il nome è obbligatorio';
@@ -963,6 +963,34 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get placementGuarantee => 'Condizioni di garanzia';
+
+  @override
+  String get contractAttach => 'Allega un contratto';
+
+  @override
+  String get contractAttached => 'Contratto allegato';
+
+  @override
+  String get contractStoredName => 'Un documento allegato in precedenza';
+
+  @override
+  String get contractRemove => 'Rimuovi il contratto';
+
+  @override
+  String get contractOpen => 'Apri il contratto';
+
+  @override
+  String get contractMissing => 'Quel documento non è su questo telefono';
+
+  @override
+  String get contractOpenFailed => 'Non è stato possibile aprire il documento';
+
+  @override
+  String get contractPickFailed =>
+      'Non è stato possibile scegliere un documento';
+
+  @override
+  String get contractTooLarge => 'Quel file è troppo grande da conservare';
 
   @override
   String get placementDeleteBody =>

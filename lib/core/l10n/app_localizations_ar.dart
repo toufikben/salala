@@ -134,7 +134,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get animalDeleteBody =>
-      'سيُحذف معها أيضاً التطعيمات وفحوصات الصحة والأوزان والزيارات البيطرية والأعراض، وسجل التسليم إن وُجد، وصورها وما على هذا الهاتف من ملفات تلك الصور، والولادات التي هي أمّ لها. لا يمكن التراجع عن هذه الخطوة.';
+      'سيُحذف معها أيضاً التطعيمات وفحوصات الصحة والأوزان والزيارات البيطرية والأعراض، وسجل التسليم إن وُجد، وصورها وما على هذا الهاتف من ملفات تلك الصور، والعقد المرفق بذلك التسليم. لا يمكن التراجع عن هذه الخطوة.';
 
   @override
   String get animalNameRequired => 'الاسم مطلوب';
@@ -953,6 +953,33 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get placementGuarantee => 'شروط الضمان';
+
+  @override
+  String get contractAttach => 'أرفق عقدًا';
+
+  @override
+  String get contractAttached => 'عقد مُرفق';
+
+  @override
+  String get contractStoredName => 'مستند أرفقته سابقًا';
+
+  @override
+  String get contractRemove => 'إزالة العقد';
+
+  @override
+  String get contractOpen => 'فتح العقد';
+
+  @override
+  String get contractMissing => 'هذا المستند ليس على هذا الهاتف';
+
+  @override
+  String get contractOpenFailed => 'لم يُفتح المستند';
+
+  @override
+  String get contractPickFailed => 'لم يُختر أي مستند';
+
+  @override
+  String get contractTooLarge => 'هذا الملف كبير جدًا للاحتفاظ به';
 
   @override
   String get placementDeleteBody =>

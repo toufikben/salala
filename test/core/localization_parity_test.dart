@@ -236,7 +236,9 @@ void main() {
     // nothing. Each one is a fragment of what a person actually read off the
     // Realme on 2026-10-12 at build `96eaa7c`, character for character equal
     // to its `.arb` value there — 231 characters in English, 205 in Arabic,
-    // 241 in French.
+    // 241 in French. The contract clause was added when a handover gained one
+    // (batch 14): it is the same kind of store, and the one that carries a
+    // buyer's signature.
     //
     // A rewording that keeps the meaning has to edit this table too. That is
     // the cost, and it is the point: three edits in three files now become one
@@ -252,6 +254,7 @@ void main() {
         'handover',
         'photographs',
         'files that hold them',
+        'contract',
         'whelpings',
         'cannot be undone',
       ],
@@ -264,6 +267,7 @@ void main() {
         'سجل التسليم',
         'صورها',
         'ملفات تلك الصور',
+        'العقد',
         'الولادات',
         'لا يمكن التراجع',
       ],
@@ -276,6 +280,7 @@ void main() {
         'cession',
         'photos',
         'fichiers qui les gardent',
+        'contrat',
         'portées',
         'irréversible',
       ],
@@ -288,6 +293,7 @@ void main() {
         'Vermittlung',
         'Fotos',
         'Dateien, die diese',
+        'Vertrag',
         'Würfe',
         'rückgängig',
       ],
@@ -300,6 +306,7 @@ void main() {
         'entrega',
         'fotografías',
         'archivos que las guardan',
+        'contrato',
         'camadas',
         'no se puede deshacer',
       ],
@@ -312,6 +319,7 @@ void main() {
         'cessione',
         'fotografie',
         'file che le conservano',
+        'contratto',
         'cucciolate',
         'irreversibile',
       ],
@@ -324,6 +332,7 @@ void main() {
         'entrega',
         'fotografias',
         'ficheiros que as guardam',
+        'contrato',
         'ninhadas',
         'não pode ser anulado',
       ],
@@ -336,6 +345,7 @@ void main() {
         'plaatsing',
         "foto's",
         'bestanden die deze',
+        'contract',
         'nestjes',
         'ongedaan',
       ],

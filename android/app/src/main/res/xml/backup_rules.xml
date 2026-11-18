@@ -16,4 +16,5 @@
     <exclude domain="sharedpref" path="FlutterSecureStorage.xml" />
     <exclude domain="sharedpref" path="FlutterSecureKeyStorage.xml" />
     <exclude domain="root" path="app_flutter/photos" />
+    <exclude domain="root" path="app_flutter/contracts" />
 </full-backup-content>

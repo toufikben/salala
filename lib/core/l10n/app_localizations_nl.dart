@@ -131,7 +131,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get animalDeleteBody =>
-      'Ook haar inentingen, gezondheidstests, gewichten, bezoeken en symptomen worden verwijderd, samen met elke geregistreerde plaatsing, haar foto\'s en de bestanden die deze op dit toestel bewaren. Dit kan niet ongedaan worden gemaakt.';
+      'Ook zijn vaccinaties, gezondheidstests, gewichten, bezoeken en symptomen worden verwijderd, samen met elke vastgelegde plaatsing, de foto\'s en de bestanden die deze op dit toestel bewaren, en het aan die plaatsing gekoppelde contract. Dit kan niet ongedaan worden gemaakt.';
 
   @override
   String get animalNameRequired => 'Een naam is verplicht';
@@ -961,6 +961,33 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get placementGuarantee => 'Garantievoorwaarden';
+
+  @override
+  String get contractAttach => 'Een contract toevoegen';
+
+  @override
+  String get contractAttached => 'Contract toegevoegd';
+
+  @override
+  String get contractStoredName => 'Een eerder toegevoegd document';
+
+  @override
+  String get contractRemove => 'Het contract verwijderen';
+
+  @override
+  String get contractOpen => 'Het contract openen';
+
+  @override
+  String get contractMissing => 'Dat document staat niet op dit toestel';
+
+  @override
+  String get contractOpenFailed => 'Het document kon niet worden geopend';
+
+  @override
+  String get contractPickFailed => 'Er kon geen document worden gekozen';
+
+  @override
+  String get contractTooLarge => 'Dat bestand is te groot om te bewaren';
 
   @override
   String get placementDeleteBody =>

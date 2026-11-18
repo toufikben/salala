@@ -77,7 +77,7 @@
       }
     }
   },
-  "animalDeleteBody": "Its vaccinations, health tests, weights, visits and symptoms are deleted too, with any handover recorded for it, its photographs and the files that hold them on this phone. This cannot be undone.",
+  "animalDeleteBody": "Its vaccinations, health tests, weights, visits and symptoms are deleted too, with any handover recorded for it, its photographs and the files that hold them on this phone, and the contract attached to that handover. This cannot be undone.",
   "animalNameRequired": "A name is required",
   "animalSpeciesRequired": "Choose a species",
 
@@ -611,6 +611,24 @@
   "@placementGuarantee": {
     "description": "What the breeder promised in writing: health guarantee, return clause, neutering condition. Free text, because the promise is theirs to word."
   },
+  "contractAttach": "Attach a contract",
+  "@contractAttach": { "description": "The row that attaches a document to a handover, when none is attached yet." },
+  "contractAttached": "Contract attached",
+  "@contractAttached": { "description": "Said once a document is attached to the handover." },
+  "contractStoredName": "A document you attached earlier",
+  "@contractStoredName": { "description": "Shown instead of a file name for a document attached on an earlier visit, whose original name was not kept." },
+  "contractRemove": "Remove the contract",
+  "@contractRemove": { "description": "Tooltip of the button that detaches the contract." },
+  "contractOpen": "Open the contract",
+  "@contractOpen": { "description": "Tooltip of the button that hands the stored document to another app." },
+  "contractMissing": "That document is not on this phone",
+  "@contractMissing": { "description": "The row names a document, but the file is not on this phone - the usual case after restoring a backup on a second phone." },
+  "contractOpenFailed": "The document could not be opened",
+  "@contractOpenFailed": { "description": "The document exists but could not be read or handed on." },
+  "contractPickFailed": "No document could be chosen",
+  "@contractPickFailed": { "description": "The phone's file picker refused or threw." },
+  "contractTooLarge": "That file is too big to keep",
+  "@contractTooLarge": { "description": "The chosen file is larger than the app will store." },
   "placementDeleteBody": "The placement is removed from this animal's history. The buyer stays in your contacts. This cannot be undone.",
 
   "buyerAdd": "New buyer",

@@ -186,6 +186,45 @@ void main() {
       expect(tableRows(pack)['user_settings'], hasLength(1));
     });
 
+    test('a path column travels as null, not as a pointer to another phone', () async {
+      final db = await openTestDatabase();
+      await seed(db);
+      // The two columns that name a file the phone holds. Neither may reach a
+      // second phone claiming a document it does not have.
+      await db.update(
+        'animals',
+        <String, Object?>{'photo_path': '/data/user/0/app/photo.jpg'},
+        where: 'id = ?',
+        whereArgs: <Object?>['a-pup'],
+      );
+      await db.update(
+        'placements',
+        <String, Object?>{'contract_file_path': '1700000000000-2048.pdf'},
+        where: 'id = ?',
+        whereArgs: <Object?>['p-1'],
+      );
+
+      final pack = await packFrom(db, exportedAtMs: 1760000000000);
+      final rows = tableRows(pack);
+
+      expect(
+        rows['animals']!.firstWhere((row) => row['id'] == 'a-pup')['photo_path'],
+        isNull,
+      );
+      expect(
+        rows['placements']!.single['contract_file_path'],
+        isNull,
+      );
+      // Everything else on those rows travels untouched: the handover keeps its
+      // buyer, its date and its money, and the animal keeps her registration.
+      expect(rows['placements']!.single['price'], 120000);
+      expect(rows['placements']!.single['buyer_id'], 'b-1');
+      expect(
+        rows['animals']!.firstWhere((row) => row['id'] == 'a-pup')['registration_no'],
+        'R-77',
+      );
+    });
+
     test('a pack built while the herd changes is one moment, not two', () async {
       final db = await openTestDatabase();
       await seed(db);

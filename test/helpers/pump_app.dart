@@ -27,6 +27,7 @@ import 'package:timezone/data/latest_all.dart' as tz_data;
 import 'package:timezone/timezone.dart' as tz;
 
 import 'fake_notification_writer.dart';
+import 'fake_contract_files.dart';
 import 'fake_pack_files.dart';
 import 'fake_photo_files.dart';
 import 'fake_review_service.dart';
@@ -202,6 +203,10 @@ Future<FakeSecureStorage> pumpSalala(
   // without one gets a fake that has never heard of any file: the screen still
   // has to answer a row whose bytes are not on the phone.
   FakePhotoFiles? photoFiles,
+  // The document picker and the contract folder. Defaulted rather than required
+  // for the same reason: a handover form with an attach row must render on a
+  // runner that has no picker.
+  FakeContractFiles? contractFiles,
   // Whether opening the app rebuilds the alarms from the ledger, which is what
   // a real launch does. Off by default: a test about saving one dose should not
   // also be handed the alarms that opening the list booked for it. The launch
@@ -336,6 +341,9 @@ Future<FakeSecureStorage> pumpSalala(
         // mention pictures: the shipped class asks the platform for its documents
         // directory, and a test runner has no platform.
         photoFilesProvider.overrideWithValue(photoFiles ?? FakePhotoFiles()),
+        contractFilesProvider.overrideWithValue(
+          contractFiles ?? FakeContractFiles(),
+        ),
         if (!resyncOnLaunch)
           remindersResyncProvider.overrideWith(AlreadyResynced.new),
         lockGracePeriodProvider.overrideWithValue(lockGrace),

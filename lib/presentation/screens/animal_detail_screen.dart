@@ -881,14 +881,20 @@ class _PlacementSection extends StatelessWidget {
 
 /// One handover. The buyer leads the row because that is the name a breeder
 /// scans the ledger for; the day, the money and the guarantee are the detail.
-class _PlacementTile extends StatelessWidget {
+///
+/// A handover with a contract on file gets one more control. It hands the file
+/// to whatever app the phone opens documents with, through the share sheet the
+/// pack already uses — this app grows no viewer of its own. A signed agreement is
+/// something a breeder prints, reads in the app she trusts with PDFs, or forwards
+/// to the buyer, and every one of those is the phone's business.
+class _PlacementTile extends ConsumerWidget {
   const _PlacementTile({required this.placement, this.buyer});
 
   final Placement placement;
   final Buyer? buyer;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final currency = placement.currency;
     final price = placement.price;
@@ -907,6 +913,7 @@ class _PlacementTile extends StatelessWidget {
       ?amount,
       if (guarantee != null && guarantee.isNotEmpty) guarantee,
     ];
+    final contract = placement.contractFilePath;
 
     return ListTile(
       onTap: () => showPlacementDialog(
@@ -918,8 +925,47 @@ class _PlacementTile extends StatelessWidget {
       // A row that has nothing beyond the fact of a placement still has to say
       // it happened, so the subtitle is absent rather than an empty line.
       subtitle: details.isEmpty ? null : Text(details.join(' · ')),
-      trailing: const Icon(Icons.chevron_right),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          if (contract != null && contract.isNotEmpty)
+            IconButton(
+              tooltip: l10n.contractOpen,
+              icon: const Icon(Icons.description_outlined),
+              onPressed: () =>
+                  _openContract(context, ref, placement.animalId, contract),
+            ),
+          const Icon(Icons.chevron_right),
+        ],
+      ),
     );
+  }
+
+  /// Hands the stored document to the phone's other apps.
+  ///
+  /// Three outcomes, three sentences. The commonest failure is a ledger restored
+  /// on a second phone: the row travelled, the file did not, and a tap that said
+  /// nothing would read as the contract never having been saved.
+  static Future<void> _openContract(
+    BuildContext context,
+    WidgetRef ref,
+    String animalId,
+    String fileName,
+  ) async {
+    final l10n = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    final files = ref.read(contractFilesProvider);
+    try {
+      final bytes = await files.readBytes(animalId, fileName);
+      if (bytes == null) {
+        messenger.showSnackBar(SnackBar(content: Text(l10n.contractMissing)));
+        return;
+      }
+      await ref.read(packFilesProvider).shareBytes(fileName, bytes);
+    } catch (error) {
+      debugPrint('Contract $fileName could not be opened: $error');
+      messenger.showSnackBar(SnackBar(content: Text(l10n.contractOpenFailed)));
+    }
   }
 }
 

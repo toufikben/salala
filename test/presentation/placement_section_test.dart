@@ -7,6 +7,7 @@ import 'package:salala/data/models/placement.dart';
 import 'package:salala/presentation/screens/animal_detail_screen.dart';
 import 'package:salala/presentation/widgets/placement_dialog.dart';
 
+import '../helpers/fake_contract_files.dart';
 import '../helpers/pump_app.dart';
 
 /// Fixed ids, for the same reason the symptom section's are: a placement rows
@@ -47,6 +48,7 @@ Placement _handover({
   double? price,
   String? currency,
   String? guarantee,
+  String? contract,
 }) => Placement(
   id: id,
   animalId: animalId,
@@ -55,6 +57,7 @@ Placement _handover({
   price: price,
   currency: currency,
   guaranteeTerms: guarantee,
+  contractFilePath: contract,
   createdAt: 0,
   updatedAt: 0,
 );
@@ -851,6 +854,158 @@ void main() {
       ),
       findsNothing,
     );
+  });
+
+  group('the contract on a handover', () {
+    /// The form's attach row, in the state it starts in.
+    Finder attachRow() => find.widgetWithText(ListTile, 'Attach a contract');
+
+    testWidgets('a chosen document is written, named on the row, and openable', (
+      tester,
+    ) async {
+      _usePhoneViewport(tester);
+      final contracts = FakeContractFiles()
+        ..nextPicked = FakeContractFiles.contract('signed.pdf', bytes: 64);
+      await pumpSalala(
+        tester,
+        seed: <Animal>[_animal(_nalaId, 'Nala')],
+        contractFiles: contracts,
+      );
+      await _openAnimal(tester, 'Nala');
+      await _scrollTo(tester, find.text('Placements'));
+
+      await _tap(tester, find.widgetWithText(TextButton, 'Add placement'));
+      await _tap(tester, attachRow());
+      // Nothing is on the disk yet: the bytes are held in the form until Save, so
+      // a breeder who backs out leaves no file behind.
+      expect(contracts.stored, isEmpty);
+      expect(find.text('Contract attached'), findsOneWidget);
+      expect(find.text('signed.pdf'), findsOneWidget);
+
+      await _saveIn(tester, 'Log a placement');
+      expect(contracts.stored, <String>['$_nalaId/signed.pdf-64']);
+
+      await _letFarewellExpire(tester);
+      await _scrollTo(tester, find.text('Buyer not recorded'));
+      // The row grew its own control: this handover has a document behind it.
+      expect(find.byTooltip('Open the contract'), findsOneWidget);
+
+      await _tap(tester, find.byTooltip('Open the contract'));
+      expect(contracts.opened, <String>['$_nalaId/signed.pdf-64']);
+    });
+
+    testWidgets('a document that is not on this phone says so instead of opening', (
+      tester,
+    ) async {
+      // The state a restored ledger is in: the row travelled, the file did not.
+      _usePhoneViewport(tester);
+      final contracts = FakeContractFiles();
+      await pumpSalala(
+        tester,
+        seed: <Animal>[_animal(_nalaId, 'Nala')],
+        seedPlacements: <Placement>[
+          _handover(
+            id: 'p-1',
+            placed: _placedOn,
+            buyerId: null,
+            contract: 'gone.pdf',
+          ),
+        ],
+        contractFiles: contracts,
+      );
+      await _openAnimal(tester, 'Nala');
+      await _scrollTo(tester, find.byTooltip('Open the contract'));
+
+      await _tap(tester, find.byTooltip('Open the contract'));
+
+      expect(find.text('That document is not on this phone'), findsOneWidget);
+      expect(contracts.opened, <String>['$_nalaId/gone.pdf']);
+    });
+
+    testWidgets('removing the contract deletes the file the row used to name', (
+      tester,
+    ) async {
+      _usePhoneViewport(tester);
+      final contracts = FakeContractFiles(
+        bytes: <String, List<int>>{'$_nalaId/old.pdf-8': <int>[1, 2, 3]},
+      );
+      await pumpSalala(
+        tester,
+        seed: <Animal>[_animal(_nalaId, 'Nala')],
+        seedPlacements: <Placement>[
+          _handover(
+            id: 'p-1',
+            placed: _placedOn,
+            buyerId: null,
+            contract: 'old.pdf-8',
+          ),
+        ],
+        contractFiles: contracts,
+      );
+      await _openAnimal(tester, 'Nala');
+      await _scrollTo(tester, find.text('Buyer not recorded'));
+
+      await _tap(tester, find.text('Buyer not recorded'));
+      expect(find.text('Contract attached'), findsOneWidget);
+
+      await _tap(tester, find.byTooltip('Remove the contract'));
+      expect(find.text('Attach a contract'), findsOneWidget);
+      await _saveIn(tester, 'Edit placement');
+
+      // Written after the row landed, never before: a save that failed would
+      // otherwise have destroyed a contract the row still names.
+      expect(contracts.deleted, <String>['$_nalaId/old.pdf-8']);
+      expect(find.byTooltip('Open the contract'), findsNothing);
+    });
+
+    testWidgets('backing out of the form removes nothing', (tester) async {
+      _usePhoneViewport(tester);
+      final contracts = FakeContractFiles(
+        bytes: <String, List<int>>{'$_nalaId/old.pdf-8': <int>[1, 2, 3]},
+      );
+      await pumpSalala(
+        tester,
+        seed: <Animal>[_animal(_nalaId, 'Nala')],
+        seedPlacements: <Placement>[
+          _handover(
+            id: 'p-1',
+            placed: _placedOn,
+            buyerId: null,
+            contract: 'old.pdf-8',
+          ),
+        ],
+        contractFiles: contracts,
+      );
+      await _openAnimal(tester, 'Nala');
+      await _scrollTo(tester, find.text('Buyer not recorded'));
+
+      await _tap(tester, find.text('Buyer not recorded'));
+      await _tap(tester, find.byTooltip('Remove the contract'));
+      await _cancelDialog(tester, 'Edit placement');
+
+      expect(contracts.deleted, isEmpty);
+      // The row still names it, so the tile still offers it.
+      expect(find.byTooltip('Open the contract'), findsOneWidget);
+    });
+
+    testWidgets('a picker that refuses says so and changes nothing', (tester) async {
+      _usePhoneViewport(tester);
+      final contracts = FakeContractFiles()
+        ..pickFailure = StateError('no picker');
+      await pumpSalala(
+        tester,
+        seed: <Animal>[_animal(_nalaId, 'Nala')],
+        contractFiles: contracts,
+      );
+      await _openAnimal(tester, 'Nala');
+      await _scrollTo(tester, find.text('Placements'));
+
+      await _tap(tester, find.widgetWithText(TextButton, 'Add placement'));
+      await _tap(tester, attachRow());
+
+      expect(find.text('No document could be chosen'), findsOneWidget);
+      expect(find.text('Attach a contract'), findsOneWidget);
+    });
   });
 }
 
