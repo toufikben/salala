@@ -40,7 +40,7 @@ void _usePhoneViewport(WidgetTester tester) {
 }
 
 Future<void> _openNala(WidgetTester tester) async {
-  await tester.tap(sectionText('Nala'));
+  await tester.tap(find.text('Nala'));
   await settleRealIo(tester);
 }
 

@@ -68,7 +68,7 @@ Future<void> _openNala(WidgetTester tester) async {
   // home screen — once by the agenda above the herd, once by its own card — so an
   // unscoped `find.text('Nala')` answers with two rows and `tap()` cannot choose.
   await tester.tap(
-    find.descendant(of: find.byType(AnimalCard), matching: sectionText('Nala')),
+    find.descendant(of: find.byType(AnimalCard), matching: find.text('Nala')),
   );
   await settleRealIo(tester);
 }

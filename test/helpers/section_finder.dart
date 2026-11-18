@@ -15,16 +15,17 @@ bool _insideTimeline(Element element) {
   return inside;
 }
 
-/// The plain string a widget draws, or null when it draws something else.
+/// The string a widget draws, or null when it draws something else.
 ///
-/// Three widgets can carry text a finder would match: a `Text`, the
-/// `EditableText` inside a form field, and a `RichText`. `find.text` answers all
-/// three, so a scoped copy of it has to as well — otherwise "the field holds the
-/// old value" stops being assertable the moment the assertion is scoped.
+/// `Text` and `EditableText` and nothing else: those are the two kinds
+/// `find.text` answers, and a scoped copy of it has to answer exactly the same
+/// set. A `RichText` is *not* in that set — every `Text` builds one, so matching
+/// it would answer twice for one string and every `tap` on the result would
+/// throw. A form field is in it, which is what lets "the field still holds the
+/// old value" be asserted once the assertion is scoped.
 String? _drawnText(Widget widget) => switch (widget) {
   Text(:final data) => data,
   EditableText(:final controller) => controller.text,
-  RichText(:final text) => text.toPlainText(),
   _ => null,
 };
 
