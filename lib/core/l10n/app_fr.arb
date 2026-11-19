@@ -165,6 +165,7 @@
   "packFromTheFuture": "Ce pack vient d'une version plus récente de Salala",
   "packIncomplete": "Il manque une partie du dossier dans ce pack : {table}",
   "packUnknownTable": "Ce pack contient une table que Salala ne connaît pas : {table}",
+  "packBadValue": "Ce pack contient une valeur que Salala ne peut pas lire : {detail}",
   "packRestoreTitle": "Remplacer tout ce qui est sur ce téléphone ?",
   "packRestoreBody": "Du {day}. Animaux : {animals}. Enregistrements : {rows}. La restauration remplacera tout ce qui est sur ce téléphone.",
   "packRestored": "Enregistrements restaurés : {rows}",

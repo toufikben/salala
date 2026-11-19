@@ -129,6 +129,7 @@
   "packFromTheFuture": "Dat pakket komt van een nieuwere Salala dan deze",
   "packIncomplete": "In dat pakket ontbreekt een deel van het stamboek: {table}",
   "packUnknownTable": "Dat pakket bevat een tabel die deze Salala niet kent: {table}",
+  "packBadValue": "Dat pakket bevat een waarde die deze Salala niet kan lezen: {detail}",
   "packRestoreTitle": "Alles op dit toestel vervangen?",
   "packRestoreBody": "Van {day}. Dieren: {animals}. Gegevens: {rows}. Herstellen vervangt alles wat nu op dit toestel staat.",
   "packRestored": "Gegevens hersteld: {rows}",

@@ -432,6 +432,11 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String packBadValue(String detail) {
+    return 'Ce pack contient une valeur que Salala ne peut pas lire : $detail';
+  }
+
+  @override
   String get packRestoreTitle => 'Remplacer tout ce qui est sur ce téléphone ?';
 
   @override

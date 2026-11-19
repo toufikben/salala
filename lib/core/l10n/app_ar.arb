@@ -177,6 +177,7 @@
   "packFromTheFuture": "هذه الحزمة من نسخة سلالة أحدث من هذه النسخة",
   "packIncomplete": "تنقص هذه الحزمة جزء من السجلات: {table}",
   "packUnknownTable": "تحتوي هذه الحزمة على جدول لا تعرفه سلالة: {table}",
+  "packBadValue": "تحتوي هذه الحزمة على قيمة لا تستطيع سلالة قراءتها: {detail}",
   "packRestoreTitle": "استبدال كل شيء على هذا الهاتف؟",
   "packRestoreBody": "من {day}. الحيوانات: {animals}. السجلات: {rows}. الاسترجاع يستبدل كل ما على هذا الهاتف الآن.",
   "packRestored": "عدد السجلات المسترجعة: {rows}",

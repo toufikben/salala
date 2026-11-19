@@ -635,6 +635,10 @@ String _whyRejected(AppLocalizations l10n, PackReject reject) =>
       PackProblem.fromTheFuture => l10n.packFromTheFuture,
       PackProblem.missingTable => l10n.packIncomplete(reject.detail),
       PackProblem.unknownTable => l10n.packUnknownTable(reject.detail),
+      // A word the app cannot read back — an animal status it does not know, a
+      // severity it never wrote. Named with the row, because the file is
+      // hand-editable and the breeder may be able to fix the word themselves.
+      PackProblem.badValue => l10n.packBadValue(reject.detail),
       // Reachable only from inside the transaction, and the restore catch below
       // already says the sentence that fits: nothing on this phone moved.
       PackProblem.danglingReference => l10n.packRestoreFailed,

@@ -432,6 +432,11 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String packBadValue(String detail) {
+    return 'Dat pakket bevat een waarde die deze Salala niet kan lezen: $detail';
+  }
+
+  @override
   String get packRestoreTitle => 'Alles op dit toestel vervangen?';
 
   @override

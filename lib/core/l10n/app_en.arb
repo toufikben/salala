@@ -247,6 +247,11 @@
   "@packUnknownTable": {
     "placeholders": { "table": { "type": "String" } }
   },
+  "packBadValue": "That pack holds a value this Salala cannot read: {detail}",
+  "@packBadValue": {
+    "description": "A row whose word is not one the app stores, e.g. an animal status it does not know. Refused before anything is written, so the ledger on this phone is untouched.",
+    "placeholders": { "detail": { "type": "String" } }
+  },
   "packRestoreTitle": "Replace everything on this phone?",
   "packRestoreBody": "From {day}. Animals: {animals}. Records: {rows}. Restoring replaces everything that is on this phone now.",
   "@packRestoreBody": {

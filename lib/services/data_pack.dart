@@ -52,6 +52,15 @@ enum PackProblem {
   /// Only knowable once the rows are in place, so this one surfaces from
   /// [restorePack] rather than [parsePack].
   danglingReference,
+
+  /// Holds a word this app stores as an enum but cannot read back.
+  ///
+  /// `status` is the one that matters: a pack saying `deceaced` used to restore
+  /// as `active`, because every `*FromName` helper falls back to a default. The
+  /// animal would come back alive, in the breeding stock, with its reminders
+  /// re-booked — a typo silently undoing a death. Nothing in the schema refuses
+  /// it: no column here has a `CHECK`, so the file is the only place to notice.
+  badValue,
 }
 
 class PackReject implements Exception {
@@ -135,11 +144,10 @@ String encodePack(Map<String, Object?> pack) =>
 /// handover keeps its price, its buyer and its date, and says plainly that the
 /// document itself did not come with the pack. Nobody is told a file exists that
 /// does not.
-const Map<String, List<String>> _pathsNotWorthCarrying =
-    <String, List<String>>{
-      'animals': <String>['photo_path'],
-      'placements': <String>['contract_file_path'],
-    };
+const Map<String, List<String>> _pathsNotWorthCarrying = <String, List<String>>{
+  'animals': <String>['photo_path'],
+  'placements': <String>['contract_file_path'],
+};
 
 /// One table's rows, with the columns above blanked.
 List<Map<String, Object?>> _readyForTravel(
@@ -215,6 +223,7 @@ PackRows parsePack(String text) {
           throw PackReject(PackProblem.notAPack, '$table row');
         }
       }
+      _checkEnums(table, parsed);
       tables[table] = parsed;
     } else {
       throw const PackReject(PackProblem.notAPack, 'table name');
@@ -258,6 +267,47 @@ PackRows parsePack(String text) {
     },
     tables: tables,
   );
+}
+
+/// The columns this app reads back as an enum, with the words it accepts.
+///
+/// Written out rather than derived from the `*FromName` helpers, because those
+/// helpers are precisely what hides the problem: each one falls back to a
+/// default when the word is not recognised, so a restored row with a typo is
+/// accepted and quietly becomes something else. The list is short and it only
+/// changes when an enum does.
+const Map<String, Map<String, Set<String>>> _enumColumns =
+    <String, Map<String, Set<String>>>{
+      'animals': <String, Set<String>>{
+        'sex': <String>{'male', 'female', 'unknown'},
+        'status': <String>{'active', 'sold', 'retired', 'deceased'},
+      },
+      'symptoms': <String, Set<String>>{
+        'severity': <String>{'mild', 'moderate', 'severe'},
+      },
+    };
+
+/// Refuses a pack whose rows hold a word this app cannot read back.
+///
+/// Called from [parsePack], before anything is written, so the answer arrives as
+/// a named refusal on the restore dialog rather than as an animal that came back
+/// alive and re-armed its reminders. A row that leaves the column out is fine:
+/// the schema's `DEFAULT` is what fills it, and that default is a real value.
+void _checkEnums(String table, List<Map<String, Object?>> rows) {
+  final columns = _enumColumns[table];
+  if (columns == null) return;
+  for (final row in rows) {
+    for (final entry in columns.entries) {
+      if (!row.containsKey(entry.key)) continue;
+      final value = row[entry.key];
+      // A null in a `NOT NULL ... DEFAULT` column is not a word this app can
+      // read either, but the insert refuses it and the restore catch already
+      // says the sentence that fits.
+      if (value is! String) continue;
+      if (entry.value.contains(value)) continue;
+      throw PackReject(PackProblem.badValue, '$table.${entry.key} = $value');
+    }
+  }
 }
 
 /// Tables that entered the schema after version 1, with the version that added

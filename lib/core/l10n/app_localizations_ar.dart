@@ -427,6 +427,11 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String packBadValue(String detail) {
+    return 'تحتوي هذه الحزمة على قيمة لا تستطيع سلالة قراءتها: $detail';
+  }
+
+  @override
   String get packRestoreTitle => 'استبدال كل شيء على هذا الهاتف؟';
 
   @override

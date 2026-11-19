@@ -848,6 +848,12 @@ abstract class AppLocalizations {
   /// **'That pack holds a table this Salala does not know: {table}'**
   String packUnknownTable(String table);
 
+  /// A row whose word is not one the app stores, e.g. an animal status it does not know. Refused before anything is written, so the ledger on this phone is untouched.
+  ///
+  /// In en, this message translates to:
+  /// **'That pack holds a value this Salala cannot read: {detail}'**
+  String packBadValue(String detail);
+
   /// No description provided for @packRestoreTitle.
   ///
   /// In en, this message translates to:

@@ -129,6 +129,7 @@
   "packFromTheFuture": "Dieses Paket stammt von einer neueren Version von Salala",
   "packIncomplete": "In diesem Paket fehlt ein Teil des Zuchtbuchs: {table}",
   "packUnknownTable": "Dieses Paket enthält eine Tabelle, die Salala nicht kennt: {table}",
+  "packBadValue": "Dieses Paket enthält einen Wert, den Salala nicht lesen kann: {detail}",
   "packRestoreTitle": "Alles auf diesem Telefon ersetzen?",
   "packRestoreBody": "Vom {day}. Tiere: {animals}. Einträge: {rows}. Die Wiederherstellung ersetzt alles, was jetzt auf diesem Telefon ist.",
   "packRestored": "Einträge wiederhergestellt: {rows}",

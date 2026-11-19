@@ -208,19 +208,20 @@ void main() {
       final rows = tableRows(pack);
 
       expect(
-        rows['animals']!.firstWhere((row) => row['id'] == 'a-pup')['photo_path'],
+        rows['animals']!.firstWhere(
+          (row) => row['id'] == 'a-pup',
+        )['photo_path'],
         isNull,
       );
-      expect(
-        rows['placements']!.single['contract_file_path'],
-        isNull,
-      );
+      expect(rows['placements']!.single['contract_file_path'], isNull);
       // Everything else on those rows travels untouched: the handover keeps its
       // buyer, its date and its money, and the animal keeps her registration.
       expect(rows['placements']!.single['price'], 120000);
       expect(rows['placements']!.single['buyer_id'], 'b-1');
       expect(
-        rows['animals']!.firstWhere((row) => row['id'] == 'a-pup')['registration_no'],
+        rows['animals']!.firstWhere(
+          (row) => row['id'] == 'a-pup',
+        )['registration_no'],
         'R-77',
       );
     });
@@ -620,6 +621,45 @@ void main() {
               .having((e) => e.problem, 'problem', PackProblem.unknownTable)
               .having((e) => e.detail, 'detail', 'secrets'),
         ),
+      );
+    });
+
+    test('a status this app cannot read back is refused, not repaired', () async {
+      // The typo is the whole test: `statusFromName` falls back to `active`, so
+      // without this check a `deceaced` animal restores alive, back in the
+      // breeding stock, with its reminders re-booked. Nothing in the schema
+      // stops it either — no column here has a `CHECK` — so the file is the only
+      // place that can notice.
+      final db = await openTestDatabase();
+      await seed(db);
+      final pack = await packFrom(db);
+      final rows = tableRows(pack);
+      rows['animals']!.first['status'] = 'deceaced';
+
+      expect(
+        () => parsePack(encodePack(<String, Object?>{...pack, 'rows': rows})),
+        throwsA(
+          isA<PackReject>()
+              .having((e) => e.problem, 'problem', PackProblem.badValue)
+              .having((e) => e.detail, 'detail', contains('status')),
+        ),
+      );
+    });
+
+    test('a row that leaves the column out takes the schema default', () async {
+      // The other side of the same rule: `sex` and `status` have a `DEFAULT`,
+      // and a pack from before a column existed is honest without it. Refusing
+      // an absent value would refuse packs that this app itself wrote.
+      final db = await openTestDatabase();
+      await seed(db);
+      final pack = await packFrom(db);
+      final rows = tableRows(pack);
+      rows['animals']!.first.remove('status');
+      rows['animals']!.first.remove('sex');
+
+      expect(
+        () => parsePack(encodePack(<String, Object?>{...pack, 'rows': rows})),
+        returnsNormally,
       );
     });
   });
