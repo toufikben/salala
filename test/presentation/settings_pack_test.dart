@@ -757,14 +757,16 @@ void main() {
       await tester.tap(find.widgetWithText(FilledButton, 'Replace'));
       await settleRefusal(tester, waitingFor: 'Records restored: 2');
       // The snackbar was built from the sentences the screen held when the tap
-      // landed, so it stays English; the app under it does not.
+      // landed, so it stays English; the app under it does not. The title is what
+      // is asserted rather than the language row: the list is scrolled down to
+      // the pack row by then, so a row above it is not built at all.
       await settleUntil(
         tester,
-        () => find.text('Sprache').evaluate().isNotEmpty,
+        () => find.text('Einstellungen').evaluate().isNotEmpty,
       );
 
-      expect(find.text('Sprache'), findsOneWidget);
-      expect(find.text('Language'), findsNothing);
+      expect(find.widgetWithText(AppBar, 'Einstellungen'), findsOneWidget);
+      expect(find.widgetWithText(AppBar, 'Settings'), findsNothing);
     });
 
     testWidgets('a pack that says system hands the app back to the phone', (
@@ -794,11 +796,12 @@ void main() {
       await tapTile(tester, 'استرجاع من حزمة');
       await tester.tap(find.widgetWithText(FilledButton, 'استبدال'));
       await settleRefusal(tester, waitingFor: 'عدد السجلات المسترجعة: 2');
+      // No override means the phone decides, and a test's phone is `en_US`.
       await settleUntil(
         tester,
-        () => find.text('Language').evaluate().isNotEmpty,
+        () => find.text('Settings').evaluate().isNotEmpty,
       );
-      expect(find.text('Language'), findsOneWidget);
+      expect(find.widgetWithText(AppBar, 'Settings'), findsOneWidget);
     });
   });
 }
