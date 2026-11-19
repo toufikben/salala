@@ -299,6 +299,9 @@ class _VaccinationFormScreenState extends ConsumerState<VaccinationFormScreen> {
           ? const Center(child: CircularProgressIndicator())
           : Form(
               key: _formKey,
+              // Re-validation on the first keystroke, not only on Save: measured
+              // on the phone as a refusal line that outlived the text that fixed it.
+              autovalidateMode: AutovalidateMode.onUserInteraction,
               // SingleChildScrollView + Column, never a lazy ListView:
               // Form.validate() only visits mounted fields.
               child: SingleChildScrollView(

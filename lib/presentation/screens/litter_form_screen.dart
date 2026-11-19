@@ -276,6 +276,9 @@ class _LitterFormScreenState extends ConsumerState<LitterFormScreen> {
       ),
       body: Form(
         key: _formKey,
+        // Re-validation on the first keystroke, not only on Save: measured
+        // on the phone as a refusal line that outlived the text that fixed it.
+        autovalidateMode: AutovalidateMode.onUserInteraction,
         // Same reason as the animal form: a lazy ListView unmounts fields
         // outside the cache extent, and Form.validate() skips what is not
         // mounted — so the required checks below would silently pass.

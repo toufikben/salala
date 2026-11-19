@@ -112,6 +112,9 @@ class _WeightFormScreenState extends ConsumerState<WeightFormScreen> {
       appBar: AppBar(title: Text(l10n.weightAdd)),
       body: Form(
         key: _formKey,
+        // Re-validation on the first keystroke, not only on Save: measured
+        // on the phone as a refusal line that outlived the text that fixed it.
+        autovalidateMode: AutovalidateMode.onUserInteraction,
         child: SingleChildScrollView(
           // Clear of the system navigation bar, which used to clip the Save pill.
           padding: EdgeInsets.fromLTRB(

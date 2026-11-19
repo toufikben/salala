@@ -530,6 +530,9 @@ class _PlacementDialogState extends ConsumerState<PlacementDialog> {
       content: SingleChildScrollView(
         child: Form(
           key: _formKey,
+          // Re-validation on the first keystroke, not only on Save: measured
+          // on the phone as a refusal line that outlived the text that fixed it.
+          autovalidateMode: AutovalidateMode.onUserInteraction,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[

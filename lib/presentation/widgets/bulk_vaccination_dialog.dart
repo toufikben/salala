@@ -165,6 +165,9 @@ class _BulkVaccinationDialogState
       title: Text(l10n.bulkVaccineTitle),
       content: Form(
         key: _formKey,
+        // Re-validation on the first keystroke, not only on Save: measured
+        // on the phone as a refusal line that outlived the text that fixed it.
+        autovalidateMode: AutovalidateMode.onUserInteraction,
         child: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,

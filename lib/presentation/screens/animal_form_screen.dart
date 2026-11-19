@@ -309,6 +309,9 @@ class _AnimalFormScreenState extends ConsumerState<AnimalFormScreen> {
       ),
       body: Form(
         key: _formKey,
+        // Re-validation on the first keystroke, not only on Save: measured
+        // on the phone as a refusal line that outlived the text that fixed it.
+        autovalidateMode: AutovalidateMode.onUserInteraction,
         // A Column inside a scroll view, deliberately not a ListView: a lazy
         // ListView drops fields outside the cache extent from the tree, and
         // Form.validate() only visits mounted fields — so an animal could be
