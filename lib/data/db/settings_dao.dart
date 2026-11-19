@@ -42,10 +42,21 @@ class SettingsDao {
 class SettingKeys {
   SettingKeys._();
 
-  static const String appLockEnabled = 'app_lock_enabled';
-  static const String lockTimeoutSeconds = 'lock_timeout_seconds';
-  static const String preferredCurrency = 'preferred_currency';
-  static const String defaultSpecies = 'default_species';
+  /// The four settings that are deliberately *not* keys here.
+  ///
+  /// `app_lock_enabled` and `lock_timeout_seconds` were constants in this class
+  /// and nothing ever wrote or read them: the lock is real when a digest exists
+  /// in the keystore, and the grace period is `lockGracePeriodProvider`. A
+  /// constant that says otherwise is a second source of truth that is always
+  /// wrong, and a pack restored onto a new phone would have carried it.
+  ///
+  /// `preferred_currency` went the same way once every placement carried its own
+  /// money: the currency is a property of the sale, not of the breeder, and
+  /// summing across currencies is the bug the statistics screen refuses. A
+  /// default here would have quietly offered to convert what must not be
+  /// converted.
+  ///
+  /// `default_species` never had a field to fill it. The form opens on `dog`.
   static const String languageCode = 'language_code';
 
   /// When a pack last left this phone, in unix milliseconds.
