@@ -199,6 +199,19 @@ class LocaleController extends Notifier<Locale?> {
         .write(SettingKeys.languageCode, locale?.languageCode ?? 'system');
     state = locale;
   }
+
+  /// Shows a language the phone already holds, without writing it back.
+  ///
+  /// `select` is for a tap on the language menu, where the row is the thing the
+  /// tap decides. A restore is the other direction: the row arrived inside the
+  /// pack, and the only job left is to repaint the app in it — writing here
+  /// would rewrite a row that is already correct, and a refusal would then be
+  /// reported for a choice nobody made.
+  ///
+  /// The app read this setting once, in `main()`, before the first frame, so
+  /// without this the ledger comes back in the pack's language and the chrome
+  /// stays in the old one until the next launch.
+  void adopt(Locale? locale) => state = locale;
 }
 
 final localeControllerProvider = NotifierProvider<LocaleController, Locale?>(

@@ -591,9 +591,43 @@ Future<void> _importPack(BuildContext context, WidgetRef ref) async {
   // rows, and the only one that is a plain read rather than a controller: it has
   // no `refresh()` to call, so the restore asks for it by name.
   ref.invalidate(agendaDosesProvider);
+  // The fourth, and the one the pack carries rather than derives: the language.
+  // `user_settings` travels whole, so the incoming ledger arrives with whatever
+  // language the other phone was reading it in — but this app read that setting
+  // once, in `main()`, before the first frame, so the rows would change hands and
+  // the chrome would stay as it was until the next launch. Adopted rather than
+  // selected: the row is already here, and a second write is a write that can be
+  // refused for a choice the breeder never made on this phone.
+  try {
+    final code = await ref
+        .read(settingsDaoProvider)
+        .read(SettingKeys.languageCode);
+    ref.read(localeControllerProvider.notifier).adopt(_shippedLocale(code));
+  } catch (error) {
+    // The ledger is back; a language that did not follow it is the loss, and the
+    // menu still offers every one of them.
+    debugPrint('Restored language could not be applied: $error');
+  }
   messenger.showSnackBar(
     SnackBar(content: Text(l10n.packRestored(pack.totalRows))),
   );
+}
+
+/// The language a restored pack asks for, or null when it asks for none this
+/// build can show.
+///
+/// Two values are not languages: `system`, which this app stores to mean "let
+/// the phone decide", and anything from a pack written by a build that shipped a
+/// language this one does not. Both end as `null` — the app then follows the
+/// phone, which is what it would have done on a first launch. Handing a bare
+/// `Locale('system')` to `MaterialApp` would leave Flutter looking for a
+/// translation nobody wrote and falling back one widget at a time.
+Locale? _shippedLocale(String? code) {
+  if (code == null || code == 'system') return null;
+  final shipped = AppLocalizations.supportedLocales.any(
+    (locale) => locale.languageCode == code,
+  );
+  return shipped ? Locale(code) : null;
 }
 
 String _whyRejected(AppLocalizations l10n, PackReject reject) =>

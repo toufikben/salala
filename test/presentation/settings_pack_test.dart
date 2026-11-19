@@ -29,6 +29,7 @@ String packJson({
   List<Map<String, Object?>> animals = const <Map<String, Object?>>[],
   List<Map<String, Object?>> vaccinations = const <Map<String, Object?>>[],
   List<Map<String, Object?>>? photos,
+  List<Map<String, Object?>> settings = const <Map<String, Object?>>[],
   int formatVersion = packFormatVersion,
 }) {
   final rows = <String, Object?>{
@@ -36,6 +37,10 @@ String packJson({
   };
   rows['animals'] = animals;
   rows['vaccinations'] = vaccinations;
+  // The settings travel with the pack, language included — which is why a
+  // restore has to do something about the language rather than assume the row
+  // on screen is the row that arrived.
+  rows['user_settings'] = settings;
   // Null is a pack from before pictures existed; a list is a pack whose rows
   // travel with their bytes in the archive.
   if (photos != null) rows['photos'] = photos;
@@ -721,6 +726,79 @@ void main() {
       );
 
       expect(find.text('Sprache'), findsOneWidget);
+    });
+
+    testWidgets('a restore adopts the language the pack was read in', (
+      tester,
+    ) async {
+      // `user_settings` travels whole, so the pack arrives with the other
+      // phone's language. The app read that setting once, in `main()`, before
+      // the first frame — so a restore that only puts the rows back leaves the
+      // ledger in one language and every label around it in another, until the
+      // next launch quietly fixes it.
+      files.pickedText = packJson(
+        animals: <Map<String, Object?>>[animalRow('a-1', 'Kenza')],
+        settings: <Map<String, Object?>>[
+          <String, Object?>{
+            'key': 'language_code',
+            'value': 'de',
+            'updated_at': 0,
+          },
+        ],
+      );
+      await pumpSalala(
+        tester,
+        packFiles: files,
+        seed: <Animal>[animal('Atlas')],
+      );
+      await goTo(tester, 'Settings');
+
+      await tapTile(tester, 'Restore from a pack');
+      await tester.tap(find.widgetWithText(FilledButton, 'Replace'));
+      await settleRefusal(tester, waitingFor: 'Records restored: 2');
+      // The snackbar was built from the sentences the screen held when the tap
+      // landed, so it stays English; the app under it does not.
+      await settleUntil(
+        tester,
+        () => find.text('Sprache').evaluate().isNotEmpty,
+      );
+
+      expect(find.text('Sprache'), findsOneWidget);
+      expect(find.text('Language'), findsNothing);
+    });
+
+    testWidgets('a pack that says system hands the app back to the phone', (
+      tester,
+    ) async {
+      // The other half of the same rule: `system` is a value this app stores but
+      // not a language it can show, so adopting it has to mean "no override"
+      // rather than a `Locale('system')` that resolves to nothing.
+      files.pickedText = packJson(
+        animals: <Map<String, Object?>>[animalRow('a-1', 'Kenza')],
+        settings: <Map<String, Object?>>[
+          <String, Object?>{
+            'key': 'language_code',
+            'value': 'system',
+            'updated_at': 0,
+          },
+        ],
+      );
+      await pumpSalala(
+        tester,
+        packFiles: files,
+        seed: <Animal>[animal('Atlas')],
+        locale: const Locale('ar'),
+      );
+      await goTo(tester, 'الإعدادات');
+
+      await tapTile(tester, 'استرجاع من حزمة');
+      await tester.tap(find.widgetWithText(FilledButton, 'استبدال'));
+      await settleRefusal(tester, waitingFor: 'عدد السجلات المسترجعة: 2');
+      await settleUntil(
+        tester,
+        () => find.text('Language').evaluate().isNotEmpty,
+      );
+      expect(find.text('Language'), findsOneWidget);
     });
   });
 }
