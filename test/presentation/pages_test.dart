@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:companion/core/build_info.dart';
 import 'package:companion/core/contact.dart';
 import 'package:companion/data/models/animal.dart';
 import 'package:companion/presentation/screens/about_screen.dart';
@@ -63,7 +64,7 @@ void main() {
       await openSetting(tester, 'About');
 
       expect(find.byType(AboutScreen), findsOneWidget);
-      expect(find.text('Version 0.1.0'), findsOneWidget);
+      expect(find.text('Version $appVersion'), findsOneWidget);
       // The licensing row is the app's legal obligation to every package it
       // bundles, and `showLicensePage` is the mechanism Flutter provides.
       expect(find.text('Open-source licences'), findsOneWidget);
@@ -149,7 +150,7 @@ void main() {
 
       expect(find.byType(WhatsNewScreen), findsOneWidget);
       expect(find.textContaining('Five more languages'), findsOneWidget);
-      expect(find.text('Version 0.1.0'), findsOneWidget);
+      expect(find.text('Version $appVersion'), findsOneWidget);
     });
 
     testWidgets('back from a page returns to Settings, not to the herd', (
