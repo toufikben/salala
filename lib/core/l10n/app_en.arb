@@ -1,6 +1,6 @@
 {
   "@@locale": "en",
-  "appTitle": "Salala",
+  "appTitle": "Companion",
   "@appTitle": {
     "description": "The product name; never translated."
   },
@@ -138,7 +138,7 @@
   "actionClear": "Clear",
   "actionReplace": "Replace",
 
-  "lockTitle": "Salala is locked",
+  "lockTitle": "Companion is locked",
   "lockEnterPin": "Enter your PIN",
   "lockUnlock": "Unlock",
   "lockWrongPin": "Wrong PIN",
@@ -168,7 +168,7 @@
   "settingsLanguage": "Language",
   "settingsLanguageSystem": "System default",
   "languageNotStored": "The phone would not keep this language.",
-  "startupFailedTitle": "Salala could not open the ledger on this phone.",
+  "startupFailedTitle": "Companion could not open the ledger on this phone.",
   "startupFailedBody": "Your records are still in the file. Close the app and open it again.",
   "settingsAbout": "About",
   "settingsTrial": "Free trial",
@@ -237,17 +237,17 @@
   },
   "packShareFailed": "The pack could not be written on this phone",
   "packReadFailed": "That file could not be opened",
-  "packNotAPack": "That file is not a Salala pack, or it is damaged",
-  "packFromTheFuture": "That pack comes from a newer Salala than this one",
+  "packNotAPack": "That file is not a Companion pack, or it is damaged",
+  "packFromTheFuture": "That pack comes from a newer Companion than this one",
   "packIncomplete": "That pack is missing part of the ledger: {table}",
   "@packIncomplete": {
     "placeholders": { "table": { "type": "String" } }
   },
-  "packUnknownTable": "That pack holds a table this Salala does not know: {table}",
+  "packUnknownTable": "That pack holds a table this Companion does not know: {table}",
   "@packUnknownTable": {
     "placeholders": { "table": { "type": "String" } }
   },
-  "packBadValue": "That pack holds a value this Salala cannot read: {detail}",
+  "packBadValue": "That pack holds a value this Companion cannot read: {detail}",
   "@packBadValue": {
     "description": "A row whose word is not one the app stores, e.g. an animal status it does not know. Refused before anything is written, so the ledger on this phone is untouched.",
     "placeholders": { "detail": { "type": "String" } }
@@ -678,14 +678,14 @@
   "@pdfChartAxes": {
     "description": "Said under the growth curve, because the curve's own marks are drawn through the embedded font and no test can read them back. It names both units and reconciles them: the weigh-in table prints 430 g for a newborn while this axis puts the same puppy at 0.43, and a buyer holding both on one page is entitled to know which one the app made up."
   },
-  "pdfDisclaimer": "Produced offline by Salala from the breeder's own records. This is not a veterinary certificate.",
+  "pdfDisclaimer": "Produced offline by Companion from the breeder's own records. This is not a veterinary certificate.",
 
   "triageTitle": "What to do next",
   "triageActNow": "Act now",
   "triageWatch": "Keep watching",
   "triageRoutineVet": "Routine vet visit",
   "triageNothing": "Nothing in this record calls for a next step",
-  "triageNotDiagnosis": "Salala reads only what you typed here. This is not a veterinary diagnosis.",
+  "triageNotDiagnosis": "Companion reads only what you typed here. This is not a veterinary diagnosis.",
   "triageNoDoseYoung": "No vaccination recorded, at {days} old",
   "@triageNoDoseYoung": {
     "placeholders": { "days": { "type": "String" } }
@@ -762,7 +762,7 @@
   "onboardingSlide1Title": "One record per animal",
   "onboardingSlide1Body": "A dog or a cat, its breed, its birth date and where it came from. The first one takes under a minute.",
   "onboardingSlide2Title": "Its health, in order",
-  "onboardingSlide2Body": "Vaccinations with their next due date, weigh-ins, screenings and vet visits. Salala books the reminder for you.",
+  "onboardingSlide2Body": "Vaccinations with their next due date, weigh-ins, screenings and vet visits. Companion books the reminder for you.",
   "onboardingSlide3Title": "Its story travels with it",
   "onboardingSlide3Body": "A PDF or a spreadsheet for the buyer, and one ZIP that carries every record and picture to a new phone.",
   "onboardingSkip": "Skip",
@@ -770,21 +770,21 @@
   "onboardingStart": "Add my first animal",
   "settingsOnboarding": "Show the introduction again",
   "settingsHelp": "Help",
-  "settingsRate": "Rate Salala",
+  "settingsRate": "Rate Companion",
   "settingsRateBody": "Opens this store's own review card.",
   "settingsWhatsNew": "What's new",
   "settingsPrivacy": "Privacy",
   "settingsTerms": "Terms of use",
   "settingsLicenses": "Open-source licences",
   "rateUnavailable": "This phone cannot show the review card right now.",
-  "aboutTitle": "About Salala",
+  "aboutTitle": "About Companion",
   "aboutBody": "An offline ledger for a small kennel or cattery. No account, no server, no tracking — the records live on this phone and leave it only through your own hands.",
   "aboutVersion": "Version {version}",
   "@aboutVersion": {
     "placeholders": { "version": { "type": "String" } }
   },
   "privacyTitle": "Privacy",
-  "privacyIntro": "Salala holds one kind of data: what you typed about your animals. This page says where it sits and what can take it off this phone.",
+  "privacyIntro": "Companion holds one kind of data: what you typed about your animals. This page says where it sits and what can take it off this phone.",
   "privacyStoredHeading": "What is stored",
   "privacyStoredBody": "Every animal, dose, weigh-in, screening, visit, symptom, handover and buyer contact — and the photographs you attached — in a database and a picture folder inside this app's private storage. Android keeps that folder out of reach of other apps, and the files are not encrypted beyond that.",
   "privacyBackupHeading": "What leaves this phone",
@@ -799,7 +799,7 @@
   "termsDataHeading": "Your data is yours",
   "termsDataBody": "We hold no copy of it and cannot restore it. Backups are your responsibility, and the export tile in Settings is the whole mechanism.",
   "termsAdviceHeading": "Not veterinary advice",
-  "termsAdviceBody": "Salala repeats what you typed and applies arithmetic to dates and weights. It does not diagnose, and a reminder is a calendar entry, not a clinical opinion. Call a veterinarian.",
+  "termsAdviceBody": "Companion repeats what you typed and applies arithmetic to dates and weights. It does not diagnose, and a reminder is a calendar entry, not a clinical opinion. Call a veterinarian.",
   "termsWarrantyHeading": "No warranty",
   "termsWarrantyBody": "The app is provided as it is. To the extent the law allows, no liability is accepted for a lost record, a missed reminder or a decision taken on what is written here.",
   "helpTitle": "Help",
@@ -810,7 +810,7 @@
   "helpQ3": "I lost my phone",
   "helpA3": "Nothing is on a server, so nothing can be sent back. A pack you exported earlier restores the ledger on a new phone; one you never exported is gone.",
   "helpQ4": "Where do the reminders come from?",
-  "helpA4": "From the next-due dates you typed. Salala books an alarm a month ahead and one on the morning itself; if notifications are switched off for the app, the dates still show in the herd's agenda.",
+  "helpA4": "From the next-due dates you typed. Companion books an alarm a month ahead and one on the morning itself; if notifications are switched off for the app, the dates still show in the herd's agenda.",
   "helpQ5": "Why does a picture say it is not on this phone?",
   "helpA5": "The row survived and the file did not — usually after a restore from a pack that carried no pictures. Adding the photo again fixes it.",
   "helpQ6": "Can I hand over the animal's record?",

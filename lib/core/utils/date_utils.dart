@@ -36,7 +36,7 @@ String formatDayOrUnknown(
   return day.isEmpty ? l10n.valueUnknown : day;
 }
 
-/// Every digit Salala prints is a Latin one, in every language (D21).
+/// Every digit Companion prints is a Latin one, in every language (D21).
 ///
 /// `intl` gives Arabic its CLDR-default Arabic-Indic digits, and `formatWeight`
 /// writes ASCII, so a row would otherwise read "18.50 كغ" next to

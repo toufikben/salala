@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:salala/core/utils/agenda.dart';
-import 'package:salala/core/utils/day_math.dart';
-import 'package:salala/data/models/animal.dart';
-import 'package:salala/data/models/vaccination.dart';
+import 'package:companion/core/utils/agenda.dart';
+import 'package:companion/core/utils/day_math.dart';
+import 'package:companion/data/models/animal.dart';
+import 'package:companion/data/models/vaccination.dart';
 
 const int _day = 86400000;
 

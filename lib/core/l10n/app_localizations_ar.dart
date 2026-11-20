@@ -1182,7 +1182,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get onboardingSlide2Body =>
-      'التطعيمات بموعد جرعتها القادمة، الأوزان، الفحوصات، والزيارات البيطرية. سالالة يحجز التذكير عنك.';
+      'التطعيمات بموعد جرعتها القادمة، الأوزان، الفحوصات، والزيارات البيطرية. رفيق يحجز التذكير عنك.';
 
   @override
   String get onboardingSlide3Title => 'قصته تسافر معه';
@@ -1207,7 +1207,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settingsHelp => 'المساعدة';
 
   @override
-  String get settingsRate => 'قيّم سالالة';
+  String get settingsRate => 'قيّم رفيق';
 
   @override
   String get settingsRateBody => 'يفتح بطاقة التقييم من المتجر.';
@@ -1228,7 +1228,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get rateUnavailable => 'هذا الهاتف لا يستطيع عرض بطاقة التقييم الآن.';
 
   @override
-  String get aboutTitle => 'حول سالالة';
+  String get aboutTitle => 'حول رفيق';
 
   @override
   String get aboutBody =>
@@ -1244,7 +1244,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get privacyIntro =>
-      'سالالة تحتفظ بنوع واحد من البيانات: ما كتبته عن حيواناتك. هذه الصفحة تقول أين تسكن وماذا يمكن أن يُخرجها من هذا الهاتف.';
+      'رفيق تحتفظ بنوع واحد من البيانات: ما كتبته عن حيواناتك. هذه الصفحة تقول أين تسكن وماذا يمكن أن يُخرجها من هذا الهاتف.';
 
   @override
   String get privacyStoredHeading => 'ما يُخزَّن';
@@ -1296,7 +1296,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get termsAdviceBody =>
-      'سالالة يعيد ما كتبته ويجري حسابًا على التواريخ والأوزان. لا يشخّص، والتذكير موعد في تقويم لا رأي سريري. اتصل بطبيب بيطري.';
+      'رفيق يعيد ما كتبته ويجري حسابًا على التواريخ والأوزان. لا يشخّص، والتذكير موعد في تقويم لا رأي سريري. اتصل بطبيب بيطري.';
 
   @override
   String get termsWarrantyHeading => 'بلا ضمان';
@@ -1334,7 +1334,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get helpA4 =>
-      'من تواريخ الجرعة القادمة التي كتبتها. سالالة يحجز تنبيهًا قبل شهر وتنبيهًا في الصباح نفسه؛ وإن كانت الإشعارات موقوفة للتطبيق، تبقى التواريخ ظاهرة في أجندة القطيع.';
+      'من تواريخ الجرعة القادمة التي كتبتها. رفيق يحجز تنبيهًا قبل شهر وتنبيهًا في الصباح نفسه؛ وإن كانت الإشعارات موقوفة للتطبيق، تبقى التواريخ ظاهرة في أجندة القطيع.';
 
   @override
   String get helpQ5 => 'لماذا تقول صورة إنها ليست على هذا الهاتف؟';

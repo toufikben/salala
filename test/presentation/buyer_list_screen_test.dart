@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:salala/data/models/animal.dart';
-import 'package:salala/data/models/buyer.dart';
-import 'package:salala/data/models/placement.dart';
+import 'package:companion/data/models/animal.dart';
+import 'package:companion/data/models/buyer.dart';
+import 'package:companion/data/models/placement.dart';
 
 import '../helpers/pump_app.dart';
 
@@ -69,7 +69,7 @@ void main() {
     tester.view.devicePixelRatio = 3;
     addTearDown(tester.view.reset);
 
-    await pumpSalala(
+    await pumpApp(
       tester,
       seed: <Animal>[_animal(_nalaId, 'Nala'), _animal(_zidaId, 'Zida')],
       seedBuyers: <Buyer>[_buyer(phone: '+33 6 12 34 56 78', country: 'FR')],
@@ -93,7 +93,7 @@ void main() {
     tester.view.devicePixelRatio = 3;
     addTearDown(tester.view.reset);
 
-    await pumpSalala(
+    await pumpApp(
       tester,
       seed: <Animal>[_animal(_nalaId, 'Nala')],
       seedBuyers: <Buyer>[_buyer(name: 'Sami')],
@@ -114,7 +114,7 @@ void main() {
     tester.view.devicePixelRatio = 3;
     addTearDown(tester.view.reset);
 
-    await pumpSalala(tester, seed: <Animal>[_animal(_nalaId, 'Nala')]);
+    await pumpApp(tester, seed: <Animal>[_animal(_nalaId, 'Nala')]);
     await _openBuyers(tester);
 
     expect(find.text('No buyers yet'), findsOneWidget);
@@ -131,7 +131,7 @@ void main() {
     tester.view.devicePixelRatio = 3;
     addTearDown(tester.view.reset);
 
-    await pumpSalala(tester, seed: <Animal>[_animal(_nalaId, 'Nala')]);
+    await pumpApp(tester, seed: <Animal>[_animal(_nalaId, 'Nala')]);
     await _openBuyers(tester);
 
     await tester.tap(find.widgetWithText(FilledButton, 'New buyer'));
@@ -168,7 +168,7 @@ void main() {
     tester.view.devicePixelRatio = 3;
     addTearDown(tester.view.reset);
 
-    await pumpSalala(
+    await pumpApp(
       tester,
       seed: <Animal>[_animal(_nalaId, 'Nala')],
       seedBuyers: <Buyer>[_buyer(name: 'Zoe Martin')],
@@ -199,7 +199,7 @@ void main() {
     tester.view.devicePixelRatio = 3;
     addTearDown(tester.view.reset);
 
-    await pumpSalala(
+    await pumpApp(
       tester,
       seed: <Animal>[_animal(_nalaId, 'Nala')],
       seedBuyers: <Buyer>[_buyer()],

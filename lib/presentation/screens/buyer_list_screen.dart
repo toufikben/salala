@@ -8,7 +8,7 @@ import '../../data/models/placement.dart';
 import '../providers/app_providers.dart';
 import '../providers/record_providers.dart';
 import '../widgets/buyer_dialog.dart';
-import '../widgets/salala_nav_bar.dart';
+import '../widgets/companion_nav_bar.dart';
 
 /// The people on the other side of the ledger.
 ///
@@ -35,7 +35,7 @@ class BuyerListScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.navBuyers)),
-      bottomNavigationBar: const SalalaNavBar(index: 2),
+      bottomNavigationBar: const CompanionNavBar(index: 2),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _edit(context, null),
         icon: const Icon(Icons.person_add_alt),

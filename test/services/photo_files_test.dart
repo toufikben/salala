@@ -3,7 +3,7 @@ import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path/path.dart' as p;
-import 'package:salala/services/photo_files.dart';
+import 'package:companion/services/photo_files.dart';
 
 /// The file layer against a real folder on a real disk.
 ///
@@ -24,7 +24,7 @@ void main() {
       PickedPhoto(name: name, bytes: Uint8List(bytes));
 
   setUp(() async {
-    root = await Directory.systemTemp.createTemp('salala_photos_test_');
+    root = await Directory.systemTemp.createTemp('companion_photos_test_');
     addTearDown(() {
       if (root.existsSync()) root.deleteSync(recursive: true);
     });

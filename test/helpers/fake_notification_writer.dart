@@ -1,5 +1,5 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:salala/services/reminder_scheduler.dart';
+import 'package:companion/services/reminder_scheduler.dart';
 import 'package:timezone/timezone.dart' as tz;
 
 /// One alarm the app asked the phone to hold.

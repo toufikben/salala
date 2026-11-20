@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:salala/presentation/screens/animal_form_screen.dart';
+import 'package:companion/presentation/screens/animal_form_screen.dart';
 
 import '../helpers/pump_app.dart';
 
@@ -28,7 +28,7 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
 
-    await pumpSalala(tester);
+    await pumpApp(tester);
     await tester.tap(find.widgetWithText(FilledButton, 'Add animal'));
     await tester.pumpAndSettle();
   }

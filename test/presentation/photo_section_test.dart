@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:salala/data/models/animal.dart';
-import 'package:salala/data/models/photo.dart';
-import 'package:salala/presentation/screens/animal_detail_screen.dart';
-import 'package:salala/services/photo_files.dart';
+import 'package:companion/data/models/animal.dart';
+import 'package:companion/data/models/photo.dart';
+import 'package:companion/presentation/screens/animal_detail_screen.dart';
+import 'package:companion/services/photo_files.dart';
 
 import '../helpers/fake_photo_files.dart';
 import '../helpers/pump_app.dart';
@@ -110,7 +110,7 @@ void main() {
   ) async {
     _usePhoneViewport(tester);
     final files = FakePhotoFiles();
-    await pumpSalala(
+    await pumpApp(
       tester,
       photoFiles: files,
       seed: <Animal>[_nala()],
@@ -132,7 +132,7 @@ void main() {
       _usePhoneViewport(tester);
       final files = FakePhotoFiles()
         ..nextPicked = FakePhotoFiles.photo('IMG_7.jpg');
-      await pumpSalala(tester, photoFiles: files, seed: <Animal>[_nala()]);
+      await pumpApp(tester, photoFiles: files, seed: <Animal>[_nala()]);
       await _openNala(tester);
       await _scrollToPhotos(tester);
 
@@ -159,7 +159,7 @@ void main() {
     _usePhoneViewport(tester);
     final files = FakePhotoFiles()
       ..nextCaptured = FakePhotoFiles.photo('CAM_1.jpg');
-    await pumpSalala(tester, photoFiles: files, seed: <Animal>[_nala()]);
+    await pumpApp(tester, photoFiles: files, seed: <Animal>[_nala()]);
     await _openNala(tester);
     await _scrollToPhotos(tester);
 
@@ -180,7 +180,7 @@ void main() {
   ) async {
     _usePhoneViewport(tester);
     final files = FakePhotoFiles();
-    await pumpSalala(tester, photoFiles: files, seed: <Animal>[_nala()]);
+    await pumpApp(tester, photoFiles: files, seed: <Animal>[_nala()]);
     await _openNala(tester);
     await _scrollToPhotos(tester);
 
@@ -201,7 +201,7 @@ void main() {
       final files = FakePhotoFiles()
         ..nextPicked = FakePhotoFiles.photo('IMG_7.jpg')
         ..storeRefusal = const PhotoRefused(PhotoProblem.notAnImage);
-      await pumpSalala(tester, photoFiles: files, seed: <Animal>[_nala()]);
+      await pumpApp(tester, photoFiles: files, seed: <Animal>[_nala()]);
       await _openNala(tester);
       await _scrollToPhotos(tester);
 
@@ -227,7 +227,7 @@ void main() {
     final files = FakePhotoFiles()
       ..nextPicked = FakePhotoFiles.photo('scan.jpg')
       ..storeRefusal = const PhotoRefused(PhotoProblem.tooLarge);
-    await pumpSalala(tester, photoFiles: files, seed: <Animal>[_nala()]);
+    await pumpApp(tester, photoFiles: files, seed: <Animal>[_nala()]);
     await _openNala(tester);
     await _scrollToPhotos(tester);
 
@@ -248,7 +248,7 @@ void main() {
     _usePhoneViewport(tester);
     final files = FakePhotoFiles()
       ..nextPicked = FakePhotoFiles.photo('IMG_8.jpg');
-    await pumpSalala(
+    await pumpApp(
       tester,
       photoFiles: files,
       seed: <Animal>[_nala()],
@@ -274,7 +274,7 @@ void main() {
   ) async {
     _usePhoneViewport(tester);
     final files = FakePhotoFiles();
-    await pumpSalala(
+    await pumpApp(
       tester,
       photoFiles: files,
       seed: <Animal>[_nala()],
@@ -309,7 +309,7 @@ void main() {
   ) async {
     _usePhoneViewport(tester);
     final files = FakePhotoFiles();
-    await pumpSalala(
+    await pumpApp(
       tester,
       photoFiles: files,
       seed: <Animal>[_nala()],
@@ -331,7 +331,7 @@ void main() {
   ) async {
     _usePhoneViewport(tester);
     final files = FakePhotoFiles();
-    await pumpSalala(
+    await pumpApp(
       tester,
       photoFiles: files,
       seed: <Animal>[_nala()],
@@ -357,7 +357,7 @@ void main() {
     (tester) async {
       _usePhoneViewport(tester);
       final files = FakePhotoFiles()..deleteFailure = StateError('locked');
-      await pumpSalala(
+      await pumpApp(
         tester,
         photoFiles: files,
         seed: <Animal>[_nala()],
@@ -388,7 +388,7 @@ void main() {
   ) async {
     _usePhoneViewport(tester);
     final files = FakePhotoFiles();
-    await pumpSalala(
+    await pumpApp(
       tester,
       photoFiles: files,
       seed: <Animal>[_nala()],
@@ -421,7 +421,7 @@ void main() {
     // the folder going, and this test is what that choice costs in calls.
     _usePhoneViewport(tester);
     final files = FakePhotoFiles();
-    await pumpSalala(tester, photoFiles: files, seed: <Animal>[_nala()]);
+    await pumpApp(tester, photoFiles: files, seed: <Animal>[_nala()]);
 
     await tester.tap(find.byIcon(Icons.more_vert));
     await tester.pumpAndSettle();
@@ -437,7 +437,7 @@ void main() {
     tester,
   ) async {
     _usePhoneViewport(tester);
-    await pumpSalala(
+    await pumpApp(
       tester,
       locale: const Locale('ar'),
       seed: <Animal>[_nala()],

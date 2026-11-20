@@ -1,12 +1,12 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:salala/core/utils/day_math.dart';
-import 'package:salala/data/db/daos.dart';
-import 'package:salala/data/models/animal.dart';
-import 'package:salala/data/models/health_test.dart';
-import 'package:salala/data/models/symptom.dart';
-import 'package:salala/data/models/vaccination.dart';
-import 'package:salala/data/models/vet_visit.dart';
-import 'package:salala/data/models/weight_entry.dart';
+import 'package:companion/core/utils/day_math.dart';
+import 'package:companion/data/db/daos.dart';
+import 'package:companion/data/models/animal.dart';
+import 'package:companion/data/models/health_test.dart';
+import 'package:companion/data/models/symptom.dart';
+import 'package:companion/data/models/vaccination.dart';
+import 'package:companion/data/models/vet_visit.dart';
+import 'package:companion/data/models/weight_entry.dart';
 
 import '../../helpers/test_db.dart';
 

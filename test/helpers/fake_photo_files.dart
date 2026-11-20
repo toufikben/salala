@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import 'package:salala/services/photo_files.dart';
+import 'package:companion/services/photo_files.dart';
 
 /// Stands in for the gallery picker and the folder under the app's documents,
 /// neither of which a test runner can answer.

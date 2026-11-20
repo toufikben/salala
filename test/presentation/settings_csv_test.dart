@@ -2,12 +2,12 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:salala/core/utils/date_utils.dart';
-import 'package:salala/data/models/animal.dart';
-import 'package:salala/data/models/buyer.dart';
-import 'package:salala/data/models/litter.dart';
-import 'package:salala/data/models/placement.dart';
-import 'package:salala/data/models/vaccination.dart';
+import 'package:companion/core/utils/date_utils.dart';
+import 'package:companion/data/models/animal.dart';
+import 'package:companion/data/models/buyer.dart';
+import 'package:companion/data/models/litter.dart';
+import 'package:companion/data/models/placement.dart';
+import 'package:companion/data/models/vaccination.dart';
 
 import '../helpers/fake_pack_files.dart';
 import '../helpers/pump_app.dart';
@@ -76,7 +76,7 @@ void main() {
     testWidgets('the herd goes out as one CSV with a BOM and CRLF', (
       tester,
     ) async {
-      await pumpSalala(
+      await pumpApp(
         tester,
         packFiles: files,
         seed: <Animal>[
@@ -89,7 +89,7 @@ void main() {
 
       expect(
         files.shared.keys.single,
-        matches(r'^salala-herd-\d{8}-\d{4}\.csv$'),
+        matches(r'^companion-herd-\d{8}-\d{4}\.csv$'),
       );
       // The mark is the first byte triple, not a character the reader sees: a
       // BOM after the header is a stray `ï»¿` in the first cell. Checked on the
@@ -106,7 +106,7 @@ void main() {
     });
 
     testWidgets('each of the four tables exports on its own', (tester) async {
-      await pumpSalala(
+      await pumpApp(
         tester,
         packFiles: files,
         seed: <Animal>[_animal(_nalaId, 'Nala')],
@@ -159,13 +159,13 @@ void main() {
       // Every table named the file it wrote, so four files are four different
       // names rather than one overwriting the next in a Downloads folder.
       expect(files.shared.keys.toSet(), hasLength(3));
-      expect(files.shared.keys, everyElement(matches(r'^salala-[a-z]+-')));
+      expect(files.shared.keys, everyElement(matches(r'^companion-[a-z]+-')));
     });
 
     testWidgets('a brand-new install says there is nothing to export', (
       tester,
     ) async {
-      await pumpSalala(tester, packFiles: files);
+      await pumpApp(tester, packFiles: files);
       await _goToSettings(tester);
       await _tapCsv(tester, 'Animals');
 
@@ -182,7 +182,7 @@ void main() {
       tester,
     ) async {
       files.shareFailure = StateError('no activity to share to');
-      await pumpSalala(
+      await pumpApp(
         tester,
         packFiles: files,
         seed: <Animal>[_animal(_nalaId, 'Nala')],
@@ -201,7 +201,7 @@ void main() {
     testWidgets('a phone that has never been backed up says so', (
       tester,
     ) async {
-      await pumpSalala(
+      await pumpApp(
         tester,
         packFiles: files,
         seed: <Animal>[_animal(_nalaId, 'Nala')],
@@ -214,7 +214,7 @@ void main() {
     testWidgets('a backup stamps the day, and the row reads it back', (
       tester,
     ) async {
-      await pumpSalala(
+      await pumpApp(
         tester,
         packFiles: files,
         seed: <Animal>[_animal(_nalaId, 'Nala')],
@@ -239,7 +239,7 @@ void main() {
       tester,
     ) async {
       files.shareFailure = StateError('no activity to share to');
-      await pumpSalala(
+      await pumpApp(
         tester,
         packFiles: files,
         seed: <Animal>[_animal(_nalaId, 'Nala')],

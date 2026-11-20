@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqflite/sqflite.dart' show DatabaseException;
-import 'package:salala/data/db/daos.dart';
-import 'package:salala/data/models/animal.dart';
-import 'package:salala/data/models/litter.dart';
+import 'package:companion/data/db/daos.dart';
+import 'package:companion/data/models/animal.dart';
+import 'package:companion/data/models/litter.dart';
 
 import '../../helpers/test_db.dart';
 

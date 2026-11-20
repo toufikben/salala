@@ -113,7 +113,7 @@ abstract class AppLocalizations {
   /// The product name; never translated.
   ///
   /// In en, this message translates to:
-  /// **'Salala'**
+  /// **'Companion'**
   String get appTitle;
 
   /// No description provided for @navAnimals.
@@ -509,7 +509,7 @@ abstract class AppLocalizations {
   /// No description provided for @lockTitle.
   ///
   /// In en, this message translates to:
-  /// **'Salala is locked'**
+  /// **'Companion is locked'**
   String get lockTitle;
 
   /// No description provided for @lockEnterPin.
@@ -635,7 +635,7 @@ abstract class AppLocalizations {
   /// No description provided for @startupFailedTitle.
   ///
   /// In en, this message translates to:
-  /// **'Salala could not open the ledger on this phone.'**
+  /// **'Companion could not open the ledger on this phone.'**
   String get startupFailedTitle;
 
   /// No description provided for @startupFailedBody.
@@ -827,13 +827,13 @@ abstract class AppLocalizations {
   /// No description provided for @packNotAPack.
   ///
   /// In en, this message translates to:
-  /// **'That file is not a Salala pack, or it is damaged'**
+  /// **'That file is not a Companion pack, or it is damaged'**
   String get packNotAPack;
 
   /// No description provided for @packFromTheFuture.
   ///
   /// In en, this message translates to:
-  /// **'That pack comes from a newer Salala than this one'**
+  /// **'That pack comes from a newer Companion than this one'**
   String get packFromTheFuture;
 
   /// No description provided for @packIncomplete.
@@ -845,13 +845,13 @@ abstract class AppLocalizations {
   /// No description provided for @packUnknownTable.
   ///
   /// In en, this message translates to:
-  /// **'That pack holds a table this Salala does not know: {table}'**
+  /// **'That pack holds a table this Companion does not know: {table}'**
   String packUnknownTable(String table);
 
   /// A row whose word is not one the app stores, e.g. an animal status it does not know. Refused before anything is written, so the ledger on this phone is untouched.
   ///
   /// In en, this message translates to:
-  /// **'That pack holds a value this Salala cannot read: {detail}'**
+  /// **'That pack holds a value this Companion cannot read: {detail}'**
   String packBadValue(String detail);
 
   /// No description provided for @packRestoreTitle.
@@ -2021,7 +2021,7 @@ abstract class AppLocalizations {
   /// No description provided for @pdfDisclaimer.
   ///
   /// In en, this message translates to:
-  /// **'Produced offline by Salala from the breeder\'s own records. This is not a veterinary certificate.'**
+  /// **'Produced offline by Companion from the breeder\'s own records. This is not a veterinary certificate.'**
   String get pdfDisclaimer;
 
   /// No description provided for @triageTitle.
@@ -2057,7 +2057,7 @@ abstract class AppLocalizations {
   /// No description provided for @triageNotDiagnosis.
   ///
   /// In en, this message translates to:
-  /// **'Salala reads only what you typed here. This is not a veterinary diagnosis.'**
+  /// **'Companion reads only what you typed here. This is not a veterinary diagnosis.'**
   String get triageNotDiagnosis;
 
   /// No description provided for @triageNoDoseYoung.
@@ -2171,7 +2171,7 @@ abstract class AppLocalizations {
   /// No description provided for @onboardingSlide2Body.
   ///
   /// In en, this message translates to:
-  /// **'Vaccinations with their next due date, weigh-ins, screenings and vet visits. Salala books the reminder for you.'**
+  /// **'Vaccinations with their next due date, weigh-ins, screenings and vet visits. Companion books the reminder for you.'**
   String get onboardingSlide2Body;
 
   /// No description provided for @onboardingSlide3Title.
@@ -2219,7 +2219,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsRate.
   ///
   /// In en, this message translates to:
-  /// **'Rate Salala'**
+  /// **'Rate Companion'**
   String get settingsRate;
 
   /// No description provided for @settingsRateBody.
@@ -2261,7 +2261,7 @@ abstract class AppLocalizations {
   /// No description provided for @aboutTitle.
   ///
   /// In en, this message translates to:
-  /// **'About Salala'**
+  /// **'About Companion'**
   String get aboutTitle;
 
   /// No description provided for @aboutBody.
@@ -2285,7 +2285,7 @@ abstract class AppLocalizations {
   /// No description provided for @privacyIntro.
   ///
   /// In en, this message translates to:
-  /// **'Salala holds one kind of data: what you typed about your animals. This page says where it sits and what can take it off this phone.'**
+  /// **'Companion holds one kind of data: what you typed about your animals. This page says where it sits and what can take it off this phone.'**
   String get privacyIntro;
 
   /// No description provided for @privacyStoredHeading.
@@ -2375,7 +2375,7 @@ abstract class AppLocalizations {
   /// No description provided for @termsAdviceBody.
   ///
   /// In en, this message translates to:
-  /// **'Salala repeats what you typed and applies arithmetic to dates and weights. It does not diagnose, and a reminder is a calendar entry, not a clinical opinion. Call a veterinarian.'**
+  /// **'Companion repeats what you typed and applies arithmetic to dates and weights. It does not diagnose, and a reminder is a calendar entry, not a clinical opinion. Call a veterinarian.'**
   String get termsAdviceBody;
 
   /// No description provided for @termsWarrantyHeading.
@@ -2441,7 +2441,7 @@ abstract class AppLocalizations {
   /// No description provided for @helpA4.
   ///
   /// In en, this message translates to:
-  /// **'From the next-due dates you typed. Salala books an alarm a month ahead and one on the morning itself; if notifications are switched off for the app, the dates still show in the herd\'s agenda.'**
+  /// **'From the next-due dates you typed. Companion books an alarm a month ahead and one on the morning itself; if notifications are switched off for the app, the dates still show in the herd\'s agenda.'**
   String get helpA4;
 
   /// No description provided for @helpQ5.

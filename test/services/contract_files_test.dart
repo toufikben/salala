@@ -3,8 +3,8 @@ import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path/path.dart' as p;
-import 'package:salala/services/contract_files.dart';
-import 'package:salala/services/photo_files.dart' show photoFolder;
+import 'package:companion/services/contract_files.dart';
+import 'package:companion/services/photo_files.dart' show photoFolder;
 
 /// The contract layer against a real folder on a real disk.
 ///
@@ -26,7 +26,7 @@ void main() {
       PickedContract(name: name, bytes: Uint8List(bytes));
 
   setUp(() async {
-    root = await Directory.systemTemp.createTemp('salala_contracts_test_');
+    root = await Directory.systemTemp.createTemp('companion_contracts_test_');
     addTearDown(() {
       if (root.existsSync()) root.deleteSync(recursive: true);
     });

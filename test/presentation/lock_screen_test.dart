@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:salala/services/app_lock_service.dart';
+import 'package:companion/services/app_lock_service.dart';
 
 import '../helpers/fake_secure_storage.dart';
 import '../helpers/pump_app.dart';
@@ -24,7 +24,7 @@ void main() {
     'a PIN that does not match leaves the gate able to be tried again',
     (tester) async {
       await gateOnPhone(tester);
-      final storage = await pumpSalala(tester, hasPin: true);
+      final storage = await pumpApp(tester, hasPin: true);
       // A real enrollment, written the way the service writes it.
       storage.values['app_lock_salt'] = 'c2FsdHNhbHRzYWx0c2ExIA==';
       storage.values['app_lock_digest'] = 'a' * 64;
@@ -48,7 +48,7 @@ void main() {
     tester,
   ) async {
     await gateOnPhone(tester);
-    final storage = await pumpSalala(tester, hasPin: true);
+    final storage = await pumpApp(tester, hasPin: true);
     storage.values['app_lock_digest'] = 'a' * 64;
     // Half a value, or one the platform rewrote in some encoding of its own: it
     // is not a salt, and no PIN can be checked against it. Reading it used to
@@ -74,7 +74,7 @@ void main() {
   /// answers below need: every try is a miss.
   Future<void> enrolledGate(WidgetTester tester) async {
     await gateOnPhone(tester);
-    final storage = await pumpSalala(tester, hasPin: true);
+    final storage = await pumpApp(tester, hasPin: true);
     storage.values['app_lock_salt'] = 'c2FsdHNhbHRzYWx0c2ExIA==';
     storage.values['app_lock_digest'] = 'a' * 64;
   }
@@ -129,7 +129,7 @@ void main() {
       final until = DateTime.now()
           .add(const Duration(minutes: 2))
           .millisecondsSinceEpoch;
-      await pumpSalala(
+      await pumpApp(
         tester,
         hasPin: true,
         secureSeed: <String, String>{
@@ -155,7 +155,7 @@ void main() {
     tester,
   ) async {
     await gateOnPhone(tester);
-    final storage = await pumpSalala(tester, hasPin: true);
+    final storage = await pumpApp(tester, hasPin: true);
     // A real enrollment, written by the shipped service, so the whole flow is
     // exercised against the digest the phone would hold.
     await AppLockService(storage: storage).enable('1234');
@@ -163,7 +163,7 @@ void main() {
     await tester.enterText(find.byType(TextField), '1234');
     await tester.tap(find.widgetWithText(FilledButton, 'Unlock'));
     await settleRealIo(tester);
-    expect(find.text('Salala is locked'), findsNothing);
+    expect(find.text('Companion is locked'), findsNothing);
 
     await tester.tap(find.widgetWithText(NavigationDestination, 'Settings'));
     await tester.pumpAndSettle();
@@ -225,18 +225,18 @@ void main() {
       tester,
     ) async {
       await gateOnPhone(tester);
-      final storage = await pumpSalala(
+      final storage = await pumpApp(
         tester,
         hasPin: true,
         lockGrace: Duration.zero,
       );
       await unlockEnrolled(tester, storage);
-      expect(find.text('Salala is locked'), findsNothing);
+      expect(find.text('Companion is locked'), findsNothing);
 
       await leave(tester);
       await comeBack(tester);
 
-      expect(find.text('Salala is locked'), findsOneWidget);
+      expect(find.text('Companion is locked'), findsOneWidget);
       expect(
         find.widgetWithText(FilledButton, 'Unlock'),
         findsOneWidget,
@@ -248,18 +248,18 @@ void main() {
       tester,
     ) async {
       await gateOnPhone(tester);
-      final storage = await pumpSalala(
+      final storage = await pumpApp(
         tester,
         hasPin: true,
         lockGrace: const Duration(hours: 1),
       );
       await unlockEnrolled(tester, storage);
-      expect(find.text('Salala is locked'), findsNothing);
+      expect(find.text('Companion is locked'), findsNothing);
 
       await leave(tester);
       await comeBack(tester);
 
-      expect(find.text('Salala is locked'), findsNothing);
+      expect(find.text('Companion is locked'), findsNothing);
       expect(find.widgetWithText(FilledButton, 'Unlock'), findsNothing);
     });
   });

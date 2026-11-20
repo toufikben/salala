@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:salala/core/utils/money.dart';
+import 'package:companion/core/utils/money.dart';
 
 /// Money in and money out, with no locale and no symbol anywhere in between.
 ///

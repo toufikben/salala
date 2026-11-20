@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:salala/presentation/widgets/animal_timeline_card.dart';
+import 'package:companion/presentation/widgets/animal_timeline_card.dart';
 
 /// Whether [element] sits inside the timeline card at the top of the ledger.
 bool _insideTimeline(Element element) {

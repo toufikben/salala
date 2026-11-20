@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:salala/services/pack_archive.dart';
-import 'package:salala/services/pack_files.dart';
+import 'package:companion/services/pack_archive.dart';
+import 'package:companion/services/pack_files.dart';
 
 /// Stands in for the share sheet and the file picker, which are Android dialogs
 /// no test runner can answer.
@@ -22,7 +22,7 @@ class FakePackFiles implements PackFiles {
     picked = text == null
         ? null
         : PickedPackFile(
-            name: 'salala-pack.json',
+            name: 'companion-pack.json',
             bytes: Uint8List.fromList(utf8.encode(text)),
           );
   }

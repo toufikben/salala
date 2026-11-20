@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:salala/core/utils/reminders.dart';
-import 'package:salala/data/models/animal.dart';
-import 'package:salala/data/models/vaccination.dart';
-import 'package:salala/presentation/screens/animal_form_screen.dart';
+import 'package:companion/core/utils/reminders.dart';
+import 'package:companion/data/models/animal.dart';
+import 'package:companion/data/models/vaccination.dart';
+import 'package:companion/presentation/screens/animal_form_screen.dart';
 
 import '../helpers/fake_notification_writer.dart';
 import '../helpers/pump_app.dart';
@@ -38,7 +38,7 @@ void main() {
   WidgetController.hitTestWarningShouldBeFatal = true;
 
   testWidgets('empty herd shows the guided empty state', (tester) async {
-    await pumpSalala(tester);
+    await pumpApp(tester);
 
     expect(find.text('No animals yet'), findsOneWidget);
     // Exactly one way in: the device check found a FAB stacked on top of the
@@ -48,7 +48,7 @@ void main() {
   });
 
   testWidgets('animals are grouped, breeding stock first', (tester) async {
-    await pumpSalala(
+    await pumpApp(
       tester,
       seed: <Animal>[
         _draft(name: 'Bella'),
@@ -82,7 +82,7 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
 
-    await pumpSalala(tester);
+    await pumpApp(tester);
 
     // The herd is empty here, so the only affordance is the empty state's own
     // button — the FAB is deliberately absent until there is something to add to.
@@ -137,7 +137,7 @@ void main() {
       // The herd stays empty on purpose: the animal being typed is the first row
       // the database turns down, so nothing else on the screen can be what the
       // breeder is looking at.
-      await pumpSalala(tester, beforeLaunch: refuseWritesTo('animals'));
+      await pumpApp(tester, beforeLaunch: refuseWritesTo('animals'));
       await tester.tap(find.widgetWithText(FilledButton, 'Add animal'));
       await tester.pumpAndSettle();
 
@@ -164,14 +164,14 @@ void main() {
   testWidgets('a locked app opens on the PIN gate, not the herd', (
     tester,
   ) async {
-    await pumpSalala(tester, hasPin: true);
+    await pumpApp(tester, hasPin: true);
 
-    expect(find.text('Salala is locked'), findsOneWidget);
+    expect(find.text('Companion is locked'), findsOneWidget);
     expect(find.text('Animals'), findsNothing);
   });
 
   testWidgets('Arabic renders right-to-left', (tester) async {
-    await pumpSalala(tester, locale: const Locale('ar'));
+    await pumpApp(tester, locale: const Locale('ar'));
 
     expect(
       find.descendant(
@@ -220,7 +220,7 @@ void main() {
       tester,
     ) async {
       final notifications = FakeNotificationWriter();
-      await pumpSalala(
+      await pumpApp(
         tester,
         notifications: notifications,
         resyncOnLaunch: true,
@@ -241,7 +241,7 @@ void main() {
       tester,
     ) async {
       final notifications = FakeNotificationWriter();
-      await pumpSalala(
+      await pumpApp(
         tester,
         notifications: notifications,
         resyncOnLaunch: true,
@@ -258,7 +258,7 @@ void main() {
       tester,
     ) async {
       final notifications = FakeNotificationWriter();
-      await pumpSalala(
+      await pumpApp(
         tester,
         notifications: notifications,
         resyncOnLaunch: true,
@@ -283,7 +283,7 @@ void main() {
       tester,
     ) async {
       final notifications = FakeNotificationWriter();
-      await pumpSalala(
+      await pumpApp(
         tester,
         notifications: notifications,
         resyncOnLaunch: true,
@@ -313,7 +313,7 @@ void main() {
     testWidgets(
       'the warning before an animal dies names the photographs it takes',
       (tester) async {
-        await pumpSalala(tester, seed: <Animal>[nala()]);
+        await pumpApp(tester, seed: <Animal>[nala()]);
 
         await _openCardMenu(tester);
         await tester.tap(find.text('Delete'));
@@ -336,7 +336,7 @@ void main() {
       'an animal the database refuses to delete keeps its card and its alarms',
       (tester) async {
         final notifications = FakeNotificationWriter();
-        await pumpSalala(
+        await pumpApp(
           tester,
           notifications: notifications,
           resyncOnLaunch: true,
@@ -379,7 +379,7 @@ void main() {
         addTearDown(tester.view.resetDevicePixelRatio);
 
         final notifications = FakeNotificationWriter();
-        await pumpSalala(
+        await pumpApp(
           tester,
           notifications: notifications,
           resyncOnLaunch: true,

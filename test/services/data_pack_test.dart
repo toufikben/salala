@@ -1,9 +1,9 @@
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:salala/data/db/schema.dart';
-import 'package:salala/data/models/photo.dart';
-import 'package:salala/services/data_pack.dart';
+import 'package:companion/data/db/schema.dart';
+import 'package:companion/data/models/photo.dart';
+import 'package:companion/services/data_pack.dart';
 import 'package:sqflite/sqflite.dart';
 
 import '../helpers/test_db.dart';

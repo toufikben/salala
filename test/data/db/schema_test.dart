@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:salala/data/db/app_database.dart';
-import 'package:salala/data/db/schema.dart';
+import 'package:companion/data/db/app_database.dart';
+import 'package:companion/data/db/schema.dart';
 import 'package:sqflite/sqflite.dart';
 
 import '../../helpers/test_db.dart';

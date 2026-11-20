@@ -35,7 +35,7 @@ enum PackProblem {
   /// Not JSON at all, or JSON that is not an object.
   unreadable,
 
-  /// JSON, but not a Salala pack: no format tag, or a body of the wrong shape.
+  /// JSON, but not a Companion pack: no format tag, or a body of the wrong shape.
   notAPack,
 
   /// Written by a newer format or a newer schema than this app has.

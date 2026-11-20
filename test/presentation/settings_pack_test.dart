@@ -2,17 +2,17 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:salala/data/db/schema.dart';
-import 'package:salala/core/utils/date_utils.dart';
-import 'package:salala/core/l10n/app_localizations.dart';
-import 'package:salala/data/models/animal.dart';
-import 'package:salala/data/models/photo.dart';
-import 'package:salala/data/models/vaccination.dart';
-import 'package:salala/presentation/screens/animal_list_screen.dart';
-import 'package:salala/presentation/widgets/animal_card.dart';
-import 'package:salala/services/data_pack.dart';
-import 'package:salala/services/pack_archive.dart';
-import 'package:salala/services/pack_files.dart';
+import 'package:companion/data/db/schema.dart';
+import 'package:companion/core/utils/date_utils.dart';
+import 'package:companion/core/l10n/app_localizations.dart';
+import 'package:companion/data/models/animal.dart';
+import 'package:companion/data/models/photo.dart';
+import 'package:companion/data/models/vaccination.dart';
+import 'package:companion/presentation/screens/animal_list_screen.dart';
+import 'package:companion/presentation/widgets/animal_card.dart';
+import 'package:companion/services/data_pack.dart';
+import 'package:companion/services/pack_archive.dart';
+import 'package:companion/services/pack_files.dart';
 
 import '../helpers/fake_notification_writer.dart';
 import '../helpers/fake_pack_files.dart';
@@ -142,7 +142,7 @@ void main() {
 
   group('exporting', () {
     testWidgets('hands the sheet every record on the phone', (tester) async {
-      await pumpSalala(
+      await pumpApp(
         tester,
         packFiles: files,
         seed: <Animal>[animal('Atlas'), animal('Zida', breeding: true)],
@@ -162,7 +162,7 @@ void main() {
       // it holds pictures as well as rows.
       expect(
         files.shared.keys.single,
-        matches(r'^salala-pack-\d{8}-\d{4}\.zip$'),
+        matches(r'^companion-pack-\d{8}-\d{4}\.zip$'),
       );
       expect(find.textContaining('is ready to send'), findsOneWidget);
     });
@@ -175,7 +175,7 @@ void main() {
           'atlas/1759000000000-4.jpg': <int>[7, 7, 7],
         },
       );
-      await pumpSalala(
+      await pumpApp(
         tester,
         packFiles: files,
         photoFiles: photos,
@@ -206,7 +206,7 @@ void main() {
 
     testWidgets('a phone that refuses the sheet says so', (tester) async {
       files.shareFailure = StateError('no activity to share to');
-      await pumpSalala(
+      await pumpApp(
         tester,
         packFiles: files,
         seed: <Animal>[animal('Atlas')],
@@ -234,7 +234,7 @@ void main() {
         ],
         vaccinations: <Map<String, Object?>>[doseRow('v-1', 'a-1', 1)],
       );
-      await pumpSalala(
+      await pumpApp(
         tester,
         packFiles: files,
         seed: <Animal>[animal('Atlas')],
@@ -261,7 +261,7 @@ void main() {
       files.pickedText = packJson(
         animals: <Map<String, Object?>>[animalRow('a-1', 'Kenza')],
       );
-      await pumpSalala(
+      await pumpApp(
         tester,
         packFiles: files,
         seed: <Animal>[animal('Atlas')],
@@ -287,7 +287,7 @@ void main() {
         ],
         vaccinations: <Map<String, Object?>>[doseRow('v-1', 'a-1', 1)],
       );
-      await pumpSalala(
+      await pumpApp(
         tester,
         packFiles: files,
         seed: <Animal>[animal('Atlas')],
@@ -338,7 +338,7 @@ void main() {
           doseRow('v-1', 'a-1', due.millisecondsSinceEpoch),
         ],
       );
-      await pumpSalala(
+      await pumpApp(
         tester,
         notifications: notifications,
         packFiles: files,
@@ -374,7 +374,7 @@ void main() {
       files.pickedText = packJson(
         animals: <Map<String, Object?>>[animalRow('atlas', 'Atlas')],
       );
-      await pumpSalala(
+      await pumpApp(
         tester,
         packFiles: files,
         photoFiles: photos,
@@ -417,7 +417,7 @@ void main() {
       (tester) async {
         final photos = FakePhotoFiles();
         files.picked = PickedPackFile(
-          name: 'salala-pack.zip',
+          name: 'companion-pack.zip',
           bytes: encodePackArchive(
             packJson(
               animals: <Map<String, Object?>>[animalRow('atlas', 'Atlas')],
@@ -435,7 +435,7 @@ void main() {
             },
           ),
         );
-        await pumpSalala(tester, packFiles: files, photoFiles: photos);
+        await pumpApp(tester, packFiles: files, photoFiles: photos);
         await goTo(tester, 'Settings');
 
         await tapTile(tester, 'Restore from a pack');
@@ -459,7 +459,7 @@ void main() {
       files.pickedText = packJson(
         animals: <Map<String, Object?>>[animalRow('a-1', 'Kenza')],
       );
-      await pumpSalala(tester, packFiles: files, photoFiles: photos);
+      await pumpApp(tester, packFiles: files, photoFiles: photos);
       await goTo(tester, 'Settings');
 
       await tapTile(tester, 'Restore from a pack');
@@ -476,7 +476,7 @@ void main() {
       tester,
     ) async {
       files.pickedText = '{"notes":"a shopping list"}';
-      await pumpSalala(
+      await pumpApp(
         tester,
         packFiles: files,
         seed: <Animal>[animal('Atlas')],
@@ -486,18 +486,18 @@ void main() {
       await tapTile(tester, 'Restore from a pack');
 
       expect(
-        find.text('That file is not a Salala pack, or it is damaged'),
+        find.text('That file is not a Companion pack, or it is damaged'),
         findsOneWidget,
       );
       expect(find.byType(AlertDialog), findsNothing);
     });
 
-    testWidgets('a pack from a newer Salala is refused', (tester) async {
+    testWidgets('a pack from a newer Companion is refused', (tester) async {
       files.pickedText = packJson(
         animals: <Map<String, Object?>>[animalRow('a-1', 'Kenza')],
         formatVersion: 99,
       );
-      await pumpSalala(
+      await pumpApp(
         tester,
         packFiles: files,
         seed: <Animal>[animal('Atlas')],
@@ -507,7 +507,7 @@ void main() {
       await tapTile(tester, 'Restore from a pack');
 
       expect(
-        find.text('That pack comes from a newer Salala than this one'),
+        find.text('That pack comes from a newer Companion than this one'),
         findsOneWidget,
       );
       expect(find.byType(AlertDialog), findsNothing);
@@ -519,7 +519,7 @@ void main() {
       ) as Map<String, Object?>;
       (broken['rows']! as Map<String, Object?>).remove('vaccinations');
       files.pickedText = jsonEncode(broken);
-      await pumpSalala(
+      await pumpApp(
         tester,
         packFiles: files,
         seed: <Animal>[animal('Atlas')],
@@ -537,7 +537,7 @@ void main() {
 
     testWidgets('backing out of the picker says nothing', (tester) async {
       files.pickedText = null;
-      await pumpSalala(
+      await pumpApp(
         tester,
         packFiles: files,
         seed: <Animal>[animal('Atlas')],
@@ -554,7 +554,7 @@ void main() {
 
     testWidgets('a file the phone will not open says so', (tester) async {
       files.pickFailure = StateError('permission denied');
-      await pumpSalala(
+      await pumpApp(
         tester,
         packFiles: files,
         seed: <Animal>[animal('Atlas')],
@@ -572,7 +572,7 @@ void main() {
       files.pickedText = packJson(
         animals: <Map<String, Object?>>[animalRow('a-1', 'Kenza')],
       );
-      await pumpSalala(
+      await pumpApp(
         tester,
         packFiles: files,
         seed: <Animal>[animal('Atlas')],
@@ -606,7 +606,7 @@ void main() {
 
   group('the app lock', () {
     testWidgets('a phone that refuses the PIN says so', (tester) async {
-      final storage = await pumpSalala(tester, seed: <Animal>[animal('Atlas')]);
+      final storage = await pumpApp(tester, seed: <Animal>[animal('Atlas')]);
       await goTo(tester, 'Settings');
 
       // Refused on the second write, which is the interesting half: the salt is
@@ -645,7 +645,7 @@ void main() {
     testWidgets('a language the phone stored changes the whole app', (
       tester,
     ) async {
-      await pumpSalala(tester, seed: <Animal>[animal('Atlas')]);
+      await pumpApp(tester, seed: <Animal>[animal('Atlas')]);
       await goTo(tester, 'Settings');
 
       await tapTile(tester, 'Language');
@@ -662,7 +662,7 @@ void main() {
     testWidgets('a language the phone will not store is not shown as chosen', (
       tester,
     ) async {
-      await pumpSalala(
+      await pumpApp(
         tester,
         seed: <Animal>[animal('Atlas')],
         beforeLaunch: refuseWritesTo('user_settings'),
@@ -688,7 +688,7 @@ void main() {
       // whatever `supportedLocales` holds has to be reachable from this row.
       // Counted rather than named, so adding a language does not mean editing
       // this test — which is the whole point of the menu reading the delegate.
-      await pumpSalala(tester, seed: <Animal>[animal('Atlas')]);
+      await pumpApp(tester, seed: <Animal>[animal('Atlas')]);
       await goTo(tester, 'Settings');
       await tapTile(tester, 'Language');
 
@@ -715,7 +715,7 @@ void main() {
     ) async {
       // Picking German rather than Arabic on purpose: the three original
       // languages would pass this test even if the menu were still hardcoded.
-      await pumpSalala(tester, seed: <Animal>[animal('Atlas')]);
+      await pumpApp(tester, seed: <Animal>[animal('Atlas')]);
       await goTo(tester, 'Settings');
 
       await tapTile(tester, 'Language');
@@ -746,7 +746,7 @@ void main() {
           },
         ],
       );
-      await pumpSalala(
+      await pumpApp(
         tester,
         packFiles: files,
         seed: <Animal>[animal('Atlas')],
@@ -785,7 +785,7 @@ void main() {
           },
         ],
       );
-      await pumpSalala(
+      await pumpApp(
         tester,
         packFiles: files,
         seed: <Animal>[animal('Atlas')],

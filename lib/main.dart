@@ -56,7 +56,7 @@ Future<void> _launch() async {
   //
   // The tap arrives before there is a router to send it to, so both paths go
   // through one provider: the cold-start payload is captured here, and a tap on
-  // a running app writes itself. `SalalaApp` opens whichever lands, once it can.
+  // a running app writes itself. `CompanionApp` opens whichever lands, once it can.
   final reminders = ReminderScheduler(PluginNotifications());
   final container = ProviderContainer(
     overrides: [
@@ -86,6 +86,6 @@ Future<void> _launch() async {
   container.read(hasPinProvider.notifier).set(hasPin);
 
   runApp(
-    UncontrolledProviderScope(container: container, child: const SalalaApp()),
+    UncontrolledProviderScope(container: container, child: const CompanionApp()),
   );
 }

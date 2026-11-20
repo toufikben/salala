@@ -2,14 +2,15 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:salala/data/models/animal.dart';
-import 'package:salala/presentation/screens/about_screen.dart';
-import 'package:salala/presentation/screens/help_screen.dart';
-import 'package:salala/presentation/screens/onboarding_screen.dart';
-import 'package:salala/presentation/screens/privacy_screen.dart';
-import 'package:salala/presentation/screens/settings_screen.dart';
-import 'package:salala/presentation/screens/terms_screen.dart';
-import 'package:salala/presentation/screens/whats_new_screen.dart';
+import 'package:companion/core/contact.dart';
+import 'package:companion/data/models/animal.dart';
+import 'package:companion/presentation/screens/about_screen.dart';
+import 'package:companion/presentation/screens/help_screen.dart';
+import 'package:companion/presentation/screens/onboarding_screen.dart';
+import 'package:companion/presentation/screens/privacy_screen.dart';
+import 'package:companion/presentation/screens/settings_screen.dart';
+import 'package:companion/presentation/screens/terms_screen.dart';
+import 'package:companion/presentation/screens/whats_new_screen.dart';
 
 import '../helpers/fake_review_service.dart';
 import '../helpers/pump_app.dart';
@@ -58,7 +59,7 @@ void main() {
     testWidgets('About names the version and offers the licences', (
       tester,
     ) async {
-      await pumpSalala(tester, seed: <Animal>[animal('Atlas')]);
+      await pumpApp(tester, seed: <Animal>[animal('Atlas')]);
       await openSetting(tester, 'About');
 
       expect(find.byType(AboutScreen), findsOneWidget);
@@ -71,7 +72,7 @@ void main() {
     testWidgets('About lists the licences when the row is tapped', (
       tester,
     ) async {
-      await pumpSalala(tester, seed: <Animal>[animal('Atlas')]);
+      await pumpApp(tester, seed: <Animal>[animal('Atlas')]);
       await openSetting(tester, 'About');
 
       await tester.tap(find.text('Open-source licences'));
@@ -84,7 +85,7 @@ void main() {
     testWidgets('Privacy says what leaves the phone and what is collected', (
       tester,
     ) async {
-      await pumpSalala(tester, seed: <Animal>[animal('Atlas')]);
+      await pumpApp(tester, seed: <Animal>[animal('Atlas')]);
       await openSetting(tester, 'Privacy');
 
       expect(find.byType(PrivacyScreen), findsOneWidget);
@@ -96,7 +97,7 @@ void main() {
     });
 
     testWidgets('Terms refuses to be veterinary advice', (tester) async {
-      await pumpSalala(tester, seed: <Animal>[animal('Atlas')]);
+      await pumpApp(tester, seed: <Animal>[animal('Atlas')]);
       await openSetting(tester, 'Terms of use');
 
       expect(find.byType(TermsScreen), findsOneWidget);
@@ -106,7 +107,7 @@ void main() {
     });
 
     testWidgets('Help answers the questions that lose data', (tester) async {
-      await pumpSalala(tester, seed: <Animal>[animal('Atlas')]);
+      await pumpApp(tester, seed: <Animal>[animal('Atlas')]);
       await openSetting(tester, 'Help');
 
       expect(find.byType(HelpScreen), findsOneWidget);
@@ -121,10 +122,10 @@ void main() {
     });
 
     testWidgets('Help shows the address to write to', (tester) async {
-      await pumpSalala(tester, seed: <Animal>[animal('Atlas')]);
+      await pumpApp(tester, seed: <Animal>[animal('Atlas')]);
       await openSetting(tester, 'Help');
 
-      final address = find.text('support@salala.app');
+      final address = find.text(AppContact.supportEmail);
       await tester.scrollUntilVisible(
         address,
         180,
@@ -143,7 +144,7 @@ void main() {
     testWidgets('What\'s new lists the release and its version', (
       tester,
     ) async {
-      await pumpSalala(tester, seed: <Animal>[animal('Atlas')]);
+      await pumpApp(tester, seed: <Animal>[animal('Atlas')]);
       await openSetting(tester, "What's new");
 
       expect(find.byType(WhatsNewScreen), findsOneWidget);
@@ -154,7 +155,7 @@ void main() {
     testWidgets('back from a page returns to Settings, not to the herd', (
       tester,
     ) async {
-      await pumpSalala(tester, seed: <Animal>[animal('Atlas')]);
+      await pumpApp(tester, seed: <Animal>[animal('Atlas')]);
       await openSetting(tester, 'Privacy');
 
       await tester.pageBack();
@@ -170,7 +171,7 @@ void main() {
     testWidgets('a fresh install meets the slides before the herd', (
       tester,
     ) async {
-      await pumpSalala(tester, onboardingSeen: false);
+      await pumpApp(tester, onboardingSeen: false);
 
       expect(find.byType(OnboardingScreen), findsOneWidget);
       expect(find.text('One record per animal'), findsOneWidget);
@@ -180,7 +181,7 @@ void main() {
     testWidgets('the three slides walk to the herd and stay gone', (
       tester,
     ) async {
-      await pumpSalala(tester, onboardingSeen: false);
+      await pumpApp(tester, onboardingSeen: false);
 
       await tester.tap(find.text('Next'));
       await tester.pumpAndSettle();
@@ -201,7 +202,7 @@ void main() {
     testWidgets('skipping marks it seen rather than leaving a loop', (
       tester,
     ) async {
-      await pumpSalala(tester, onboardingSeen: false);
+      await pumpApp(tester, onboardingSeen: false);
 
       await tester.tap(find.text('Skip'));
       await settleRealIo(tester);
@@ -213,7 +214,7 @@ void main() {
     testWidgets('Settings reopens the slides and returns here afterwards', (
       tester,
     ) async {
-      await pumpSalala(tester, seed: <Animal>[animal('Atlas')]);
+      await pumpApp(tester, seed: <Animal>[animal('Atlas')]);
       await openSetting(tester, 'Show the introduction again');
 
       expect(find.byType(OnboardingScreen), findsOneWidget);
@@ -231,8 +232,8 @@ void main() {
   group('the rating row', () {
     testWidgets('asks the store for its card', (tester) async {
       final review = FakeReviewService();
-      await pumpSalala(tester, seed: <Animal>[animal('Atlas')], review: review);
-      await openSetting(tester, 'Rate Salala');
+      await pumpApp(tester, seed: <Animal>[animal('Atlas')], review: review);
+      await openSetting(tester, 'Rate Companion');
 
       expect(review.requests, 1);
       // A card that was shown needs no sentence: the store's own dialog is on
@@ -247,8 +248,8 @@ void main() {
       // That is still what the breeder asked for, so silence is the right answer
       // — an apology here would read as a failure that did not happen.
       final review = FakeReviewService(cards: false);
-      await pumpSalala(tester, seed: <Animal>[animal('Atlas')], review: review);
-      await openSetting(tester, 'Rate Salala');
+      await pumpApp(tester, seed: <Animal>[animal('Atlas')], review: review);
+      await openSetting(tester, 'Rate Companion');
 
       expect(review.requests, 1);
       expect(find.byType(SnackBar), findsNothing);
@@ -257,8 +258,8 @@ void main() {
     testWidgets('a phone that refuses the request says so', (tester) async {
       final review = FakeReviewService()
         ..failure = UnsupportedError('no store on this phone');
-      await pumpSalala(tester, seed: <Animal>[animal('Atlas')], review: review);
-      await openSetting(tester, 'Rate Salala');
+      await pumpApp(tester, seed: <Animal>[animal('Atlas')], review: review);
+      await openSetting(tester, 'Rate Companion');
 
       expect(
         find.text('This phone cannot show the review card right now.'),
@@ -275,11 +276,11 @@ void main() {
       // second tap arrives after the row has already gone idle — and the test
       // would be asserting on a race that never happens on a real phone.
       final review = FakeReviewService()..gate = Completer<void>();
-      await pumpSalala(tester, seed: <Animal>[animal('Atlas')], review: review);
+      await pumpApp(tester, seed: <Animal>[animal('Atlas')], review: review);
       await tester.tap(find.widgetWithText(NavigationDestination, 'Settings'));
       await settleRealIo(tester);
 
-      final row = find.text('Rate Salala');
+      final row = find.text('Rate Companion');
       await tester.scrollUntilVisible(
         row,
         180,

@@ -40,9 +40,9 @@ class StoreReviewService extends ReviewService {
       await review.openStoreListing(
         // Empty on Android, which reads the package off the manifest instead;
         // Apple's platforms require it and iOS is deferred until then.
-        appStoreId: SalalaContact.appStoreId.isEmpty
+        appStoreId: AppContact.appStoreId.isEmpty
             ? null
-            : SalalaContact.appStoreId,
+            : AppContact.appStoreId,
       );
       return false;
     } catch (error) {

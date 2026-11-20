@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:salala/core/utils/heat_cycle.dart';
-import 'package:salala/data/models/animal.dart';
-import 'package:salala/data/models/litter.dart';
+import 'package:companion/core/utils/heat_cycle.dart';
+import 'package:companion/data/models/animal.dart';
+import 'package:companion/data/models/litter.dart';
 
 /// A day, as the app stores days: local midnight in unix milliseconds.
 int day(int year, int month, int dayOfMonth) =>

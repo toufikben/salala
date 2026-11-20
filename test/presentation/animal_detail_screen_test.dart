@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:salala/data/models/animal.dart';
-import 'package:salala/data/models/health_test.dart';
-import 'package:salala/data/models/vaccination.dart';
-import 'package:salala/data/models/vet_visit.dart';
-import 'package:salala/core/utils/date_utils.dart';
-import 'package:salala/core/utils/reminders.dart';
-import 'package:salala/data/models/weight_entry.dart';
-import 'package:salala/presentation/screens/animal_detail_screen.dart';
-import 'package:salala/presentation/screens/health_test_form_screen.dart';
-import 'package:salala/presentation/screens/vaccination_form_screen.dart';
-import 'package:salala/presentation/screens/vet_visit_form_screen.dart';
-import 'package:salala/presentation/screens/weight_form_screen.dart';
-import 'package:salala/presentation/widgets/animal_card.dart';
+import 'package:companion/data/models/animal.dart';
+import 'package:companion/data/models/health_test.dart';
+import 'package:companion/data/models/vaccination.dart';
+import 'package:companion/data/models/vet_visit.dart';
+import 'package:companion/core/utils/date_utils.dart';
+import 'package:companion/core/utils/reminders.dart';
+import 'package:companion/data/models/weight_entry.dart';
+import 'package:companion/presentation/screens/animal_detail_screen.dart';
+import 'package:companion/presentation/screens/health_test_form_screen.dart';
+import 'package:companion/presentation/screens/vaccination_form_screen.dart';
+import 'package:companion/presentation/screens/vet_visit_form_screen.dart';
+import 'package:companion/presentation/screens/weight_form_screen.dart';
+import 'package:companion/presentation/widgets/animal_card.dart';
 
 import '../helpers/fake_notification_writer.dart';
 import '../helpers/pump_app.dart';
@@ -153,7 +153,7 @@ void main() {
 
   testWidgets('an animal card opens its ledger', (tester) async {
     _usePhoneViewport(tester);
-    await pumpSalala(tester, seed: <Animal>[_nala()]);
+    await pumpApp(tester, seed: <Animal>[_nala()]);
     await _openNala(tester);
 
     // The page opens on the animal rather than on a list of fields: species,
@@ -186,7 +186,7 @@ void main() {
     tester,
   ) async {
     _usePhoneViewport(tester);
-    await pumpSalala(tester, seed: <Animal>[_nala()]);
+    await pumpApp(tester, seed: <Animal>[_nala()]);
     await _openNala(tester);
 
     // The identity card is the page's first item, so the sentence is on screen
@@ -202,7 +202,7 @@ void main() {
     tester,
   ) async {
     _usePhoneViewport(tester);
-    await pumpSalala(
+    await pumpApp(
       tester,
       seed: <Animal>[
         Animal(
@@ -233,7 +233,7 @@ void main() {
   ) async {
     _usePhoneViewport(tester);
     final notifications = FakeNotificationWriter();
-    await pumpSalala(
+    await pumpApp(
       tester,
       notifications: notifications,
       seed: <Animal>[_nala()],
@@ -269,7 +269,7 @@ void main() {
     // itself is still to come.
     final due = _daysAhead(20);
     final dueDay = dayFromMs(due)!;
-    await pumpSalala(
+    await pumpApp(
       tester,
       notifications: notifications,
       seed: <Animal>[_nala()],
@@ -303,7 +303,7 @@ void main() {
   ) async {
     _usePhoneViewport(tester);
     final notifications = FakeNotificationWriter();
-    await pumpSalala(
+    await pumpApp(
       tester,
       notifications: notifications,
       seed: <Animal>[_nala()],
@@ -333,7 +333,7 @@ void main() {
   ) async {
     _usePhoneViewport(tester);
     final notifications = FakeNotificationWriter();
-    await pumpSalala(
+    await pumpApp(
       tester,
       notifications: notifications,
       seed: <Animal>[_nala(status: AnimalStatus.sold)],
@@ -370,7 +370,7 @@ void main() {
   ) async {
     _usePhoneViewport(tester);
     final notifications = FakeNotificationWriter();
-    await pumpSalala(
+    await pumpApp(
       tester,
       notifications: notifications,
       seed: <Animal>[_nala()],
@@ -415,7 +415,7 @@ void main() {
     _usePhoneViewport(tester);
     final notifications = FakeNotificationWriter()
       ..writeFailure = StateError('the notifier channel is closed');
-    await pumpSalala(
+    await pumpApp(
       tester,
       notifications: notifications,
       seed: <Animal>[_nala()],
@@ -457,7 +457,7 @@ void main() {
     _usePhoneViewport(tester);
     final notifications = FakeNotificationWriter()
       ..clearFailure = StateError('the notifier channel is closed');
-    await pumpSalala(
+    await pumpApp(
       tester,
       notifications: notifications,
       seed: <Animal>[_nala()],
@@ -498,7 +498,7 @@ void main() {
 
   testWidgets('a dose whose due date passed is badged overdue', (tester) async {
     _usePhoneViewport(tester);
-    await pumpSalala(
+    await pumpApp(
       tester,
       seed: <Animal>[_nala()],
       seedVaccinations: <Vaccination>[
@@ -527,7 +527,7 @@ void main() {
 
   testWidgets('a dose is correctable from its own row', (tester) async {
     _usePhoneViewport(tester);
-    await pumpSalala(
+    await pumpApp(
       tester,
       seed: <Animal>[_nala()],
       seedVaccinations: <Vaccination>[
@@ -552,7 +552,7 @@ void main() {
     tester,
   ) async {
     _usePhoneViewport(tester);
-    await pumpSalala(tester, seed: <Animal>[_nala()]);
+    await pumpApp(tester, seed: <Animal>[_nala()]);
     await _openNala(tester);
 
     // The symptoms section sits above the weights one, so the weights button is
@@ -587,7 +587,7 @@ void main() {
     tester,
   ) async {
     _usePhoneViewport(tester);
-    await pumpSalala(
+    await pumpApp(
       tester,
       seed: <Animal>[_nala()],
       seedWeights: <WeightEntry>[_weigh(300, 9), _weigh(4200, 2)],
@@ -607,7 +607,7 @@ void main() {
     tester,
   ) async {
     _usePhoneViewport(tester);
-    await pumpSalala(
+    await pumpApp(
       tester,
       seed: <Animal>[_nala()],
       seedWeights: <WeightEntry>[_weigh(300, 9), _weigh(4200, 2)],
@@ -639,7 +639,7 @@ void main() {
     tester,
   ) async {
     _usePhoneViewport(tester);
-    await pumpSalala(
+    await pumpApp(
       tester,
       seed: <Animal>[_nala()],
       seedHealthTests: <HealthTest>[
@@ -661,7 +661,7 @@ void main() {
 
   testWidgets('logging a screening writes the row', (tester) async {
     _usePhoneViewport(tester);
-    await pumpSalala(tester, seed: <Animal>[_nala()]);
+    await pumpApp(tester, seed: <Animal>[_nala()]);
     await _openNala(tester);
     await _scrollTo(tester, sectionText('Health tests'));
 
@@ -684,7 +684,7 @@ void main() {
 
   testWidgets('a screening without a result is refused', (tester) async {
     _usePhoneViewport(tester);
-    await pumpSalala(tester, seed: <Animal>[_nala()]);
+    await pumpApp(tester, seed: <Animal>[_nala()]);
     await _openNala(tester);
     await _scrollTo(tester, sectionText('Health tests'));
 
@@ -716,7 +716,7 @@ void main() {
 
   testWidgets('a screening is correctable from its own row', (tester) async {
     _usePhoneViewport(tester);
-    await pumpSalala(
+    await pumpApp(
       tester,
       seed: <Animal>[_nala()],
       seedHealthTests: <HealthTest>[
@@ -742,7 +742,7 @@ void main() {
     tester,
   ) async {
     _usePhoneViewport(tester);
-    await pumpSalala(
+    await pumpApp(
       tester,
       seed: <Animal>[_nala()],
       seedHealthTests: <HealthTest>[
@@ -776,7 +776,7 @@ void main() {
   ) async {
     _usePhoneViewport(tester);
     final notifications = FakeNotificationWriter();
-    await pumpSalala(
+    await pumpApp(
       tester,
       notifications: notifications,
       seed: <Animal>[_nala()],
@@ -815,7 +815,7 @@ void main() {
   ) async {
     _usePhoneViewport(tester);
     final notifications = FakeNotificationWriter();
-    await pumpSalala(
+    await pumpApp(
       tester,
       notifications: notifications,
       seed: <Animal>[_nala(status: AnimalStatus.sold)],
@@ -844,7 +844,7 @@ void main() {
     tester,
   ) async {
     _usePhoneViewport(tester);
-    await pumpSalala(tester, seed: <Animal>[_nala()]);
+    await pumpApp(tester, seed: <Animal>[_nala()]);
     await _openNala(tester);
     await _scrollTo(tester, sectionText('Vet visits'));
 
@@ -885,7 +885,7 @@ void main() {
     tester,
   ) async {
     _usePhoneViewport(tester);
-    await pumpSalala(
+    await pumpApp(
       tester,
       seed: <Animal>[_nala()],
       seedVisits: <VetVisit>[
@@ -907,7 +907,7 @@ void main() {
 
   testWidgets('the ledger keeps its section order in Arabic', (tester) async {
     _usePhoneViewport(tester);
-    await pumpSalala(
+    await pumpApp(
       tester,
       locale: const Locale('ar'),
       seed: <Animal>[_nala()],
@@ -943,7 +943,7 @@ void main() {
     (tester) async {
       _usePhoneViewport(tester);
       final notifications = FakeNotificationWriter();
-      await pumpSalala(
+      await pumpApp(
         tester,
         notifications: notifications,
         seed: <Animal>[_nala()],
@@ -978,7 +978,7 @@ void main() {
     (tester) async {
       _usePhoneViewport(tester);
       final notifications = FakeNotificationWriter();
-      await pumpSalala(
+      await pumpApp(
         tester,
         notifications: notifications,
         resyncOnLaunch: true,
@@ -1030,7 +1030,7 @@ void main() {
       'touched', (tester) async {
     _usePhoneViewport(tester);
     final notifications = FakeNotificationWriter();
-    await pumpSalala(
+    await pumpApp(
       tester,
       notifications: notifications,
       seed: <Animal>[_nala()],
@@ -1069,7 +1069,7 @@ void main() {
       'what answers', (tester) async {
     _usePhoneViewport(tester);
     final notifications = FakeNotificationWriter();
-    await pumpSalala(
+    await pumpApp(
       tester,
       notifications: notifications,
       seed: <Animal>[_nala()],
@@ -1107,7 +1107,7 @@ void main() {
     (tester) async {
       _usePhoneViewport(tester);
       final notifications = FakeNotificationWriter();
-      await pumpSalala(
+      await pumpApp(
         tester,
         notifications: notifications,
         seed: <Animal>[_nala()],
@@ -1142,7 +1142,7 @@ void main() {
     'a visit the database refuses keeps the form open and the button live',
     (tester) async {
       _usePhoneViewport(tester);
-      await pumpSalala(
+      await pumpApp(
         tester,
         seed: <Animal>[_nala()],
         beforeLaunch: refuseWritesTo('vet_visits'),
@@ -1171,7 +1171,7 @@ void main() {
     'a weigh-in the database refuses keeps the form open and the button live',
     (tester) async {
       _usePhoneViewport(tester);
-      await pumpSalala(
+      await pumpApp(
         tester,
         seed: <Animal>[_nala()],
         beforeLaunch: refuseWritesTo('weight_entries'),
@@ -1212,7 +1212,7 @@ void main() {
     'on a day after the birth does reach the ledger',
     (tester) async {
       _usePhoneViewport(tester);
-      await pumpSalala(
+      await pumpApp(
         tester,
         seed: <Animal>[_nala().copyWith(birthDate: _daysAgo(400))],
         beforeLaunch: refuseWritesTo('weight_entries'),
@@ -1266,7 +1266,7 @@ void main() {
     'same edit with a legal day does reach the ledger',
     (tester) async {
       _usePhoneViewport(tester);
-      await pumpSalala(
+      await pumpApp(
         tester,
         seed: <Animal>[_nala().copyWith(birthDate: _daysAgo(1000))],
         seedVaccinations: <Vaccination>[
@@ -1313,7 +1313,7 @@ void main() {
   testWidgets('a screening dated before the animal was born is refused on the edit, and a '
       'legal day on the same screening is SQLite\'s to refuse', (tester) async {
     _usePhoneViewport(tester);
-    await pumpSalala(
+    await pumpApp(
       tester,
       seed: <Animal>[_nala().copyWith(birthDate: _daysAgo(1000))],
       seedHealthTests: <HealthTest>[
@@ -1355,7 +1355,7 @@ void main() {
     'the edit, and a live expiry on the same row is SQLite\'s to refuse',
     (tester) async {
       _usePhoneViewport(tester);
-      await pumpSalala(
+      await pumpApp(
         tester,
         seed: <Animal>[_nala().copyWith(birthDate: _daysAgo(1000))],
         seedHealthTests: <HealthTest>[
@@ -1414,7 +1414,7 @@ void main() {
     'legal day on the same visit is SQLite\'s to refuse',
     (tester) async {
       _usePhoneViewport(tester);
-      await pumpSalala(
+      await pumpApp(
         tester,
         seed: <Animal>[_nala().copyWith(birthDate: _daysAgo(1000))],
         seedVisits: <VetVisit>[

@@ -48,7 +48,7 @@ class SystemPackFiles extends PackFiles {
     // '.../cache/share_plus'". Any other folder works: the plugin copies the
     // file into its own and publishes that copy through its FileProvider.
     final cache = await getApplicationCacheDirectory();
-    final folder = Directory(p.join(cache.path, 'salala_out'));
+    final folder = Directory(p.join(cache.path, 'companion_out'));
     await folder.create(recursive: true);
     final file = File(p.join(folder.path, name));
     await file.writeAsBytes(bytes, flush: true);
@@ -76,14 +76,14 @@ String fileStamp(DateTime at) {
   return '${at.year}${two(at.month)}${two(at.day)}-${two(at.hour)}${two(at.minute)}';
 }
 
-/// `salala-pack-20261005-2041.zip`: the ledger and its pictures.
+/// `companion-pack-20261005-2041.zip`: the ledger and its pictures.
 ///
 /// `.zip` rather than `.json` because the file is a container now. A breeder who
 /// renames it can still restore it — the reader sniffs the bytes — but the name
 /// is what mail apps and file managers use to offer the right thing.
-String packFileName(DateTime now) => 'salala-pack-${fileStamp(now)}.zip';
+String packFileName(DateTime now) => 'companion-pack-${fileStamp(now)}.zip';
 
-/// `salala-herd-20261005-2041.csv`, and the three siblings below.
+/// `companion-herd-20261005-2041.csv`, and the three siblings below.
 ///
 /// Slugged to plain ASCII for the same reason the PDF is: the name is what lands
 /// in a Downloads folder and inside a mail attachment list, and a CSV whose name
@@ -91,9 +91,9 @@ String packFileName(DateTime now) => 'salala-pack-${fileStamp(now)}.zip';
 /// The table's own name goes in the file, not a translated word, so one export
 /// from an Arabic phone and one from a French phone compare row for row.
 String csvFileName(String table, DateTime now) =>
-    'salala-$table-${fileStamp(now)}.csv';
+    'companion-$table-${fileStamp(now)}.csv';
 
-/// `salala-nala-20261005-2041.pdf`, named for the animal it describes.
+/// `companion-nala-20261005-2041.pdf`, named for the animal it describes.
 ///
 /// The name is slugged to plain ASCII because this string is what lands in a
 /// buyer's Downloads folder: an animal called `نالة / 2026` would otherwise
@@ -105,6 +105,6 @@ String pdfFileName(String animalName, DateTime now) {
       .replaceAll(RegExp('^-+|-+\$'), '')
       .toLowerCase();
   return slug.isEmpty
-      ? 'salala-${fileStamp(now)}.pdf'
-      : 'salala-$slug-${fileStamp(now)}.pdf';
+      ? 'companion-${fileStamp(now)}.pdf'
+      : 'companion-$slug-${fileStamp(now)}.pdf';
 }

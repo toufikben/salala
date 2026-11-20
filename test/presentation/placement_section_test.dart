@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:salala/core/utils/date_utils.dart';
-import 'package:salala/data/models/animal.dart';
-import 'package:salala/data/models/buyer.dart';
-import 'package:salala/data/models/placement.dart';
-import 'package:salala/presentation/screens/animal_detail_screen.dart';
-import 'package:salala/presentation/widgets/placement_dialog.dart';
+import 'package:companion/core/utils/date_utils.dart';
+import 'package:companion/data/models/animal.dart';
+import 'package:companion/data/models/buyer.dart';
+import 'package:companion/data/models/placement.dart';
+import 'package:companion/presentation/screens/animal_detail_screen.dart';
+import 'package:companion/presentation/widgets/placement_dialog.dart';
 
 import '../helpers/fake_contract_files.dart';
 import '../helpers/pump_app.dart';
@@ -246,7 +246,7 @@ void main() {
     // The case the paid export was always shipping empty: an animal with a full
     // health record and no placement prints no buyer block at all.
     _usePhoneViewport(tester);
-    await pumpSalala(tester, seed: <Animal>[_animal(_nalaId, 'Nala')]);
+    await pumpApp(tester, seed: <Animal>[_animal(_nalaId, 'Nala')]);
     await _openAnimal(tester, 'Nala');
     await _scrollTo(tester, sectionText('Placements'));
 
@@ -268,7 +268,7 @@ void main() {
     'a placement written through the form appears and survives reopening',
     (tester) async {
       _usePhoneViewport(tester);
-      await pumpSalala(tester, seed: <Animal>[_animal(_nalaId, 'Nala')]);
+      await pumpApp(tester, seed: <Animal>[_animal(_nalaId, 'Nala')]);
       await _openAnimal(tester, 'Nala');
       await _scrollTo(tester, sectionText('Placements'));
 
@@ -323,7 +323,7 @@ void main() {
     tester,
   ) async {
     _usePhoneViewport(tester);
-    await pumpSalala(
+    await pumpApp(
       tester,
       seed: <Animal>[_animal(_nalaId, 'Nala'), _animal(_atlasId, 'Atlas')],
     );
@@ -360,7 +360,7 @@ void main() {
 
   testWidgets('tapping a row edits it and the row changes', (tester) async {
     _usePhoneViewport(tester);
-    await pumpSalala(
+    await pumpApp(
       tester,
       seed: <Animal>[_animal(_nalaId, 'Nala')],
       seedBuyers: <Buyer>[_aicha()],
@@ -419,7 +419,7 @@ void main() {
     // state, and the delete that takes the whole history with it is the failure
     // this checks for.
     _usePhoneViewport(tester);
-    await pumpSalala(
+    await pumpApp(
       tester,
       seed: <Animal>[_animal(_nalaId, 'Nala')],
       seedBuyers: <Buyer>[_aicha()],
@@ -466,7 +466,7 @@ void main() {
     // D21, for the one row a buyer reads off the document: an amount typed 2500
     // has to arrive as 2500 in Arabic too, next to Arabic words.
     _usePhoneViewport(tester);
-    await pumpSalala(
+    await pumpApp(
       tester,
       locale: const Locale('ar'),
       seed: <Animal>[_animal(_nalaId, 'نلة')],
@@ -500,7 +500,7 @@ void main() {
     'a handover the database refuses keeps the dialog open and the button live',
     (tester) async {
       _usePhoneViewport(tester);
-      await pumpSalala(
+      await pumpApp(
         tester,
         seed: <Animal>[_animal(_nalaId, 'Nala')],
         beforeLaunch: refuseWritesTo('placements'),
@@ -530,7 +530,7 @@ void main() {
     'a contact the database refuses leaves both dialogs holding their words',
     (tester) async {
       _usePhoneViewport(tester);
-      await pumpSalala(
+      await pumpApp(
         tester,
         seed: <Animal>[_animal(_nalaId, 'Nala')],
         beforeLaunch: refuseWritesTo('buyers'),
@@ -570,7 +570,7 @@ void main() {
     // Both dates come off the run's own today: a handover can be booked a year
     // ahead and reached fifteen years back, so the only pair that stays legal
     // on a runner in another year is a relative one.
-    await pumpSalala(
+    await pumpApp(
       tester,
       seed: <Animal>[
         _animal(_nalaId, 'Nala').copyWith(birthDate: _daysAgo(400)),
@@ -632,7 +632,7 @@ void main() {
     // the delete with no buyer named — `placements.buyer_id ... ON DELETE SET
     // NULL`, which the transfer pack then prints as its own sentence.
     _usePhoneViewport(tester);
-    await pumpSalala(
+    await pumpApp(
       tester,
       seed: <Animal>[_animal(_nalaId, 'Nala')],
       seedBuyers: <Buyer>[_aicha()],
@@ -704,7 +704,7 @@ void main() {
       // handover that cannot be saved, answered with "try again" over a name that is
       // already gone, is a dead end nobody could dig themselves out of.
       _usePhoneViewport(tester);
-      await pumpSalala(tester, seed: <Animal>[_animal(_nalaId, 'Nala')]);
+      await pumpApp(tester, seed: <Animal>[_animal(_nalaId, 'Nala')]);
       await _openAnimal(tester, 'Nala');
       await _scrollTo(tester, sectionText('Placements'));
 
@@ -754,7 +754,7 @@ void main() {
     'a contact the database refuses to delete is still offered and still named',
     (tester) async {
       _usePhoneViewport(tester);
-      await pumpSalala(
+      await pumpApp(
         tester,
         seed: <Animal>[_animal(_nalaId, 'Nala')],
         seedBuyers: <Buyer>[_aicha()],
@@ -815,7 +815,7 @@ void main() {
 
   testWidgets('cancelling the confirmation deletes nobody', (tester) async {
     _usePhoneViewport(tester);
-    await pumpSalala(
+    await pumpApp(
       tester,
       seed: <Animal>[_animal(_nalaId, 'Nala')],
       seedBuyers: <Buyer>[_aicha()],
@@ -847,7 +847,7 @@ void main() {
     // button on a new contact would ask the database to delete an id that does
     // not exist.
     _usePhoneViewport(tester);
-    await pumpSalala(tester, seed: <Animal>[_animal(_nalaId, 'Nala')]);
+    await pumpApp(tester, seed: <Animal>[_animal(_nalaId, 'Nala')]);
     await _openAnimal(tester, 'Nala');
     await _scrollTo(tester, sectionText('Placements'));
 
@@ -873,7 +873,7 @@ void main() {
         _usePhoneViewport(tester);
         final contracts = FakeContractFiles()
           ..nextPicked = FakeContractFiles.contract('signed.pdf', bytes: 64);
-        await pumpSalala(
+        await pumpApp(
           tester,
           seed: <Animal>[_animal(_nalaId, 'Nala')],
           contractFiles: contracts,
@@ -908,7 +908,7 @@ void main() {
         // The state a restored ledger is in: the row travelled, the file did not.
         _usePhoneViewport(tester);
         final contracts = FakeContractFiles();
-        await pumpSalala(
+        await pumpApp(
           tester,
           seed: <Animal>[_animal(_nalaId, 'Nala')],
           seedPlacements: <Placement>[
@@ -943,7 +943,7 @@ void main() {
           '$_nalaId/old.pdf-8': <int>[1, 2, 3],
         },
       );
-      await pumpSalala(
+      await pumpApp(
         tester,
         seed: <Animal>[_animal(_nalaId, 'Nala')],
         seedPlacements: <Placement>[
@@ -979,7 +979,7 @@ void main() {
           '$_nalaId/old.pdf-8': <int>[1, 2, 3],
         },
       );
-      await pumpSalala(
+      await pumpApp(
         tester,
         seed: <Animal>[_animal(_nalaId, 'Nala')],
         seedPlacements: <Placement>[
@@ -1010,7 +1010,7 @@ void main() {
       _usePhoneViewport(tester);
       final contracts = FakeContractFiles()
         ..pickFailure = StateError('no picker');
-      await pumpSalala(
+      await pumpApp(
         tester,
         seed: <Animal>[_animal(_nalaId, 'Nala')],
         contractFiles: contracts,

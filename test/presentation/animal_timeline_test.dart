@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:salala/data/models/animal.dart';
-import 'package:salala/presentation/screens/animal_detail_screen.dart';
-import 'package:salala/data/models/health_test.dart';
-import 'package:salala/data/models/placement.dart';
-import 'package:salala/data/models/vaccination.dart';
-import 'package:salala/data/models/weight_entry.dart';
-import 'package:salala/presentation/widgets/animal_timeline_card.dart';
+import 'package:companion/data/models/animal.dart';
+import 'package:companion/presentation/screens/animal_detail_screen.dart';
+import 'package:companion/data/models/health_test.dart';
+import 'package:companion/data/models/placement.dart';
+import 'package:companion/data/models/vaccination.dart';
+import 'package:companion/data/models/weight_entry.dart';
+import 'package:companion/presentation/widgets/animal_timeline_card.dart';
 
 import '../helpers/pump_app.dart';
 
@@ -60,7 +60,7 @@ void main() {
     tester,
   ) async {
     _usePhoneViewport(tester);
-    await pumpSalala(
+    await pumpApp(
       tester,
       seed: <Animal>[_animal()],
       seedVaccinations: <Vaccination>[
@@ -115,7 +115,7 @@ void main() {
     tester,
   ) async {
     _usePhoneViewport(tester);
-    await pumpSalala(
+    await pumpApp(
       tester,
       seed: <Animal>[_animal()],
       seedVaccinations: <Vaccination>[
@@ -163,7 +163,7 @@ void main() {
     tester,
   ) async {
     _usePhoneViewport(tester);
-    await pumpSalala(
+    await pumpApp(
       tester,
       seed: <Animal>[_animal()],
       seedPlacements: <Placement>[
@@ -195,7 +195,7 @@ void main() {
 
   testWidgets('an animal with nothing dated says so', (tester) async {
     _usePhoneViewport(tester);
-    await pumpSalala(
+    await pumpApp(
       tester,
       seed: <Animal>[
         Animal(
@@ -219,7 +219,7 @@ void main() {
     (tester) async {
       _usePhoneViewport(tester);
       // Seven doses: more than the card shows before it offers the rest.
-      await pumpSalala(
+      await pumpApp(
         tester,
         seed: <Animal>[_animal()],
         seedVaccinations: <Vaccination>[
@@ -266,7 +266,7 @@ void main() {
 
   testWidgets('a dose opens the screen that owns it', (tester) async {
     _usePhoneViewport(tester);
-    await pumpSalala(
+    await pumpApp(
       tester,
       seed: <Animal>[_animal()],
       seedVaccinations: <Vaccination>[
@@ -297,7 +297,7 @@ void main() {
   testWidgets('the timeline speaks Arabic', (tester) async {
     _usePhoneViewport(tester);
     await initializeDateFormatting();
-    await pumpSalala(
+    await pumpApp(
       tester,
       locale: const Locale('ar'),
       seed: <Animal>[_animal()],

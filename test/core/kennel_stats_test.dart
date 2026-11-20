@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:salala/core/utils/kennel_stats.dart';
-import 'package:salala/data/models/animal.dart';
-import 'package:salala/data/models/litter.dart';
-import 'package:salala/data/models/placement.dart';
+import 'package:companion/core/utils/kennel_stats.dart';
+import 'package:companion/data/models/animal.dart';
+import 'package:companion/data/models/litter.dart';
+import 'package:companion/data/models/placement.dart';
 
 /// A calendar day, as the app stores one.
 int day(int year, int month, int dayOfMonth) =>

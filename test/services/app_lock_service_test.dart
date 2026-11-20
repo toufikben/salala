@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:salala/services/app_lock_service.dart';
+import 'package:companion/services/app_lock_service.dart';
 
 import '../helpers/fake_secure_storage.dart';
 

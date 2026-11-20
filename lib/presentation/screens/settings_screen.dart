@@ -20,7 +20,7 @@ import '../../services/trial.dart';
 import '../providers/agenda_providers.dart';
 import '../providers/app_providers.dart';
 import '../widgets/pin_dialogs.dart';
-import '../widgets/salala_nav_bar.dart';
+import '../widgets/companion_nav_bar.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -31,7 +31,7 @@ class SettingsScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.navSettings)),
-      bottomNavigationBar: const SalalaNavBar(index: 3),
+      bottomNavigationBar: const CompanionNavBar(index: 3),
       body: ListView(
         padding: const EdgeInsets.symmetric(vertical: 8),
         children: <Widget>[

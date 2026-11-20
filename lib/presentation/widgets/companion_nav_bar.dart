@@ -12,8 +12,8 @@ import '../../core/router/app_router.dart';
 ///
 /// The order is the order a breeder works in: the herd, the whelpings that
 /// produce it, the people it goes to, and the settings that hold all of it.
-class SalalaNavBar extends StatelessWidget {
-  const SalalaNavBar({super.key, required this.index});
+class CompanionNavBar extends StatelessWidget {
+  const CompanionNavBar({super.key, required this.index});
 
   final int index;
 

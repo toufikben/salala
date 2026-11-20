@@ -10,7 +10,7 @@ class AppLocalizationsNl extends AppLocalizations {
   AppLocalizationsNl([String locale = 'nl']) : super(locale);
 
   @override
-  String get appTitle => 'Salala';
+  String get appTitle => 'Companion';
 
   @override
   String get navAnimals => 'Dieren';
@@ -233,7 +233,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get actionReplace => 'Vervangen';
 
   @override
-  String get lockTitle => 'Salala is vergrendeld';
+  String get lockTitle => 'Companion is vergrendeld';
 
   @override
   String get lockEnterPin => 'Voer uw pincode in';
@@ -303,7 +303,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get startupFailedTitle =>
-      'Salala kon het stamboek op dit toestel niet openen.';
+      'Companion kon het stamboek op dit toestel niet openen.';
 
   @override
   String get startupFailedBody =>
@@ -415,11 +415,11 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get packNotAPack =>
-      'Dat bestand is geen Salala-pakket, of het is beschadigd';
+      'Dat bestand is geen Companion-pakket, of het is beschadigd';
 
   @override
   String get packFromTheFuture =>
-      'Dat pakket komt van een nieuwere Salala dan deze';
+      'Dat pakket komt van een nieuwere Companion dan deze';
 
   @override
   String packIncomplete(String table) {
@@ -428,12 +428,12 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String packUnknownTable(String table) {
-    return 'Dat pakket bevat een tabel die deze Salala niet kent: $table';
+    return 'Dat pakket bevat een tabel die deze Companion niet kent: $table';
   }
 
   @override
   String packBadValue(String detail) {
-    return 'Dat pakket bevat een waarde die deze Salala niet kan lezen: $detail';
+    return 'Dat pakket bevat een waarde die deze Companion niet kan lezen: $detail';
   }
 
   @override
@@ -1084,7 +1084,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get pdfDisclaimer =>
-      'Offline gemaakt door Salala uit de eigen gegevens van de fokker. Dit is geen diergeneeskundig certificaat.';
+      'Offline gemaakt door Companion uit de eigen gegevens van de fokker. Dit is geen diergeneeskundig certificaat.';
 
   @override
   String get triageTitle => 'Wat nu te doen';
@@ -1103,7 +1103,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get triageNotDiagnosis =>
-      'Salala leest alleen wat u hier hebt ingevoerd. Dit is geen diergeneeskundige diagnose.';
+      'Companion leest alleen wat u hier hebt ingevoerd. Dit is geen diergeneeskundige diagnose.';
 
   @override
   String triageNoDoseYoung(String days) {
@@ -1190,7 +1190,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get onboardingSlide2Body =>
-      'Inentingen met de volgende datum, wegingen, onderzoeken en bezoeken. Salala zet de herinnering voor je klaar.';
+      'Inentingen met de volgende datum, wegingen, onderzoeken en bezoeken. Companion zet de herinnering voor je klaar.';
 
   @override
   String get onboardingSlide3Title => 'Zijn verhaal reist mee';
@@ -1215,7 +1215,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get settingsHelp => 'Help';
 
   @override
-  String get settingsRate => 'Salala beoordelen';
+  String get settingsRate => 'Companion beoordelen';
 
   @override
   String get settingsRateBody => 'Opent de beoordelingskaart van de winkel.';
@@ -1237,7 +1237,7 @@ class AppLocalizationsNl extends AppLocalizations {
       'Deze telefoon kan de beoordelingskaart nu niet tonen.';
 
   @override
-  String get aboutTitle => 'Over Salala';
+  String get aboutTitle => 'Over Companion';
 
   @override
   String get aboutBody =>
@@ -1253,7 +1253,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get privacyIntro =>
-      'Salala bewaart één ding: wat je over je dieren hebt ingevuld. Deze pagina zegt waar het staat en wat het van deze telefoon kan halen.';
+      'Companion bewaart één ding: wat je over je dieren hebt ingevuld. Deze pagina zegt waar het staat en wat het van deze telefoon kan halen.';
 
   @override
   String get privacyStoredHeading => 'Wat er wordt bewaard';
@@ -1305,7 +1305,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get termsAdviceBody =>
-      'Salala herhaalt wat je hebt ingevuld en rekent met datums en gewichten. Het stelt geen diagnose, en een herinnering is een agenda-item, geen klinische mening. Bel een dierenarts.';
+      'Companion herhaalt wat je hebt ingevuld en rekent met datums en gewichten. Het stelt geen diagnose, en een herinnering is een agenda-item, geen klinische mening. Bel een dierenarts.';
 
   @override
   String get termsWarrantyHeading => 'Geen garantie';
@@ -1343,7 +1343,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get helpA4 =>
-      'Uit de volgende datums die je hebt ingevuld. Salala zet een alarm een maand vooruit en een op de ochtend zelf; staan meldingen uit, dan blijven de datums in de agenda van de groep.';
+      'Uit de volgende datums die je hebt ingevuld. Companion zet een alarm een maand vooruit en een op de ochtend zelf; staan meldingen uit, dan blijven de datums in de agenda van de groep.';
 
   @override
   String get helpQ5 =>

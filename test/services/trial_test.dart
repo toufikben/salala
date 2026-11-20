@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:salala/data/db/settings_dao.dart';
-import 'package:salala/services/trial.dart';
+import 'package:companion/data/db/settings_dao.dart';
+import 'package:companion/services/trial.dart';
 
 import '../helpers/test_db.dart';
 

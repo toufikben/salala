@@ -11,14 +11,14 @@ import 'presentation/providers/app_providers.dart';
 ///
 /// A PIN that is only asked for at launch is not a lock: a phone handed to a
 /// buyer stays unlocked until the process dies, which on Android can be days.
-class SalalaApp extends ConsumerStatefulWidget {
-  const SalalaApp({super.key});
+class CompanionApp extends ConsumerStatefulWidget {
+  const CompanionApp({super.key});
 
   @override
-  ConsumerState<SalalaApp> createState() => _SalalaAppState();
+  ConsumerState<CompanionApp> createState() => _CompanionAppState();
 }
 
-class _SalalaAppState extends ConsumerState<SalalaApp>
+class _CompanionAppState extends ConsumerState<CompanionApp>
     with WidgetsBindingObserver {
   /// When the app last went to the background, or null while it is in front.
   DateTime? _leftAt;
@@ -104,7 +104,7 @@ class _SalalaAppState extends ConsumerState<SalalaApp>
     _router = router;
 
     return MaterialApp.router(
-      title: 'Salala',
+      title: 'Companion',
       debugShowCheckedModeBanner: false,
       routerConfig: router,
       locale: ref.watch(localeControllerProvider),

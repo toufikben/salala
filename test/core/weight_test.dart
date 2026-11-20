@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:salala/core/utils/weight.dart';
+import 'package:companion/core/utils/weight.dart';
 
 void main() {
   String fmt(int grams) => formatWeight(grams, kg: 'kg', g: 'g');

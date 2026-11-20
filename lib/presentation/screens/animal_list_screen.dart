@@ -18,7 +18,7 @@ import '../providers/app_providers.dart';
 import '../providers/record_providers.dart';
 import '../widgets/animal_card.dart';
 import '../widgets/birthday_card.dart';
-import '../widgets/salala_nav_bar.dart';
+import '../widgets/companion_nav_bar.dart';
 
 class AnimalListScreen extends ConsumerStatefulWidget {
   const AnimalListScreen({super.key});
@@ -125,7 +125,7 @@ class _AnimalListScreenState extends ConsumerState<AnimalListScreen> {
           ),
         ),
       ),
-      bottomNavigationBar: const SalalaNavBar(index: 0),
+      bottomNavigationBar: const CompanionNavBar(index: 0),
       // The empty herd carries its own "Add animal" button in the middle of the
       // screen; a second affordance for the same action at the thumb corner only
       // competes with it. During a search there is no such middle button, and

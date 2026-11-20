@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:salala/data/models/animal.dart';
-import 'package:salala/data/models/vaccination.dart';
-import 'package:salala/presentation/widgets/animal_card.dart';
+import 'package:companion/data/models/animal.dart';
+import 'package:companion/data/models/vaccination.dart';
+import 'package:companion/presentation/widgets/animal_card.dart';
 
 import '../helpers/pump_app.dart';
 
@@ -74,7 +74,7 @@ void main() {
     tester,
   ) async {
     _usePhoneViewport(tester);
-    await pumpSalala(
+    await pumpApp(
       tester,
       seed: <Animal>[
         _animal('a-1', name: 'Bella'),
@@ -107,7 +107,7 @@ void main() {
     tester,
   ) async {
     _usePhoneViewport(tester);
-    await pumpSalala(
+    await pumpApp(
       tester,
       seed: <Animal>[
         // The weaker match is the breeding animal on purpose: the herd view puts
@@ -131,7 +131,7 @@ void main() {
 
   testWidgets('a chip typed from a sticker finds the dog', (tester) async {
     _usePhoneViewport(tester);
-    await pumpSalala(
+    await pumpApp(
       tester,
       seed: <Animal>[
         _animal('a-1', name: 'Bella'),
@@ -149,7 +149,7 @@ void main() {
   testWidgets('nothing matches: the word comes back, and clearing the box brings the '
       'herd with it', (tester) async {
     _usePhoneViewport(tester);
-    await pumpSalala(tester, seed: <Animal>[_animal(_nalaId, name: 'Nala')]);
+    await pumpApp(tester, seed: <Animal>[_animal(_nalaId, name: 'Nala')]);
 
     await tester.enterText(_searchField, 'zzz');
     await tester.pump();
@@ -174,7 +174,7 @@ void main() {
     tester,
   ) async {
     _usePhoneViewport(tester);
-    await pumpSalala(
+    await pumpApp(
       tester,
       seed: <Animal>[
         _animal(_nalaId, name: 'Nala'),
@@ -204,7 +204,7 @@ void main() {
     tester,
   ) async {
     _usePhoneViewport(tester);
-    await pumpSalala(
+    await pumpApp(
       tester,
       seed: <Animal>[
         _animal(_nalaId, name: 'Nala'),
@@ -231,7 +231,7 @@ void main() {
     tester,
   ) async {
     _usePhoneViewport(tester);
-    await pumpSalala(
+    await pumpApp(
       tester,
       locale: const Locale('ar'),
       seed: <Animal>[

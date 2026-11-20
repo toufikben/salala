@@ -1,9 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:salala/app.dart';
-import 'package:salala/data/models/animal.dart';
-import 'package:salala/presentation/providers/app_providers.dart';
-import 'package:salala/presentation/screens/animal_detail_screen.dart';
+import 'package:companion/app.dart';
+import 'package:companion/data/models/animal.dart';
+import 'package:companion/presentation/providers/app_providers.dart';
+import 'package:companion/presentation/screens/animal_detail_screen.dart';
 
 import '../helpers/pump_app.dart';
 
@@ -27,11 +27,11 @@ Animal _nala() => Animal(
 /// The container the pumped app is actually using, so a test can hand the app
 /// the same thing `main()` hands it when the phone reports a launch payload.
 ProviderContainer _container(WidgetTester tester) =>
-    ProviderScope.containerOf(tester.element(find.byType(SalalaApp)));
+    ProviderScope.containerOf(tester.element(find.byType(CompanionApp)));
 
 void main() {
   testWidgets('a tapped reminder opens the animal it is about', (tester) async {
-    await pumpSalala(tester, seed: <Animal>[_nala()]);
+    await pumpApp(tester, seed: <Animal>[_nala()]);
     expect(find.byType(AnimalDetailScreen), findsNothing);
 
     _container(tester).read(pendingAnimalTapProvider.notifier).set(_nalaId);
@@ -46,7 +46,7 @@ void main() {
   testWidgets('the tap is spent once, so leaving the ledger stays left', (
     tester,
   ) async {
-    await pumpSalala(tester, seed: <Animal>[_nala()]);
+    await pumpApp(tester, seed: <Animal>[_nala()]);
 
     final container = _container(tester);
     container.read(pendingAnimalTapProvider.notifier).set(_nalaId);
@@ -64,10 +64,10 @@ void main() {
   testWidgets('a locked phone answers the tap with the PIN, then the dog', (
     tester,
   ) async {
-    await pumpSalala(tester, hasPin: true, seed: <Animal>[_nala()]);
+    await pumpApp(tester, hasPin: true, seed: <Animal>[_nala()]);
     final container = _container(tester);
 
-    expect(find.text('Salala is locked'), findsOneWidget);
+    expect(find.text('Companion is locked'), findsOneWidget);
 
     container.read(pendingAnimalTapProvider.notifier).set(_nalaId);
     await tester.pumpAndSettle();
@@ -75,7 +75,7 @@ void main() {
     // The gate holds: the alert is remembered, not forced through a lock. This
     // is the whole reason the payload is a provider rather than a `go` at the
     // moment of the tap.
-    expect(find.text('Salala is locked'), findsOneWidget);
+    expect(find.text('Companion is locked'), findsOneWidget);
     expect(find.byType(AnimalDetailScreen), findsNothing);
     expect(container.read(pendingAnimalTapProvider), _nalaId);
 
@@ -96,7 +96,7 @@ void main() {
     // Deleted between the alarm being written and the thumb landing on it — a
     // week is plenty of time for that. The id still opens a screen, which is
     // what makes the answer "this animal was deleted" instead of a blank app.
-    await pumpSalala(tester, seed: <Animal>[_nala()]);
+    await pumpApp(tester, seed: <Animal>[_nala()]);
 
     _container(tester).read(pendingAnimalTapProvider.notifier).set('animal-x');
     await settleRealIo(tester);

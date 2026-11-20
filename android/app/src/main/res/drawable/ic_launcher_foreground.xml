@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The pedigree fork on the deep pine field. Drawn as vectors so the launcher
+     can mask it to any shape (circle, squircle, teardrop) without a bitmap
+     landing in the wrong safe zone: everything that matters sits inside the
+     66dp safe circle. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- stem: the animal in the ledger, up to the split -->
+    <path
+        android:strokeColor="#FBF7F1"
+        android:strokeWidth="5.5"
+        android:strokeLineCap="round"
+        android:pathData="M54,73.2 L54,57.1" />
+
+    <!-- the two parents -->
+    <path
+        android:strokeColor="#FBF7F1"
+        android:strokeWidth="5.5"
+        android:strokeLineCap="round"
+        android:pathData="M54,57.1 L35.4,41" />
+    <path
+        android:strokeColor="#FBF7F1"
+        android:strokeWidth="5.5"
+        android:strokeLineCap="round"
+        android:pathData="M54,57.1 L72.6,41" />
+
+    <!-- the line carrying on to the ancestor, in clay -->
+    <path
+        android:strokeColor="#B4623C"
+        android:strokeWidth="5.5"
+        android:strokeLineCap="round"
+        android:pathData="M54,57.1 L54,27.3" />
+
+    <!-- nodes -->
+    <path
+        android:fillColor="#FBF7F1"
+        android:pathData="M54,73.2 m-3.9,0 a3.9,3.9 0 1,0 7.8,0 a3.9,3.9 0 1,0 -7.8,0" />
+    <path
+        android:fillColor="#FBF7F1"
+        android:pathData="M35.4,41 m-3.4,0 a3.4,3.4 0 1,0 6.8,0 a3.4,3.4 0 1,0 -6.8,0" />
+    <path
+        android:fillColor="#FBF7F1"
+        android:pathData="M72.6,41 m-3.4,0 a3.4,3.4 0 1,0 6.8,0 a3.4,3.4 0 1,0 -6.8,0" />
+    <path
+        android:fillColor="#B4623C"
+        android:pathData="M54,27.3 m-2.9,0 a2.9,2.9 0 1,0 5.8,0 a2.9,2.9 0 1,0 -5.8,0" />
+</vector>

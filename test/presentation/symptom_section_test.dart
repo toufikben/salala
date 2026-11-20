@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:salala/core/utils/date_utils.dart';
-import 'package:salala/data/models/animal.dart';
-import 'package:salala/data/models/symptom.dart';
-import 'package:salala/presentation/screens/animal_detail_screen.dart';
-import 'package:salala/presentation/widgets/symptom_dialog.dart';
-import 'package:salala/presentation/widgets/triage_card.dart';
+import 'package:companion/core/utils/date_utils.dart';
+import 'package:companion/data/models/animal.dart';
+import 'package:companion/data/models/symptom.dart';
+import 'package:companion/presentation/screens/animal_detail_screen.dart';
+import 'package:companion/presentation/widgets/symptom_dialog.dart';
+import 'package:companion/presentation/widgets/triage_card.dart';
 
 import '../helpers/pump_app.dart';
 import '../helpers/section_finder.dart';
@@ -150,7 +150,7 @@ void main() {
     'the Symptoms section lists label, severity and date from the row',
     (tester) async {
       _usePhoneViewport(tester);
-      await pumpSalala(
+      await pumpApp(
         tester,
         seed: <Animal>[_nala()],
         seedSymptoms: <Symptom>[_sighting(observedAt: _seenOn)],
@@ -181,7 +181,7 @@ void main() {
       // after a navigation. A severe sighting must jump the card to the act-now
       // label while the same screen stays open.
       _usePhoneViewport(tester);
-      await pumpSalala(tester, seed: <Animal>[_nala()]);
+      await pumpApp(tester, seed: <Animal>[_nala()]);
       await _openNala(tester);
 
       expect(
@@ -219,7 +219,7 @@ void main() {
     tester,
   ) async {
     _usePhoneViewport(tester);
-    await pumpSalala(
+    await pumpApp(
       tester,
       seed: <Animal>[_nala()],
       seedSymptoms: <Symptom>[_sighting(observedAt: _seenOn)],
@@ -275,7 +275,7 @@ void main() {
     tester,
   ) async {
     _usePhoneViewport(tester);
-    await pumpSalala(
+    await pumpApp(
       tester,
       seed: <Animal>[_nala()],
       seedSymptoms: <Symptom>[_sighting(observedAt: _seenOn)],
@@ -320,7 +320,7 @@ void main() {
     tester,
   ) async {
     _usePhoneViewport(tester);
-    await pumpSalala(tester, seed: <Animal>[_nala()]);
+    await pumpApp(tester, seed: <Animal>[_nala()]);
     await _openNala(tester);
 
     await _tap(tester, find.widgetWithText(TextButton, 'Add symptom'));
@@ -347,7 +347,7 @@ void main() {
     // D21: an Arabic-Indic digit anywhere on screen is a defect, and the dialog
     // routes its date through formatDayFor, the same helper every other row uses.
     _usePhoneViewport(tester);
-    await pumpSalala(
+    await pumpApp(
       tester,
       locale: const Locale('ar'),
       seed: <Animal>[_nala()],
@@ -372,7 +372,7 @@ void main() {
     'a symptom the database refuses keeps the dialog open and the button live',
     (tester) async {
       _usePhoneViewport(tester);
-      await pumpSalala(
+      await pumpApp(
         tester,
         seed: <Animal>[_nala()],
         beforeLaunch: refuseWritesTo('symptoms'),
@@ -402,7 +402,7 @@ void main() {
     'a symptom the database refuses to delete stays in the ledger and says so',
     (tester) async {
       _usePhoneViewport(tester);
-      await pumpSalala(
+      await pumpApp(
         tester,
         seed: <Animal>[_nala()],
         seedSymptoms: <Symptom>[_sighting(observedAt: _seenOn)],
@@ -439,7 +439,7 @@ void main() {
       // Relative to the run's today on both sides: the sighting has to sit
       // inside the picker's fifteen-year window and still be before the birth,
       // and a fixed pair of dates stops satisfying both as the years pass.
-      await pumpSalala(
+      await pumpApp(
         tester,
         seed: <Animal>[_nala().copyWith(birthDate: _daysAgo(400))],
         beforeLaunch: refuseWritesTo('symptoms'),

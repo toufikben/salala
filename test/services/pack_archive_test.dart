@@ -3,9 +3,9 @@ import 'dart:typed_data';
 
 import 'package:archive/archive.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:salala/data/db/schema.dart' show schemaVersion;
-import 'package:salala/services/data_pack.dart';
-import 'package:salala/services/pack_archive.dart';
+import 'package:companion/data/db/schema.dart' show schemaVersion;
+import 'package:companion/services/data_pack.dart';
+import 'package:companion/services/pack_archive.dart';
 
 import '../helpers/fake_photo_files.dart';
 import '../helpers/test_db.dart';

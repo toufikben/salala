@@ -4,24 +4,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:salala/app.dart';
-import 'package:salala/core/utils/triage.dart';
-import 'package:salala/data/db/daos.dart';
-import 'package:salala/data/models/animal.dart';
-import 'package:salala/data/models/buyer.dart';
-import 'package:salala/data/models/health_test.dart';
-import 'package:salala/data/models/litter.dart';
-import 'package:salala/data/models/placement.dart';
-import 'package:salala/data/models/photo.dart';
-import 'package:salala/data/models/symptom.dart';
-import 'package:salala/data/models/vaccination.dart';
-import 'package:salala/data/models/vet_visit.dart';
-import 'package:salala/data/models/weight_entry.dart';
-import 'package:salala/presentation/providers/app_providers.dart';
-import 'package:salala/presentation/providers/triage_providers.dart';
-import 'package:salala/presentation/widgets/date_tile.dart';
-import 'package:salala/services/app_lock_service.dart';
-import 'package:salala/services/reminder_scheduler.dart';
+import 'package:companion/app.dart';
+import 'package:companion/core/utils/triage.dart';
+import 'package:companion/data/db/daos.dart';
+import 'package:companion/data/models/animal.dart';
+import 'package:companion/data/models/buyer.dart';
+import 'package:companion/data/models/health_test.dart';
+import 'package:companion/data/models/litter.dart';
+import 'package:companion/data/models/placement.dart';
+import 'package:companion/data/models/photo.dart';
+import 'package:companion/data/models/symptom.dart';
+import 'package:companion/data/models/vaccination.dart';
+import 'package:companion/data/models/vet_visit.dart';
+import 'package:companion/data/models/weight_entry.dart';
+import 'package:companion/presentation/providers/app_providers.dart';
+import 'package:companion/presentation/providers/triage_providers.dart';
+import 'package:companion/presentation/widgets/date_tile.dart';
+import 'package:companion/services/app_lock_service.dart';
+import 'package:companion/services/reminder_scheduler.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:timezone/data/latest_all.dart' as tz_data;
 import 'package:timezone/timezone.dart' as tz;
@@ -192,7 +192,7 @@ Future<void> waitForSchedulerCalls(
 /// Boots the real router + theme + localizations against a temporary database
 /// and a fake keystore. [seed] rows are inserted through the real DAO before
 /// the first frame, so the UI is exercised against genuine SQL results.
-Future<FakeSecureStorage> pumpSalala(
+Future<FakeSecureStorage> pumpApp(
   WidgetTester tester, {
   Locale? locale,
   bool hasPin = false,
@@ -351,7 +351,7 @@ Future<FakeSecureStorage> pumpSalala(
         initialOnboardingSeenProvider.overrideWithValue(onboardingSeen),
         if (review != null) reviewServiceProvider.overrideWithValue(review),
       ],
-      child: const SalalaApp(),
+      child: const CompanionApp(),
     ),
   );
   await settleRealIo(tester);

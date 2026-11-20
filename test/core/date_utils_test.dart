@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:salala/core/utils/date_utils.dart';
+import 'package:companion/core/utils/date_utils.dart';
 
 /// Which numeral system a date is written in, per language.
 ///

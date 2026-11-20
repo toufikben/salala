@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import 'package:salala/services/contract_files.dart';
+import 'package:companion/services/contract_files.dart';
 
 /// Stands in for the document picker and the contract folder, neither of which a
 /// test runner can answer.

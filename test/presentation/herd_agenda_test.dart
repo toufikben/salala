@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:salala/data/models/animal.dart';
-import 'package:salala/data/models/vaccination.dart';
-import 'package:salala/presentation/screens/animal_detail_screen.dart';
+import 'package:companion/data/models/animal.dart';
+import 'package:companion/data/models/vaccination.dart';
+import 'package:companion/presentation/screens/animal_detail_screen.dart';
 
 import '../helpers/pump_app.dart';
 import '../helpers/section_finder.dart';
@@ -87,7 +87,7 @@ void main() {
     tester,
   ) async {
     _usePhoneViewport(tester);
-    await pumpSalala(
+    await pumpApp(
       tester,
       seed: <Animal>[_animal(_nalaId, name: 'Nala')],
       seedVaccinations: <Vaccination>[_dose(animalId: _nalaId, dueInDays: -3)],
@@ -108,7 +108,7 @@ void main() {
     tester,
   ) async {
     _usePhoneViewport(tester);
-    await pumpSalala(
+    await pumpApp(
       tester,
       seed: <Animal>[_animal(_nalaId, name: 'Nala')],
       seedVaccinations: <Vaccination>[_dose(animalId: _nalaId, dueInDays: 5)],
@@ -122,7 +122,7 @@ void main() {
     tester,
   ) async {
     _usePhoneViewport(tester);
-    await pumpSalala(
+    await pumpApp(
       tester,
       seed: <Animal>[_animal(_nalaId, name: 'Nala')],
       seedVaccinations: <Vaccination>[_dose(animalId: _nalaId, dueInDays: 20)],
@@ -136,7 +136,7 @@ void main() {
 
   testWidgets('a dose with no next date is not a booking', (tester) async {
     _usePhoneViewport(tester);
-    await pumpSalala(
+    await pumpApp(
       tester,
       seed: <Animal>[_animal(_nalaId, name: 'Nala')],
       seedVaccinations: <Vaccination>[_noBookingDose(_nalaId)],
@@ -148,7 +148,7 @@ void main() {
 
   testWidgets('an animal that was sold comes off the agenda', (tester) async {
     _usePhoneViewport(tester);
-    await pumpSalala(
+    await pumpApp(
       tester,
       seed: <Animal>[
         _animal(_nalaId, name: 'Nala'),
@@ -170,7 +170,7 @@ void main() {
     tester,
   ) async {
     _usePhoneViewport(tester);
-    await pumpSalala(
+    await pumpApp(
       tester,
       seed: <Animal>[
         _animal(_nalaId, name: 'Nala'),
@@ -190,7 +190,7 @@ void main() {
 
   testWidgets("tapping a row opens that animal's ledger", (tester) async {
     _usePhoneViewport(tester);
-    await pumpSalala(
+    await pumpApp(
       tester,
       seed: <Animal>[
         _animal(_nalaId, name: 'Nala'),
@@ -219,7 +219,7 @@ void main() {
     // breeder to book a shot that is no longer in the database — and nothing else
     // on the way back would notice, because the list was never rebuilt.
     _usePhoneViewport(tester);
-    await pumpSalala(
+    await pumpApp(
       tester,
       seed: <Animal>[_animal(_nalaId, name: 'Nala')],
       seedVaccinations: <Vaccination>[_dose(animalId: _nalaId, dueInDays: -3)],
@@ -252,7 +252,7 @@ void main() {
 
   testWidgets('the agenda speaks Arabic, with Latin digits', (tester) async {
     _usePhoneViewport(tester);
-    await pumpSalala(
+    await pumpApp(
       tester,
       locale: const Locale('ar'),
       seed: <Animal>[_animal(_nalaId, name: 'Nala')],

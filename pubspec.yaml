@@ -1,5 +1,5 @@
-name: salala
-description: "Salala — an offline-first health and lineage record for small-scale dog and cat breeders, with a transferable PDF pack for puppy buyers."
+name: companion
+description: "Companion - an offline-first health and lineage record for small-scale dog and cat breeders, with a transferable PDF pack for puppy buyers."
 publish_to: 'none'
 version: 0.1.0+1
 

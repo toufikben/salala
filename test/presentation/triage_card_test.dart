@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_test/flutter_test.dart';
-import 'package:salala/core/utils/triage.dart';
-import 'package:salala/data/models/animal.dart';
-import 'package:salala/data/models/vaccination.dart';
-import 'package:salala/data/models/weight_entry.dart';
-import 'package:salala/presentation/screens/animal_detail_screen.dart';
-import 'package:salala/presentation/widgets/animal_card.dart';
+import 'package:companion/core/utils/triage.dart';
+import 'package:companion/data/models/animal.dart';
+import 'package:companion/data/models/vaccination.dart';
+import 'package:companion/data/models/weight_entry.dart';
+import 'package:companion/presentation/screens/animal_detail_screen.dart';
+import 'package:companion/presentation/widgets/animal_card.dart';
 
 import '../helpers/pump_app.dart';
 
@@ -122,7 +122,7 @@ void main() {
     tester,
   ) async {
     _usePhoneViewport(tester);
-    await pumpSalala(tester, seed: <Animal>[_animal(ageDays: 90)]);
+    await pumpApp(tester, seed: <Animal>[_animal(ageDays: 90)]);
     await _openLedger(tester);
 
     expect(find.text('Act now'), findsOneWidget);
@@ -132,7 +132,7 @@ void main() {
     );
     expect(
       find.text(
-        'Salala reads only what you typed here. '
+        'Companion reads only what you typed here. '
         'This is not a veterinary diagnosis.',
       ),
       findsOneWidget,
@@ -143,7 +143,7 @@ void main() {
     tester,
   ) async {
     _usePhoneViewport(tester);
-    await pumpSalala(
+    await pumpApp(
       tester,
       seed: <Animal>[_animal()],
       seedVaccinations: <Vaccination>[_dose(dueInDays: 100)],
@@ -159,7 +159,7 @@ void main() {
 
   testWidgets('an overdue dose reaches the card in Arabic', (tester) async {
     _usePhoneViewport(tester);
-    await pumpSalala(
+    await pumpApp(
       tester,
       locale: const Locale('ar'),
       seed: <Animal>[_animal()],
@@ -192,7 +192,7 @@ void main() {
     // point of deriving it from the record lists instead is that this test has
     // to pass without a navigation in it.
     _usePhoneViewport(tester);
-    await pumpSalala(
+    await pumpApp(
       tester,
       seed: <Animal>[_animal()],
       seedWeights: <WeightEntry>[_weigh(1000, 25)],

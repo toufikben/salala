@@ -10,7 +10,7 @@ class AppLocalizationsEs extends AppLocalizations {
   AppLocalizationsEs([String locale = 'es']) : super(locale);
 
   @override
-  String get appTitle => 'Salala';
+  String get appTitle => 'Companion';
 
   @override
   String get navAnimals => 'Animales';
@@ -234,7 +234,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get actionReplace => 'Sustituir';
 
   @override
-  String get lockTitle => 'Salala está bloqueado';
+  String get lockTitle => 'Companion está bloqueado';
 
   @override
   String get lockEnterPin => 'Introduzca su PIN';
@@ -303,7 +303,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get startupFailedTitle =>
-      'Salala no pudo abrir el libro de cría en este teléfono.';
+      'Companion no pudo abrir el libro de cría en este teléfono.';
 
   @override
   String get startupFailedBody =>
@@ -414,11 +414,11 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get packNotAPack =>
-      'Ese archivo no es un paquete de Salala, o está dañado';
+      'Ese archivo no es un paquete de Companion, o está dañado';
 
   @override
   String get packFromTheFuture =>
-      'Ese paquete viene de una versión de Salala más reciente que esta';
+      'Ese paquete viene de una versión de Companion más reciente que esta';
 
   @override
   String packIncomplete(String table) {
@@ -427,12 +427,12 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String packUnknownTable(String table) {
-    return 'Ese paquete contiene una tabla que esta Salala no conoce: $table';
+    return 'Ese paquete contiene una tabla que esta Companion no conoce: $table';
   }
 
   @override
   String packBadValue(String detail) {
-    return 'Ese paquete contiene un valor que esta Salala no puede leer: $detail';
+    return 'Ese paquete contiene un valor que esta Companion no puede leer: $detail';
   }
 
   @override
@@ -1084,7 +1084,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get pdfDisclaimer =>
-      'Generado sin conexión por Salala a partir de los registros del propio criador. No es un certificado veterinario.';
+      'Generado sin conexión por Companion a partir de los registros del propio criador. No es un certificado veterinario.';
 
   @override
   String get triageTitle => 'Qué hacer ahora';
@@ -1103,7 +1103,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get triageNotDiagnosis =>
-      'Salala solo lee lo que usted escribió aquí. Esto no es un diagnóstico veterinario.';
+      'Companion solo lee lo que usted escribió aquí. Esto no es un diagnóstico veterinario.';
 
   @override
   String triageNoDoseYoung(String days) {
@@ -1190,7 +1190,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get onboardingSlide2Body =>
-      'Vacunas con su próxima fecha, pesajes, pruebas y visitas. Salala reserva el recordatorio por ti.';
+      'Vacunas con su próxima fecha, pesajes, pruebas y visitas. Companion reserva el recordatorio por ti.';
 
   @override
   String get onboardingSlide3Title => 'Su historia viaja con él';
@@ -1215,7 +1215,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsHelp => 'Ayuda';
 
   @override
-  String get settingsRate => 'Valorar Salala';
+  String get settingsRate => 'Valorar Companion';
 
   @override
   String get settingsRateBody => 'Abre la tarjeta de valoración de la tienda.';
@@ -1237,7 +1237,7 @@ class AppLocalizationsEs extends AppLocalizations {
       'Este teléfono no puede mostrar la tarjeta de valoración ahora.';
 
   @override
-  String get aboutTitle => 'Acerca de Salala';
+  String get aboutTitle => 'Acerca de Companion';
 
   @override
   String get aboutBody =>
@@ -1253,7 +1253,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get privacyIntro =>
-      'Salala guarda una sola cosa: lo que escribiste sobre tus animales. Esta página dice dónde está y qué puede sacarlo de este teléfono.';
+      'Companion guarda una sola cosa: lo que escribiste sobre tus animales. Esta página dice dónde está y qué puede sacarlo de este teléfono.';
 
   @override
   String get privacyStoredHeading => 'Qué se guarda';
@@ -1305,7 +1305,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get termsAdviceBody =>
-      'Salala repite lo que escribiste y hace aritmética con fechas y pesos. No diagnostica, y un recordatorio es una entrada de calendario, no una opinión clínica. Llama a un veterinario.';
+      'Companion repite lo que escribiste y hace aritmética con fechas y pesos. No diagnostica, y un recordatorio es una entrada de calendario, no una opinión clínica. Llama a un veterinario.';
 
   @override
   String get termsWarrantyHeading => 'Sin garantía';
@@ -1343,7 +1343,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get helpA4 =>
-      'De las próximas fechas que escribiste. Salala pone una alarma un mes antes y otra la mañana misma; si las notificaciones están apagadas, las fechas siguen en la agenda de la manada.';
+      'De las próximas fechas que escribiste. Companion pone una alarma un mes antes y otra la mañana misma; si las notificaciones están apagadas, las fechas siguen en la agenda de la manada.';
 
   @override
   String get helpQ5 => '¿Por qué una foto dice que no está en este teléfono?';

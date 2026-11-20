@@ -1,4 +1,4 @@
-// Database schema v2 for Salala (breeder health + lineage records).
+// Database schema v2 for Companion (breeder health + lineage records).
 //
 // Design notes (see ARCHITECTURE.md):
 // - Single breeder per device: no `owners` table (the consumer-app idea from the

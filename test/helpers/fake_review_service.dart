@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:salala/services/review_service.dart';
+import 'package:companion/services/review_service.dart';
 
 /// The store's card, as a test runner sees it: it is never there.
 ///

@@ -18,7 +18,7 @@ import '../widgets/animal_card.dart';
 import '../widgets/bulk_vaccination_dialog.dart';
 import '../widgets/litter_pedigree.dart';
 import '../widgets/record_refusal.dart';
-import '../widgets/salala_nav_bar.dart';
+import '../widgets/companion_nav_bar.dart';
 
 class LitterListScreen extends ConsumerWidget {
   const LitterListScreen({super.key});
@@ -31,7 +31,7 @@ class LitterListScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.navLitters)),
-      bottomNavigationBar: const SalalaNavBar(index: 1),
+      bottomNavigationBar: const CompanionNavBar(index: 1),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => context.push(AppPaths.newLitter),
         icon: const Icon(Icons.add),

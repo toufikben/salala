@@ -1,8 +1,8 @@
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:salala/services/contract_files.dart';
-import 'package:salala/services/photo_files.dart';
+import 'package:companion/services/contract_files.dart';
+import 'package:companion/services/photo_files.dart';
 
 /// D10's privacy promise is a sentence about a path, and a path in a comment is
 /// not evidence. The first version of these rules read

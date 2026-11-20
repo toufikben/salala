@@ -1,12 +1,12 @@
 import 'package:flutter/widgets.dart' show Locale;
 import 'package:flutter_test/flutter_test.dart';
-import 'package:salala/core/l10n/app_localizations.dart';
-import 'package:salala/data/models/animal.dart';
-import 'package:salala/data/models/buyer.dart';
-import 'package:salala/data/models/litter.dart';
-import 'package:salala/data/models/placement.dart';
-import 'package:salala/data/models/vaccination.dart';
-import 'package:salala/services/csv_export.dart';
+import 'package:companion/core/l10n/app_localizations.dart';
+import 'package:companion/data/models/animal.dart';
+import 'package:companion/data/models/buyer.dart';
+import 'package:companion/data/models/litter.dart';
+import 'package:companion/data/models/placement.dart';
+import 'package:companion/data/models/vaccination.dart';
+import 'package:companion/services/csv_export.dart';
 
 /// The spreadsheet export, tested on the bytes rather than on a screenshot.
 ///

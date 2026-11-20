@@ -1,10 +1,10 @@
 import 'package:flutter/widgets.dart' show Locale;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:salala/core/l10n/app_localizations.dart';
-import 'package:salala/core/utils/date_utils.dart';
-import 'package:salala/core/utils/reminders.dart';
-import 'package:salala/services/reminder_scheduler.dart';
+import 'package:companion/core/l10n/app_localizations.dart';
+import 'package:companion/core/utils/date_utils.dart';
+import 'package:companion/core/utils/reminders.dart';
+import 'package:companion/services/reminder_scheduler.dart';
 import 'package:timezone/data/latest_all.dart' as tz_data;
 import 'package:timezone/timezone.dart' as tz;
 

@@ -53,7 +53,7 @@ class HelpScreen extends StatelessWidget {
             // Shown, not launched: an app with no intents to declare is an app
             // that cannot be accused of reaching anywhere it did not say. The
             // address is a real inbox, so it can be typed from another device.
-            subtitle: const SelectableText(SalalaContact.supportEmail),
+            subtitle: const SelectableText(AppContact.supportEmail),
           ),
         ],
       ),

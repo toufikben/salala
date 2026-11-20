@@ -1,8 +1,8 @@
 import 'package:flutter/widgets.dart' show Locale;
 import 'package:flutter_test/flutter_test.dart';
-import 'package:salala/core/l10n/app_localizations.dart';
-import 'package:salala/core/l10n/triage_labels.dart';
-import 'package:salala/core/utils/triage.dart';
+import 'package:companion/core/l10n/app_localizations.dart';
+import 'package:companion/core/l10n/triage_labels.dart';
+import 'package:companion/core/utils/triage.dart';
 
 Future<AppLocalizations> _locale(String code) =>
     AppLocalizations.delegate.load(Locale(code));

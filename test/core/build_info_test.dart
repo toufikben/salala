@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:salala/core/build_info.dart';
+import 'package:companion/core/build_info.dart';
 
 /// Two copies of the version, and the file that keeps them agreeing.
 ///

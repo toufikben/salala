@@ -2,15 +2,15 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:salala/core/l10n/app_localizations.dart';
-import 'package:salala/core/l10n/triage_labels.dart';
-import 'package:salala/core/utils/triage.dart';
-import 'package:salala/data/models/animal.dart';
-import 'package:salala/data/models/health_test.dart';
-import 'package:salala/data/models/litter.dart';
-import 'package:salala/data/models/symptom.dart';
-import 'package:salala/data/models/vaccination.dart';
-import 'package:salala/data/models/weight_entry.dart';
+import 'package:companion/core/l10n/app_localizations.dart';
+import 'package:companion/core/l10n/triage_labels.dart';
+import 'package:companion/core/utils/triage.dart';
+import 'package:companion/data/models/animal.dart';
+import 'package:companion/data/models/health_test.dart';
+import 'package:companion/data/models/litter.dart';
+import 'package:companion/data/models/symptom.dart';
+import 'package:companion/data/models/vaccination.dart';
+import 'package:companion/data/models/weight_entry.dart';
 
 const int _day = 86400000;
 

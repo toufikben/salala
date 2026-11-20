@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:salala/data/models/animal.dart';
-import 'package:salala/data/models/litter.dart';
-import 'package:salala/presentation/screens/litter_form_screen.dart';
-import 'package:salala/presentation/screens/animal_list_screen.dart';
-import 'package:salala/presentation/widgets/animal_card.dart';
+import 'package:companion/data/models/animal.dart';
+import 'package:companion/data/models/litter.dart';
+import 'package:companion/presentation/screens/litter_form_screen.dart';
+import 'package:companion/presentation/screens/animal_list_screen.dart';
+import 'package:companion/presentation/widgets/animal_card.dart';
 
 import '../helpers/pump_app.dart';
 
@@ -101,7 +101,7 @@ void main() {
     tester,
   ) async {
     _usePhoneViewport(tester);
-    await pumpSalala(tester);
+    await pumpApp(tester);
     await _openLittersTab(tester);
 
     expect(find.text('No litters yet'), findsOneWidget);
@@ -110,7 +110,7 @@ void main() {
 
   testWidgets('a dam cannot be left out of a whelping', (tester) async {
     _usePhoneViewport(tester);
-    await pumpSalala(
+    await pumpApp(
       tester,
       seed: <Animal>[
         _stock(name: 'Nala', sex: Sex.female),
@@ -137,7 +137,7 @@ void main() {
     tester,
   ) async {
     _usePhoneViewport(tester);
-    await pumpSalala(
+    await pumpApp(
       tester,
       seed: <Animal>[
         _stock(name: 'Nala', sex: Sex.female),
@@ -222,7 +222,7 @@ void main() {
   testWidgets(
     'a whelping the database refuses is refused whole, and the form stays open',
     (tester) async {
-      await pumpSalala(
+      await pumpApp(
         tester,
         seed: <Animal>[
           _stock(name: 'Nala', sex: Sex.female),
@@ -287,7 +287,7 @@ void main() {
     'a whelping dated before its mating is refused before anything is written',
     (tester) async {
       _usePhoneViewport(tester);
-      await pumpSalala(
+      await pumpApp(
         tester,
         seed: <Animal>[_stock(name: 'Nala', sex: Sex.female)],
       );
@@ -349,7 +349,7 @@ void main() {
     'a weaning dated before its whelping is refused, and named as that',
     (tester) async {
       _usePhoneViewport(tester);
-      await pumpSalala(
+      await pumpApp(
         tester,
         seed: <Animal>[_stock(name: 'Nala', sex: Sex.female)],
       );
@@ -392,7 +392,7 @@ void main() {
     tester,
   ) async {
     _usePhoneViewport(tester);
-    await pumpSalala(
+    await pumpApp(
       tester,
       seed: <Animal>[_stock(name: 'Nala', sex: Sex.female)],
     );
@@ -455,7 +455,7 @@ void main() {
     tester,
   ) async {
     _usePhoneViewport(tester);
-    await pumpSalala(
+    await pumpApp(
       tester,
       seed: <Animal>[
         _stock(id: 'dam', name: 'Nala', sex: Sex.female),
@@ -512,7 +512,7 @@ void main() {
     tester,
   ) async {
     _usePhoneViewport(tester);
-    await pumpSalala(
+    await pumpApp(
       tester,
       seed: <Animal>[_stock(id: 'dam', name: 'Nala', sex: Sex.female)],
       seedLitters: <Litter>[_litter(damId: 'dam')],

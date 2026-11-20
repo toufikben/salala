@@ -1,15 +1,15 @@
 import 'package:flutter/widgets.dart' show Locale;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:salala/core/l10n/app_localizations.dart';
-import 'package:salala/core/utils/date_utils.dart';
-import 'package:salala/core/utils/reminders.dart';
-import 'package:salala/data/db/daos.dart';
-import 'package:salala/data/models/animal.dart';
-import 'package:salala/data/models/health_test.dart';
-import 'package:salala/data/models/vaccination.dart';
-import 'package:salala/services/reminder_resync.dart';
-import 'package:salala/services/reminder_scheduler.dart';
+import 'package:companion/core/l10n/app_localizations.dart';
+import 'package:companion/core/utils/date_utils.dart';
+import 'package:companion/core/utils/reminders.dart';
+import 'package:companion/data/db/daos.dart';
+import 'package:companion/data/models/animal.dart';
+import 'package:companion/data/models/health_test.dart';
+import 'package:companion/data/models/vaccination.dart';
+import 'package:companion/services/reminder_resync.dart';
+import 'package:companion/services/reminder_scheduler.dart';
 import 'package:timezone/data/latest_all.dart' as tz_data;
 import 'package:timezone/timezone.dart' as tz;
 
@@ -22,7 +22,7 @@ import '../helpers/test_db.dart';
 /// about which mornings are still ahead, so a test that asked the runner what
 /// time it was could pass on one day and fail on the next.
 void main() {
-  // `main()` does this for the app, and `pumpSalala` does it for widget tests.
+  // `main()` does this for the app, and `pumpApp` does it for widget tests.
   // This file calls the real formatter, so it owes the same setup: without the
   // symbol tables a `DateFormat` throws on the first day it is asked to render.
   setUpAll(() => initializeDateFormatting());

@@ -51,7 +51,7 @@ class PluginNotifications implements NotificationWriter {
   static const String smallIcon = 'ic_notification';
 
   static const AndroidNotificationDetails _channel = AndroidNotificationDetails(
-    'salala_reminders',
+    'companion_reminders',
     'Reminders',
     channelDescription:
         'Doses and screenings coming up, so a booking can be made in time.',
