@@ -1444,4 +1444,39 @@ class AppLocalizationsEn extends AppLocalizations {
   String daysPlural(String n) {
     return '$n days';
   }
+
+  @override
+  String get onboardingLittersTitle => 'Every litter, from mating to weaning';
+
+  @override
+  String get onboardingLittersBody =>
+      'Date the mating and Companion gives you a whelping window, not a guess. Then every puppy, its sex, its colour and its birth weight.';
+
+  @override
+  String get onboardingPedigreeTitle => 'The pedigree on one page';
+
+  @override
+  String get onboardingPedigreeBody =>
+      'Sire, dam and grandparents drawn as a tree, printed beside the health record. Enough for a buyer, without paying a registry.';
+
+  @override
+  String get onboardingBuyersTitle => 'Who is waiting, who has paid';
+
+  @override
+  String get onboardingBuyersBody =>
+      'Deposits, the puppy each buyer chose, the day it went home, and the signed contract filed with it.';
+
+  @override
+  String get onboardingYoursTitle => 'Nobody else\'s server';
+
+  @override
+  String get onboardingYoursBody =>
+      'No account, no ads, no tracking. Works in a shed with no signal, and your records leave the phone only when you export them.';
+
+  @override
+  String get onboardingSupportTitle => 'Made by one person';
+
+  @override
+  String get onboardingSupportBody =>
+      'Companion is built by a single programmer, not a company. No ads and no investors. If it earns its place in your kennel, buying it is what keeps the updates coming.';
 }

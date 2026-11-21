@@ -443,5 +443,15 @@
   "timelineKindSymptom": "Symptoom",
   "timelineKindWeight": "Weging",
   "timelineKindPhoto": "Foto",
-  "timelineKindPlacement": "Plaatsing"
+  "timelineKindPlacement": "Plaatsing",
+  "onboardingLittersTitle": "Elk nest, van dekking tot spenen",
+  "onboardingLittersBody": "Leg de dekking vast en Companion geeft je een werpvenster, geen gok. Daarna elke pup, geslacht, kleur en geboortegewicht.",
+  "onboardingPedigreeTitle": "De stamboom op één pagina",
+  "onboardingPedigreeBody": "Vader, moeder en grootouders als boom getekend, afgedrukt naast het gezondheidsoverzicht. Genoeg voor een koper, zonder een stamboek te betalen.",
+  "onboardingBuyersTitle": "Wie wacht, wie heeft betaald",
+  "onboardingBuyersBody": "Aanbetalingen, de pup die elke koper koos, de dag van vertrek en het ondertekende contract erbij opgeborgen.",
+  "onboardingYoursTitle": "Niemand anders z’n server",
+  "onboardingYoursBody": "Geen account, geen advertenties, geen tracking. Werkt in een schuur zonder bereik, en je gegevens verlaten de telefoon alleen als je exporteert.",
+  "onboardingSupportTitle": "Door één persoon gemaakt",
+  "onboardingSupportBody": "Companion wordt gebouwd door één programmeur, niet door een bedrijf. Geen advertenties en geen investeerders. Als het zijn plek in je fokkerij verdient, houdt de aankoop de updates gaande."
 }

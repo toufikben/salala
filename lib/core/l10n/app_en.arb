@@ -849,5 +849,15 @@
   "timelineKindPhoto": "Photo",
   "timelineKindPlacement": "Handed over",
   "daysPlural": "{n} days",
-  "@daysPlural": { "placeholders": { "n": { "type": "String" } } }
+  "@daysPlural": { "placeholders": { "n": { "type": "String" } } },
+  "onboardingLittersTitle": "Every litter, from mating to weaning",
+  "onboardingLittersBody": "Date the mating and Companion gives you a whelping window, not a guess. Then every puppy, its sex, its colour and its birth weight.",
+  "onboardingPedigreeTitle": "The pedigree on one page",
+  "onboardingPedigreeBody": "Sire, dam and grandparents drawn as a tree, printed beside the health record. Enough for a buyer, without paying a registry.",
+  "onboardingBuyersTitle": "Who is waiting, who has paid",
+  "onboardingBuyersBody": "Deposits, the puppy each buyer chose, the day it went home, and the signed contract filed with it.",
+  "onboardingYoursTitle": "Nobody else's server",
+  "onboardingYoursBody": "No account, no ads, no tracking. Works in a shed with no signal, and your records leave the phone only when you export them.",
+  "onboardingSupportTitle": "Made by one person",
+  "onboardingSupportBody": "Companion is built by a single programmer, not a company. No ads and no investors. If it earns its place in your kennel, buying it is what keeps the updates coming."
 }

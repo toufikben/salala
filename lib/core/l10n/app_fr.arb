@@ -511,5 +511,15 @@
   "timelineKindSymptom": "Symptôme",
   "timelineKindWeight": "Pesée",
   "timelineKindPhoto": "Photo",
-  "timelineKindPlacement": "Cession"
+  "timelineKindPlacement": "Cession",
+  "onboardingLittersTitle": "Chaque portée, de la saillie au sevrage",
+  "onboardingLittersBody": "Notez la saillie et Companion vous donne une fenêtre de mise bas, pas une devinette. Puis chaque chiot, son sexe, sa robe et son poids de naissance.",
+  "onboardingPedigreeTitle": "Le pédigrée sur une page",
+  "onboardingPedigreeBody": "Père, mère et grands-parents dessinés en arbre, imprimés à côté du bilan de santé. De quoi satisfaire un acheteur, sans payer un registre.",
+  "onboardingBuyersTitle": "Qui attend, qui a payé",
+  "onboardingBuyersBody": "Acomptes, le chiot choisi par chaque acheteur, le jour du départ, et le contrat signé rangé avec.",
+  "onboardingYoursTitle": "Le serveur de personne d’autre",
+  "onboardingYoursBody": "Sans compte, sans publicité, sans pistage. Fonctionne dans un cabanon sans réseau, et vos données ne quittent le téléphone que si vous exportez.",
+  "onboardingSupportTitle": "Fait par une personne",
+  "onboardingSupportBody": "Companion est construit par un seul programmeur, pas par une entreprise. Sans publicité et sans investisseurs. S’il trouve sa place dans votre élevage, l’acheter est ce qui fait vivre les mises à jour."
 }

@@ -10,11 +10,19 @@ import '../providers/app_providers.dart';
 /// What a brand-new install sees once, and what a returning breeder can reopen
 /// from Settings.
 ///
-/// Three slides, no account, no permission prompt: the point is that the app has
-/// nothing to ask for at the door. Every sentence here is a promise the rest of
-/// the app keeps — a record per animal, its health in order, its story leaving
-/// with it — because an introduction that oversells is a screen the breeder reads
-/// once and then distrusts.
+/// Eight cards, one per thing the app actually does, in the order a breeder
+/// meets them: the animal, the litter, the pedigree, the health, the buyer, the
+/// document, the privacy, and finally who made it. No account, no permission
+/// prompt: the point is that the app has nothing to ask for at the door. Every
+/// sentence here is a promise the rest of the app keeps — a record per animal,
+/// its health in order, its story leaving with it — because an introduction that
+/// oversells is a screen the breeder reads once and then distrusts.
+///
+/// The last card is not a feature. It is the honest answer to "why does this
+/// cost money": one programmer, no company, no ads, no investors, and the sale
+/// is what pays for the next update. It comes last because a breeder who has
+/// just read what the app does can judge whether that is worth anything, and a
+/// plea before the demonstration is a plea nobody believes.
 ///
 /// "Seen" is a settings row rather than a first-run flag in memory: an app that
 /// re-introduces itself after every process death is an app that assumes the
@@ -63,8 +71,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
 
+    // One list, in reading order. Each card names one thing the app holds, so a
+    // breeder who only ever reads this page still knows where the litter is and
+    // where the buyer is.
     final slides = <_Slide>[
       _Slide(
         icon: Icons.pets_outlined,
@@ -72,14 +82,43 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
         body: l10n.onboardingSlide1Body,
       ),
       _Slide(
+        icon: Icons.pregnant_woman_outlined,
+        title: l10n.onboardingLittersTitle,
+        body: l10n.onboardingLittersBody,
+      ),
+      _Slide(
+        icon: Icons.account_tree_outlined,
+        title: l10n.onboardingPedigreeTitle,
+        body: l10n.onboardingPedigreeBody,
+      ),
+      _Slide(
         icon: Icons.vaccines_outlined,
         title: l10n.onboardingSlide2Title,
         body: l10n.onboardingSlide2Body,
       ),
       _Slide(
+        icon: Icons.people_alt_outlined,
+        title: l10n.onboardingBuyersTitle,
+        body: l10n.onboardingBuyersBody,
+      ),
+      _Slide(
         icon: Icons.ios_share,
         title: l10n.onboardingSlide3Title,
         body: l10n.onboardingSlide3Body,
+      ),
+      _Slide(
+        icon: Icons.wifi_off_outlined,
+        title: l10n.onboardingYoursTitle,
+        body: l10n.onboardingYoursBody,
+      ),
+      _Slide(
+        icon: Icons.favorite_outline,
+        title: l10n.onboardingSupportTitle,
+        body: l10n.onboardingSupportBody,
+        // The one card that is not a feature gets the clay tone the rest of the
+        // app reserves for things that are not routine: it should not look like
+        // a ninth feature, because it is not one.
+        warm: true,
       ),
     ];
     final last = _index == slides.length - 1;
@@ -106,45 +145,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 itemCount: slides.length,
                 onPageChanged: (index) => setState(() => _index = index),
                 itemBuilder: (context, index) {
-                  final slide = slides[index];
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 32),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Container(
-                          width: 132,
-                          height: 132,
-                          decoration: BoxDecoration(
-                            color: theme.colorScheme.tertiaryContainer,
-                            borderRadius: BorderRadius.circular(36),
-                          ),
-                          child: Icon(
-                            slide.icon,
-                            size: 58,
-                            color: theme.colorScheme.onTertiaryContainer,
-                          ),
-                        ),
-                        const SizedBox(height: 34),
-                        Text(
-                          slide.title,
-                          textAlign: TextAlign.center,
-                          style: theme.textTheme.headlineSmall?.copyWith(
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        const SizedBox(height: 14),
-                        Text(
-                          slide.body,
-                          textAlign: TextAlign.center,
-                          style: theme.textTheme.bodyLarge?.copyWith(
-                            height: 1.55,
-                            color: theme.colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
+                  return _Card(slide: slides[index]);
                 },
               ),
             ),
@@ -158,14 +159,14 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                       for (var dot = 0; dot < slides.length; dot++)
                         AnimatedContainer(
                           duration: const Duration(milliseconds: 180),
-                          margin: const EdgeInsets.symmetric(horizontal: 4),
-                          width: dot == _index ? 22 : 8,
-                          height: 8,
+                          margin: const EdgeInsets.symmetric(horizontal: 3),
+                          width: dot == _index ? 18 : 6,
+                          height: 6,
                           decoration: BoxDecoration(
                             color: dot == _index
-                                ? theme.colorScheme.primary
-                                : theme.colorScheme.outlineVariant,
-                            borderRadius: BorderRadius.circular(4),
+                                ? Theme.of(context).colorScheme.primary
+                                : Theme.of(context).colorScheme.outlineVariant,
+                            borderRadius: BorderRadius.circular(3),
                           ),
                         ),
                     ],
@@ -195,10 +196,79 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   }
 }
 
+/// One introduction card.
+///
+/// Scrollable rather than centred-and-clipped: a German sentence is longer than
+/// an English one, and the card that explains the product is the last place to
+/// discover that a paragraph does not fit.
+class _Card extends StatelessWidget {
+  const _Card({required this.slide});
+
+  final _Slide slide;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final tile = slide.warm
+        ? theme.colorScheme.secondaryContainer
+        : theme.colorScheme.tertiaryContainer;
+    final ink = slide.warm
+        ? theme.colorScheme.onSecondaryContainer
+        : theme.colorScheme.onTertiaryContainer;
+
+    return LayoutBuilder(
+      builder: (context, constraints) => SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 32),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(minHeight: constraints.maxHeight),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Container(
+                width: 116,
+                height: 116,
+                decoration: BoxDecoration(
+                  color: tile,
+                  borderRadius: BorderRadius.circular(34),
+                ),
+                child: Icon(slide.icon, size: 52, color: ink),
+              ),
+              const SizedBox(height: 30),
+              Text(
+                slide.title,
+                textAlign: TextAlign.center,
+                style: theme.textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 14),
+              Text(
+                slide.body,
+                textAlign: TextAlign.center,
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  height: 1.55,
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _Slide {
-  const _Slide({required this.icon, required this.title, required this.body});
+  const _Slide({
+    required this.icon,
+    required this.title,
+    required this.body,
+    this.warm = false,
+  });
 
   final IconData icon;
   final String title;
   final String body;
+  final bool warm;
 }

@@ -1451,4 +1451,39 @@ class AppLocalizationsNl extends AppLocalizations {
   String daysPlural(String n) {
     return '$n dagen';
   }
+
+  @override
+  String get onboardingLittersTitle => 'Elk nest, van dekking tot spenen';
+
+  @override
+  String get onboardingLittersBody =>
+      'Leg de dekking vast en Companion geeft je een werpvenster, geen gok. Daarna elke pup, geslacht, kleur en geboortegewicht.';
+
+  @override
+  String get onboardingPedigreeTitle => 'De stamboom op één pagina';
+
+  @override
+  String get onboardingPedigreeBody =>
+      'Vader, moeder en grootouders als boom getekend, afgedrukt naast het gezondheidsoverzicht. Genoeg voor een koper, zonder een stamboek te betalen.';
+
+  @override
+  String get onboardingBuyersTitle => 'Wie wacht, wie heeft betaald';
+
+  @override
+  String get onboardingBuyersBody =>
+      'Aanbetalingen, de pup die elke koper koos, de dag van vertrek en het ondertekende contract erbij opgeborgen.';
+
+  @override
+  String get onboardingYoursTitle => 'Niemand anders z’n server';
+
+  @override
+  String get onboardingYoursBody =>
+      'Geen account, geen advertenties, geen tracking. Werkt in een schuur zonder bereik, en je gegevens verlaten de telefoon alleen als je exporteert.';
+
+  @override
+  String get onboardingSupportTitle => 'Door één persoon gemaakt';
+
+  @override
+  String get onboardingSupportBody =>
+      'Companion wordt gebouwd door één programmeur, niet door een bedrijf. Geen advertenties en geen investeerders. Als het zijn plek in je fokkerij verdient, houdt de aankoop de updates gaande.';
 }

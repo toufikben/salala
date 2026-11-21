@@ -179,18 +179,31 @@ void main() {
       expect(find.text('No animals yet'), findsNothing);
     });
 
-    testWidgets('the three slides walk to the herd and stay gone', (
+    testWidgets('the eight cards walk to the herd and stay gone', (
       tester,
     ) async {
       await pumpApp(tester, onboardingSeen: false);
 
-      await tester.tap(find.text('Next'));
-      await tester.pumpAndSettle();
-      expect(find.text('Its health, in order'), findsOneWidget);
+      // One card per thing the app holds, in the order a breeder meets them.
+      const cards = <String>[
+        'One record per animal',
+        'Every litter, from mating to weaning',
+        'The pedigree on one page',
+        'Its health, in order',
+        'Who is waiting, who has paid',
+        'Its story travels with it',
+        "Nobody else's server",
+      ];
+      for (final title in cards) {
+        expect(find.text(title), findsOneWidget, reason: 'card "$title"');
+        await tester.tap(find.text('Next'));
+        await tester.pumpAndSettle();
+      }
 
-      await tester.tap(find.text('Next'));
-      await tester.pumpAndSettle();
-      expect(find.text('Its story travels with it'), findsOneWidget);
+      // The last card is not a feature: it is the answer to why this costs
+      // money, and it has to be the last thing rather than the first.
+      expect(find.text('Made by one person'), findsOneWidget);
+      expect(find.text('Add my first animal'), findsOneWidget);
 
       await tester.tap(find.text('Add my first animal'));
       await settleRealIo(tester);

@@ -523,5 +523,15 @@
   "timelineKindSymptom": "عرض",
   "timelineKindWeight": "وزن",
   "timelineKindPhoto": "صورة",
-  "timelineKindPlacement": "تسليم"
+  "timelineKindPlacement": "تسليم",
+  "onboardingLittersTitle": "كل بطن، من التلقيح إلى الفطام",
+  "onboardingLittersBody": "سجّل تاريخ التلقيح، ويعطيك Companion نافذة ولادة لا تخمينًا. ثم كل جرو، وجنسه ولونه ووزنه عند الميلاد.",
+  "onboardingPedigreeTitle": "النسب في صفحة واحدة",
+  "onboardingPedigreeBody": "الأب والأم والأجداد مرسومون شجرةً، مطبوعة بجانب تقرير الصحة. تكفي المشتري دون أن تدفع لنقابة.",
+  "onboardingBuyersTitle": "من ينتظر، ومن دفع",
+  "onboardingBuyersBody": "العربون، والجرو الذي اختاره كل مشترٍ، ويوم ذهابه إلى بيته، والعقد الموقّع محفوظًا معه.",
+  "onboardingYoursTitle": "لا خادم لأحد غيرك",
+  "onboardingYoursBody": "بلا حساب، بلا إعلانات، بلا تتبّع. يعمل في سقيفة بلا شبكة، وسجلاتك لا تغادر الهاتف إلا حين تصدّرها.",
+  "onboardingSupportTitle": "صنعه شخص واحد",
+  "onboardingSupportBody": "Companion يبنيه مبرمج واحد، لا شركة. بلا إعلانات وبلا مستثمرين. وإن وجد مكانه في مربّاك، فشراؤه هو ما يُبقي التحديثات تصل."
 }

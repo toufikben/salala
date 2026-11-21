@@ -443,5 +443,15 @@
   "timelineKindSymptom": "Sintomo",
   "timelineKindWeight": "Pesata",
   "timelineKindPhoto": "Foto",
-  "timelineKindPlacement": "Cessione"
+  "timelineKindPlacement": "Cessione",
+  "onboardingLittersTitle": "Ogni cucciolata, dall’accoppiamento allo svezzamento",
+  "onboardingLittersBody": "Segna l’accoppiamento e Companion ti dà una finestra di parto, non un indovinello. Poi ogni cucciolo, sesso, mantello e peso alla nascita.",
+  "onboardingPedigreeTitle": "Il pedigree su una pagina",
+  "onboardingPedigreeBody": "Padre, madre e nonni disegnati ad albero, stampati accanto al quadro sanitario. Basta per un acquirente, senza pagare un registro.",
+  "onboardingBuyersTitle": "Chi aspetta, chi ha pagato",
+  "onboardingBuyersBody": "Caparre, il cucciolo scelto da ogni acquirente, il giorno della partenza e il contratto firmato archiviato insieme.",
+  "onboardingYoursTitle": "Il server di nessun altro",
+  "onboardingYoursBody": "Nessun account, nessuna pubblicità, nessun tracciamento. Funziona in un capanno senza rete, e i tuoi dati escono dal telefono solo quando esporti.",
+  "onboardingSupportTitle": "Fatto da una persona",
+  "onboardingSupportBody": "Companion è costruito da un solo programmatore, non da un’azienda. Nessuna pubblicità e nessun investitore. Se si guadagna il suo posto nel tuo allevamento, comprarlo è ciò che tiene in vita gli aggiornamenti."
 }

@@ -2629,6 +2629,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{n} days'**
   String daysPlural(String n);
+
+  /// No description provided for @onboardingLittersTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Every litter, from mating to weaning'**
+  String get onboardingLittersTitle;
+
+  /// No description provided for @onboardingLittersBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Date the mating and Companion gives you a whelping window, not a guess. Then every puppy, its sex, its colour and its birth weight.'**
+  String get onboardingLittersBody;
+
+  /// No description provided for @onboardingPedigreeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'The pedigree on one page'**
+  String get onboardingPedigreeTitle;
+
+  /// No description provided for @onboardingPedigreeBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Sire, dam and grandparents drawn as a tree, printed beside the health record. Enough for a buyer, without paying a registry.'**
+  String get onboardingPedigreeBody;
+
+  /// No description provided for @onboardingBuyersTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Who is waiting, who has paid'**
+  String get onboardingBuyersTitle;
+
+  /// No description provided for @onboardingBuyersBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Deposits, the puppy each buyer chose, the day it went home, and the signed contract filed with it.'**
+  String get onboardingBuyersBody;
+
+  /// No description provided for @onboardingYoursTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Nobody else\'s server'**
+  String get onboardingYoursTitle;
+
+  /// No description provided for @onboardingYoursBody.
+  ///
+  /// In en, this message translates to:
+  /// **'No account, no ads, no tracking. Works in a shed with no signal, and your records leave the phone only when you export them.'**
+  String get onboardingYoursBody;
+
+  /// No description provided for @onboardingSupportTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Made by one person'**
+  String get onboardingSupportTitle;
+
+  /// No description provided for @onboardingSupportBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Companion is built by a single programmer, not a company. No ads and no investors. If it earns its place in your kennel, buying it is what keeps the updates coming.'**
+  String get onboardingSupportBody;
 }
 
 class _AppLocalizationsDelegate

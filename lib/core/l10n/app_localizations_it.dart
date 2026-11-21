@@ -1455,4 +1455,40 @@ class AppLocalizationsIt extends AppLocalizations {
   String daysPlural(String n) {
     return '$n giorni';
   }
+
+  @override
+  String get onboardingLittersTitle =>
+      'Ogni cucciolata, dall’accoppiamento allo svezzamento';
+
+  @override
+  String get onboardingLittersBody =>
+      'Segna l’accoppiamento e Companion ti dà una finestra di parto, non un indovinello. Poi ogni cucciolo, sesso, mantello e peso alla nascita.';
+
+  @override
+  String get onboardingPedigreeTitle => 'Il pedigree su una pagina';
+
+  @override
+  String get onboardingPedigreeBody =>
+      'Padre, madre e nonni disegnati ad albero, stampati accanto al quadro sanitario. Basta per un acquirente, senza pagare un registro.';
+
+  @override
+  String get onboardingBuyersTitle => 'Chi aspetta, chi ha pagato';
+
+  @override
+  String get onboardingBuyersBody =>
+      'Caparre, il cucciolo scelto da ogni acquirente, il giorno della partenza e il contratto firmato archiviato insieme.';
+
+  @override
+  String get onboardingYoursTitle => 'Il server di nessun altro';
+
+  @override
+  String get onboardingYoursBody =>
+      'Nessun account, nessuna pubblicità, nessun tracciamento. Funziona in un capanno senza rete, e i tuoi dati escono dal telefono solo quando esporti.';
+
+  @override
+  String get onboardingSupportTitle => 'Fatto da una persona';
+
+  @override
+  String get onboardingSupportBody =>
+      'Companion è costruito da un solo programmatore, non da un’azienda. Nessuna pubblicità e nessun investitore. Se si guadagna il suo posto nel tuo allevamento, comprarlo è ciò che tiene in vita gli aggiornamenti.';
 }

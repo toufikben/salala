@@ -1451,4 +1451,40 @@ class AppLocalizationsEs extends AppLocalizations {
   String daysPlural(String n) {
     return '$n días';
   }
+
+  @override
+  String get onboardingLittersTitle =>
+      'Cada camada, del apareamiento al destete';
+
+  @override
+  String get onboardingLittersBody =>
+      'Anota la monta y Companion te da una ventana de parto, no una adivinanza. Después cada cachorro, su sexo, su color y su peso al nacer.';
+
+  @override
+  String get onboardingPedigreeTitle => 'El pedigrí en una página';
+
+  @override
+  String get onboardingPedigreeBody =>
+      'Padre, madre y abuelos dibujados como árbol, impresos junto al historial de salud. Suficiente para un comprador, sin pagar a un registro.';
+
+  @override
+  String get onboardingBuyersTitle => 'Quién espera, quién ha pagado';
+
+  @override
+  String get onboardingBuyersBody =>
+      'Señales, el cachorro que eligió cada comprador, el día que se fue a casa y el contrato firmado archivado con él.';
+
+  @override
+  String get onboardingYoursTitle => 'El servidor de nadie más';
+
+  @override
+  String get onboardingYoursBody =>
+      'Sin cuenta, sin anuncios, sin rastreo. Funciona en un cobertizo sin cobertura, y tus datos solo salen del teléfono cuando los exportas.';
+
+  @override
+  String get onboardingSupportTitle => 'Hecho por una persona';
+
+  @override
+  String get onboardingSupportBody =>
+      'Companion lo construye un solo programador, no una empresa. Sin anuncios y sin inversores. Si se gana su sitio en tu criadero, comprarlo es lo que mantiene las actualizaciones.';
 }

@@ -1440,4 +1440,39 @@ class AppLocalizationsAr extends AppLocalizations {
   String daysPlural(String n) {
     return '$n أيام';
   }
+
+  @override
+  String get onboardingLittersTitle => 'كل بطن، من التلقيح إلى الفطام';
+
+  @override
+  String get onboardingLittersBody =>
+      'سجّل تاريخ التلقيح، ويعطيك Companion نافذة ولادة لا تخمينًا. ثم كل جرو، وجنسه ولونه ووزنه عند الميلاد.';
+
+  @override
+  String get onboardingPedigreeTitle => 'النسب في صفحة واحدة';
+
+  @override
+  String get onboardingPedigreeBody =>
+      'الأب والأم والأجداد مرسومون شجرةً، مطبوعة بجانب تقرير الصحة. تكفي المشتري دون أن تدفع لنقابة.';
+
+  @override
+  String get onboardingBuyersTitle => 'من ينتظر، ومن دفع';
+
+  @override
+  String get onboardingBuyersBody =>
+      'العربون، والجرو الذي اختاره كل مشترٍ، ويوم ذهابه إلى بيته، والعقد الموقّع محفوظًا معه.';
+
+  @override
+  String get onboardingYoursTitle => 'لا خادم لأحد غيرك';
+
+  @override
+  String get onboardingYoursBody =>
+      'بلا حساب، بلا إعلانات، بلا تتبّع. يعمل في سقيفة بلا شبكة، وسجلاتك لا تغادر الهاتف إلا حين تصدّرها.';
+
+  @override
+  String get onboardingSupportTitle => 'صنعه شخص واحد';
+
+  @override
+  String get onboardingSupportBody =>
+      'Companion يبنيه مبرمج واحد، لا شركة. بلا إعلانات وبلا مستثمرين. وإن وجد مكانه في مربّاك، فشراؤه هو ما يُبقي التحديثات تصل.';
 }

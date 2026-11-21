@@ -443,5 +443,15 @@
   "timelineKindSymptom": "Symptom",
   "timelineKindWeight": "Gewicht",
   "timelineKindPhoto": "Foto",
-  "timelineKindPlacement": "Vermittlung"
+  "timelineKindPlacement": "Vermittlung",
+  "onboardingLittersTitle": "Jeder Wurf, von der Deckung bis zum Absetzen",
+  "onboardingLittersBody": "Deckdatum eintragen, und Companion gibt Ihnen ein Wurffenster statt einer Schätzung. Danach jeder Welpe mit Geschlecht, Farbe und Geburtsgewicht.",
+  "onboardingPedigreeTitle": "Die Ahnentafel auf einer Seite",
+  "onboardingPedigreeBody": "Vater, Mutter und Großeltern als Baum, gedruckt neben dem Gesundheitsbericht. Genug für einen Käufer, ohne Zuchtverband.",
+  "onboardingBuyersTitle": "Wer wartet, wer gezahlt hat",
+  "onboardingBuyersBody": "Anzahlungen, der Welpe jedes Käufers, der Tag des Umzugs und der unterschriebene Vertrag dazu abgelegt.",
+  "onboardingYoursTitle": "Kein fremder Server",
+  "onboardingYoursBody": "Kein Konto, keine Werbung, kein Tracking. Läuft im Schuppen ohne Netz, und Ihre Daten verlassen das Telefon nur beim Export.",
+  "onboardingSupportTitle": "Von einer Person gebaut",
+  "onboardingSupportBody": "Companion wird von einem einzelnen Programmierer gebaut, nicht von einer Firma. Keine Werbung, keine Investoren. Wenn es seinen Platz in Ihrem Zwinger verdient, hält der Kauf die Updates am Laufen."
 }

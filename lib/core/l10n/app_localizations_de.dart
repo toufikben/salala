@@ -1455,4 +1455,40 @@ class AppLocalizationsDe extends AppLocalizations {
   String daysPlural(String n) {
     return '$n Tage';
   }
+
+  @override
+  String get onboardingLittersTitle =>
+      'Jeder Wurf, von der Deckung bis zum Absetzen';
+
+  @override
+  String get onboardingLittersBody =>
+      'Deckdatum eintragen, und Companion gibt Ihnen ein Wurffenster statt einer Schätzung. Danach jeder Welpe mit Geschlecht, Farbe und Geburtsgewicht.';
+
+  @override
+  String get onboardingPedigreeTitle => 'Die Ahnentafel auf einer Seite';
+
+  @override
+  String get onboardingPedigreeBody =>
+      'Vater, Mutter und Großeltern als Baum, gedruckt neben dem Gesundheitsbericht. Genug für einen Käufer, ohne Zuchtverband.';
+
+  @override
+  String get onboardingBuyersTitle => 'Wer wartet, wer gezahlt hat';
+
+  @override
+  String get onboardingBuyersBody =>
+      'Anzahlungen, der Welpe jedes Käufers, der Tag des Umzugs und der unterschriebene Vertrag dazu abgelegt.';
+
+  @override
+  String get onboardingYoursTitle => 'Kein fremder Server';
+
+  @override
+  String get onboardingYoursBody =>
+      'Kein Konto, keine Werbung, kein Tracking. Läuft im Schuppen ohne Netz, und Ihre Daten verlassen das Telefon nur beim Export.';
+
+  @override
+  String get onboardingSupportTitle => 'Von einer Person gebaut';
+
+  @override
+  String get onboardingSupportBody =>
+      'Companion wird von einem einzelnen Programmierer gebaut, nicht von einer Firma. Keine Werbung, keine Investoren. Wenn es seinen Platz in Ihrem Zwinger verdient, hält der Kauf die Updates am Laufen.';
 }
