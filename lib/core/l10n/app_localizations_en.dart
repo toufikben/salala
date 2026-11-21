@@ -10,7 +10,7 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appTitle => 'Salala';
+  String get appTitle => 'Companion';
 
   @override
   String get navAnimals => 'Animals';
@@ -19,14 +19,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get navLitters => 'Litters';
 
   @override
+  String get navBuyers => 'Buyers';
+
+  @override
   String get navSettings => 'Settings';
+
+  @override
+  String get languageName => 'English';
 
   @override
   String get homeEmptyTitle => 'No animals yet';
 
   @override
   String get homeEmptyBody =>
-      'Add your first dog or cat to start a health and lineage record.';
+      'A herd begins with one. Give her a name, and her record starts here.';
 
   @override
   String get homeAddAnimal => 'Add animal';
@@ -38,7 +44,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeAllAnimals => 'All animals';
 
   @override
-  String get homeSearchHint => 'Search by name, number, chip or note';
+  String get homeSearchHint => 'Search by name, number, chip, note or buyer';
 
   @override
   String homeNoMatches(String query) {
@@ -73,10 +79,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get animalBirthDate => 'Date of birth';
 
   @override
+  String animalBornOn(String day) {
+    return 'Born $day';
+  }
+
+  @override
   String get animalStatus => 'Status';
 
   @override
   String get animalMicrochip => 'Microchip number';
+
+  @override
+  String get animalMicrochipDate => 'Microchip implanted';
+
+  @override
+  String get animalLitter => 'Litter';
+
+  @override
+  String get animalNone => 'None';
 
   @override
   String get animalRegistrationNo => 'Registry number';
@@ -105,8 +125,13 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String animalDeleteLittersNote(int litters, int puppies) {
+    return 'This also deletes $litters of her whelpings, and the $puppies puppies they registered stay in your animals without the record of their mother.';
+  }
+
+  @override
   String get animalDeleteBody =>
-      'Its vaccinations, health tests, weights, visits and symptoms are deleted too, with any handover recorded for it, its photographs and the files that hold them on this phone, and, if it is a dam, its whelpings. This cannot be undone.';
+      'Its vaccinations, health tests, weights, visits and symptoms are deleted too, with any handover recorded for it, its photographs and the files that hold them on this phone, and the contract attached to that handover. This cannot be undone.';
 
   @override
   String get animalNameRequired => 'A name is required';
@@ -160,6 +185,27 @@ class AppLocalizationsEn extends AppLocalizations {
   String get recordsEmpty => 'Nothing recorded yet.';
 
   @override
+  String get detailStoryLine => 'Every entry here is part of her story.';
+
+  @override
+  String get detailDiedLine => 'Her record stays as it was.';
+
+  @override
+  String placedFarewell(String name) {
+    return '$name has gone to a new home. The record stays with you.';
+  }
+
+  @override
+  String reminderHeadsUpBody(String what, String dueDay) {
+    return 'Heads up: $what is due on $dueDay';
+  }
+
+  @override
+  String reminderDueBody(String what) {
+    return '$what is due today. Two minutes is enough';
+  }
+
+  @override
   String get actionSave => 'Save';
 
   @override
@@ -187,7 +233,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get actionReplace => 'Replace';
 
   @override
-  String get lockTitle => 'Salala is locked';
+  String get lockTitle => 'Companion is locked';
 
   @override
   String get lockEnterPin => 'Enter your PIN';
@@ -227,7 +273,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get lockChangeFailed => 'The phone would not change the app lock.';
 
   @override
+  String get lockChangePinDone => 'PIN changed.';
+
+  @override
+  String lockTooManyAttempts(int seconds) {
+    return 'Too many wrong PINs. Try again in ${seconds}s.';
+  }
+
+  @override
   String get settingsAppLock => 'App lock';
+
+  @override
+  String get settingsChangePin => 'Change PIN';
+
+  @override
+  String get settingsChangePinBody =>
+      'Enter the current PIN, then choose a new one.';
 
   @override
   String get settingsLanguage => 'Language';
@@ -240,7 +301,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get startupFailedTitle =>
-      'Salala could not open the ledger on this phone.';
+      'Companion could not open the ledger on this phone.';
 
   @override
   String get startupFailedBody =>
@@ -248,6 +309,17 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsAbout => 'About';
+
+  @override
+  String get settingsTrial => 'Free trial';
+
+  @override
+  String settingsTrialRemaining(String days) {
+    return '$days days left';
+  }
+
+  @override
+  String get settingsTrialOver => 'The trial has ended';
 
   @override
   String get settingsBuildTag => 'Build';
@@ -261,13 +333,69 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsExportBody =>
-      'One JSON file with every record on this phone';
+      'One ZIP file with every record and picture on this phone';
 
   @override
   String get settingsImport => 'Restore from a pack';
 
   @override
   String get settingsImportBody => 'Read a pack back onto this phone';
+
+  @override
+  String settingsLastBackup(String day) {
+    return 'Last backup: $day';
+  }
+
+  @override
+  String get settingsNeverBackedUp => 'No backup has left this phone yet';
+
+  @override
+  String get settingsCsv => 'Spreadsheet (CSV)';
+
+  @override
+  String get settingsCsvBody =>
+      'For your accountant, a registry form, or a co-owner. Opens in Excel, Numbers or Google Sheets.';
+
+  @override
+  String get settingsCsvHerd => 'Animals';
+
+  @override
+  String get settingsCsvLitters => 'Litters';
+
+  @override
+  String get settingsCsvVaccinations => 'Vaccinations';
+
+  @override
+  String get settingsCsvPlacements => 'Handovers';
+
+  @override
+  String csvShared(String file) {
+    return '$file is ready to send';
+  }
+
+  @override
+  String get csvShareFailed => 'The sheet could not be written on this phone';
+
+  @override
+  String get csvEmpty => 'There is nothing on this phone to export yet';
+
+  @override
+  String get csvColAnimal => 'Animal';
+
+  @override
+  String get csvColCountry => 'Country';
+
+  @override
+  String get csvColPuppies => 'Puppies';
+
+  @override
+  String get csvColBreedingStock => 'Breeding stock';
+
+  @override
+  String get csvColYes => 'yes';
+
+  @override
+  String get csvColNo => 'no';
 
   @override
   String packShared(String file) {
@@ -281,11 +409,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get packReadFailed => 'That file could not be opened';
 
   @override
-  String get packNotAPack => 'That file is not a Salala pack, or it is damaged';
+  String get packNotAPack =>
+      'That file is not a Companion pack, or it is damaged';
 
   @override
   String get packFromTheFuture =>
-      'That pack comes from a newer Salala than this one';
+      'That pack comes from a newer Companion than this one';
 
   @override
   String packIncomplete(String table) {
@@ -294,7 +423,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String packUnknownTable(String table) {
-    return 'That pack holds a table this Salala does not know: $table';
+    return 'That pack holds a table this Companion does not know: $table';
+  }
+
+  @override
+  String packBadValue(String detail) {
+    return 'That pack holds a value this Companion cannot read: $detail';
   }
 
   @override
@@ -316,6 +450,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get litterAdd => 'New litter';
+
+  @override
+  String get litterEditTitle => 'Edit litter';
+
+  @override
+  String get litterAddPuppies => 'Add puppies';
+
+  @override
+  String get litterHowMany => 'How many?';
 
   @override
   String get litterAddTitle => 'Register a litter';
@@ -372,6 +515,122 @@ class AppLocalizationsEn extends AppLocalizations {
   String litterExpected(String date) {
     return 'Expected whelping: $date';
   }
+
+  @override
+  String get statsTitle => 'The kennel in numbers';
+
+  @override
+  String get settingsStats => 'The kennel in numbers';
+
+  @override
+  String get statsHerdGroup => 'Who is here';
+
+  @override
+  String get statsBreedingGroup => 'Whelpings and puppies';
+
+  @override
+  String get statsMoneyGroup => 'Handovers';
+
+  @override
+  String get statsAtHome => 'Animals at home';
+
+  @override
+  String get statsBreedingStock => 'Breeding stock';
+
+  @override
+  String get statsFemales => 'Females at home';
+
+  @override
+  String get statsMales => 'Males at home';
+
+  @override
+  String get statsEverRecorded => 'Ever recorded';
+
+  @override
+  String get statsWhelpings => 'Whelpings on file';
+
+  @override
+  String get statsPuppies => 'Puppies from your litters';
+
+  @override
+  String statsPuppiesThisYear(String year) {
+    return 'Puppies born in $year';
+  }
+
+  @override
+  String get statsPlacements => 'Handovers';
+
+  @override
+  String get statsUnnamedCurrency => 'No currency named';
+
+  @override
+  String statsHandoverCount(String count) {
+    return '$count of them paid';
+  }
+
+  @override
+  String get statsNoRevenue => 'No price recorded';
+
+  @override
+  String get statsFooter =>
+      'Counted from your own ledger, on this phone. Nothing here leaves it.';
+
+  @override
+  String get birthdayTitle => 'Coming up';
+
+  @override
+  String get birthdayToday => 'today';
+
+  @override
+  String birthdayIn(String days) {
+    return 'in $days';
+  }
+
+  @override
+  String birthdayTurning(String name, String years) {
+    return '$name turns $years';
+  }
+
+  @override
+  String get heatCardTitle => 'Next heat';
+
+  @override
+  String heatCardWindow(String earliest, String latest) {
+    return 'Between $earliest and $latest';
+  }
+
+  @override
+  String heatCardSteady(String count) {
+    return 'Based on $count cycles in her own record.';
+  }
+
+  @override
+  String get heatCardThin =>
+      'Only one cycle on file, so the window is wide. Record another mating and it narrows.';
+
+  @override
+  String heatCardWhelping(String day) {
+    return 'A mating in this window would whelp around $day.';
+  }
+
+  @override
+  String get bulkVaccineTitle => 'Vaccinate together';
+
+  @override
+  String bulkVaccineCount(String count) {
+    return '$count animals get the same dose';
+  }
+
+  @override
+  String get bulkVaccineAction => 'Vaccinate the litter';
+
+  @override
+  String bulkVaccineDone(String count) {
+    return 'Recorded for $count animals';
+  }
+
+  @override
+  String get pedigreeTitle => 'Pedigree';
 
   @override
   String litterPuppyCount(int count) {
@@ -654,6 +913,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get photoAdd => 'Add photo';
 
   @override
+  String get photoFromGallery => 'Choose from the gallery';
+
+  @override
+  String get photoFromCamera => 'Take a photo';
+
+  @override
   String get photoDeleteBody =>
       'The picture is removed from this animal\'s ledger, and the file with it. This cannot be undone.';
 
@@ -697,6 +962,33 @@ class AppLocalizationsEn extends AppLocalizations {
   String get placementGuarantee => 'Guarantee terms';
 
   @override
+  String get contractAttach => 'Attach a contract';
+
+  @override
+  String get contractAttached => 'Contract attached';
+
+  @override
+  String get contractStoredName => 'A document you attached earlier';
+
+  @override
+  String get contractRemove => 'Remove the contract';
+
+  @override
+  String get contractOpen => 'Open the contract';
+
+  @override
+  String get contractMissing => 'That document is not on this phone';
+
+  @override
+  String get contractOpenFailed => 'The document could not be opened';
+
+  @override
+  String get contractPickFailed => 'No document could be chosen';
+
+  @override
+  String get contractTooLarge => 'That file is too big to keep';
+
+  @override
   String get placementDeleteBody =>
       'The placement is removed from this animal\'s history. The buyer stays in your contacts. This cannot be undone.';
 
@@ -719,18 +1011,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get buyerCountryCode => 'Country code';
 
   @override
+  String get buyersEmptyTitle => 'No buyers yet';
+
+  @override
+  String get buyersEmptyBody =>
+      'A buyer is added with a handover — or here, before one: the person you sold to last year still wants the pedigree.';
+
+  @override
+  String get buyersNoAnimals => 'No animal on file for this contact';
+
+  @override
   String buyerDeleteBody(String name) {
     return '$name is removed from your contacts. The handover stays in the animal\'s history, with no buyer named. This cannot be undone.';
-  }
-
-  @override
-  String reminderHeadsUpBody(String what, String dueDay) {
-    return 'Heads up: $what is due on $dueDay';
-  }
-
-  @override
-  String reminderDueBody(String what) {
-    return '$what is due today';
   }
 
   @override
@@ -786,7 +1078,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get pdfDisclaimer =>
-      'Produced offline by Salala from the breeder\'s own records. This is not a veterinary certificate.';
+      'Produced offline by Companion from the breeder\'s own records. This is not a veterinary certificate.';
 
   @override
   String get triageTitle => 'What to do next';
@@ -805,7 +1097,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get triageNotDiagnosis =>
-      'Salala reads only what you typed here. This is not a veterinary diagnosis.';
+      'Companion reads only what you typed here. This is not a veterinary diagnosis.';
 
   @override
   String triageNoDoseYoung(String days) {
@@ -820,6 +1112,11 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String triageDoseDueSoon(String name, String days) {
     return '$name is due in $days';
+  }
+
+  @override
+  String triageDoseToday(String what) {
+    return '$what is due today';
   }
 
   @override
@@ -876,7 +1173,310 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get onboardingSlide1Title => 'One record per animal';
+
+  @override
+  String get onboardingSlide1Body =>
+      'A dog or a cat, its breed, its birth date and where it came from. The first one takes under a minute.';
+
+  @override
+  String get onboardingSlide2Title => 'Its health, in order';
+
+  @override
+  String get onboardingSlide2Body =>
+      'Vaccinations with their next due date, weigh-ins, screenings and vet visits. Companion books the reminder for you.';
+
+  @override
+  String get onboardingSlide3Title => 'Its story travels with it';
+
+  @override
+  String get onboardingSlide3Body =>
+      'A PDF or a spreadsheet for the buyer, and one ZIP that carries every record and picture to a new phone.';
+
+  @override
+  String get onboardingSkip => 'Skip';
+
+  @override
+  String get onboardingNext => 'Next';
+
+  @override
+  String get onboardingStart => 'Add my first animal';
+
+  @override
+  String get settingsOnboarding => 'Show the introduction again';
+
+  @override
+  String get settingsHelp => 'Help';
+
+  @override
+  String get settingsRate => 'Rate Companion';
+
+  @override
+  String get settingsRateBody => 'Opens this store\'s own review card.';
+
+  @override
+  String get settingsWhatsNew => 'What\'s new';
+
+  @override
+  String get settingsPrivacy => 'Privacy';
+
+  @override
+  String get settingsTerms => 'Terms of use';
+
+  @override
+  String get settingsLicenses => 'Open-source licences';
+
+  @override
+  String get rateUnavailable =>
+      'This phone cannot show the review card right now.';
+
+  @override
+  String get aboutTitle => 'About Companion';
+
+  @override
+  String get aboutBody =>
+      'An offline ledger for a small kennel or cattery. No account, no server, no tracking — the records live on this phone and leave it only through your own hands.';
+
+  @override
+  String aboutVersion(String version) {
+    return 'Version $version';
+  }
+
+  @override
+  String get privacyTitle => 'Privacy';
+
+  @override
+  String get privacyIntro =>
+      'Companion holds one kind of data: what you typed about your animals. This page says where it sits and what can take it off this phone.';
+
+  @override
+  String get privacyStoredHeading => 'What is stored';
+
+  @override
+  String get privacyStoredBody =>
+      'Every animal, dose, weigh-in, screening, visit, symptom, handover and buyer contact — and the photographs you attached — in a database and a picture folder inside this app\'s private storage. Android keeps that folder out of reach of other apps, and the files are not encrypted beyond that.';
+
+  @override
+  String get privacyBackupHeading => 'What leaves this phone';
+
+  @override
+  String get privacyBackupBody =>
+      'Only what you export: a ZIP with every record and picture, a CSV of one table, or a PDF of one animal. Each goes wherever you send it, so a backup carries your buyers\' names and phone numbers — treat the file the way you would the paper it replaces. Turn on the app lock if the phone travels.';
+
+  @override
+  String get privacyCollectHeading => 'What is collected about you';
+
+  @override
+  String get privacyCollectBody =>
+      'Nothing. There is no analytics, no crash reporting, no advertising identifier and no network call in this app.';
+
+  @override
+  String get privacyRemoveHeading => 'How to erase it';
+
+  @override
+  String get privacyRemoveBody =>
+      'Uninstalling removes the database and the picture folder with it. There is no copy anywhere else, so export a pack first if the records matter — and remember that the app lock\'s PIN cannot be recovered either.';
+
+  @override
+  String get termsTitle => 'Terms of use';
+
+  @override
+  String get termsUseHeading => 'What this app is for';
+
+  @override
+  String get termsUseBody =>
+      'Keeping your own records about the animals in your care. One licence per person; install it on the phones you use.';
+
+  @override
+  String get termsDataHeading => 'Your data is yours';
+
+  @override
+  String get termsDataBody =>
+      'We hold no copy of it and cannot restore it. Backups are your responsibility, and the export tile in Settings is the whole mechanism.';
+
+  @override
+  String get termsAdviceHeading => 'Not veterinary advice';
+
+  @override
+  String get termsAdviceBody =>
+      'Companion repeats what you typed and applies arithmetic to dates and weights. It does not diagnose, and a reminder is a calendar entry, not a clinical opinion. Call a veterinarian.';
+
+  @override
+  String get termsWarrantyHeading => 'No warranty';
+
+  @override
+  String get termsWarrantyBody =>
+      'The app is provided as it is. To the extent the law allows, no liability is accepted for a lost record, a missed reminder or a decision taken on what is written here.';
+
+  @override
+  String get helpTitle => 'Help';
+
+  @override
+  String get helpQ1 => 'How do I back up?';
+
+  @override
+  String get helpA1 =>
+      'Settings, then Export records. The ZIP file carries every row and every picture; send it to yourself and keep it. Restoring reads the same file back on any phone.';
+
+  @override
+  String get helpQ2 => 'I forgot my PIN';
+
+  @override
+  String get helpA2 =>
+      'It cannot be recovered, because only a hash of it is stored. Uninstalling the app clears the lock and the ledger with it, so if you have a recent pack, restore that afterwards.';
+
+  @override
+  String get helpQ3 => 'I lost my phone';
+
+  @override
+  String get helpA3 =>
+      'Nothing is on a server, so nothing can be sent back. A pack you exported earlier restores the ledger on a new phone; one you never exported is gone.';
+
+  @override
+  String get helpQ4 => 'Where do the reminders come from?';
+
+  @override
+  String get helpA4 =>
+      'From the next-due dates you typed. Companion books an alarm a month ahead and one on the morning itself; if notifications are switched off for the app, the dates still show in the herd\'s agenda.';
+
+  @override
+  String get helpQ5 => 'Why does a picture say it is not on this phone?';
+
+  @override
+  String get helpA5 =>
+      'The row survived and the file did not — usually after a restore from a pack that carried no pictures. Adding the photo again fixes it.';
+
+  @override
+  String get helpQ6 => 'Can I hand over the animal\'s record?';
+
+  @override
+  String get helpA6 =>
+      'Yes. Open the animal and export its PDF: a fixed document the buyer can keep without this app. The handover itself is recorded on the same page.';
+
+  @override
+  String get helpQ7 => 'Which languages are there?';
+
+  @override
+  String get helpA7 =>
+      'English, Arabic, French, German, Spanish, Italian, Portuguese and Dutch. Settings, then Language — the change applies immediately.';
+
+  @override
+  String get helpQ8 => 'Something is wrong with the app';
+
+  @override
+  String get helpA8 =>
+      'Write to us and say what you were doing when it happened. The version is on the About page.';
+
+  @override
+  String get helpContactHeading => 'Write to us';
+
+  @override
+  String get whatsNewTitle => 'What\'s new';
+
+  @override
+  String get whatsNew1 =>
+      'Photographs on the herd cards, and a warmer, roomier layout throughout.';
+
+  @override
+  String get whatsNew2 => 'A tapped reminder opens the animal it is about.';
+
+  @override
+  String get whatsNew3 =>
+      'The spreadsheet export speaks the language you are reading.';
+
+  @override
+  String get whatsNew4 =>
+      'Five more languages: German, Spanish, Italian, Portuguese and Dutch.';
+
+  @override
+  String get whatsNew5 =>
+      'Privacy, terms and help pages, and a rating row in Settings.';
+
+  @override
+  String get whatsNew6 =>
+      'One list per animal: every dose, weigh-in, visit and handover in date order.';
+
+  @override
+  String get timelineTitle => 'What happened';
+
+  @override
+  String get timelineEmpty => 'Nothing dated yet.';
+
+  @override
+  String timelineShowAll(String count) {
+    return 'Show all $count';
+  }
+
+  @override
+  String get timelineShowLess => 'Show fewer';
+
+  @override
+  String get timelineKindBorn => 'Born';
+
+  @override
+  String get timelineKindDied => 'Died';
+
+  @override
+  String get timelineKindWhelped => 'Whelped';
+
+  @override
+  String get timelineKindVaccination => 'Vaccination';
+
+  @override
+  String get timelineKindHealthTest => 'Health test';
+
+  @override
+  String get timelineKindVisit => 'Vet visit';
+
+  @override
+  String get timelineKindSymptom => 'Symptom';
+
+  @override
+  String get timelineKindWeight => 'Weigh-in';
+
+  @override
+  String get timelineKindPhoto => 'Photo';
+
+  @override
+  String get timelineKindPlacement => 'Handed over';
+
+  @override
   String daysPlural(String n) {
     return '$n days';
   }
+
+  @override
+  String get onboardingLittersTitle => 'Every litter, from mating to weaning';
+
+  @override
+  String get onboardingLittersBody =>
+      'Date the mating and Companion gives you a whelping window, not a guess. Then every puppy, its sex, its colour and its birth weight.';
+
+  @override
+  String get onboardingPedigreeTitle => 'The pedigree on one page';
+
+  @override
+  String get onboardingPedigreeBody =>
+      'Sire, dam and grandparents drawn as a tree, printed beside the health record. Enough for a buyer, without paying a registry.';
+
+  @override
+  String get onboardingBuyersTitle => 'Who is waiting, who has paid';
+
+  @override
+  String get onboardingBuyersBody =>
+      'Deposits, the puppy each buyer chose, the day it went home, and the signed contract filed with it.';
+
+  @override
+  String get onboardingYoursTitle => 'Nobody else\'s server';
+
+  @override
+  String get onboardingYoursBody =>
+      'No account, no ads, no tracking. Works in a shed with no signal, and your records leave the phone only when you export them.';
+
+  @override
+  String get onboardingSupportTitle => 'Made by one person';
+
+  @override
+  String get onboardingSupportBody =>
+      'Companion is built by a single programmer, not a company. No ads and no investors. If it earns its place in your kennel, buying it is what keeps the updates coming.';
 }

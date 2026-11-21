@@ -7,9 +7,11 @@ import '../../data/db/settings_dao.dart';
 import '../../data/models/animal.dart';
 import '../../data/models/litter.dart';
 import '../../services/app_lock_service.dart';
+import '../../services/contract_files.dart';
 import '../../services/pack_files.dart';
 import '../../services/photo_files.dart';
 import '../../services/reminder_scheduler.dart';
+import '../../services/review_service.dart';
 
 /// The opened database. `main()` overrides this after `ensureInitialized`, and
 /// tests override it with a temporary file database — which is why nothing here
@@ -53,17 +55,60 @@ final settingsDaoProvider = Provider<SettingsDao>(
   (ref) => SettingsDao(ref.watch(databaseProvider)),
 );
 
+/// When a pack last left this phone, or null if none ever has.
+///
+/// A plain FutureProvider rather than a controller: the value is written by the
+/// export itself and read by one tile, so the tile owning the invalidation is
+/// simpler than a notifier that has nothing to compute.
+final lastBackupProvider = FutureProvider.autoDispose<DateTime?>((ref) async {
+  final ms = await ref
+      .read(settingsDaoProvider)
+      .readInt(SettingKeys.lastPackExportedAt);
+  return ms == null ? null : DateTime.fromMillisecondsSinceEpoch(ms);
+});
+
 final appLockProvider = Provider<AppLockService>((ref) => AppLockService());
 
 /// The share sheet and the file picker. Tests hand in a recorder, because the
 /// real one talks to Android.
 final packFilesProvider = Provider<PackFiles>((ref) => const SystemPackFiles());
 
+/// Files a handover can point at: a signed contract, a deposit slip.
+final contractFilesProvider = Provider<ContractFiles>(
+  (ref) => const SystemContractFiles(),
+);
+
 /// The photo folder and the image picker. Same seam for the same reason: the
 /// real one talks to Android, so the screens are tested against a recorder.
 final photoFilesProvider = Provider<PhotoFiles>(
   (ref) => const SystemPhotoFiles(),
 );
+
+/// The store's review card. A recorder in tests, because the real one talks to
+/// Play and a widget test has no store.
+final reviewServiceProvider = Provider<ReviewService>(
+  (ref) => const StoreReviewService(),
+);
+
+/// Whether the introduction has been seen on this device.
+///
+/// A notifier rather than a read-only value because two things change it: the
+/// slides their own Done button, and Settings can send the breeder back through
+/// them. `main()` seeds it from the settings row, and the router both reads it and
+/// listens to it — a plain `Provider` would need a restart to notice.
+class OnboardingSeen extends Notifier<bool> {
+  @override
+  bool build() => ref.watch(initialOnboardingSeenProvider);
+
+  void markSeen() => state = true;
+}
+
+final onboardingSeenProvider = NotifierProvider<OnboardingSeen, bool>(
+  OnboardingSeen.new,
+);
+
+/// The stored value, read once at launch. Overridden by `main()` and by tests.
+final initialOnboardingSeenProvider = Provider<bool>((ref) => true);
 
 /// True once the PIN gate has been satisfied (or never armed). The router
 /// redirects on this, so it is a synchronous flag, not the async digest check.
@@ -89,9 +134,52 @@ class HasPin extends Notifier<bool> {
 
 final hasPinProvider = NotifierProvider<HasPin, bool>(HasPin.new);
 
+/// How long the app may stay in the background before the gate comes back.
+///
+/// Android sends a phone to `paused` for a permission prompt, a share sheet, or
+/// the two seconds it takes to read a notification: relocking on every one of
+/// those would make the PIN a nuisance rather than a lock. Thirty seconds is
+/// long enough to answer a message and short enough that a phone left in a car
+/// is closed before the next person picks it up. Tests override it to zero.
+final lockGracePeriodProvider = Provider<Duration>(
+  (ref) => const Duration(seconds: 30),
+);
+
 /// `main()` overrides this with the value stored in `user_settings`, so the
 /// chosen language survives a restart without a loading flash.
 final initialLocaleProvider = Provider<Locale?>((ref) => null);
+
+/// The animal whose reminder was tapped, until the app has opened it.
+///
+/// Held rather than navigated on the spot, because the tap is not always
+/// answerable when it arrives: a cold start has no router yet, and a phone with a
+/// PIN has a gate in front of the ledger. So the tap is remembered and the shell
+/// opens it the moment both are true, which is one rule instead of three call
+/// sites agreeing with each other.
+///
+/// The payload is an animal id rather than a route, so an alert written by an
+/// older build that named nothing at all simply opens nothing.
+class PendingAnimalTap extends Notifier<String?> {
+  @override
+  String? build() => null;
+
+  void set(String? animalId) {
+    if (animalId == null || animalId.isEmpty) return;
+    state = animalId;
+  }
+
+  /// Hands the id over once and forgets it: a tap is answered once, not on every
+  /// rebuild of the shell.
+  String? take() {
+    final id = state;
+    state = null;
+    return id;
+  }
+}
+
+final pendingAnimalTapProvider = NotifierProvider<PendingAnimalTap, String?>(
+  PendingAnimalTap.new,
+);
 
 class LocaleController extends Notifier<Locale?> {
   @override
@@ -111,6 +199,19 @@ class LocaleController extends Notifier<Locale?> {
         .write(SettingKeys.languageCode, locale?.languageCode ?? 'system');
     state = locale;
   }
+
+  /// Shows a language the phone already holds, without writing it back.
+  ///
+  /// `select` is for a tap on the language menu, where the row is the thing the
+  /// tap decides. A restore is the other direction: the row arrived inside the
+  /// pack, and the only job left is to repaint the app in it — writing here
+  /// would rewrite a row that is already correct, and a refusal would then be
+  /// reported for a choice nobody made.
+  ///
+  /// The app read this setting once, in `main()`, before the first frame, so
+  /// without this the ledger comes back in the pack's language and the chrome
+  /// stays in the old one until the next launch.
+  void adopt(Locale? locale) => state = locale;
 }
 
 final localeControllerProvider = NotifierProvider<LocaleController, Locale?>(
@@ -135,11 +236,12 @@ class AnimalsController extends AsyncNotifier<List<Animal>> {
     await _rereadAfter('change');
   }
 
-  /// Deleting an animal takes its picture folder with it.
+  /// Deleting an animal takes its picture folder with it — and its contracts.
   ///
   /// The foreign key removes the rows; only this app can reach the bytes. A
   /// delete that left them behind would keep a dead animal's photographs on the
-  /// phone with no row, no screen and no way to find them again.
+  /// phone with no row, no screen and no way to find them again. A signed
+  /// contract is worse: it carries a buyer's name and signature.
   ///
   /// So this clears the folder whether or not any row survived to be counted: the
   /// one state where the ledger says "no pictures" and the folder disagrees is a
@@ -153,6 +255,11 @@ class AnimalsController extends AsyncNotifier<List<Animal>> {
       await ref.read(photoFilesProvider).deleteAll(id);
     } catch (error) {
       debugPrint('Photo folder for deleted animal $id not removed: $error');
+    }
+    try {
+      await ref.read(contractFilesProvider).deleteAll(id);
+    } catch (error) {
+      debugPrint('Contract folder for deleted animal $id not removed: $error');
     }
     await _rereadAfter('delete');
   }
@@ -194,9 +301,32 @@ class LittersController extends AsyncNotifier<List<Litter>> {
     return created;
   }
 
-  Future<void> edit(Litter litter) async {
-    await ref.read(daosProvider).litters.update(litter);
+  /// Saves an edited whelping and carries the correction into its puppies.
+  ///
+  /// The puppies' birthday and parents were stamped from the litter at
+  /// registration, so leaving them behind would make the herd disagree with the
+  /// whelping it came from. Passing [previous] is what lets the database tell a
+  /// copied value apart from one the breeder fixed by hand.
+  Future<void> edit(Litter litter, {Litter? previous}) async {
+    final daos = ref.read(daosProvider);
+    await daos.litters.update(litter);
+    if (previous != null) {
+      await daos.litters.retargetPuppies(previous: previous, updated: litter);
+      await ref
+          .read(animalsProvider.notifier)
+          ._rereadAfter('a whelping change');
+    }
     await _rereadAfter('a whelping change');
+  }
+
+  /// Registers puppies for a whelping already in the ledger.
+  Future<List<Animal>> addPuppies(Litter litter, int count) async {
+    final daos = ref.read(daosProvider);
+    final created = await daos.litters.addPuppies(litter, count);
+    // Puppies are animals: the home list is stale the moment they land.
+    await ref.read(animalsProvider.notifier)._rereadAfter('new puppies');
+    await _rereadAfter('new puppies');
+    return created;
   }
 
   /// Deleting a litter unlinks its animals (`litter_id ON DELETE SET NULL`), so

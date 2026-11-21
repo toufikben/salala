@@ -1,17 +1,16 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/widgets.dart' show Locale;
 import 'package:flutter_test/flutter_test.dart';
-import 'package:salala/core/l10n/app_localizations.dart';
-import 'package:salala/core/l10n/triage_labels.dart';
-import 'package:salala/core/utils/triage.dart';
-import 'package:salala/data/models/animal.dart';
-import 'package:salala/data/models/health_test.dart';
-import 'package:salala/data/models/litter.dart';
-import 'package:salala/data/models/symptom.dart';
-import 'package:salala/data/models/vaccination.dart';
-import 'package:salala/data/models/weight_entry.dart';
+import 'package:companion/core/l10n/app_localizations.dart';
+import 'package:companion/core/l10n/triage_labels.dart';
+import 'package:companion/core/utils/triage.dart';
+import 'package:companion/data/models/animal.dart';
+import 'package:companion/data/models/health_test.dart';
+import 'package:companion/data/models/litter.dart';
+import 'package:companion/data/models/symptom.dart';
+import 'package:companion/data/models/vaccination.dart';
+import 'package:companion/data/models/weight_entry.dart';
 
 const int _day = 86400000;
 
@@ -828,11 +827,11 @@ void main() {
 
   group('wording', () {
     test(
-      'every rule has a sentence, in all three languages, in Latin digits',
+      'every rule has a sentence, in every language, in Latin digits',
       () async {
         final localizations = <AppLocalizations>[];
-        for (final tag in <String>['en', 'ar', 'fr']) {
-          localizations.add(await AppLocalizations.delegate.load(Locale(tag)));
+        for (final locale in AppLocalizations.supportedLocales) {
+          localizations.add(await AppLocalizations.delegate.load(locale));
         }
 
         for (final id in TriageRuleId.values) {
@@ -871,13 +870,13 @@ void main() {
     );
 
     test('the urgency words exist in every language', () async {
-      for (final tag in <String>['en', 'ar', 'fr']) {
-        final l10n = await AppLocalizations.delegate.load(Locale(tag));
+      for (final locale in AppLocalizations.supportedLocales) {
+        final l10n = await AppLocalizations.delegate.load(locale);
         for (final urgency in TriageUrgency.values) {
           expect(
             triageUrgencyLabel(l10n, urgency).trim(),
             isNotEmpty,
-            reason: '$urgency in $tag',
+            reason: '$urgency in ${locale.languageCode}',
           );
         }
       }

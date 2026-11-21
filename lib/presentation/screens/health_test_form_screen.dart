@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/l10n/app_localizations.dart';
 import '../../core/utils/date_utils.dart';
+import '../../core/utils/text_input.dart';
 import '../../data/models/health_test.dart';
 import '../providers/app_providers.dart';
 import '../providers/record_providers.dart';
@@ -172,10 +173,10 @@ class _HealthTestFormScreenState extends ConsumerState<HealthTestFormScreen> {
           animalId: widget.animalId,
           testType: _testType.text.trim(),
           result: _result.text.trim(),
-          testingBody: _testingBody.text.trim(),
-          certificateNo: _certificateNo.text.trim(),
-          verifiedBy: _verifiedBy.text.trim(),
-          notes: _notes.text.trim(),
+          testingBody: blankToNull(_testingBody.text),
+          certificateNo: blankToNull(_certificateNo.text),
+          verifiedBy: blankToNull(_verifiedBy.text),
+          notes: blankToNull(_notes.text),
           testDate: _testDate,
           validUntil: _validUntil,
           clearValidUntil: _validUntil == null,
@@ -212,6 +213,7 @@ class _HealthTestFormScreenState extends ConsumerState<HealthTestFormScreen> {
     }
     await scheduler.replace(
       recordId: test.id,
+      animalId: widget.animalId,
       dueMs: test.validUntil,
       l10n: l10n,
       title: reminderTitle(ref, l10n, widget.animalId),
@@ -289,6 +291,9 @@ class _HealthTestFormScreenState extends ConsumerState<HealthTestFormScreen> {
           ? const Center(child: CircularProgressIndicator())
           : Form(
               key: _formKey,
+              // Re-validation on the first keystroke, not only on Save: measured
+              // on the phone as a refusal line that outlived the text that fixed it.
+              autovalidateMode: AutovalidateMode.onUserInteraction,
               child: SingleChildScrollView(
                 // Clear of the system navigation bar, which used to clip the Save pill.
                 padding: EdgeInsets.fromLTRB(

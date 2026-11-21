@@ -43,21 +43,21 @@ Future<void> _launch() async {
 
   final languageCode = await SettingsDao(db).read(SettingKeys.languageCode);
   final hasPin = await AppLockService().isLocked();
+  // Read before the first frame for the same reason the language is: the launch
+  // screen has to be decided once, not painted as the herd and then replaced with
+  // three slides. A first launch has no row at all, which reads as `not seen`.
+  final onboardingSeen = await SettingsDao(db)
+      .readBool(SettingKeys.onboardingSeen);
 
   // Bootstrapped before the first frame so the permission prompt and the
   // timezone pin are both settled by the time a dose can be saved. The single
   // instance is handed to the tree: a second, unbootstrapped scheduler would
   // throw on its first schedule call.
+  //
+  // The tap arrives before there is a router to send it to, so both paths go
+  // through one provider: the cold-start payload is captured here, and a tap on
+  // a running app writes itself. `CompanionApp` opens whichever lands, once it can.
   final reminders = ReminderScheduler(PluginNotifications());
-  try {
-    await reminders.bootstrap();
-  } catch (error) {
-    // A phone that refuses notifications must still open the ledger. The
-    // reminders are the loss, and Settings shows nothing about them, so the
-    // failure has to leave a trace for whoever debugs a missing alarm.
-    debugPrint('Reminder bootstrap failed: $error');
-  }
-
   final container = ProviderContainer(
     overrides: [
       databaseProvider.overrideWithValue(db),
@@ -67,11 +67,25 @@ Future<void> _launch() async {
             ? null
             : Locale(languageCode),
       ),
+      initialOnboardingSeenProvider.overrideWithValue(onboardingSeen),
     ],
   );
+  try {
+    final launchedFrom = await reminders.bootstrap(
+      onTap: (payload) =>
+          container.read(pendingAnimalTapProvider.notifier).set(payload),
+    );
+    container.read(pendingAnimalTapProvider.notifier).set(launchedFrom);
+  } catch (error) {
+    // A phone that refuses notifications must still open the ledger. The
+    // reminders are the loss, and Settings shows nothing about them, so the
+    // failure has to leave a trace for whoever debugs a missing alarm.
+    debugPrint('Reminder bootstrap failed: $error');
+  }
+
   container.read(hasPinProvider.notifier).set(hasPin);
 
   runApp(
-    UncontrolledProviderScope(container: container, child: const SalalaApp()),
+    UncontrolledProviderScope(container: container, child: const CompanionApp()),
   );
 }

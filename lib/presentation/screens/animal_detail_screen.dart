@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,11 +7,13 @@ import '../../core/l10n/app_localizations.dart';
 import '../../core/l10n/enum_labels.dart';
 import '../../core/router/app_router.dart';
 import '../../core/utils/date_utils.dart';
+import '../../core/utils/heat_cycle.dart';
 import '../../core/utils/money.dart';
 import '../../core/utils/weight.dart';
 import '../../data/models/animal.dart';
 import '../../data/models/buyer.dart';
 import '../../data/models/health_test.dart';
+import '../../data/models/litter.dart';
 import '../../data/models/placement.dart';
 import '../../data/models/photo.dart';
 import '../../data/models/symptom.dart';
@@ -27,6 +27,9 @@ import '../../services/photo_files.dart';
 import '../providers/app_providers.dart';
 import '../providers/record_providers.dart';
 import '../providers/triage_providers.dart';
+import '../widgets/animal_timeline_card.dart';
+import '../widgets/heat_cycle_card.dart';
+import '../widgets/photo_thumb.dart';
 import '../widgets/placement_dialog.dart';
 import '../widgets/record_refusal.dart';
 import '../widgets/symptom_dialog.dart';
@@ -43,6 +46,7 @@ class AnimalDetailScreen extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final animalsAsync = ref.watch(animalsProvider);
     final animals = animalsAsync.value ?? const <Animal>[];
+    final litters = ref.watch(littersProvider).value ?? const <Litter>[];
     final matches = animals.where((a) => a.id == animalId);
     final animal = matches.isEmpty ? null : matches.first;
 
@@ -87,7 +91,7 @@ class AnimalDetailScreen extends ConsumerWidget {
               24 + MediaQuery.paddingOf(context).bottom,
             ),
             children: <Widget>[
-              _IdentityCard(animal: animal, animals: animals),
+              _IdentityCard(animal: animal, animals: animals, litters: litters),
               // Above the records, because it is the one part of this page that
               // answers a question rather than showing what was typed.
               ref
@@ -99,6 +103,24 @@ class AnimalDetailScreen extends ConsumerWidget {
                           ref.invalidate(triageForAnimalProvider(animal.id)),
                     ),
                     data: (findings) => TriageCard(findings: findings),
+                  ),
+              // Above the records and below the triage card, because it is a
+              // planning aid rather than a warning: the windows a breeder acts
+              // on before anything is wrong. A dam with fewer than two matings
+              // on file gets nothing at all, and `forecastHeat` decides that.
+              _HeatSection(animal: animal, litters: litters),
+              // Above the records and below the heat card: the one card on this
+              // page that answers *when*, so it sits where the eye arrives
+              // before the six sections that answer *what*. It cannot fail on
+              // its own — every list it reads is one the sections below read —
+              // so an error here is drawn as empty rather than as a retry the
+              // breeder would press to no effect.
+              ref
+                  .watch(animalTimelineProvider(animal.id))
+                  .when(
+                    loading: () => const _SectionLoading(),
+                    error: (error, stack) => const SizedBox.shrink(),
+                    data: (events) => AnimalTimelineCard(events: events),
                   ),
               _RecordSection(
                 title: l10n.recordsSymptoms,
@@ -264,6 +286,26 @@ class AnimalDetailScreen extends ConsumerWidget {
   }
 }
 
+/// The heat card, or nothing at all when the record cannot support one.
+///
+/// A separate widget rather than an `if` in the page body so the silence is one
+/// decision in one place: `forecastHeat` returns null for a male, a dam with no
+/// matings, and a dam with one — and this widget is the only caller that turns
+/// that null into "do not draw".
+class _HeatSection extends StatelessWidget {
+  const _HeatSection({required this.animal, required this.litters});
+
+  final Animal animal;
+  final List<Litter> litters;
+
+  @override
+  Widget build(BuildContext context) {
+    final forecast = forecastHeat(litters, animal);
+    if (forecast == null) return const SizedBox.shrink();
+    return HeatCycleCard(forecast: forecast, species: animal.species);
+  }
+}
+
 /// Writes this animal's buyer pack and hands it to the share sheet.
 ///
 /// The font is read on each tap instead of at startup: it is 431 KB, this app has
@@ -297,27 +339,50 @@ Future<void> _sharePdfPack(
 }
 
 /// Name, lineage and the paperwork a buyer asks to see.
-class _IdentityCard extends StatelessWidget {
-  const _IdentityCard({required this.animal, required this.animals});
+///
+/// It opens with the animal's own photograph and the facts a buyer reads first —
+/// species, breed, sex, the day she was born, and whether she is still here — and
+/// then lists the paperwork underneath as label/value rows. Before, this was one
+/// wall of `Label: value` lines with a chip on top, which on a phone is a form
+/// nobody reads; the photograph is what makes it a page about an animal.
+class _IdentityCard extends ConsumerWidget {
+  const _IdentityCard({
+    required this.animal,
+    required this.animals,
+    required this.litters,
+  });
 
   final Animal animal;
   final List<Animal> animals;
+  final List<Litter> litters;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
-    final rows = <(String, String)>[
-      (l10n.animalSpecies, animal.species),
-      if (animal.breed != null && animal.breed!.isNotEmpty)
-        (l10n.animalBreed, animal.breed!),
-      (l10n.animalSex, sexLabel(l10n, animal.sex)),
-      (l10n.animalStatus, statusLabel(l10n, animal.status)),
+    final theme = Theme.of(context);
+    final litterMatches = litters.where((l) => l.id == animal.litterId);
+    final litter = litterMatches.isEmpty ? null : litterMatches.first;
+
+    // The last picture taken is the one on the card, and the strip below keeps
+    // the growth order it always had.
+    final photos = ref.watch(photosForAnimalProvider(animal.id)).value;
+    final cover = photos == null || photos.isEmpty ? null : photos.last;
+
+    final headline = <String>[
+      animal.species,
+      if (animal.breed != null && animal.breed!.isNotEmpty) animal.breed!,
+      sexLabel(l10n, animal.sex),
       if (animal.birthDate != null)
-        (l10n.animalBirthDate, formatDay(context, animal.birthDate)),
+        l10n.animalBornOn(formatDay(context, animal.birthDate)),
+    ];
+
+    final rows = <(String, String)>[
       if (animal.color != null && animal.color!.isNotEmpty)
         (l10n.animalColor, animal.color!),
       if (animal.microchipId != null && animal.microchipId!.isNotEmpty)
         (l10n.animalMicrochip, animal.microchipId!),
+      if (animal.microchipDate != null)
+        (l10n.animalMicrochipDate, formatDay(context, animal.microchipDate)),
       if (animal.registrationNo != null && animal.registrationNo!.isNotEmpty)
         (l10n.animalRegistrationNo, animal.registrationNo!),
       if (animal.registry != null && animal.registry!.isNotEmpty)
@@ -332,35 +397,180 @@ class _IdentityCard extends StatelessWidget {
         l10n.animalSire,
         animalById(animals, animal.sireId)?.name ?? l10n.valueUnknown,
       ),
+      if (litter != null) (l10n.animalLitter, litter.name),
       if (animal.deathDate != null)
         (l10n.animalDeathDate, formatDay(context, animal.deathDate)),
     ];
 
     return Card(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            if (animal.isBreedingStock)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: Chip(label: Text(l10n.homeBreedingStock)),
-              ),
-            for (final row in rows)
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 2),
-                child: Text(
-                  '${row.$1}: ${row.$2}',
-                  style: Theme.of(context).textTheme.bodyMedium,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          _DetailPhoto(animal: animal, cover: cover),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                if (animal.isBreedingStock ||
+                    animal.status != AnimalStatus.active)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: Wrap(
+                      spacing: 6,
+                      runSpacing: 6,
+                      children: <Widget>[
+                        if (animal.isBreedingStock)
+                          Chip(
+                            label: Text(l10n.homeBreedingStock),
+                            backgroundColor:
+                                theme.colorScheme.tertiaryContainer,
+                            side: BorderSide.none,
+                            labelStyle: theme.textTheme.labelMedium?.copyWith(
+                              color: theme.colorScheme.onTertiaryContainer,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        if (animal.status != AnimalStatus.active)
+                          Chip(
+                            label: Text(statusLabel(l10n, animal.status)),
+                            side: BorderSide.none,
+                            labelStyle: theme.textTheme.labelMedium,
+                          ),
+                      ],
+                    ),
+                  ),
+                Text(
+                  headline.join(' · '),
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: theme.colorScheme.onSurface,
+                  ),
                 ),
-              ),
-            if (animal.notes != null && animal.notes!.isNotEmpty) ...<Widget>[
-              const SizedBox(height: 8),
-              Text(animal.notes!),
-            ],
-          ],
+                if (rows.isNotEmpty) ...<Widget>[
+                  const SizedBox(height: 12),
+                  for (final row in rows)
+                    _FactRow(label: row.$1, value: row.$2),
+                ],
+                if (animal.notes != null &&
+                    animal.notes!.isNotEmpty) ...<Widget>[
+                  const SizedBox(height: 12),
+                  Text(
+                    animal.notes!,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                      height: 1.45,
+                    ),
+                  ),
+                ],
+                // One quiet line at the foot of the page, and the only warmth on
+                // it. Two different sentences because the animal who has died
+                // does not want a sentence about her ongoing story — and an app
+                // that keeps saying it anyway is an app that has not read its own
+                // ledger. Placed after the notes so it reads as a closing line
+                // rather than as a caption on the photograph.
+                Padding(
+                  padding: const EdgeInsets.only(top: 14),
+                  child: Text(
+                    animal.deathDate != null
+                        ? l10n.detailDiedLine
+                        : l10n.detailStoryLine,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant.withValues(
+                        alpha: 0.85,
+                      ),
+                      fontStyle: FontStyle.italic,
+                      height: 1.5,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// The animal's photograph at the top of her own page, or her letter on paper.
+class _DetailPhoto extends StatelessWidget {
+  const _DetailPhoto({required this.animal, required this.cover});
+
+  final Animal animal;
+  final Photo? cover;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final ground = switch (animal.sex) {
+      Sex.male => scheme.primaryContainer,
+      Sex.female => scheme.tertiaryContainer,
+      Sex.unknown => scheme.surfaceContainerHigh,
+    };
+    final initial = animal.name.isEmpty
+        ? '?'
+        : animal.name.characters.first.toUpperCase();
+
+    final fallback = ColoredBox(
+      color: ground,
+      child: Center(
+        child: Text(
+          initial,
+          style: theme.textTheme.displayLarge?.copyWith(
+            color: scheme.onSurface.withValues(alpha: 0.22),
+            fontWeight: FontWeight.w700,
+          ),
         ),
+      ),
+    );
+
+    return AspectRatio(
+      aspectRatio: 3 / 2,
+      child: cover == null
+          ? fallback
+          : PhotoImage(
+              photo: cover!,
+              width: double.infinity,
+              height: double.infinity,
+              radius: 0,
+              missing: fallback,
+            ),
+    );
+  }
+}
+
+/// One label and its value, on one line: label quiet, value plain.
+///
+/// Two columns rather than `Label: value` in one string, because the colon form
+/// forces every label to the same length by eye and drifts the values around on
+/// a phone where they wrap.
+class _FactRow extends StatelessWidget {
+  const _FactRow({required this.label, required this.value});
+
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 3),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          SizedBox(
+            width: 116,
+            child: Text(
+              label,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ),
+          Expanded(child: Text(value, style: theme.textTheme.bodyMedium)),
+        ],
       ),
     );
   }
@@ -685,14 +895,20 @@ class _PlacementSection extends StatelessWidget {
 
 /// One handover. The buyer leads the row because that is the name a breeder
 /// scans the ledger for; the day, the money and the guarantee are the detail.
-class _PlacementTile extends StatelessWidget {
+///
+/// A handover with a contract on file gets one more control. It hands the file
+/// to whatever app the phone opens documents with, through the share sheet the
+/// pack already uses — this app grows no viewer of its own. A signed agreement is
+/// something a breeder prints, reads in the app she trusts with PDFs, or forwards
+/// to the buyer, and every one of those is the phone's business.
+class _PlacementTile extends ConsumerWidget {
   const _PlacementTile({required this.placement, this.buyer});
 
   final Placement placement;
   final Buyer? buyer;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final currency = placement.currency;
     final price = placement.price;
@@ -711,6 +927,7 @@ class _PlacementTile extends StatelessWidget {
       ?amount,
       if (guarantee != null && guarantee.isNotEmpty) guarantee,
     ];
+    final contract = placement.contractFilePath;
 
     return ListTile(
       onTap: () => showPlacementDialog(
@@ -722,8 +939,47 @@ class _PlacementTile extends StatelessWidget {
       // A row that has nothing beyond the fact of a placement still has to say
       // it happened, so the subtitle is absent rather than an empty line.
       subtitle: details.isEmpty ? null : Text(details.join(' · ')),
-      trailing: const Icon(Icons.chevron_right),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          if (contract != null && contract.isNotEmpty)
+            IconButton(
+              tooltip: l10n.contractOpen,
+              icon: const Icon(Icons.description_outlined),
+              onPressed: () =>
+                  _openContract(context, ref, placement.animalId, contract),
+            ),
+          const Icon(Icons.chevron_right),
+        ],
+      ),
     );
+  }
+
+  /// Hands the stored document to the phone's other apps.
+  ///
+  /// Three outcomes, three sentences. The commonest failure is a ledger restored
+  /// on a second phone: the row travelled, the file did not, and a tap that said
+  /// nothing would read as the contract never having been saved.
+  static Future<void> _openContract(
+    BuildContext context,
+    WidgetRef ref,
+    String animalId,
+    String fileName,
+  ) async {
+    final l10n = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    final files = ref.read(contractFilesProvider);
+    try {
+      final bytes = await files.readBytes(animalId, fileName);
+      if (bytes == null) {
+        messenger.showSnackBar(SnackBar(content: Text(l10n.contractMissing)));
+        return;
+      }
+      await ref.read(packFilesProvider).shareBytes(fileName, bytes);
+    } catch (error) {
+      debugPrint('Contract $fileName could not be opened: $error');
+      messenger.showSnackBar(SnackBar(content: Text(l10n.contractOpenFailed)));
+    }
   }
 }
 
@@ -893,70 +1149,21 @@ class _PhotoThumb extends StatelessWidget {
   );
 }
 
-/// One picture: the bytes when this phone has them, a named blank when not.
-class _PhotoImage extends ConsumerWidget {
+/// One picture in the strip: the bytes when this phone has them, a named blank
+/// when not.
+///
+/// The decode rule and the missing-file sentence moved to [PhotoImage] when the
+/// herd card started drawing the same photograph; this is now the strip's frame
+/// around it, so a thumbnail and a card cannot drift apart on either.
+class _PhotoImage extends StatelessWidget {
   const _PhotoImage({required this.photo, this.size = 104});
 
   final Photo photo;
   final double size;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    // Decoded at the size actually drawn. A 12-megapixel camera JPEG costs about
-    // 48 MB once decoded, and this widget is a 104-point square in a strip that
-    // can hold a dozen of them: asked for the whole picture, the ledger screen
-    // spends its memory on pixels it then shrinks to nothing on the way to the
-    // canvas, on a phone with about 350 MB free.
-    final decodeWidth = (size * MediaQuery.devicePixelRatioOf(context)).ceil();
-    return SizedBox(
-      width: size,
-      height: size,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(8),
-        child: ref
-            .watch(photoPathProvider(photo))
-            .when(
-              // Not a spinner: the answer is one stat call, and a bar that appears
-              // and disappears per thumbnail is a strip that flickers.
-              loading: () => const ColoredBox(color: Color(0x14000000)),
-              error: (error, stack) => const _PhotoMissing(),
-              data: (path) => path == null
-                  ? const _PhotoMissing()
-                  : Image.file(
-                      File(path),
-                      cacheWidth: decodeWidth,
-                      fit: BoxFit.cover,
-                      // A file that will not decode is the same fact as one that is
-                      // not there, told the same way.
-                      errorBuilder: (context, error, stack) =>
-                          const _PhotoMissing(),
-                    ),
-            ),
-      ),
-    );
-  }
-}
-
-class _PhotoMissing extends StatelessWidget {
-  const _PhotoMissing();
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return ColoredBox(
-      color: theme.colorScheme.surfaceContainerHighest,
-      child: Padding(
-        padding: const EdgeInsets.all(6),
-        child: Center(
-          child: Text(
-            AppLocalizations.of(context).photoMissing,
-            textAlign: TextAlign.center,
-            style: theme.textTheme.labelSmall,
-          ),
-        ),
-      ),
-    );
-  }
+  Widget build(BuildContext context) =>
+      PhotoImage(photo: photo, width: size, height: size);
 }
 
 /// Takes the file the breeder chose into this animal's folder and its row into
@@ -973,11 +1180,37 @@ Future<void> _addPhoto(
   String animalId,
 ) async {
   final l10n = AppLocalizations.of(context);
+
+  // Asked before the picker opens, because the two are different trips out of
+  // the app: the gallery is a document that already exists, the camera is a
+  // picture of the animal in front of the breeder. One tap decides which.
+  final source = await showModalBottomSheet<PhotoSource>(
+    context: context,
+    builder: (sheetContext) => SafeArea(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          ListTile(
+            leading: const Icon(Icons.photo_library_outlined),
+            title: Text(l10n.photoFromGallery),
+            onTap: () => Navigator.of(sheetContext).pop(PhotoSource.gallery),
+          ),
+          ListTile(
+            leading: const Icon(Icons.photo_camera_outlined),
+            title: Text(l10n.photoFromCamera),
+            onTap: () => Navigator.of(sheetContext).pop(PhotoSource.camera),
+          ),
+        ],
+      ),
+    ),
+  );
+  if (source == null || !context.mounted) return;
+
   final messenger = ScaffoldMessenger.of(context);
   try {
     // Null is the picker closed without a choice. That is a decision, not a
     // failure, and it gets no sentence and no row.
-    await addPhoto(ref, animalId);
+    await addPhoto(ref, animalId, source: source);
   } on PhotoRefused catch (refused) {
     messenger.showSnackBar(
       SnackBar(

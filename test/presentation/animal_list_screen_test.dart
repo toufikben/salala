@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:salala/core/utils/reminders.dart';
-import 'package:salala/data/models/animal.dart';
-import 'package:salala/data/models/vaccination.dart';
-import 'package:salala/presentation/screens/animal_form_screen.dart';
+import 'package:companion/core/utils/reminders.dart';
+import 'package:companion/data/models/animal.dart';
+import 'package:companion/data/models/vaccination.dart';
+import 'package:companion/presentation/screens/animal_form_screen.dart';
 
 import '../helpers/fake_notification_writer.dart';
 import '../helpers/pump_app.dart';
@@ -19,13 +19,26 @@ Animal _draft({String name = 'Atlas', bool breeding = false}) => Animal(
   updatedAt: 0,
 );
 
+/// The card's own overflow menu.
+///
+/// Scrolled to first: the card is a photograph now, so on the default 800-point
+/// test window the menu sits below the fold and a bare `tap` lands on nothing —
+/// which is exactly the failure `hitTestWarningShouldBeFatal` is set to catch.
+Future<void> _openCardMenu(WidgetTester tester) async {
+  final menu = find.byIcon(Icons.more_vert);
+  await tester.ensureVisible(menu);
+  await tester.pumpAndSettle();
+  await tester.tap(menu);
+  await tester.pumpAndSettle();
+}
+
 void main() {
   // A tap that misses its widget must fail the test instead of only warning;
   // a missed tap here once produced a green test that had saved nothing.
   WidgetController.hitTestWarningShouldBeFatal = true;
 
   testWidgets('empty herd shows the guided empty state', (tester) async {
-    await pumpSalala(tester);
+    await pumpApp(tester);
 
     expect(find.text('No animals yet'), findsOneWidget);
     // Exactly one way in: the device check found a FAB stacked on top of the
@@ -35,7 +48,7 @@ void main() {
   });
 
   testWidgets('animals are grouped, breeding stock first', (tester) async {
-    await pumpSalala(
+    await pumpApp(
       tester,
       seed: <Animal>[
         _draft(name: 'Bella'),
@@ -43,14 +56,18 @@ void main() {
       ],
     );
 
-    expect(find.text('Breeding stock'), findsOneWidget);
+    expect(find.text('Breeding stock'), findsNWidgets(2));
     expect(find.text('Zeus'), findsOneWidget);
     expect(find.text('All animals'), findsOneWidget);
 
     // With a herd to work on, the corner button is back.
     expect(find.byType(FloatingActionButton), findsOneWidget);
 
-    final breedingIndex = tester.getTopLeft(find.text('Breeding stock')).dy;
+    // The header, not the chip on Zeus's card: `first` is the earlier widget in
+    // the tree, and the section header is built before the cards under it.
+    final breedingIndex = tester
+        .getTopLeft(find.text('Breeding stock').first)
+        .dy;
     final allIndex = tester.getTopLeft(find.text('All animals')).dy;
     expect(breedingIndex, lessThan(allIndex));
   });
@@ -65,7 +82,7 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
 
-    await pumpSalala(tester);
+    await pumpApp(tester);
 
     // The herd is empty here, so the only affordance is the empty state's own
     // button — the FAB is deliberately absent until there is something to add to.
@@ -86,11 +103,19 @@ void main() {
       'dog',
     );
     // Focusing a field can scroll the button out from under the tap, so the
-    // scroll is re-asserted rather than assumed.
-    await tester.ensureVisible(save);
+    // scroll is re-asserted rather than assumed — and the caret's own
+    // scroll-into-view runs on the frame after the jump, so it is settled first
+    // and the tap follows the jump in the same frame.
     await tester.pumpAndSettle();
+    await tester.ensureVisible(save);
+    await tester.pump();
     await tester.tap(save);
-    // The write goes to the database, so the fake clock alone cannot finish it.
+    // The write goes to the database, so the fake clock alone cannot finish it —
+    // and the form closing is what proves the tap landed.
+    await settleUntil(
+      tester,
+      () => find.byType(AnimalFormScreen).evaluate().isEmpty,
+    );
     await settleRealIo(tester);
 
     // The route has to be gone: while the form is still open its own name field
@@ -112,7 +137,7 @@ void main() {
       // The herd stays empty on purpose: the animal being typed is the first row
       // the database turns down, so nothing else on the screen can be what the
       // breeder is looking at.
-      await pumpSalala(tester, beforeLaunch: refuseWritesTo('animals'));
+      await pumpApp(tester, beforeLaunch: refuseWritesTo('animals'));
       await tester.tap(find.widgetWithText(FilledButton, 'Add animal'));
       await tester.pumpAndSettle();
 
@@ -139,14 +164,14 @@ void main() {
   testWidgets('a locked app opens on the PIN gate, not the herd', (
     tester,
   ) async {
-    await pumpSalala(tester, hasPin: true);
+    await pumpApp(tester, hasPin: true);
 
-    expect(find.text('Salala is locked'), findsOneWidget);
+    expect(find.text('Companion is locked'), findsOneWidget);
     expect(find.text('Animals'), findsNothing);
   });
 
   testWidgets('Arabic renders right-to-left', (tester) async {
-    await pumpSalala(tester, locale: const Locale('ar'));
+    await pumpApp(tester, locale: const Locale('ar'));
 
     expect(
       find.descendant(
@@ -195,7 +220,7 @@ void main() {
       tester,
     ) async {
       final notifications = FakeNotificationWriter();
-      await pumpSalala(
+      await pumpApp(
         tester,
         notifications: notifications,
         resyncOnLaunch: true,
@@ -216,7 +241,7 @@ void main() {
       tester,
     ) async {
       final notifications = FakeNotificationWriter();
-      await pumpSalala(
+      await pumpApp(
         tester,
         notifications: notifications,
         resyncOnLaunch: true,
@@ -233,7 +258,7 @@ void main() {
       tester,
     ) async {
       final notifications = FakeNotificationWriter();
-      await pumpSalala(
+      await pumpApp(
         tester,
         notifications: notifications,
         resyncOnLaunch: true,
@@ -258,7 +283,7 @@ void main() {
       tester,
     ) async {
       final notifications = FakeNotificationWriter();
-      await pumpSalala(
+      await pumpApp(
         tester,
         notifications: notifications,
         resyncOnLaunch: true,
@@ -270,8 +295,7 @@ void main() {
 
       // The card's own menu and its own confirm dialog: the delete the breeder
       // aims at is the one under test, not a DAO called behind the widget tree.
-      await tester.tap(find.byIcon(Icons.more_vert));
-      await tester.pumpAndSettle();
+      await _openCardMenu(tester);
       await tester.tap(find.text('Delete'));
       await tester.pumpAndSettle();
       await tester.tap(find.widgetWithText(FilledButton, 'Delete'));
@@ -289,10 +313,9 @@ void main() {
     testWidgets(
       'the warning before an animal dies names the photographs it takes',
       (tester) async {
-        await pumpSalala(tester, seed: <Animal>[nala()]);
+        await pumpApp(tester, seed: <Animal>[nala()]);
 
-        await tester.tap(find.byIcon(Icons.more_vert));
-        await tester.pumpAndSettle();
+        await _openCardMenu(tester);
         await tester.tap(find.text('Delete'));
         await tester.pumpAndSettle();
 
@@ -313,7 +336,7 @@ void main() {
       'an animal the database refuses to delete keeps its card and its alarms',
       (tester) async {
         final notifications = FakeNotificationWriter();
-        await pumpSalala(
+        await pumpApp(
           tester,
           notifications: notifications,
           resyncOnLaunch: true,
@@ -324,8 +347,7 @@ void main() {
         await waitForSchedulerCalls(tester, notifications, 3);
         expect(notifications.written, hasLength(1));
 
-        await tester.tap(find.byIcon(Icons.more_vert));
-        await tester.pumpAndSettle();
+        await _openCardMenu(tester);
         await tester.tap(find.text('Delete'));
         await tester.pumpAndSettle();
         await tester.tap(find.widgetWithText(FilledButton, 'Delete'));
@@ -357,7 +379,7 @@ void main() {
         addTearDown(tester.view.resetDevicePixelRatio);
 
         final notifications = FakeNotificationWriter();
-        await pumpSalala(
+        await pumpApp(
           tester,
           notifications: notifications,
           resyncOnLaunch: true,
@@ -371,8 +393,7 @@ void main() {
         expect(booked, hasLength(2));
         expect(notifications.written, hasLength(1));
 
-        await tester.tap(find.byIcon(Icons.more_vert));
-        await tester.pumpAndSettle();
+        await _openCardMenu(tester);
         await tester.tap(find.text('Edit'));
         await tester.pumpAndSettle();
         await tester.tap(find.byType(DropdownButtonFormField<AnimalStatus>));

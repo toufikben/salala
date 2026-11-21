@@ -4,30 +4,33 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:salala/app.dart';
-import 'package:salala/core/utils/triage.dart';
-import 'package:salala/data/db/daos.dart';
-import 'package:salala/data/models/animal.dart';
-import 'package:salala/data/models/buyer.dart';
-import 'package:salala/data/models/health_test.dart';
-import 'package:salala/data/models/placement.dart';
-import 'package:salala/data/models/photo.dart';
-import 'package:salala/data/models/symptom.dart';
-import 'package:salala/data/models/vaccination.dart';
-import 'package:salala/data/models/vet_visit.dart';
-import 'package:salala/data/models/weight_entry.dart';
-import 'package:salala/presentation/providers/app_providers.dart';
-import 'package:salala/presentation/providers/triage_providers.dart';
-import 'package:salala/presentation/widgets/date_tile.dart';
-import 'package:salala/services/app_lock_service.dart';
-import 'package:salala/services/reminder_scheduler.dart';
+import 'package:companion/app.dart';
+import 'package:companion/core/utils/triage.dart';
+import 'package:companion/data/db/daos.dart';
+import 'package:companion/data/models/animal.dart';
+import 'package:companion/data/models/buyer.dart';
+import 'package:companion/data/models/health_test.dart';
+import 'package:companion/data/models/litter.dart';
+import 'package:companion/data/models/placement.dart';
+import 'package:companion/data/models/photo.dart';
+import 'package:companion/data/models/symptom.dart';
+import 'package:companion/data/models/vaccination.dart';
+import 'package:companion/data/models/vet_visit.dart';
+import 'package:companion/data/models/weight_entry.dart';
+import 'package:companion/presentation/providers/app_providers.dart';
+import 'package:companion/presentation/providers/triage_providers.dart';
+import 'package:companion/presentation/widgets/date_tile.dart';
+import 'package:companion/services/app_lock_service.dart';
+import 'package:companion/services/reminder_scheduler.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:timezone/data/latest_all.dart' as tz_data;
 import 'package:timezone/timezone.dart' as tz;
 
 import 'fake_notification_writer.dart';
+import 'fake_contract_files.dart';
 import 'fake_pack_files.dart';
 import 'fake_photo_files.dart';
+import 'fake_review_service.dart';
 import 'fake_secure_storage.dart';
 import 'test_db.dart';
 
@@ -80,9 +83,16 @@ Future<void> settleRealIo(WidgetTester tester) async {
   // below and fail 19 screens later as `pumpAndSettle timed out` (run
   // 37383228340). The bound stays finite so a genuinely stuck widget still
   // fails loudly rather than hanging the suite.
+  //
+  // The bound is 120 rounds — about five real seconds — rather than four. A
+  // loaded machine can take whole seconds to answer the first query, and this
+  // helper is reached by screens whose section *does* resolve: run `run24` failed
+  // two of them on the forty-round figure while the same tests were green alone.
+  // A section that never resolves still fails, just later and with the same
+  // sentence.
   for (
     var round = 0;
-    round < 40 && tester.any(find.bySubtype<ProgressIndicator>());
+    round < 120 && tester.any(find.bySubtype<ProgressIndicator>());
     round++
   ) {
     await tester.pump(const Duration(milliseconds: 25));
@@ -112,6 +122,33 @@ Future<void> settleRealIo(WidgetTester tester) async {
   }
 }
 
+/// Waits for a fact a write produces, giving SQLite real time to land it.
+///
+/// `settleRealIo` is right for a section that closes when it stops spinning, and
+/// its rounds are fixed. A save that pops a route, replaces a row, or moves a
+/// card shows no spinner at all: the screen sits still while the write runs on
+/// another isolate, and a loaded machine can need longer than the fixed rounds
+/// allow. That is how the same test passes alone and fails inside a suite.
+///
+/// The bound is finite and the caller's own assertion still decides the outcome:
+/// a wait that times out leaves the screen in exactly the state the test then
+/// reports, rather than turning a stuck screen into a pass.
+Future<void> settleUntil(
+  WidgetTester tester,
+  bool Function() done, {
+  Duration timeout = const Duration(seconds: 20),
+}) async {
+  var waited = Duration.zero;
+  const step = Duration(milliseconds: 25);
+  const real = Duration(milliseconds: 20);
+  while (!done() && waited < timeout) {
+    await tester.pump(step);
+    await tester.runAsync(() => Future<void>.delayed(real));
+    waited += step + real;
+  }
+  await tester.pump();
+}
+
 /// Waits until the scheduler has been handed a whole save or a whole launch.
 ///
 /// The dose is written on another isolate, so the alarms reach the writer some
@@ -126,14 +163,22 @@ Future<void> settleRealIo(WidgetTester tester) async {
 Future<void> waitForSchedulerCalls(
   WidgetTester tester,
   FakeNotificationWriter notifications,
-  int calls,
-) async {
-  for (var round = 0; round < 40 && notifications.log.length < calls; round++) {
+  int calls, {
+  Duration timeout = const Duration(seconds: 15),
+}) async {
+  // A real-time bound, not a round count. The alarm booking sits behind a
+  // database transaction, a resync read and a couple of preference writes, and a
+  // loaded machine can take seconds over that: forty rounds of 25 ms — one
+  // second — let this pass alone and fail inside a suite, reporting zero calls
+  // from a restore that had simply not got there yet.
+  final clock = Stopwatch()..start();
+  while (notifications.log.length < calls && clock.elapsed < timeout) {
     await tester.pump();
     await tester.runAsync(
       () => Future<void>.delayed(const Duration(milliseconds: 25)),
     );
   }
+  clock.stop();
   if (notifications.log.length < calls) {
     throw StateError(
       'the scheduler reached ${notifications.log.length} of $calls calls '
@@ -147,7 +192,7 @@ Future<void> waitForSchedulerCalls(
 /// Boots the real router + theme + localizations against a temporary database
 /// and a fake keystore. [seed] rows are inserted through the real DAO before
 /// the first frame, so the UI is exercised against genuine SQL results.
-Future<FakeSecureStorage> pumpSalala(
+Future<FakeSecureStorage> pumpApp(
   WidgetTester tester, {
   Locale? locale,
   bool hasPin = false,
@@ -158,11 +203,23 @@ Future<FakeSecureStorage> pumpSalala(
   // without one gets a fake that has never heard of any file: the screen still
   // has to answer a row whose bytes are not on the phone.
   FakePhotoFiles? photoFiles,
+  // The document picker and the contract folder. Defaulted rather than required
+  // for the same reason: a handover form with an attach row must render on a
+  // runner that has no picker.
+  FakeContractFiles? contractFiles,
   // Whether opening the app rebuilds the alarms from the ledger, which is what
   // a real launch does. Off by default: a test about saving one dose should not
   // also be handed the alarms that opening the list booked for it. The launch
   // path switches this on and tests itself.
   bool resyncOnLaunch = false,
+  // Whether this install has already been introduced to itself. Defaults to
+  // true, because almost every test is about the app rather than about arriving
+  // in it — a suite where every screen is behind three slides would be a suite
+  // about slides. The onboarding tests pass false.
+  bool onboardingSeen = true,
+  // The store's review card, which no test runner has. A recorder in its place
+  // is what lets the rating row be proved to call it and to answer a refusal.
+  FakeReviewService? review,
   List<Animal> seed = const <Animal>[],
   List<Vaccination> seedVaccinations = const <Vaccination>[],
   List<WeightEntry> seedWeights = const <WeightEntry>[],
@@ -170,6 +227,7 @@ Future<FakeSecureStorage> pumpSalala(
   List<VetVisit> seedVisits = const <VetVisit>[],
   List<Symptom> seedSymptoms = const <Symptom>[],
   List<Photo> seedPhotos = const <Photo>[],
+  List<Litter> seedLitters = const <Litter>[],
   List<Buyer> seedBuyers = const <Buyer>[],
   List<Placement> seedPlacements = const <Placement>[],
   // A database the test wants bent before the first frame, after the seeds have
@@ -178,8 +236,14 @@ Future<FakeSecureStorage> pumpSalala(
   // that wants to prove a form survives a refused insert installs a trigger here
   // rather than faking a dao.
   Future<void> Function(Database db)? beforeLaunch,
+  // How long the app may sit in the background before the PIN gate comes back.
+  // Zero for the tests that send a lifecycle event and expect the gate at once.
+  Duration lockGrace = const Duration(seconds: 30),
+  // Keystore values written before the first frame: a broken digest, a lockout
+  // that outlived the process, or an enrollment the app has to open on.
+  Map<String, String> secureSeed = const <String, String>{},
 }) async {
-  final storage = FakeSecureStorage();
+  final storage = FakeSecureStorage()..values.addAll(secureSeed);
   late Database database;
 
   // The triage table, read here instead of from inside its provider, and read
@@ -253,6 +317,12 @@ Future<FakeSecureStorage> pumpSalala(
     for (final placement in seedPlacements) {
       await daos.placements.create(placement, nowMs: nowMs++);
     }
+    // Litters last: `dam_id` and `sire_id` are foreign keys into the animals
+    // just written. Seeded as rows rather than through `createWithPuppies`, so a
+    // test can hand a screen a whelping that has no puppies yet.
+    for (final litter in seedLitters) {
+      await daos.litters.create(litter, nowMs: nowMs++);
+    }
     if (beforeLaunch != null) await beforeLaunch(database);
   });
 
@@ -271,11 +341,17 @@ Future<FakeSecureStorage> pumpSalala(
         // mention pictures: the shipped class asks the platform for its documents
         // directory, and a test runner has no platform.
         photoFilesProvider.overrideWithValue(photoFiles ?? FakePhotoFiles()),
+        contractFilesProvider.overrideWithValue(
+          contractFiles ?? FakeContractFiles(),
+        ),
         if (!resyncOnLaunch)
           remindersResyncProvider.overrideWith(AlreadyResynced.new),
+        lockGracePeriodProvider.overrideWithValue(lockGrace),
         if (locale != null) initialLocaleProvider.overrideWithValue(locale),
+        initialOnboardingSeenProvider.overrideWithValue(onboardingSeen),
+        if (review != null) reviewServiceProvider.overrideWithValue(review),
       ],
-      child: const SalalaApp(),
+      child: const CompanionApp(),
     ),
   );
   await settleRealIo(tester);
@@ -336,8 +412,13 @@ Future<void> tapSaveAndGetAnswer(
           of: find.widgetWithText(AlertDialog, dialogTitle),
           matching: find.widgetWithText(FilledButton, 'Save'),
         );
-  await tester.ensureVisible(save);
+  // The field that was typed into last owns a caret whose own scroll-into-view
+  // runs one frame later and drags the page back to that field. Settling first,
+  // then jumping to the button and tapping in the same frame, is what keeps the
+  // tap on the button rather than on whatever moved in front of it.
   await tester.pumpAndSettle();
+  await tester.ensureVisible(save);
+  await tester.pump();
   await tester.tap(save);
   await settleRefusal(tester, waitingFor: waitingFor);
 }

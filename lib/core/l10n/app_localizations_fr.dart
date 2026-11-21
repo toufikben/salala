@@ -10,7 +10,7 @@ class AppLocalizationsFr extends AppLocalizations {
   AppLocalizationsFr([String locale = 'fr']) : super(locale);
 
   @override
-  String get appTitle => 'Salala';
+  String get appTitle => 'Companion';
 
   @override
   String get navAnimals => 'Animaux';
@@ -19,14 +19,20 @@ class AppLocalizationsFr extends AppLocalizations {
   String get navLitters => 'Portées';
 
   @override
+  String get navBuyers => 'Acquéreurs';
+
+  @override
   String get navSettings => 'Réglages';
+
+  @override
+  String get languageName => 'Français';
 
   @override
   String get homeEmptyTitle => 'Aucun animal pour l\'instant';
 
   @override
   String get homeEmptyBody =>
-      'Ajoutez votre premier chien ou chat pour commencer le dossier santé et les origines.';
+      'Un troupeau commence par un seul. Donnez-lui un nom, et sa fiche commence ici.';
 
   @override
   String get homeAddAnimal => 'Ajouter un animal';
@@ -38,7 +44,8 @@ class AppLocalizationsFr extends AppLocalizations {
   String get homeAllAnimals => 'Tous les animaux';
 
   @override
-  String get homeSearchHint => 'Rechercher par nom, numéro, puce ou note';
+  String get homeSearchHint =>
+      'Rechercher par nom, numéro, puce, note ou acquéreur';
 
   @override
   String homeNoMatches(String query) {
@@ -73,10 +80,24 @@ class AppLocalizationsFr extends AppLocalizations {
   String get animalBirthDate => 'Date de naissance';
 
   @override
+  String animalBornOn(String day) {
+    return 'Né le $day';
+  }
+
+  @override
   String get animalStatus => 'Statut';
 
   @override
   String get animalMicrochip => 'N° de puce';
+
+  @override
+  String get animalMicrochipDate => 'Date du puçage';
+
+  @override
+  String get animalLitter => 'Portée';
+
+  @override
+  String get animalNone => 'Aucun';
 
   @override
   String get animalRegistrationNo => 'N° d\'affiliation';
@@ -105,8 +126,13 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String animalDeleteLittersNote(int litters, int puppies) {
+    return 'Cela supprime aussi $litters portée(s) dont elle est la mère ; $puppies de leurs chiots restent dans vos animaux mais perdent la trace de leur mère.';
+  }
+
+  @override
   String get animalDeleteBody =>
-      'Ses vaccins, tests de santé, pesées, visites et symptômes seront supprimés aussi, ainsi que la cession enregistrée, ses photos et les fichiers qui les gardent sur cet appareil, et les portées dont cet animal est la mère. Action irréversible.';
+      'Ses vaccins, tests de santé, pesées, visites et symptômes sont aussi supprimés, avec toute cession enregistrée, ses photos et les fichiers qui les gardent sur ce téléphone, ainsi que le contrat joint à cette cession. Cette action est irréversible.';
 
   @override
   String get animalNameRequired => 'Le nom est obligatoire';
@@ -160,6 +186,27 @@ class AppLocalizationsFr extends AppLocalizations {
   String get recordsEmpty => 'Rien d\'enregistré.';
 
   @override
+  String get detailStoryLine => 'Chaque ligne ici fait partie de son histoire.';
+
+  @override
+  String get detailDiedLine => 'Sa fiche reste telle qu\'elle était.';
+
+  @override
+  String placedFarewell(String name) {
+    return '$name est parti dans un nouveau foyer. La fiche reste avec vous.';
+  }
+
+  @override
+  String reminderHeadsUpBody(String what, String dueDay) {
+    return 'À noter : $what arrive à échéance le $dueDay';
+  }
+
+  @override
+  String reminderDueBody(String what) {
+    return '$what arrive aujourd\'hui. Deux minutes suffisent';
+  }
+
+  @override
   String get actionSave => 'Enregistrer';
 
   @override
@@ -187,7 +234,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get actionReplace => 'Remplacer';
 
   @override
-  String get lockTitle => 'Salala est verrouillé';
+  String get lockTitle => 'Companion est verrouillé';
 
   @override
   String get lockEnterPin => 'Saisissez votre code';
@@ -228,7 +275,22 @@ class AppLocalizationsFr extends AppLocalizations {
       'Le téléphone a refusé de modifier le verrouillage.';
 
   @override
+  String get lockChangePinDone => 'Code modifié.';
+
+  @override
+  String lockTooManyAttempts(int seconds) {
+    return 'Trop de codes erronés. Réessayez dans $seconds s.';
+  }
+
+  @override
   String get settingsAppLock => 'Verrouillage';
+
+  @override
+  String get settingsChangePin => 'Modifier le code';
+
+  @override
+  String get settingsChangePinBody =>
+      'Saisissez le code actuel, puis choisissez-en un nouveau.';
 
   @override
   String get settingsLanguage => 'Langue';
@@ -242,7 +304,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get startupFailedTitle =>
-      'Salala n\'a pas pu ouvrir le registre sur ce téléphone.';
+      'Companion n\'a pas pu ouvrir le registre sur ce téléphone.';
 
   @override
   String get startupFailedBody =>
@@ -250,6 +312,17 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get settingsAbout => 'À propos';
+
+  @override
+  String get settingsTrial => 'Essai gratuit';
+
+  @override
+  String settingsTrialRemaining(String days) {
+    return 'Encore $days jours';
+  }
+
+  @override
+  String get settingsTrialOver => 'L\'essai est terminé';
 
   @override
   String get settingsBuildTag => 'Version';
@@ -263,13 +336,71 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get settingsExportBody =>
-      'Un fichier JSON avec tous les enregistrements de ce téléphone';
+      'Un fichier ZIP avec tous les enregistrements et toutes les photos de ce téléphone';
 
   @override
   String get settingsImport => 'Restaurer un pack';
 
   @override
   String get settingsImportBody => 'Relire un pack sur ce téléphone';
+
+  @override
+  String settingsLastBackup(String day) {
+    return 'Dernière sauvegarde : $day';
+  }
+
+  @override
+  String get settingsNeverBackedUp =>
+      'Aucune sauvegarde n\'a encore quitté ce téléphone';
+
+  @override
+  String get settingsCsv => 'Tableur (CSV)';
+
+  @override
+  String get settingsCsvBody =>
+      'Pour votre comptable, un formulaire de registre ou un copropriétaire. S\'ouvre dans Excel, Numbers ou Google Sheets.';
+
+  @override
+  String get settingsCsvHerd => 'Animaux';
+
+  @override
+  String get settingsCsvLitters => 'Portées';
+
+  @override
+  String get settingsCsvVaccinations => 'Vaccinations';
+
+  @override
+  String get settingsCsvPlacements => 'Cessions';
+
+  @override
+  String csvShared(String file) {
+    return '$file est prêt à envoyer';
+  }
+
+  @override
+  String get csvShareFailed =>
+      'Le tableur n\'a pas pu être écrit sur ce téléphone';
+
+  @override
+  String get csvEmpty => 'Rien à exporter sur ce téléphone pour l\'instant';
+
+  @override
+  String get csvColAnimal => 'Animal';
+
+  @override
+  String get csvColCountry => 'Pays';
+
+  @override
+  String get csvColPuppies => 'Chiots';
+
+  @override
+  String get csvColBreedingStock => 'Reproducteur';
+
+  @override
+  String get csvColYes => 'oui';
+
+  @override
+  String get csvColNo => 'non';
 
   @override
   String packShared(String file) {
@@ -284,11 +415,11 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get packNotAPack =>
-      'Ce fichier n\'est pas un pack Salala, ou il est endommagé';
+      'Ce fichier n\'est pas un pack Companion, ou il est endommagé';
 
   @override
   String get packFromTheFuture =>
-      'Ce pack vient d\'une version plus récente de Salala';
+      'Ce pack vient d\'une version plus récente de Companion';
 
   @override
   String packIncomplete(String table) {
@@ -297,7 +428,12 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String packUnknownTable(String table) {
-    return 'Ce pack contient une table que Salala ne connaît pas : $table';
+    return 'Ce pack contient une table que Companion ne connaît pas : $table';
+  }
+
+  @override
+  String packBadValue(String detail) {
+    return 'Ce pack contient une valeur que Companion ne peut pas lire : $detail';
   }
 
   @override
@@ -319,6 +455,15 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get litterAdd => 'Nouvelle portée';
+
+  @override
+  String get litterEditTitle => 'Modifier la portée';
+
+  @override
+  String get litterAddPuppies => 'Ajouter des chiots';
+
+  @override
+  String get litterHowMany => 'Combien ?';
 
   @override
   String get litterAddTitle => 'Enregistrer une portée';
@@ -375,6 +520,122 @@ class AppLocalizationsFr extends AppLocalizations {
   String litterExpected(String date) {
     return 'Mise bas prévue : $date';
   }
+
+  @override
+  String get statsTitle => 'L\'élevage en chiffres';
+
+  @override
+  String get settingsStats => 'L\'élevage en chiffres';
+
+  @override
+  String get statsHerdGroup => 'Qui est là';
+
+  @override
+  String get statsBreedingGroup => 'Portées et chiots';
+
+  @override
+  String get statsMoneyGroup => 'Cessions';
+
+  @override
+  String get statsAtHome => 'Animaux présents';
+
+  @override
+  String get statsBreedingStock => 'Reproducteurs';
+
+  @override
+  String get statsFemales => 'Femelles présentes';
+
+  @override
+  String get statsMales => 'Mâles présents';
+
+  @override
+  String get statsEverRecorded => 'Tous ceux enregistrés';
+
+  @override
+  String get statsWhelpings => 'Portées au carnet';
+
+  @override
+  String get statsPuppies => 'Chiots de vos portées';
+
+  @override
+  String statsPuppiesThisYear(String year) {
+    return 'Chiots nés en $year';
+  }
+
+  @override
+  String get statsPlacements => 'Cessions';
+
+  @override
+  String get statsUnnamedCurrency => 'Devise non précisée';
+
+  @override
+  String statsHandoverCount(String count) {
+    return 'Dont $count payées';
+  }
+
+  @override
+  String get statsNoRevenue => 'Aucun prix enregistré';
+
+  @override
+  String get statsFooter =>
+      'Calculé à partir de votre propre carnet, sur ce téléphone. Rien n\'en sort.';
+
+  @override
+  String get birthdayTitle => 'À venir';
+
+  @override
+  String get birthdayToday => 'aujourd\'hui';
+
+  @override
+  String birthdayIn(String days) {
+    return 'dans $days';
+  }
+
+  @override
+  String birthdayTurning(String name, String years) {
+    return '$name fête ses $years';
+  }
+
+  @override
+  String get heatCardTitle => 'Prochaines chaleurs';
+
+  @override
+  String heatCardWindow(String earliest, String latest) {
+    return 'Entre le $earliest et le $latest';
+  }
+
+  @override
+  String heatCardSteady(String count) {
+    return 'D\'après $count cycles de son propre carnet.';
+  }
+
+  @override
+  String get heatCardThin =>
+      'Un seul cycle au carnet, la fourchette reste donc large. Enregistrez une autre saillie et elle se resserre.';
+
+  @override
+  String heatCardWhelping(String day) {
+    return 'Une saillie dans cette période donnerait une naissance vers le $day.';
+  }
+
+  @override
+  String get bulkVaccineTitle => 'Vacciner ensemble';
+
+  @override
+  String bulkVaccineCount(String count) {
+    return '$count animaux reçoivent la même dose';
+  }
+
+  @override
+  String get bulkVaccineAction => 'Vacciner la portée';
+
+  @override
+  String bulkVaccineDone(String count) {
+    return 'Enregistré pour $count animaux';
+  }
+
+  @override
+  String get pedigreeTitle => 'Pedigree';
 
   @override
   String litterPuppyCount(int count) {
@@ -657,6 +918,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get photoAdd => 'Ajouter une photo';
 
   @override
+  String get photoFromGallery => 'Choisir dans la galerie';
+
+  @override
+  String get photoFromCamera => 'Prendre une photo';
+
+  @override
   String get photoDeleteBody =>
       'La photo est retirée du registre de cet animal, et le fichier avec elle. Action irréversible.';
 
@@ -700,6 +967,33 @@ class AppLocalizationsFr extends AppLocalizations {
   String get placementGuarantee => 'Conditions de garantie';
 
   @override
+  String get contractAttach => 'Joindre un contrat';
+
+  @override
+  String get contractAttached => 'Contrat joint';
+
+  @override
+  String get contractStoredName => 'Un document joint plus tôt';
+
+  @override
+  String get contractRemove => 'Retirer le contrat';
+
+  @override
+  String get contractOpen => 'Ouvrir le contrat';
+
+  @override
+  String get contractMissing => 'Ce document n\'est pas sur ce téléphone';
+
+  @override
+  String get contractOpenFailed => 'Le document n\'a pas pu être ouvert';
+
+  @override
+  String get contractPickFailed => 'Aucun document n\'a pu être choisi';
+
+  @override
+  String get contractTooLarge => 'Ce fichier est trop lourd pour être conservé';
+
+  @override
   String get placementDeleteBody =>
       'Le placement est retiré de l\'historique de cet animal. L\'acquéreur reste dans vos contacts. Action irréversible.';
 
@@ -722,18 +1016,18 @@ class AppLocalizationsFr extends AppLocalizations {
   String get buyerCountryCode => 'Code pays';
 
   @override
+  String get buyersEmptyTitle => 'Aucun acquéreur pour l\'instant';
+
+  @override
+  String get buyersEmptyBody =>
+      'Un acquéreur s\'ajoute avec un placement — ou ici, avant : la personne à qui vous avez vendu l\'an dernier veut encore le pedigree.';
+
+  @override
+  String get buyersNoAnimals => 'Aucun animal enregistré pour ce contact';
+
+  @override
   String buyerDeleteBody(String name) {
     return '$name est supprimé de vos contacts. Le placement reste dans l\'historique de l\'animal, sans acquéreur nommé. Action irréversible.';
-  }
-
-  @override
-  String reminderHeadsUpBody(String what, String dueDay) {
-    return 'À noter : $what arrive à échéance le $dueDay';
-  }
-
-  @override
-  String reminderDueBody(String what) {
-    return '$what arrive à échéance aujourd\'hui';
   }
 
   @override
@@ -789,7 +1083,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get pdfDisclaimer =>
-      'Établi hors ligne par Salala à partir des registres de l\'éleveur. Ce document n\'est pas un certificat vétérinaire.';
+      'Établi hors ligne par Companion à partir des registres de l\'éleveur. Ce document n\'est pas un certificat vétérinaire.';
 
   @override
   String get triageTitle => 'Prochaine étape';
@@ -808,7 +1102,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get triageNotDiagnosis =>
-      'Salala ne lit que ce que vous avez saisi ici. Ceci n\'est pas un diagnostic vétérinaire.';
+      'Companion ne lit que ce que vous avez saisi ici. Ceci n\'est pas un diagnostic vétérinaire.';
 
   @override
   String triageNoDoseYoung(String days) {
@@ -823,6 +1117,11 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String triageDoseDueSoon(String name, String days) {
     return '$name prévu dans $days';
+  }
+
+  @override
+  String triageDoseToday(String what) {
+    return '$what arrive à échéance aujourd\'hui';
   }
 
   @override
@@ -879,7 +1178,311 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get onboardingSlide1Title => 'Une fiche par animal';
+
+  @override
+  String get onboardingSlide1Body =>
+      'Un chien ou un chat, sa race, sa date de naissance et son origine. Le premier prend moins d\'une minute.';
+
+  @override
+  String get onboardingSlide2Title => 'Sa santé, dans l\'ordre';
+
+  @override
+  String get onboardingSlide2Body =>
+      'Vaccins avec leur prochaine échéance, pesées, dépistages et visites. Companion pose le rappel à votre place.';
+
+  @override
+  String get onboardingSlide3Title => 'Son histoire voyage avec lui';
+
+  @override
+  String get onboardingSlide3Body =>
+      'Un PDF ou un tableur pour l\'acheteur, et un seul ZIP qui porte chaque fiche et chaque photo vers un nouveau téléphone.';
+
+  @override
+  String get onboardingSkip => 'Passer';
+
+  @override
+  String get onboardingNext => 'Suivant';
+
+  @override
+  String get onboardingStart => 'Ajouter mon premier animal';
+
+  @override
+  String get settingsOnboarding => 'Revoir l\'introduction';
+
+  @override
+  String get settingsHelp => 'Aide';
+
+  @override
+  String get settingsRate => 'Noter Companion';
+
+  @override
+  String get settingsRateBody => 'Ouvre la fiche d\'avis de la boutique.';
+
+  @override
+  String get settingsWhatsNew => 'Nouveautés';
+
+  @override
+  String get settingsPrivacy => 'Confidentialité';
+
+  @override
+  String get settingsTerms => 'Conditions d\'utilisation';
+
+  @override
+  String get settingsLicenses => 'Licences libres';
+
+  @override
+  String get rateUnavailable =>
+      'Ce téléphone ne peut pas afficher la fiche d\'avis pour l\'instant.';
+
+  @override
+  String get aboutTitle => 'À propos de Companion';
+
+  @override
+  String get aboutBody =>
+      'Un registre hors ligne pour un petit élevage. Pas de compte, pas de serveur, pas de pistage — les fiches vivent sur ce téléphone et n\'en sortent que par vos mains.';
+
+  @override
+  String aboutVersion(String version) {
+    return 'Version $version';
+  }
+
+  @override
+  String get privacyTitle => 'Confidentialité';
+
+  @override
+  String get privacyIntro =>
+      'Companion ne détient qu\'une chose : ce que vous avez saisi sur vos animaux. Cette page dit où cela se trouve et ce qui peut le faire quitter ce téléphone.';
+
+  @override
+  String get privacyStoredHeading => 'Ce qui est stocké';
+
+  @override
+  String get privacyStoredBody =>
+      'Chaque animal, vaccin, pesée, dépistage, visite, symptôme, cession et contact d\'acheteur — et les photos jointes — dans une base et un dossier d\'images dans le stockage privé de l\'application. Android tient ce dossier hors de portée des autres applications, et les fichiers ne sont pas chiffrés au-delà.';
+
+  @override
+  String get privacyBackupHeading => 'Ce qui quitte ce téléphone';
+
+  @override
+  String get privacyBackupBody =>
+      'Seulement ce que vous exportez : un ZIP avec toutes les fiches et images, un CSV d\'une table, ou un PDF d\'un animal. Chacun va où vous l\'envoyez, donc une sauvegarde porte les noms et téléphones de vos acheteurs — traitez le fichier comme le papier qu\'il remplace. Activez le verrouillage si le téléphone voyage.';
+
+  @override
+  String get privacyCollectHeading => 'Ce qui est collecté sur vous';
+
+  @override
+  String get privacyCollectBody =>
+      'Rien. Aucune analyse, aucun rapport de plantage, aucun identifiant publicitaire et aucun appel réseau dans cette application.';
+
+  @override
+  String get privacyRemoveHeading => 'Comment l\'effacer';
+
+  @override
+  String get privacyRemoveBody =>
+      'La désinstallation emporte la base et le dossier d\'images. Il n\'existe aucune copie ailleurs, alors exportez un pack d\'abord si les fiches comptent — et le code du verrouillage n\'est pas récupérable non plus.';
+
+  @override
+  String get termsTitle => 'Conditions d\'utilisation';
+
+  @override
+  String get termsUseHeading => 'À quoi sert cette application';
+
+  @override
+  String get termsUseBody =>
+      'Tenir vos propres fiches sur les animaux dont vous avez la charge. Une licence par personne ; installez-la sur les téléphones que vous utilisez.';
+
+  @override
+  String get termsDataHeading => 'Vos données sont à vous';
+
+  @override
+  String get termsDataBody =>
+      'Nous n\'en détenons aucune copie et ne pouvons rien restaurer. Les sauvegardes sont votre responsabilité, et le bouton d\'export dans les Réglages en est tout le mécanisme.';
+
+  @override
+  String get termsAdviceHeading => 'Pas un avis vétérinaire';
+
+  @override
+  String get termsAdviceBody =>
+      'Companion répète ce que vous avez saisi et fait de l\'arithmétique sur des dates et des poids. Il ne diagnostique pas, et un rappel est une entrée d\'agenda, pas un avis clinique. Appelez un vétérinaire.';
+
+  @override
+  String get termsWarrantyHeading => 'Sans garantie';
+
+  @override
+  String get termsWarrantyBody =>
+      'L\'application est fournie en l\'état. Dans la mesure permise par la loi, aucune responsabilité n\'est acceptée pour une fiche perdue, un rappel manqué ou une décision prise sur ce qui est écrit ici.';
+
+  @override
+  String get helpTitle => 'Aide';
+
+  @override
+  String get helpQ1 => 'Comment sauvegarder ?';
+
+  @override
+  String get helpA1 =>
+      'Réglages, puis Exporter les dossiers. Le ZIP porte chaque ligne et chaque photo ; envoyez-le à vous-même et gardez-le. La restauration relit le même fichier sur n\'importe quel téléphone.';
+
+  @override
+  String get helpQ2 => 'J\'ai oublié mon code';
+
+  @override
+  String get helpA2 =>
+      'Il n\'est pas récupérable, seule une empreinte est stockée. Désinstaller efface le verrou et le registre avec lui, donc si vous avez un pack récent, restaurez-le ensuite.';
+
+  @override
+  String get helpQ3 => 'J\'ai perdu mon téléphone';
+
+  @override
+  String get helpA3 =>
+      'Rien n\'est sur un serveur, donc rien ne peut être renvoyé. Un pack exporté plus tôt restaure le registre sur un nouveau téléphone ; un pack jamais exporté est perdu.';
+
+  @override
+  String get helpQ4 => 'D\'où viennent les rappels ?';
+
+  @override
+  String get helpA4 =>
+      'Des dates de prochaine échéance que vous avez saisies. Companion pose une alarme un mois avant et une le matin même ; si les notifications sont coupées, les dates restent dans l\'agenda du troupeau.';
+
+  @override
+  String get helpQ5 =>
+      'Pourquoi une photo dit qu\'elle n\'est pas sur ce téléphone ?';
+
+  @override
+  String get helpA5 =>
+      'La ligne a survécu, le fichier non — souvent après une restauration depuis un pack sans photos. Rajouter la photo règle le cas.';
+
+  @override
+  String get helpQ6 => 'Puis-je remettre la fiche de l\'animal ?';
+
+  @override
+  String get helpA6 =>
+      'Oui. Ouvrez l\'animal et exportez son PDF : un document fixe que l\'acheteur garde sans cette application. La cession elle-même est enregistrée sur la même page.';
+
+  @override
+  String get helpQ7 => 'Quelles langues sont disponibles ?';
+
+  @override
+  String get helpA7 =>
+      'Anglais, arabe, français, allemand, espagnol, italien, portugais et néerlandais. Réglages, puis Langue — le changement s\'applique aussitôt.';
+
+  @override
+  String get helpQ8 => 'Quelque chose ne va pas';
+
+  @override
+  String get helpA8 =>
+      'Écrivez-nous en disant ce que vous faisiez au moment des faits. La version est sur la page À propos.';
+
+  @override
+  String get helpContactHeading => 'Écrivez-nous';
+
+  @override
+  String get whatsNewTitle => 'Nouveautés';
+
+  @override
+  String get whatsNew1 =>
+      'Des photos sur les cartes du troupeau, et une mise en page plus chaude et plus ample.';
+
+  @override
+  String get whatsNew2 => 'Un rappel touché ouvre l\'animal qu\'il concerne.';
+
+  @override
+  String get whatsNew3 => 'L\'export tableur parle la langue que vous lisez.';
+
+  @override
+  String get whatsNew4 =>
+      'Cinq langues de plus : allemand, espagnol, italien, portugais et néerlandais.';
+
+  @override
+  String get whatsNew5 =>
+      'Pages confidentialité, conditions et aide, et une ligne de notation dans les Réglages.';
+
+  @override
+  String get whatsNew6 =>
+      'Une seule liste par animal : chaque vaccin, pesée, visite et cession dans l\'ordre des dates.';
+
+  @override
+  String get timelineTitle => 'Ce qui s\'est passé';
+
+  @override
+  String get timelineEmpty => 'Rien de daté pour l\'instant.';
+
+  @override
+  String timelineShowAll(String count) {
+    return 'Afficher tout ($count)';
+  }
+
+  @override
+  String get timelineShowLess => 'Afficher moins';
+
+  @override
+  String get timelineKindBorn => 'Naissance';
+
+  @override
+  String get timelineKindDied => 'Décès';
+
+  @override
+  String get timelineKindWhelped => 'Mise bas';
+
+  @override
+  String get timelineKindVaccination => 'Vaccin';
+
+  @override
+  String get timelineKindHealthTest => 'Test de santé';
+
+  @override
+  String get timelineKindVisit => 'Visite vétérinaire';
+
+  @override
+  String get timelineKindSymptom => 'Symptôme';
+
+  @override
+  String get timelineKindWeight => 'Pesée';
+
+  @override
+  String get timelineKindPhoto => 'Photo';
+
+  @override
+  String get timelineKindPlacement => 'Cession';
+
+  @override
   String daysPlural(String n) {
     return '$n jours';
   }
+
+  @override
+  String get onboardingLittersTitle =>
+      'Chaque portée, de la saillie au sevrage';
+
+  @override
+  String get onboardingLittersBody =>
+      'Notez la saillie et Companion vous donne une fenêtre de mise bas, pas une devinette. Puis chaque chiot, son sexe, sa robe et son poids de naissance.';
+
+  @override
+  String get onboardingPedigreeTitle => 'Le pédigrée sur une page';
+
+  @override
+  String get onboardingPedigreeBody =>
+      'Père, mère et grands-parents dessinés en arbre, imprimés à côté du bilan de santé. De quoi satisfaire un acheteur, sans payer un registre.';
+
+  @override
+  String get onboardingBuyersTitle => 'Qui attend, qui a payé';
+
+  @override
+  String get onboardingBuyersBody =>
+      'Acomptes, le chiot choisi par chaque acheteur, le jour du départ, et le contrat signé rangé avec.';
+
+  @override
+  String get onboardingYoursTitle => 'Le serveur de personne d’autre';
+
+  @override
+  String get onboardingYoursBody =>
+      'Sans compte, sans publicité, sans pistage. Fonctionne dans un cabanon sans réseau, et vos données ne quittent le téléphone que si vous exportez.';
+
+  @override
+  String get onboardingSupportTitle => 'Fait par une personne';
+
+  @override
+  String get onboardingSupportBody =>
+      'Companion est construit par un seul programmeur, pas par une entreprise. Sans publicité et sans investisseurs. S’il trouve sa place dans votre élevage, l’acheter est ce qui fait vivre les mises à jour.';
 }

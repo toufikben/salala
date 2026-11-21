@@ -5,9 +5,10 @@
          purpose, so a Play policy audit never has to be entered into. -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <application
-        android:label="سلالة"
+        android:label="Companion"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:allowBackup="false"
         android:fullBackupContent="@xml/backup_rules"

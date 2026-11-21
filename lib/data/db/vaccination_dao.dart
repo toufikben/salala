@@ -26,4 +26,32 @@ class VaccinationDao extends RecordDao<Vaccination> {
     );
     return rows.map(fromMap).toList();
   }
+
+  /// Writes one dose per animal, all of it or none of it.
+  ///
+  /// A litter is vaccinated in one sitting: the vial is open, the breeder holds
+  /// one puppy and then the next, and typing nine identical rows on a phone
+  /// between holds is how a litter ends up half-recorded. The transaction is the
+  /// promise — a refusal on the sixth row leaves the first five unwritten, so the
+  /// ledger never carries a partial sitting nobody can tell from a real one.
+  ///
+  /// Returns the rows as stored, in the order they were given, because each one
+  /// gains an id here and the caller has to book a reminder against it.
+  Future<List<Vaccination>> createAll(
+    List<Vaccination> records, {
+    int? nowMs,
+  }) async {
+    if (records.isEmpty) return const <Vaccination>[];
+    final stamp = nowMs ?? DateTime.now().toUtc().millisecondsSinceEpoch;
+    return db.transaction((txn) async {
+      final written = <Vaccination>[];
+      for (final record in records) {
+        final row = <String, Object?>{...toMap(record)};
+        stampRecordRow(row, stamp, isNew: true);
+        await txn.insert(table, row);
+        written.add(fromMap(row));
+      }
+      return written;
+    });
+  }
 }

@@ -14,6 +14,7 @@ import 'reminder_scheduler.dart';
 class ReminderBooking {
   const ReminderBooking({
     required this.recordId,
+    required this.animalId,
     required this.dueMs,
     required this.title,
     required this.what,
@@ -21,6 +22,11 @@ class ReminderBooking {
   });
 
   final String recordId;
+
+  /// What the notification carries as its payload: tapping the alarm opens the
+  /// animal the record belongs to.
+  final String animalId;
+
   final int dueMs;
   final String title;
   final String what;
@@ -64,6 +70,7 @@ List<ReminderBooking> bookingsFor({
     bookings.add(
       ReminderBooking(
         recordId: recordId,
+        animalId: animalId,
         dueMs: dueMs,
         title: name,
         what: what,
@@ -175,7 +182,16 @@ Future<int> resyncReminders(
 
   final doses = await daos.vaccinations.dueBefore(cutoff);
   final screenings = await daos.healthTests.expiringBy(cutoff);
-  if (doses.isEmpty && screenings.isEmpty) return 0;
+  if (doses.isEmpty && screenings.isEmpty) {
+    // Nothing in the ledger is worth waking anyone for, which is a statement
+    // about the *phone* too: it should be holding no alarm at all. Returning
+    // zero here left the booking of a deleted record in place for ever, because
+    // `staleRecordIds` names ids out of rows and the rows are exactly what is
+    // gone — the one case [ReminderScheduler.clearEverything] exists for. It is
+    // one platform call, on a ledger that books nothing anyway.
+    await scheduler.clearEverything();
+    return 0;
+  }
 
   final herd = <String, String>{
     for (final animal in await daos.animals.findAll())
@@ -221,6 +237,7 @@ Future<int> reconcile(
   )) {
     await scheduler.replace(
       recordId: booking.recordId,
+      animalId: booking.animalId,
       dueMs: booking.dueMs,
       l10n: l10n,
       title: booking.title,

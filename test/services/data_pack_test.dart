@@ -1,9 +1,9 @@
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:salala/data/db/schema.dart';
-import 'package:salala/data/models/photo.dart';
-import 'package:salala/services/data_pack.dart';
+import 'package:companion/data/db/schema.dart';
+import 'package:companion/data/models/photo.dart';
+import 'package:companion/services/data_pack.dart';
 import 'package:sqflite/sqflite.dart';
 
 import '../helpers/test_db.dart';
@@ -178,9 +178,52 @@ void main() {
       expect(pack['formatVersion'], packFormatVersion);
       expect(pack['schemaVersion'], schemaVersion);
       expect(pack['exportedAt'], 1760000000000);
-      expect(tableRows(pack).keys.toList(), dataTables);
+      // The value tables, plus the picture rows: the archive needs those rows to
+      // know which files to carry, and a restore without them would write bytes
+      // no screen can name.
+      expect(tableRows(pack).keys.toList(), <String>[...dataTables, 'photos']);
       expect(tableRows(pack)['animals'], hasLength(2));
       expect(tableRows(pack)['user_settings'], hasLength(1));
+    });
+
+    test('a path column travels as null, not as a pointer to another phone', () async {
+      final db = await openTestDatabase();
+      await seed(db);
+      // The two columns that name a file the phone holds. Neither may reach a
+      // second phone claiming a document it does not have.
+      await db.update(
+        'animals',
+        <String, Object?>{'photo_path': '/data/user/0/app/photo.jpg'},
+        where: 'id = ?',
+        whereArgs: <Object?>['a-pup'],
+      );
+      await db.update(
+        'placements',
+        <String, Object?>{'contract_file_path': '1700000000000-2048.pdf'},
+        where: 'id = ?',
+        whereArgs: <Object?>['p-1'],
+      );
+
+      final pack = await packFrom(db, exportedAtMs: 1760000000000);
+      final rows = tableRows(pack);
+
+      expect(
+        rows['animals']!.firstWhere(
+          (row) => row['id'] == 'a-pup',
+        )['photo_path'],
+        isNull,
+      );
+      expect(rows['placements']!.single['contract_file_path'], isNull);
+      // Everything else on those rows travels untouched: the handover keeps its
+      // buyer, its date and its money, and the animal keeps her registration.
+      expect(rows['placements']!.single['price'], 120000);
+      expect(rows['placements']!.single['buyer_id'], 'b-1');
+      expect(
+        rows['animals']!.firstWhere(
+          (row) => row['id'] == 'a-pup',
+        )['registration_no'],
+        'R-77',
+      );
     });
 
     test('a pack built while the herd changes is one moment, not two', () async {
@@ -578,6 +621,45 @@ void main() {
               .having((e) => e.problem, 'problem', PackProblem.unknownTable)
               .having((e) => e.detail, 'detail', 'secrets'),
         ),
+      );
+    });
+
+    test('a status this app cannot read back is refused, not repaired', () async {
+      // The typo is the whole test: `statusFromName` falls back to `active`, so
+      // without this check a `deceaced` animal restores alive, back in the
+      // breeding stock, with its reminders re-booked. Nothing in the schema
+      // stops it either — no column here has a `CHECK` — so the file is the only
+      // place that can notice.
+      final db = await openTestDatabase();
+      await seed(db);
+      final pack = await packFrom(db);
+      final rows = tableRows(pack);
+      rows['animals']!.first['status'] = 'deceaced';
+
+      expect(
+        () => parsePack(encodePack(<String, Object?>{...pack, 'rows': rows})),
+        throwsA(
+          isA<PackReject>()
+              .having((e) => e.problem, 'problem', PackProblem.badValue)
+              .having((e) => e.detail, 'detail', contains('status')),
+        ),
+      );
+    });
+
+    test('a row that leaves the column out takes the schema default', () async {
+      // The other side of the same rule: `sex` and `status` have a `DEFAULT`,
+      // and a pack from before a column existed is honest without it. Refusing
+      // an absent value would refuse packs that this app itself wrote.
+      final db = await openTestDatabase();
+      await seed(db);
+      final pack = await packFrom(db);
+      final rows = tableRows(pack);
+      rows['animals']!.first.remove('status');
+      rows['animals']!.first.remove('sex');
+
+      expect(
+        () => parsePack(encodePack(<String, Object?>{...pack, 'rows': rows})),
+        returnsNormally,
       );
     });
   });

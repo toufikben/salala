@@ -16,11 +16,12 @@ import '../data/models/photo.dart';
 /// version may add, and a format that travels table-by-table costs one line in
 /// `schema.dart` per new table instead of a branch here.
 ///
-/// Photos are **not** inside. `photos` is a [fileBackedTables] table, so a pack
-/// that names one is refused as `unknownTable` rather than quietly dropping the
-/// rows a phone cannot answer anyway: the bytes stay where they were written.
-/// A `photo_path` travels as the text it is, so restoring brings the ledger back
-/// and leaves the pictures on the old phone, and the ledger says so per row.
+/// Photos are **not** rows this module restores on their own. A `photos` row is
+/// a file name, and the bytes are what make it worth anything: the export puts
+/// the rows in the pack and the files in a ZIP beside it (`pack_archive.dart`),
+/// so a restore on a second phone gets both. A pack holding the rows but no
+/// bytes is still accepted — the pictures then render as the named blank this
+/// app already draws for a file the phone does not have.es on the old phone, and the ledger says so per row.
 /// The PDF pack is where an image belongs.
 const String packFormat = 'salala-pack';
 
@@ -34,7 +35,7 @@ enum PackProblem {
   /// Not JSON at all, or JSON that is not an object.
   unreadable,
 
-  /// JSON, but not a Salala pack: no format tag, or a body of the wrong shape.
+  /// JSON, but not a Companion pack: no format tag, or a body of the wrong shape.
   notAPack,
 
   /// Written by a newer format or a newer schema than this app has.
@@ -51,6 +52,15 @@ enum PackProblem {
   /// Only knowable once the rows are in place, so this one surfaces from
   /// [restorePack] rather than [parsePack].
   danglingReference,
+
+  /// Holds a word this app stores as an enum but cannot read back.
+  ///
+  /// `status` is the one that matters: a pack saying `deceaced` used to restore
+  /// as `active`, because every `*FromName` helper falls back to a default. The
+  /// animal would come back alive, in the breeding stock, with its reminders
+  /// re-booked — a typo silently undoing a death. Nothing in the schema refuses
+  /// it: no column here has a `CHECK`, so the file is the only place to notice.
+  badValue,
 }
 
 class PackReject implements Exception {
@@ -89,10 +99,20 @@ class PackRows {
 /// animal it does not contain, and [restorePack]'s transaction refuses the whole
 /// thing on the foreign key, so the one restore the breeder ever needs fails on
 /// a file they believed was safe. One snapshot, or nothing.
-Future<Map<String, Object?>> packFrom(Database db, {int? exportedAtMs}) async {
+Future<Map<String, Object?>> packFrom(
+  Database db, {
+  int? exportedAtMs,
+  bool includePhotos = true,
+}) async {
+  // `photos` joins the value tables here even though it is listed as
+  // file-backed: its rows are what tell the archive which files to carry, and a
+  // restore that put the bytes back without the rows would write files no screen
+  // can reach. Declining them is only for a caller that wants the ledger alone.
+  final tables = <String>[...dataTables, if (includePhotos) 'photos'];
   final rows = await db.transaction(
     (Transaction txn) async => <String, Object?>{
-      for (final table in dataTables) table: await txn.query(table),
+      for (final table in tables)
+        table: _readyForTravel(table, await txn.query(table)),
     },
   );
   return <String, Object?>{
@@ -108,6 +128,42 @@ Future<Map<String, Object?>> packFrom(Database db, {int? exportedAtMs}) async {
 /// looking for one animal's name, not parsing bytes.
 String encodePack(Map<String, Object?> pack) =>
     const JsonEncoder.withIndent('  ').convert(pack);
+
+/// Columns that name a file on the phone that wrote the pack, per table.
+///
+/// These are **dropped** on the way out rather than carried, and the reason is the
+/// one fact a backup cannot promise: a path is a pointer into a filesystem that
+/// belongs to one device. `animals.photo_path` has never been written by anything
+/// — pictures live in their own table with their own folder — and
+/// `placements.contract_file_path` is a bare file name inside this app's folder
+/// for the same reason.
+///
+/// Carrying a contract's *name* would be fine on its own, but it would arrive on
+/// the second phone naming a file that phone does not hold, and the screen would
+/// say "open the contract" about nothing. So the column travels as null: the
+/// handover keeps its price, its buyer and its date, and says plainly that the
+/// document itself did not come with the pack. Nobody is told a file exists that
+/// does not.
+const Map<String, List<String>> _pathsNotWorthCarrying = <String, List<String>>{
+  'animals': <String>['photo_path'],
+  'placements': <String>['contract_file_path'],
+};
+
+/// One table's rows, with the columns above blanked.
+List<Map<String, Object?>> _readyForTravel(
+  String table,
+  List<Map<String, Object?>> rows,
+) {
+  final drop = _pathsNotWorthCarrying[table];
+  if (drop == null) return rows;
+  return <Map<String, Object?>>[
+    for (final row in rows)
+      <String, Object?>{
+        for (final entry in row.entries)
+          entry.key: drop.contains(entry.key) ? null : entry.value,
+      },
+  ];
+}
 
 /// Reads a pack and proves it is a whole one before any row is written.
 ///
@@ -146,7 +202,10 @@ PackRows parsePack(String text) {
   final tables = <String, List<Map<String, Object?>>>{};
   for (final entry in rows.entries) {
     if (entry.key case final String table) {
-      if (!dataTables.contains(table)) {
+      // `photos` is allowed in a pack although it is not a [dataTables] table:
+      // its rows travel with the bytes in the archive, and refusing them here
+      // would leave a restored phone with pictures it cannot name.
+      if (!dataTables.contains(table) && table != 'photos') {
         throw PackReject(PackProblem.unknownTable, table);
       }
       final List<Object?> rowsOfTable;
@@ -164,6 +223,7 @@ PackRows parsePack(String text) {
           throw PackReject(PackProblem.notAPack, '$table row');
         }
       }
+      _checkEnums(table, parsed);
       tables[table] = parsed;
     } else {
       throw const PackReject(PackProblem.notAPack, 'table name');
@@ -209,6 +269,47 @@ PackRows parsePack(String text) {
   );
 }
 
+/// The columns this app reads back as an enum, with the words it accepts.
+///
+/// Written out rather than derived from the `*FromName` helpers, because those
+/// helpers are precisely what hides the problem: each one falls back to a
+/// default when the word is not recognised, so a restored row with a typo is
+/// accepted and quietly becomes something else. The list is short and it only
+/// changes when an enum does.
+const Map<String, Map<String, Set<String>>> _enumColumns =
+    <String, Map<String, Set<String>>>{
+      'animals': <String, Set<String>>{
+        'sex': <String>{'male', 'female', 'unknown'},
+        'status': <String>{'active', 'sold', 'retired', 'deceased'},
+      },
+      'symptoms': <String, Set<String>>{
+        'severity': <String>{'mild', 'moderate', 'severe'},
+      },
+    };
+
+/// Refuses a pack whose rows hold a word this app cannot read back.
+///
+/// Called from [parsePack], before anything is written, so the answer arrives as
+/// a named refusal on the restore dialog rather than as an animal that came back
+/// alive and re-armed its reminders. A row that leaves the column out is fine:
+/// the schema's `DEFAULT` is what fills it, and that default is a real value.
+void _checkEnums(String table, List<Map<String, Object?>> rows) {
+  final columns = _enumColumns[table];
+  if (columns == null) return;
+  for (final row in rows) {
+    for (final entry in columns.entries) {
+      if (!row.containsKey(entry.key)) continue;
+      final value = row[entry.key];
+      // A null in a `NOT NULL ... DEFAULT` column is not a word this app can
+      // read either, but the insert refuses it and the restore catch already
+      // says the sentence that fits.
+      if (value is! String) continue;
+      if (entry.value.contains(value)) continue;
+      throw PackReject(PackProblem.badValue, '$table.${entry.key} = $value');
+    }
+  }
+}
+
 /// Tables that entered the schema after version 1, with the version that added
 /// them. A pack stamped below that number is entitled not to carry them.
 ///
@@ -239,12 +340,15 @@ bool _addedAfterPack(String table, int packSchema) {
 /// the rows that were on the phone before the attempt are still there and the
 /// database is still answering questions.
 ///
-/// The pictures are the one table a pack does not carry, and the restore is the
-/// one moment the ledger changes underneath a folder of files. Their rows are
-/// read back before the animals go (the cascade takes them with it, measured on
-/// a real database at run `38165892860`), and the ones whose animal the incoming
-/// file carries are put back: those bytes are still this phone's own pictures,
-/// and dropping the row would hide them behind no screen at all.
+/// The pictures are the one table whose rows and bytes can arrive separately: a
+/// pack from an older version carries no `photos` table at all, and a ZIP whose
+/// files were missing carries rows with no bytes. Their rows are read back
+/// before the animals go (the cascade takes them with it, measured on a real
+/// database at run `38165892860`), and then the incoming rows and this phone's
+/// own are merged, filtered to animals the pack kept. Neither list may lose the
+/// other: the pack's rows name the files the archive wrote beside it, and the
+/// phone's own rows name bytes nothing can recreate. Dropping either would hide
+/// a picture that is still on the disk behind no screen at all.
 ///
 /// The rows that came through are what this returns, because the caller has a
 /// folder to sweep against them — `PhotoFiles.deleteUnbacked` — and asking the
@@ -276,12 +380,28 @@ Future<List<Photo>> restorePack(Database db, PackRows pack) {
     final herd = <String>{
       for (final row in await txn.query('animals')) row['id']! as String,
     };
+    // A picture row is the one row a pack can arrive without the bytes for, so
+    // the two lists are merged rather than one replacing the other: the pack's
+    // rows name the files the archive wrote beside it, and this phone's own rows
+    // name bytes nothing can recreate. Neither list may lose the other, and the
+    // herd filter is what stops either from outliving its animal.
+    final source = <Map<String, Object?>>[
+      ...pictures,
+      ...?pack.tables['photos'],
+    ];
     final kept = <Photo>[];
-    for (final picture in pictures) {
-      if (herd.contains(picture['animal_id'])) {
-        await txn.insert('photos', picture);
-        kept.add(Photo.fromMap(picture));
+    final seen = <String>{};
+    for (final picture in source) {
+      if (!herd.contains(picture['animal_id'])) continue;
+      if (picture['id'] case final String id) {
+        if (!seen.add(id)) continue;
       }
+      await txn.insert(
+        'photos',
+        picture,
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+      kept.add(Photo.fromMap(picture));
     }
 
     final dangling = await txn.rawQuery('PRAGMA foreign_key_check');

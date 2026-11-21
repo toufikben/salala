@@ -1,7 +1,7 @@
-name: salala
-description: "Salala — an offline-first health and lineage record for small-scale dog and cat breeders, with a transferable PDF pack for puppy buyers."
+name: companion
+description: "Companion - an offline-first health and lineage record for small-scale dog and cat breeders, with a transferable PDF pack for puppy buyers."
 publish_to: 'none'
-version: 0.1.0+1
+version: 1.0.0+1
 
 environment:
   sdk: ^3.13.4
@@ -49,6 +49,23 @@ dependencies:
   # purpose — the backup leaves the phone through the breeder's own hands.
   share_plus: ^13.3.1
   file_selector: ^1.1.0
+
+  # The container the pack travels in. A backup that carried only rows left every
+  # picture behind on the old phone, which is the one thing a restore cannot
+  # invent: the bytes are put in a ZIP beside `pack.json`, and the same reader
+  # still opens the plain JSON files earlier versions wrote.
+  archive: ^4.3.0
+
+  # The camera behind "Add photo". `image_picker` delegates to the Android camera
+  # app through an intent, so the app itself asks for no CAMERA permission and
+  # holds no camera code — the written file comes back as bytes.
+  image_picker: ^1.2.0
+
+  # The rating row in Settings. Android's own in-app review sheet, which is a
+  # Play Core dialog rather than a page of ours: it has no dismiss button of our
+  # own to get wrong, and on a phone without Play it reports itself unavailable
+  # and the row falls back to the store listing.
+  in_app_review: ^2.0.12
 
   # Buyer pack (Stage 2). `pdf` writes the record a breeder hands to a buyer: a
   # fixed-layout document that survives a phone change, an app the buyer does

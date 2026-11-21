@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:salala/presentation/screens/animal_form_screen.dart';
+import 'package:companion/presentation/screens/animal_form_screen.dart';
 
 import '../helpers/pump_app.dart';
 
@@ -28,7 +28,7 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
 
-    await pumpSalala(tester);
+    await pumpApp(tester);
     await tester.tap(find.widgetWithText(FilledButton, 'Add animal'));
     await tester.pumpAndSettle();
   }
@@ -108,6 +108,34 @@ void main() {
       // The field that answered is the first refusing one, not the first field:
       // a name already filled in must not be what the screen drags her back to.
       expect(tester.widget<TextFormField>(species).controller!.text, isEmpty);
+    },
+  );
+
+  testWidgets(
+    'the refusal sentence leaves the moment the box is filled',
+    (tester) async {
+      await openAnimalForm(tester);
+
+      final save = find.widgetWithText(FilledButton, 'Save');
+      await scrollToEnd(tester);
+      await tester.tap(save);
+      await tester.pumpAndSettle();
+      expect(find.text('A name is required'), findsOneWidget);
+
+      // Typed into, not merely set: `onUserInteraction` is the promise that a
+      // keystroke re-validates, and a controller written from the outside would
+      // pass this test while the phone stayed broken.
+      await tester.enterText(
+        find.widgetWithText(TextFormField, 'Name'),
+        'Nala',
+      );
+      await tester.pumpAndSettle();
+
+      // Measured on the phone: the sentence used to outlive the text that fixed
+      // it, and a breeder who had done the right thing was still being told she
+      // had not.
+      expect(find.text('A name is required'), findsNothing);
+      expect(find.text('Choose a species'), findsOneWidget);
     },
   );
 }

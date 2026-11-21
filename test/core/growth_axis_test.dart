@@ -1,7 +1,7 @@
 import 'dart:math' show Random;
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:salala/core/utils/growth_axis.dart';
+import 'package:companion/core/utils/growth_axis.dart';
 
 /// The seed of the sweep below, fixed so CI and a laptop see the same inputs.
 const int _sweepSeed = 20261009;

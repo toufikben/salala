@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import 'package:salala/services/photo_files.dart';
+import 'package:companion/services/photo_files.dart';
 
 /// Stands in for the gallery picker and the folder under the app's documents,
 /// neither of which a test runner can answer.
@@ -13,10 +13,25 @@ import 'package:salala/services/photo_files.dart';
 /// So the strip is driven through the blank it shows when a file is missing, and
 /// the bytes are `photo_files_test.dart`'s to prove against a real folder.
 class FakePhotoFiles implements PhotoFiles {
-  FakePhotoFiles();
+  FakePhotoFiles({Map<String, List<int>>? bytes})
+    : bytes = bytes ?? <String, List<int>>{};
 
   /// What `pick()` hands back. Null is the breeder closing the picker.
   PickedPhoto? nextPicked;
+
+  /// What `capture()` hands back. Null is the breeder backing out of the camera.
+  PickedPhoto? nextCaptured;
+
+  /// How many times the camera was asked for. A test that proves the sheet's
+  /// second row opens the camera reads this rather than a stored row.
+  int captures = 0;
+
+  /// The folder's contents, as `<animalId>/<fileName>` → bytes. The backup test
+  /// seeds it, reads it through [readBytes], and finds what a restore wrote in it.
+  final Map<String, List<int>> bytes;
+
+  /// Every restore, as `<animalId>/<fileName>`, in the order they happened.
+  final List<String> restored = <String>[];
 
   /// Thrown instead of storing, for the refusal a screen has to say out loud.
   PhotoRefused? storeRefusal;
@@ -50,6 +65,28 @@ class FakePhotoFiles implements PhotoFiles {
 
   @override
   Future<PickedPhoto?> pick() async => nextPicked;
+
+  @override
+  Future<PickedPhoto?> capture() async {
+    captures++;
+    return nextCaptured;
+  }
+
+  @override
+  Future<Uint8List?> readBytes(String animalId, String fileName) async {
+    final content = bytes['$animalId/$fileName'];
+    return content == null ? null : Uint8List.fromList(content);
+  }
+
+  @override
+  Future<void> restore(
+    String animalId,
+    String fileName,
+    List<int> content,
+  ) async {
+    restored.add('$animalId/$fileName');
+    bytes['$animalId/$fileName'] = List<int>.from(content);
+  }
 
   @override
   Future<String> store(String animalId, PickedPhoto photo) async {

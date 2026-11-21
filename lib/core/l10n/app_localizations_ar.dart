@@ -19,14 +19,19 @@ class AppLocalizationsAr extends AppLocalizations {
   String get navLitters => 'الولادات';
 
   @override
+  String get navBuyers => 'المشترون';
+
+  @override
   String get navSettings => 'الإعدادات';
+
+  @override
+  String get languageName => 'العربية';
 
   @override
   String get homeEmptyTitle => 'لا توجد حيوانات بعد';
 
   @override
-  String get homeEmptyBody =>
-      'أضف كلبك أو قطتك الأول لتبدأ سجل الصحة والأنساب.';
+  String get homeEmptyBody => 'القطيع يبدأ بواحد. سمّها، وابدأ سجلّها من هنا.';
 
   @override
   String get homeAddAnimal => 'إضافة حيوان';
@@ -38,7 +43,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get homeAllAnimals => 'كل الحيوانات';
 
   @override
-  String get homeSearchHint => 'ابحث بالاسم أو الرقم أو الشريحة أو الملاحظة';
+  String get homeSearchHint =>
+      'ابحث بالاسم أو الرقم أو الشريحة أو الملاحظة أو المشتري';
 
   @override
   String homeNoMatches(String query) {
@@ -76,10 +82,24 @@ class AppLocalizationsAr extends AppLocalizations {
   String get animalBirthDate => 'تاريخ الميلاد';
 
   @override
+  String animalBornOn(String day) {
+    return 'وُلد في $day';
+  }
+
+  @override
   String get animalStatus => 'الحالة';
 
   @override
   String get animalMicrochip => 'رقم الشريحة';
+
+  @override
+  String get animalMicrochipDate => 'تاريخ زرع الشريحة';
+
+  @override
+  String get animalLitter => 'الولادة';
+
+  @override
+  String get animalNone => 'لا شيء';
 
   @override
   String get animalRegistrationNo => 'رقم التسجيل';
@@ -108,8 +128,13 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String animalDeleteLittersNote(int litters, int puppies) {
+    return 'سيُحذف أيضاً $litters سجل ولادة هي أمّها، ويبقى $puppies من جرائها في حيواناتك لكن دون سجل أمّهم.';
+  }
+
+  @override
   String get animalDeleteBody =>
-      'سيُحذف معها أيضاً التطعيمات وفحوصات الصحة والأوزان والزيارات البيطرية والأعراض، وسجل التسليم إن وُجد، وصورها وما على هذا الهاتف من ملفات تلك الصور، والولادات التي هي أمّ لها. لا يمكن التراجع عن هذه الخطوة.';
+      'سيُحذف معها أيضاً التطعيمات وفحوصات الصحة والأوزان والزيارات البيطرية والأعراض، وسجل التسليم إن وُجد، وصورها وما على هذا الهاتف من ملفات تلك الصور، والعقد المرفق بذلك التسليم. لا يمكن التراجع عن هذه الخطوة.';
 
   @override
   String get animalNameRequired => 'الاسم مطلوب';
@@ -161,6 +186,27 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get recordsEmpty => 'لا يوجد سجل بعد.';
+
+  @override
+  String get detailStoryLine => 'كل سجل هنا جزء من قصتها.';
+
+  @override
+  String get detailDiedLine => 'سجلّها يبقى كما كان.';
+
+  @override
+  String placedFarewell(String name) {
+    return '$name انتقل إلى بيت جديد. السجل بقي معك.';
+  }
+
+  @override
+  String reminderHeadsUpBody(String what, String dueDay) {
+    return 'تنبيه: $what مستحق في $dueDay';
+  }
+
+  @override
+  String reminderDueBody(String what) {
+    return '$what موعدها اليوم. دقيقتان تكفيان';
+  }
 
   @override
   String get actionSave => 'حفظ';
@@ -230,7 +276,21 @@ class AppLocalizationsAr extends AppLocalizations {
   String get lockChangeFailed => 'رفض الهاتف تغيير قفل التطبيق.';
 
   @override
+  String get lockChangePinDone => 'تم تغيير الرمز.';
+
+  @override
+  String lockTooManyAttempts(int seconds) {
+    return 'محاولات خاطئة كثيرة. أعد المحاولة بعد $seconds ثانية.';
+  }
+
+  @override
   String get settingsAppLock => 'قفل التطبيق';
+
+  @override
+  String get settingsChangePin => 'تغيير الرمز';
+
+  @override
+  String get settingsChangePinBody => 'أدخل الرمز الحالي ثم اختر رمزًا جديدًا.';
 
   @override
   String get settingsLanguage => 'اللغة';
@@ -253,6 +313,17 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settingsAbout => 'حول التطبيق';
 
   @override
+  String get settingsTrial => 'التجربة المجانية';
+
+  @override
+  String settingsTrialRemaining(String days) {
+    return 'بقيت $days يومًا';
+  }
+
+  @override
+  String get settingsTrialOver => 'انتهت التجربة';
+
+  @override
   String get settingsBuildTag => 'رقم البناء';
 
   @override
@@ -263,13 +334,70 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settingsExport => 'تصدير السجلات';
 
   @override
-  String get settingsExportBody => 'ملف JSON واحد فيه كل سجلات هذا الهاتف';
+  String get settingsExportBody =>
+      'ملف ZIP واحد يحمل كل سجل وصورة على هذا الهاتف';
 
   @override
   String get settingsImport => 'استرجاع من حزمة';
 
   @override
   String get settingsImportBody => 'قراءة حزمة وإرجاعها إلى هذا الهاتف';
+
+  @override
+  String settingsLastBackup(String day) {
+    return 'آخر نسخة احتياطية: $day';
+  }
+
+  @override
+  String get settingsNeverBackedUp => 'لم تخرج نسخة احتياطية من هذا الهاتف بعد';
+
+  @override
+  String get settingsCsv => 'جدول (CSV)';
+
+  @override
+  String get settingsCsvBody =>
+      'لمحاسبك أو لاستمارة السجل أو لشريك في الملكية. يُفتح في Excel أو Numbers أو Google Sheets.';
+
+  @override
+  String get settingsCsvHerd => 'الحيوانات';
+
+  @override
+  String get settingsCsvLitters => 'الولادات';
+
+  @override
+  String get settingsCsvVaccinations => 'التحصينات';
+
+  @override
+  String get settingsCsvPlacements => 'التسليمات';
+
+  @override
+  String csvShared(String file) {
+    return '$file جاهز للإرسال';
+  }
+
+  @override
+  String get csvShareFailed => 'لم يمكن كتابة الجدول على هذا الهاتف';
+
+  @override
+  String get csvEmpty => 'لا يوجد على هذا الهاتف ما يُصدَّر بعد';
+
+  @override
+  String get csvColAnimal => 'الحيوان';
+
+  @override
+  String get csvColCountry => 'الدولة';
+
+  @override
+  String get csvColPuppies => 'الجراء';
+
+  @override
+  String get csvColBreedingStock => 'قطيع التربية';
+
+  @override
+  String get csvColYes => 'نعم';
+
+  @override
+  String get csvColNo => 'لا';
 
   @override
   String packShared(String file) {
@@ -299,6 +427,11 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String packBadValue(String detail) {
+    return 'تحتوي هذه الحزمة على قيمة لا تستطيع سلالة قراءتها: $detail';
+  }
+
+  @override
   String get packRestoreTitle => 'استبدال كل شيء على هذا الهاتف؟';
 
   @override
@@ -317,6 +450,15 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get litterAdd => 'ولادة جديدة';
+
+  @override
+  String get litterEditTitle => 'تعديل الولادة';
+
+  @override
+  String get litterAddPuppies => 'إضافة جراء';
+
+  @override
+  String get litterHowMany => 'كم عددها؟';
 
   @override
   String get litterAddTitle => 'تسجيل ولادة';
@@ -371,6 +513,122 @@ class AppLocalizationsAr extends AppLocalizations {
   String litterExpected(String date) {
     return 'الولادة المتوقعة: $date';
   }
+
+  @override
+  String get statsTitle => 'الكنل بالأرقام';
+
+  @override
+  String get settingsStats => 'الكنل بالأرقام';
+
+  @override
+  String get statsHerdGroup => 'من هنا';
+
+  @override
+  String get statsBreedingGroup => 'البطون والجراء';
+
+  @override
+  String get statsMoneyGroup => 'التسليمات';
+
+  @override
+  String get statsAtHome => 'حيوانات موجودة';
+
+  @override
+  String get statsBreedingStock => 'قطيع التربية';
+
+  @override
+  String get statsFemales => 'إناث هنا';
+
+  @override
+  String get statsMales => 'ذكور هنا';
+
+  @override
+  String get statsEverRecorded => 'كل ما سُجّل';
+
+  @override
+  String get statsWhelpings => 'بطون في السجل';
+
+  @override
+  String get statsPuppies => 'جراء من بطونك';
+
+  @override
+  String statsPuppiesThisYear(String year) {
+    return 'جراء وُلدوا في $year';
+  }
+
+  @override
+  String get statsPlacements => 'تسليمات';
+
+  @override
+  String get statsUnnamedCurrency => 'بلا عملة محددة';
+
+  @override
+  String statsHandoverCount(String count) {
+    return '$count منها مدفوعة';
+  }
+
+  @override
+  String get statsNoRevenue => 'لا سعر مسجّل';
+
+  @override
+  String get statsFooter =>
+      'محسوبة من سجلك أنت، على هذا الهاتف. لا شيء منها يخرج عنه.';
+
+  @override
+  String get birthdayTitle => 'قريبًا';
+
+  @override
+  String get birthdayToday => 'اليوم';
+
+  @override
+  String birthdayIn(String days) {
+    return 'بعد $days';
+  }
+
+  @override
+  String birthdayTurning(String name, String years) {
+    return '$name يبلغ $years';
+  }
+
+  @override
+  String get heatCardTitle => 'الشياع القادم';
+
+  @override
+  String heatCardWindow(String earliest, String latest) {
+    return 'بين $earliest و$latest';
+  }
+
+  @override
+  String heatCardSteady(String count) {
+    return 'محسوب على $count دورات في سجلّها.';
+  }
+
+  @override
+  String get heatCardThin =>
+      'دورة واحدة فقط في السجل، لذلك النافذة واسعة. سجّل تلقيحًا آخر لتضيق.';
+
+  @override
+  String heatCardWhelping(String day) {
+    return 'التلقيح في هذه النافذة يعني ولادة حول $day.';
+  }
+
+  @override
+  String get bulkVaccineTitle => 'تحصين جماعي';
+
+  @override
+  String bulkVaccineCount(String count) {
+    return '$count حيوانًا ستأخذ الجرعة نفسها';
+  }
+
+  @override
+  String get bulkVaccineAction => 'حصّن البطن كله';
+
+  @override
+  String bulkVaccineDone(String count) {
+    return 'سُجّلت لـ $count حيوانًا';
+  }
+
+  @override
+  String get pedigreeTitle => 'شجرة النسب';
 
   @override
   String litterPuppyCount(int count) {
@@ -653,6 +911,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get photoAdd => 'صورة جديدة';
 
   @override
+  String get photoFromGallery => 'اختيار من المعرض';
+
+  @override
+  String get photoFromCamera => 'التقاط صورة';
+
+  @override
   String get photoDeleteBody =>
       'تُحذف هذه الصورة من سجل الحيوان ويُحذف ملفها معها. لا يمكن التراجع عن ذلك.';
 
@@ -696,6 +960,33 @@ class AppLocalizationsAr extends AppLocalizations {
   String get placementGuarantee => 'شروط الضمان';
 
   @override
+  String get contractAttach => 'أرفق عقدًا';
+
+  @override
+  String get contractAttached => 'عقد مُرفق';
+
+  @override
+  String get contractStoredName => 'مستند أرفقته سابقًا';
+
+  @override
+  String get contractRemove => 'إزالة العقد';
+
+  @override
+  String get contractOpen => 'فتح العقد';
+
+  @override
+  String get contractMissing => 'هذا المستند ليس على هذا الهاتف';
+
+  @override
+  String get contractOpenFailed => 'لم يُفتح المستند';
+
+  @override
+  String get contractPickFailed => 'لم يُختر أي مستند';
+
+  @override
+  String get contractTooLarge => 'هذا الملف كبير جدًا للاحتفاظ به';
+
+  @override
   String get placementDeleteBody =>
       'يُحذف هذا التسليم من سجل الحيوان، ويبقى المشتري في جهات اتصالك. لا يمكن التراجع عن ذلك.';
 
@@ -718,18 +1009,18 @@ class AppLocalizationsAr extends AppLocalizations {
   String get buyerCountryCode => 'رمز البلد';
 
   @override
+  String get buyersEmptyTitle => 'لا يوجد مشترون بعد';
+
+  @override
+  String get buyersEmptyBody =>
+      'يُضاف المشتري مع تسليم، أو من هنا قبل التسليم: من اشتريت منه العام الماضي ما زال يطلب شهادة النسب.';
+
+  @override
+  String get buyersNoAnimals => 'لا يوجد حيوان مسجَّل لهذا الشخص';
+
+  @override
   String buyerDeleteBody(String name) {
     return 'يُحذف $name من جهات اتصالك. ويبقى سجل التسليم في تاريخ الحيوان دون ذكر المشتري. لا يمكن التراجع عن ذلك.';
-  }
-
-  @override
-  String reminderHeadsUpBody(String what, String dueDay) {
-    return 'تنبيه: $what مستحق في $dueDay';
-  }
-
-  @override
-  String reminderDueBody(String what) {
-    return '$what مستحق اليوم';
   }
 
   @override
@@ -822,6 +1113,11 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String triageDoseToday(String what) {
+    return '$what مستحق اليوم';
+  }
+
+  @override
   String triageWeightLossPuppy(String percent) {
     return 'فقد الحيوان الصغير $percent% من وزنه منذ آخر وزن';
   }
@@ -875,7 +1171,308 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get onboardingSlide1Title => 'سجل واحد لكل حيوان';
+
+  @override
+  String get onboardingSlide1Body =>
+      'كلب أو قطة، سلالته، تاريخ ميلاده، ومن أين جاء. الأول لا يأخذ دقيقة.';
+
+  @override
+  String get onboardingSlide2Title => 'صحته، بالترتيب';
+
+  @override
+  String get onboardingSlide2Body =>
+      'التطعيمات بموعد جرعتها القادمة، الأوزان، الفحوصات، والزيارات البيطرية. رفيق يحجز التذكير عنك.';
+
+  @override
+  String get onboardingSlide3Title => 'قصته تسافر معه';
+
+  @override
+  String get onboardingSlide3Body =>
+      'ملف PDF أو جدول للمشتري، وحزمة ZIP واحدة تحمل كل سجل وصورة إلى هاتف جديد.';
+
+  @override
+  String get onboardingSkip => 'تخطٍّ';
+
+  @override
+  String get onboardingNext => 'التالي';
+
+  @override
+  String get onboardingStart => 'أضف أول حيوان';
+
+  @override
+  String get settingsOnboarding => 'أعد عرض المقدمة';
+
+  @override
+  String get settingsHelp => 'المساعدة';
+
+  @override
+  String get settingsRate => 'قيّم رفيق';
+
+  @override
+  String get settingsRateBody => 'يفتح بطاقة التقييم من المتجر.';
+
+  @override
+  String get settingsWhatsNew => 'ما الجديد';
+
+  @override
+  String get settingsPrivacy => 'الخصوصية';
+
+  @override
+  String get settingsTerms => 'شروط الاستخدام';
+
+  @override
+  String get settingsLicenses => 'رخص البرمجيات المفتوحة';
+
+  @override
+  String get rateUnavailable => 'هذا الهاتف لا يستطيع عرض بطاقة التقييم الآن.';
+
+  @override
+  String get aboutTitle => 'حول رفيق';
+
+  @override
+  String get aboutBody =>
+      'دفتر محلي لمربٍّ صغير. لا حساب، لا خادم، لا تتبع — السجلات تسكن هذا الهاتف ولا تخرج إلا بيدك.';
+
+  @override
+  String aboutVersion(String version) {
+    return 'الإصدار $version';
+  }
+
+  @override
+  String get privacyTitle => 'الخصوصية';
+
+  @override
+  String get privacyIntro =>
+      'رفيق تحتفظ بنوع واحد من البيانات: ما كتبته عن حيواناتك. هذه الصفحة تقول أين تسكن وماذا يمكن أن يُخرجها من هذا الهاتف.';
+
+  @override
+  String get privacyStoredHeading => 'ما يُخزَّن';
+
+  @override
+  String get privacyStoredBody =>
+      'كل حيوان، جرعة، وزن، فحص، زيارة، عرض، تسليم وجهة اتصال — والصور التي أرفقتها — في قاعدة بيانات ومجلد صور داخل مساحة التطبيق الخاصة. أندرويد يمنع التطبيقات الأخرى من الوصول إلى ذلك المجلد، والملفات غير مشفّرة بعد ذلك.';
+
+  @override
+  String get privacyBackupHeading => 'ما يخرج من هذا الهاتف';
+
+  @override
+  String get privacyBackupBody =>
+      'فقط ما تصدّره: حزمة ZIP فيها كل سجل وصورة، جدول CSV واحد، أو PDF لحيوان واحد. كل ملف يذهب حيث ترسله، وبالتالي الحزمة تحمل أسماء مشتريك وأرقام هواتفهم — عامل الملف كما تعامل الورق الذي يحل مكانه. شغّل قفل التطبيق إن كان الهاتف يسافر.';
+
+  @override
+  String get privacyCollectHeading => 'ما يُجمع عنك';
+
+  @override
+  String get privacyCollectBody =>
+      'لا شيء. لا تحليلات، لا تقارير أعطال، لا معرّف إعلاني، ولا اتصال شبكي في هذا التطبيق.';
+
+  @override
+  String get privacyRemoveHeading => 'كيف تمسحه';
+
+  @override
+  String get privacyRemoveBody =>
+      'إزالة التطبيق تزيل قاعدة البيانات ومجلد الصور معه. لا توجد نسخة في مكان آخر، فصدّر حزمة أولًا إن كانت السجلات تهمك — وتذكّر أن رقم قفل التطبيق لا يُستعاد أيضًا.';
+
+  @override
+  String get termsTitle => 'شروط الاستخدام';
+
+  @override
+  String get termsUseHeading => 'لماذا هذا التطبيق';
+
+  @override
+  String get termsUseBody =>
+      'للاحتفاظ بسجلاتك عن الحيوانات التي في رعايتك. رخصة واحدة لكل شخص؛ ثبّته على الهواتف التي تستخدمها.';
+
+  @override
+  String get termsDataHeading => 'بياناتك لك';
+
+  @override
+  String get termsDataBody =>
+      'لا نحتفظ بنسخة منها ولا نستطيع استعادتها. النسخ الاحتياطي مسؤوليتك، وزر التصدير في الإعدادات هو الآلية كلها.';
+
+  @override
+  String get termsAdviceHeading => 'ليس استشارة بيطرية';
+
+  @override
+  String get termsAdviceBody =>
+      'رفيق يعيد ما كتبته ويجري حسابًا على التواريخ والأوزان. لا يشخّص، والتذكير موعد في تقويم لا رأي سريري. اتصل بطبيب بيطري.';
+
+  @override
+  String get termsWarrantyHeading => 'بلا ضمان';
+
+  @override
+  String get termsWarrantyBody =>
+      'يُقدَّم التطبيق كما هو. وفي حدود ما يسمح به القانون، لا تُقبل مسؤولية عن سجل ضائع أو تذكير فائت أو قرار اتُّخذ بناء على ما هو مكتوب هنا.';
+
+  @override
+  String get helpTitle => 'المساعدة';
+
+  @override
+  String get helpQ1 => 'كيف أنسخ احتياطيًا؟';
+
+  @override
+  String get helpA1 =>
+      'الإعدادات، ثم تصدير السجلات. ملف ZIP يحمل كل صف وكل صورة؛ أرسله لنفسك واحتفظ به. الاستعادة تقرأ الملف نفسه على أي هاتف.';
+
+  @override
+  String get helpQ2 => 'نسيت رقمي السري';
+
+  @override
+  String get helpA2 =>
+      'لا يُستعاد، لأن المحفوظ بصمة له فقط. إزالة التطبيق تمسح القفل والدفتر معه، فإن كان لديك حزمة حديثة استعدها بعد ذلك.';
+
+  @override
+  String get helpQ3 => 'فقدت هاتفي';
+
+  @override
+  String get helpA3 =>
+      'لا شيء على خادم، فلا شيء يمكن إعادته. حزمة صدّرتها سابقًا تعيد الدفتر على هاتف جديد؛ وحزمة لم تصدّرها ضاعت.';
+
+  @override
+  String get helpQ4 => 'من أين تأتي التذكيرات؟';
+
+  @override
+  String get helpA4 =>
+      'من تواريخ الجرعة القادمة التي كتبتها. رفيق يحجز تنبيهًا قبل شهر وتنبيهًا في الصباح نفسه؛ وإن كانت الإشعارات موقوفة للتطبيق، تبقى التواريخ ظاهرة في أجندة القطيع.';
+
+  @override
+  String get helpQ5 => 'لماذا تقول صورة إنها ليست على هذا الهاتف؟';
+
+  @override
+  String get helpA5 =>
+      'الصف بقي والملف لم يبقَ — غالبًا بعد استعادة من حزمة بلا صور. إضافة الصورة مرة أخرى تكفي.';
+
+  @override
+  String get helpQ6 => 'هل أستطيع تسليم سجل الحيوان؟';
+
+  @override
+  String get helpA6 =>
+      'نعم. افتح الحيوان وصدّر ملف PDF: مستند ثابت يحتفظ به المشتري دون هذا التطبيق. والتسليم نفسه يُسجَّل في الصفحة نفسها.';
+
+  @override
+  String get helpQ7 => 'ما اللغات المتوفرة؟';
+
+  @override
+  String get helpA7 =>
+      'الإنجليزية، العربية، الفرنسية، الألمانية، الإسبانية، الإيطالية، البرتغالية، الهولندية. الإعدادات ثم اللغة — التغيير يُطبَّق فورًا.';
+
+  @override
+  String get helpQ8 => 'هناك خطأ في التطبيق';
+
+  @override
+  String get helpA8 =>
+      'اكتب لنا وقل ماذا كنت تفعل حين حدث. الإصدار في صفحة «حول».';
+
+  @override
+  String get helpContactHeading => 'اكتب لنا';
+
+  @override
+  String get whatsNewTitle => 'ما الجديد';
+
+  @override
+  String get whatsNew1 =>
+      'صور على بطاقات القطيع، وتصميم أوسع وأدفأ في كل الشاشات.';
+
+  @override
+  String get whatsNew2 => 'نقرة التذكير تفتح الحيوان الذي يخصّه.';
+
+  @override
+  String get whatsNew3 => 'تصدير الجدول صار بلغة التطبيق التي تقرأها.';
+
+  @override
+  String get whatsNew4 =>
+      'خمس لغات إضافية: الألمانية، الإسبانية، الإيطالية، البرتغالية، الهولندية.';
+
+  @override
+  String get whatsNew5 =>
+      'صفحات الخصوصية والشروط والمساعدة، وزر تقييم في الإعدادات.';
+
+  @override
+  String get whatsNew6 =>
+      'قائمة واحدة لكل حيوان: كل تطعيم ووزن وزيارة وتسليم بترتيب التاريخ.';
+
+  @override
+  String get timelineTitle => 'ما حدث';
+
+  @override
+  String get timelineEmpty => 'لا شيء مؤرّخ بعد.';
+
+  @override
+  String timelineShowAll(String count) {
+    return 'عرض الكل $count';
+  }
+
+  @override
+  String get timelineShowLess => 'عرض أقل';
+
+  @override
+  String get timelineKindBorn => 'الميلاد';
+
+  @override
+  String get timelineKindDied => 'الوفاة';
+
+  @override
+  String get timelineKindWhelped => 'ولادة';
+
+  @override
+  String get timelineKindVaccination => 'تطعيم';
+
+  @override
+  String get timelineKindHealthTest => 'فحص صحي';
+
+  @override
+  String get timelineKindVisit => 'زيارة بيطرية';
+
+  @override
+  String get timelineKindSymptom => 'عرض';
+
+  @override
+  String get timelineKindWeight => 'وزن';
+
+  @override
+  String get timelineKindPhoto => 'صورة';
+
+  @override
+  String get timelineKindPlacement => 'تسليم';
+
+  @override
   String daysPlural(String n) {
     return '$n أيام';
   }
+
+  @override
+  String get onboardingLittersTitle => 'كل بطن، من التلقيح إلى الفطام';
+
+  @override
+  String get onboardingLittersBody =>
+      'سجّل تاريخ التلقيح، ويعطيك Companion نافذة ولادة لا تخمينًا. ثم كل جرو، وجنسه ولونه ووزنه عند الميلاد.';
+
+  @override
+  String get onboardingPedigreeTitle => 'النسب في صفحة واحدة';
+
+  @override
+  String get onboardingPedigreeBody =>
+      'الأب والأم والأجداد مرسومون شجرةً، مطبوعة بجانب تقرير الصحة. تكفي المشتري دون أن تدفع لنقابة.';
+
+  @override
+  String get onboardingBuyersTitle => 'من ينتظر، ومن دفع';
+
+  @override
+  String get onboardingBuyersBody =>
+      'العربون، والجرو الذي اختاره كل مشترٍ، ويوم ذهابه إلى بيته، والعقد الموقّع محفوظًا معه.';
+
+  @override
+  String get onboardingYoursTitle => 'لا خادم لأحد غيرك';
+
+  @override
+  String get onboardingYoursBody =>
+      'بلا حساب، بلا إعلانات، بلا تتبّع. يعمل في سقيفة بلا شبكة، وسجلاتك لا تغادر الهاتف إلا حين تصدّرها.';
+
+  @override
+  String get onboardingSupportTitle => 'صنعه شخص واحد';
+
+  @override
+  String get onboardingSupportBody =>
+      'Companion يبنيه مبرمج واحد، لا شركة. بلا إعلانات وبلا مستثمرين. وإن وجد مكانه في مربّاك، فشراؤه هو ما يُبقي التحديثات تصل.';
 }

@@ -29,21 +29,104 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   const arbDir = 'lib/core/l10n';
   const template = 'en';
-  const translated = <String>['ar', 'fr'];
+  const translated = <String>['ar', 'fr', 'de', 'es', 'it', 'pt', 'nl'];
   const allLocales = <String>[template, ...translated];
 
-  /// French borrows these nine words unchanged, measured off the files rather
-  /// than guessed, so the list is as long as the exception is and no longer.
-  const frenchHomographs = <String>{
-    'appTitle',
-    'animalNotes',
-    'recordsPhotos',
-    'recordsPlacements',
-    'unitKg',
-    'unitGrams',
-    'weightNote',
-    'visitNoReason',
-    'pdfPlacement',
+  /// Words that are spelled identically in another language and in English, and
+  /// so are not evidence of an untranslated paste.
+  ///
+  /// Each set is measured off the files, not guessed: `appTitle` is the product
+  /// name, `unitKg`/`unitGrams` are the SI symbols, `healthTestResultHelper` is
+  /// the certificate's own English grading on purpose, and `Screening`,
+  /// `Symptom`, `Status`, `Pedigree` and `Vaccinations` are simply the same word
+  /// in German, Dutch, Italian and Portuguese. Anything else that reads
+  /// character-for-character like the English is either a paste or a stranger
+  /// homograph — and this list is where that gets decided, deliberately.
+  const homographs = <String, Set<String>>{
+    'fr': <String>{
+      'appTitle',
+      'animalNotes',
+      'recordsPhotos',
+      'recordsPlacements',
+      'settingsCsvVaccinations',
+      'csvColAnimal',
+      'unitKg',
+      'unitGrams',
+      'weightNote',
+      'visitNoReason',
+      'pdfPlacement',
+      // "Version" is the French word and the English one, and the placeholder
+      // carries the only part that could differ.
+      'aboutVersion',
+      // The tree's heading is spelled "Pedigree" in French too.
+      'pedigreeTitle',
+      // "Photo" is the French word for the thing as well as the English one.
+      'timelineKindPhoto',
+    },
+    'de': <String>{
+      'appTitle',
+      'animalName',
+      'animalStatus',
+      'unitKg',
+      'unitGrams',
+      'healthTestType',
+      'healthTestResultHelper',
+      'symptomName',
+      'aboutVersion',
+      // "Symptom" is the German word for the thing as well as the English one.
+      'timelineKindSymptom',
+      // "in {days}" is the German phrase and the English one, and the
+      // placeholder carries the only part that could differ.
+      'birthdayIn',
+    },
+    'es': <String>{
+      'appTitle',
+      'csvColAnimal',
+      'csvColNo',
+      'unitKg',
+      'unitGrams',
+      'healthTestResultHelper',
+    },
+    'it': <String>{
+      'appTitle',
+      'csvColNo',
+      'unitKg',
+      'unitGrams',
+      'healthTestType',
+      'healthTestResultHelper',
+      'pdfPedigree',
+      // Italian uses the English "privacy" for the concept, which is the word
+      // the Garante itself prints; the alternative "riservatezza" is a word no
+      // Italian app uses for this page.
+      'privacyTitle',
+      'settingsPrivacy',
+      // "Pedigree" is the Italian word for the chart as well as the English one.
+      'pedigreeTitle',
+    },
+    'pt': <String>{
+      'appTitle',
+      'csvColAnimal',
+      'unitKg',
+      'unitGrams',
+      'healthTestResultHelper',
+      'pdfPedigree',
+      'pedigreeTitle',
+    },
+    'nl': <String>{
+      'appTitle',
+      'animalStatus',
+      'unitKg',
+      'unitGrams',
+      'healthTestType',
+      'healthTestResultHelper',
+      'symptomState',
+      // Dutch keeps "privacy" and "help" as loanwords in software; both are what
+      // a Dutch settings screen says.
+      'privacyTitle',
+      'settingsPrivacy',
+      'helpTitle',
+      'settingsHelp',
+    },
   };
 
   Map<String, dynamic> readArb(String locale) =>
@@ -157,7 +240,9 @@ void main() {
     // nothing. Each one is a fragment of what a person actually read off the
     // Realme on 2026-10-12 at build `96eaa7c`, character for character equal
     // to its `.arb` value there — 231 characters in English, 205 in Arabic,
-    // 241 in French.
+    // 241 in French. The contract clause was added when a handover gained one
+    // (batch 14): it is the same kind of store, and the one that carries a
+    // buyer's signature.
     //
     // A rewording that keeps the meaning has to edit this table too. That is
     // the cost, and it is the point: three edits in three files now become one
@@ -173,6 +258,7 @@ void main() {
         'handover',
         'photographs',
         'files that hold them',
+        'contract',
         'whelpings',
         'cannot be undone',
       ],
@@ -185,7 +271,8 @@ void main() {
         'سجل التسليم',
         'صورها',
         'ملفات تلك الصور',
-        'الولادات',
+        'العقد',
+        'سجل ولادة',
         'لا يمكن التراجع',
       ],
       'fr': <String>[
@@ -197,12 +284,83 @@ void main() {
         'cession',
         'photos',
         'fichiers qui les gardent',
-        'portées',
+        'contrat',
+        'portée',
         'irréversible',
+      ],
+      'de': <String>[
+        'Impfungen',
+        'Gesundheitsuntersuchungen',
+        'Gewichte',
+        'Besuche',
+        'Symptome',
+        'Vermittlung',
+        'Fotos',
+        'Dateien, die diese',
+        'Vertrag',
+        'Würfe',
+        'rückgängig',
+      ],
+      'es': <String>[
+        'vacunas',
+        'pruebas de salud',
+        'pesos',
+        'visitas',
+        'síntomas',
+        'entrega',
+        'fotografías',
+        'archivos que las guardan',
+        'contrato',
+        'camadas',
+        'no se puede deshacer',
+      ],
+      'it': <String>[
+        'vaccinazioni',
+        'test sanitari',
+        'pesi',
+        'visite',
+        'sintomi',
+        'cessione',
+        'fotografie',
+        'file che le conservano',
+        'contratto',
+        'cucciolate',
+        'irreversibile',
+      ],
+      'pt': <String>[
+        'vacinas',
+        'testes de saúde',
+        'pesos',
+        'visitas',
+        'sintomas',
+        'entrega',
+        'fotografias',
+        'ficheiros que as guardam',
+        'contrato',
+        'ninhadas',
+        'não pode ser anulado',
+      ],
+      'nl': <String>[
+        'inentingen',
+        'gezondheidstests',
+        'gewichten',
+        'bezoeken',
+        'symptomen',
+        'plaatsing',
+        "foto's",
+        'bestanden die deze',
+        'contract',
+        'nestjes',
+        'ongedaan',
       ],
     };
     for (final locale in allLocales) {
-      final body = message(arb[locale]!, 'animalDeleteBody');
+      // The warning is two sentences now: the list of stores, and — only for a
+      // dam — the count of whelpings the cascade takes with a named tag. Read
+      // together, because a breeder reads them together.
+      final body =
+          '${message(arb[locale]!, 'animalDeleteBody')}\n'
+          '${message(arb[locale]!, 'animalDeleteLittersNote')}';
       final absent = <String>[];
       for (final fragment in mustName[locale]!) {
         if (!body.contains(fragment)) absent.add(fragment);
@@ -218,31 +376,31 @@ void main() {
     }
   });
 
-  test(
-    'a French message that reads exactly like the English one is on the list',
-    () {
+  test('a message that reads exactly like the English one is on the list', () {
+    for (final locale in translated) {
       final identical = <String>[];
       for (final key in keys) {
-        if (message(arb['fr']!, key) == message(arb[template]!, key)) {
+        if (message(arb[locale]!, key) == message(arb[template]!, key)) {
           identical.add(key);
         }
       }
+      final allowed = homographs[locale] ?? const <String>{};
       expect(
-        identical.toSet().difference(frenchHomographs),
+        identical.toSet().difference(allowed),
         isEmpty,
         reason:
-            'these French values are the English strings, and "Notes" and "kg" '
-            'are not among the nine that legitimately are: '
-            '${identical.toSet().difference(frenchHomographs)}',
+            'these $locale values are the English strings, and "Notes" and "kg" '
+            'are not among the ones that legitimately are: '
+            '${identical.toSet().difference(allowed)}',
       );
       expect(
-        frenchHomographs.difference(identical.toSet()),
+        allowed.difference(identical.toSet()),
         isEmpty,
         reason:
-            'these keys no longer read the same in both languages, so the list '
-            'above is stale and should shrink: '
-            '${frenchHomographs.difference(identical.toSet())}',
+            'these $locale keys no longer read the same in both languages, so '
+            'the list above is stale and should shrink: '
+            '${allowed.difference(identical.toSet())}',
       );
-    },
-  );
+    }
+  });
 }

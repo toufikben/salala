@@ -1,13 +1,13 @@
 import 'package:flutter/widgets.dart' show Locale;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:salala/core/l10n/app_localizations.dart';
-import 'package:salala/core/utils/litter_rows.dart';
-import 'package:salala/data/models/animal.dart';
-import 'package:salala/data/models/buyer.dart';
-import 'package:salala/data/models/placement.dart';
-import 'package:salala/data/models/vaccination.dart';
-import 'package:salala/data/models/weight_entry.dart';
+import 'package:companion/core/l10n/app_localizations.dart';
+import 'package:companion/core/utils/litter_rows.dart';
+import 'package:companion/data/models/animal.dart';
+import 'package:companion/data/models/buyer.dart';
+import 'package:companion/data/models/placement.dart';
+import 'package:companion/data/models/vaccination.dart';
+import 'package:companion/data/models/weight_entry.dart';
 
 /// What the whelping record says, before any page is drawn.
 ///

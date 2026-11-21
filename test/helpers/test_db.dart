@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
-import 'package:salala/data/db/app_database.dart';
+import 'package:companion/data/db/app_database.dart';
 
 bool _factoryInstalled = false;
 
@@ -19,9 +19,9 @@ Future<Database> openTestDatabase() async {
     _factoryInstalled = true;
   }
 
-  final dir = await Directory.systemTemp.createTemp('salala_test_');
+  final dir = await Directory.systemTemp.createTemp('companion_test_');
   final db = await AppDatabase.openAt(
-    '${dir.path}${Platform.pathSeparator}salala.db',
+    '${dir.path}${Platform.pathSeparator}companion.db',
   );
   addTearDown(() async {
     await db.close();

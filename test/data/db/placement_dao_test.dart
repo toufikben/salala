@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:salala/data/db/daos.dart';
-import 'package:salala/data/models/animal.dart';
-import 'package:salala/data/models/buyer.dart';
-import 'package:salala/data/models/placement.dart';
+import 'package:companion/data/db/daos.dart';
+import 'package:companion/data/models/animal.dart';
+import 'package:companion/data/models/buyer.dart';
+import 'package:companion/data/models/placement.dart';
 
 import '../../helpers/test_db.dart';
 
