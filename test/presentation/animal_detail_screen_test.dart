@@ -618,8 +618,12 @@ void main() {
     // delete: a weigh-in is never edited, it is removed and measured again.
     // Scroll to the row's own text, not to the delete icon: both weigh-ins are
     // on screen by the time the scroll ends, and scrollUntilVisible finishes by
-    // asking for the single element it was given. Two icons, one answer.
+    // asking for the single element it was given. Two icons, one answer. The
+    // row's text can stop at the very edge of the viewport with the icon still
+    // under the fold, so the icon is pulled fully into view before it is tapped.
     await _scrollTo(tester, find.text('4.20 kg').last);
+    await tester.ensureVisible(find.byIcon(Icons.delete_outline).first);
+    await settleRealIo(tester);
     await tester.tap(find.byIcon(Icons.delete_outline).first);
     await tester.pumpAndSettle();
 
