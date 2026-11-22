@@ -165,7 +165,8 @@ jobs:
         run: |
           flutter build apk --release --target-platform=android-arm64 \
             --dart-define=SALALA_BUILD_TAG=${GITHUB_SHA::7} --dart-define=use_arabic=true
-          flutter build appbundle --dart-define=use_arabic=true
+          flutter build appbundle --target-platform=android-arm,android-arm64 \
+            --dart-define=use_arabic=true
 
       - name: Prove the APK carries the release certificate
         run: |

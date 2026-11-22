@@ -43,16 +43,6 @@ android {
         // flag during build.
         versionCode = flutter.versionCode
         versionName = flutter.versionName
-
-        // Phones only. The x86_64 slice exists for emulators, and Play does not
-        // serve it to a real device — but it is 12 MB of `libflutter.so` plus
-        // 17 MB of debug symbols inside the bundle, which is a third of the
-        // upload for a target no user of this app has. An x86 phone is not a
-        // device a breeder carries, and the two ARM slices cover every handset
-        // Play reports for this category.
-        ndk {
-            abiFilters += listOf("armeabi-v7a", "arm64-v8a")
-        }
     }
 
     signingConfigs {
