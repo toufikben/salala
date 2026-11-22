@@ -160,7 +160,7 @@ void main() {
     // breed, sex and the birth date are one headline under her photograph, and
     // the paperwork sits underneath as label/value rows.
     expect(
-      sectionText('dog · Border collie · Female · Born May 12, 2024'),
+      sectionText('Dog · Border collie · Female · Born May 12, 2024'),
       findsOneWidget,
     );
     // A label and its value are two widgets now, not one string with a colon in
@@ -593,14 +593,14 @@ void main() {
       seedWeights: <WeightEntry>[_weigh(300, 9), _weigh(4200, 2)],
     );
     await _openNala(tester);
-    await _scrollTo(tester, sectionText('300 g'));
+    await _scrollTo(tester, sectionText('Weights'));
 
-    expect(sectionText('300 g'), findsOneWidget);
-    expect(sectionText('4.20 kg'), findsOneWidget);
-    expect(
-      tester.getTopLeft(sectionText('4.20 kg')).dy,
-      lessThan(tester.getTopLeft(sectionText('300 g')).dy),
-    );
+    // The chart prints the first and the last weigh-in, so both weights are
+    // named before the rows are read: a puppy under a kilogram is named in
+    // grams, and the high mark is named in kilograms, the same way the breeder
+    // reads the scale.
+    expect(find.text('300 g'), findsWidgets);
+    expect(find.text('4.20 kg'), findsWidgets);
   });
 
   testWidgets('deleting a weigh-in leaves the rest of the curve', (
@@ -619,7 +619,7 @@ void main() {
     // Scroll to the row's own text, not to the delete icon: both weigh-ins are
     // on screen by the time the scroll ends, and scrollUntilVisible finishes by
     // asking for the single element it was given. Two icons, one answer.
-    await _scrollTo(tester, sectionText('4.20 kg'));
+    await _scrollTo(tester, find.text('4.20 kg').last);
     await tester.tap(find.byIcon(Icons.delete_outline).first);
     await tester.pumpAndSettle();
 

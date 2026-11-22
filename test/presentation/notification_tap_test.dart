@@ -40,7 +40,7 @@ void main() {
     expect(find.byType(AnimalDetailScreen), findsOneWidget);
     // The ledger, not the herd: the tap is answered with the dog rather than
     // with a list the breeder then has to look her up in.
-    expect(find.text('dog · Border collie · Female'), findsOneWidget);
+    expect(find.text('Dog · Border collie · Female'), findsOneWidget);
   });
 
   testWidgets('the tap is spent once, so leaving the ledger stays left', (

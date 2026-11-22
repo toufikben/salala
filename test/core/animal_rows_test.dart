@@ -82,7 +82,7 @@ void main() {
           l10n.animalRegistry,
           l10n.animalMicrochip,
         ]);
-        expect(facts[0].$2, 'dog');
+        expect(facts[0].$2, 'Dog');
         expect(facts[1].$2, 'Canary');
         expect(facts[2].$2, l10n.sexFemale);
         expect(facts[3].$2, l10n.statusActive);
