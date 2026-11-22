@@ -146,13 +146,14 @@ void main() {
       '+212 600 111 222',
     );
     await tester.tap(find.widgetWithText(FilledButton, 'Save'));
-    // Keyed on the form closing: a write that landed dismisses it, and the list
-    // behind it only shows the name once the write and its refresh have both
-    // answered — which on a loaded machine can outlast the fixed rounds.
+    // Keyed on the row appearing, not on the form closing: the form is dismissed
+    // by the write landing, and the list behind it only shows the name once the
+    // write *and* its refresh have both answered. Waiting for the button to come
+    // back was one step too early, and on a loaded machine the refresh outlasted
+    // the fixed rounds after it (run 45027240456).
     await settleUntil(
       tester,
-      () =>
-          find.widgetWithText(FilledButton, 'New buyer').evaluate().isNotEmpty,
+      () => find.text('Nadia Haddad').evaluate().isNotEmpty,
     );
     await settleRealIo(tester);
 

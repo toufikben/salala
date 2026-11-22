@@ -219,6 +219,14 @@ void main() {
       await pumpApp(tester, onboardingSeen: false);
 
       await tester.tap(find.text('Skip'));
+      // Waited on by the outcome, not by a round count: the skip writes a
+      // setting and the home page reads it back on another isolate, and a loaded
+      // machine can need longer than `settleRealIo`'s fixed rounds. That is how
+      // this passed alone and failed inside a suite (run 45027240456).
+      await settleUntil(
+        tester,
+        () => find.text('No animals yet').evaluate().isNotEmpty,
+      );
       await settleRealIo(tester);
 
       expect(find.text('No animals yet'), findsOneWidget);
