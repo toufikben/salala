@@ -43,6 +43,16 @@ android {
         // flag during build.
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+
+        // Phones only. The x86_64 slice exists for emulators, and Play does not
+        // serve it to a real device — but it is 12 MB of `libflutter.so` plus
+        // 17 MB of debug symbols inside the bundle, which is a third of the
+        // upload for a target no user of this app has. An x86 phone is not a
+        // device a breeder carries, and the two ARM slices cover every handset
+        // Play reports for this category.
+        ndk {
+            abiFilters += listOf("armeabi-v7a", "arm64-v8a")
+        }
     }
 
     signingConfigs {
@@ -62,6 +72,14 @@ android {
                 signingConfigs.getByName("release")
             } else {
                 signingConfigs.getByName("debug")
+            }
+            // The symbols are 45 MB of the bundle and Play does not need them in
+            // it: the console takes a separate `native-debug-symbols.zip` on the
+            // same release, which is what makes a crash report readable. Keeping
+            // them in the bundle only makes the upload bigger than Play's own
+            // per-file ceiling.
+            ndk {
+                debugSymbolLevel = "none"
             }
         }
     }
