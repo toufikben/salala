@@ -369,7 +369,7 @@ class _IdentityCard extends ConsumerWidget {
     final cover = photos == null || photos.isEmpty ? null : photos.last;
 
     final headline = <String>[
-      animal.species,
+      speciesLabel(animal.species),
       if (animal.breed != null && animal.breed!.isNotEmpty) animal.breed!,
       sexLabel(l10n, animal.sex),
       if (animal.birthDate != null)
@@ -984,6 +984,11 @@ class _PlacementTile extends ConsumerWidget {
 }
 
 /// The growth curve, drawn from the stored weigh-ins in time order.
+///
+/// A bare polyline in a 72-pixel strip looks like a divider with a kink: the eye
+/// cannot tell whether the line rising means grams or kilos. The first and last
+/// weigh-in are printed above the line and their dates below it, so the curve
+/// answers "from what, to what, over how long" without a legend or a new screen.
 class _WeightSparkline extends StatelessWidget {
   const _WeightSparkline({required this.entries});
 
@@ -991,15 +996,47 @@ class _WeightSparkline extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 72,
-      width: double.infinity,
-      child: CustomPaint(
-        painter: _SparklinePainter(
-          entries: entries,
-          color: Theme.of(context).colorScheme.primary,
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final caption = theme.textTheme.labelSmall?.copyWith(
+      color: theme.colorScheme.onSurfaceVariant,
+    );
+    final first = entries.first;
+    final last = entries.last;
+    String weight(WeightEntry entry) =>
+        formatWeight(entry.weightGrams, kg: l10n.unitKg, g: l10n.unitGrams);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            Text(weight(first), style: caption),
+            Text(weight(last), style: caption),
+          ],
         ),
-      ),
+        const SizedBox(height: 4),
+        SizedBox(
+          height: 64,
+          width: double.infinity,
+          child: CustomPaint(
+            painter: _SparklinePainter(
+              entries: entries,
+              color: theme.colorScheme.primary,
+            ),
+          ),
+        ),
+        const SizedBox(height: 4),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            Text(formatDay(context, first.measuredAt), style: caption),
+            Text(formatDay(context, last.measuredAt), style: caption),
+          ],
+        ),
+        const SizedBox(height: 8),
+      ],
     );
   }
 }

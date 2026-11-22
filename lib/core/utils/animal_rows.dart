@@ -50,7 +50,7 @@ List<(String, String)> animalFacts(
   String localeTag,
   Animal animal,
 ) => <(String, String)>[
-  (l10n.animalSpecies, animal.species),
+  (l10n.animalSpecies, speciesLabel(animal.species)),
   (l10n.animalBreed, animal.breed ?? l10n.valueUnknown),
   (l10n.animalSex, sexLabel(l10n, animal.sex)),
   (l10n.animalStatus, statusLabel(l10n, animal.status)),
