@@ -78,6 +78,30 @@ const List<String> photoExtensions = <String>[
 /// still say the same directory.
 const String photosDirectoryName = 'photos';
 
+/// A name for a new file under an animal's folder: the moment, the size, and a
+/// counter that only ever grows.
+///
+/// The moment and the size are not enough. Two documents picked in the same
+/// millisecond and the same size — a two-page contract and its copy, two photos
+/// from a burst — produce one name, and the second write replaces the first
+/// without an error. That is a signed contract lost with nothing on screen to
+/// say it went. The counter is process-wide and monotonic, so the second name
+/// differs from the first even inside one millisecond.
+int _lastIssuedMs = 0;
+int _issuedInThatMs = 0;
+
+String newFileName(int bytes, String extension) {
+  final nowMs = DateTime.now().toUtc().millisecondsSinceEpoch;
+  if (nowMs == _lastIssuedMs) {
+    _issuedInThatMs += 1;
+  } else {
+    _lastIssuedMs = nowMs;
+    _issuedInThatMs = 0;
+  }
+  final suffix = _issuedInThatMs == 0 ? '' : '-$_issuedInThatMs';
+  return '$nowMs$suffix-$bytes${extension.isEmpty ? '' : '.$extension'}';
+}
+
 /// Where a picture lives, and how it gets there — behind one seam.
 ///
 /// `data_pack.dart` decides what a backup holds and proves it against a real
@@ -250,9 +274,7 @@ class SystemPhotoFiles extends PhotoFiles {
     // Named here rather than kept from the source: a gallery file is called
     // IMG_2841.jpg on the second animal too, and two animals may own that name.
     // The extension is the only part of the old name worth carrying.
-    final name =
-        '${DateTime.now().toUtc().millisecondsSinceEpoch}-'
-        '${photo.bytes.length}.$extension';
+    final name = newFileName(photo.bytes.length, extension);
     if (!isStorablePhotoName(name)) {
       throw PhotoRefused(PhotoProblem.notAnImage, name);
     }

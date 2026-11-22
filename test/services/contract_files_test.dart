@@ -188,6 +188,26 @@ void main() {
       expect(await files_.pathFor('animal-1', keep), isNotNull);
     });
 
+    // The neighbour above only survives because two stores usually land in
+    // different milliseconds. Two documents of the same size stored in the same
+    // millisecond — a signed contract and the scan of it — used to produce one
+    // name, and the second write silently replaced the first. The name is now
+    // issued by a counter, so this case cannot come back without this test
+    // failing.
+    test('two stores in one millisecond and one size keep both files', () async {
+      final files_ = files();
+      final first = await files_.store('animal-1', picked('a.pdf', bytes: 8));
+      final second = await files_.store('animal-1', picked('b.pdf', bytes: 8));
+
+      expect(first, isNot(second));
+      final folder = Directory(
+        p.join(root.path, contractsDirectoryName, photoFolder('animal-1')),
+      );
+      expect(folder.listSync().length, 2);
+      expect(await files_.pathFor('animal-1', first), isNotNull);
+      expect(await files_.pathFor('animal-1', second), isNotNull);
+    });
+
     test('deleting a file that is not there is not an error', () async {
       await expectLater(
         files().delete('animal-1', '1700000000000-1.pdf'),

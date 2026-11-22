@@ -5,7 +5,7 @@ import 'package:file_selector/file_selector.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
-import 'photo_files.dart' show photoFolder;
+import 'photo_files.dart' show newFileName, photoFolder;
 
 /// A document the breeder attached to a handover: signed contract, deposit slip,
 /// vaccination card photographed at the gate.
@@ -144,9 +144,7 @@ class SystemContractFiles extends ContractFiles {
     // called `contract.pdf`, and the animal's own folder would then hold one of
     // them. The extension is the only part of the old name worth carrying.
     final extension = _extensionOf(contract.name);
-    final name =
-        '${DateTime.now().toUtc().millisecondsSinceEpoch}-'
-        '${contract.bytes.length}${extension.isEmpty ? '' : '.$extension'}';
+    final name = newFileName(contract.bytes.length, extension);
     // Belts and braces: the name is built here from two numbers and an
     // extension, so it cannot fail the rule. If it ever does, that is a bug in
     // this file rather than a document the breeder chose, and a sentence about
