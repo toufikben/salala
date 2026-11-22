@@ -73,14 +73,6 @@ android {
             } else {
                 signingConfigs.getByName("debug")
             }
-            // The symbols are 45 MB of the bundle and Play does not need them in
-            // it: the console takes a separate `native-debug-symbols.zip` on the
-            // same release, which is what makes a crash report readable. Keeping
-            // them in the bundle only makes the upload bigger than Play's own
-            // per-file ceiling.
-            ndk {
-                debugSymbolLevel = "none"
-            }
         }
     }
 }
