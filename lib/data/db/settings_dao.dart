@@ -82,4 +82,11 @@ class SettingKeys {
   /// restore could not carry would look like a fresh install, and a breeder who
   /// brought her ledger to a new phone would be handed a second trial for it.
   static const String trialStartedAt = 'trial_started_at';
+
+  /// What this phone has bought, as a comma-separated list of plan names.
+  ///
+  /// Written only from what Play confirmed, never from what the app hoped: a
+  /// switch flipped in the UI is a free Pro subscription for anyone who can
+  /// reach the settings table, and Play re-checks it on every launch anyway.
+  static const String ownedPlans = 'owned_plans';
 }

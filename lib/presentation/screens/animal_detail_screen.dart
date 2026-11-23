@@ -21,9 +21,11 @@ import '../../data/models/vaccination.dart';
 import '../../data/models/vet_visit.dart';
 import '../../data/models/weight_entry.dart';
 import '../../services/animal_pdf.dart';
+import '../../services/billing.dart';
 import '../../services/pack_files.dart';
 import '../../services/pdf_layout.dart';
 import '../../services/photo_files.dart';
+import '../../services/trial.dart';
 import '../providers/app_providers.dart';
 import '../providers/record_providers.dart';
 import '../providers/triage_providers.dart';
@@ -31,6 +33,7 @@ import '../widgets/animal_timeline_card.dart';
 import '../widgets/heat_cycle_card.dart';
 import '../widgets/photo_thumb.dart';
 import '../widgets/placement_dialog.dart';
+import '../widgets/pro_gate.dart';
 import '../widgets/record_refusal.dart';
 import '../widgets/symptom_dialog.dart';
 import '../widgets/triage_card.dart';
@@ -319,6 +322,10 @@ Future<void> _sharePdfPack(
 ) async {
   final l10n = AppLocalizations.of(context);
   final messenger = ScaffoldMessenger.of(context);
+
+  // Asked before the PDF is built rather than after: a page a breeder waited for
+  // and then cannot send is worse than a sheet that explains itself in one line.
+  if (!await ensurePro(context, ref, ProFeature.reports)) return;
 
   try {
     final baseFont = await rootBundle.load(pdfFontAsset);
@@ -1217,6 +1224,16 @@ Future<void> _addPhoto(
   String animalId,
 ) async {
   final l10n = AppLocalizations.of(context);
+
+  // The free allowance is per animal and the sentence is the allowance: three
+  // pictures identify a dog, and the fourth is the one that sells the plan.
+  final kept = await ref.read(photosForAnimalProvider(animalId).future);
+  if (!context.mounted) return;
+  if (kept.length >= FreeAllowance.photosPerAnimal &&
+      !await ensurePro(context, ref, ProFeature.unlimitedPhotos)) {
+    return;
+  }
+  if (!context.mounted) return;
 
   // Asked before the picker opens, because the two are different trips out of
   // the app: the gallery is a document that already exists, the camera is a

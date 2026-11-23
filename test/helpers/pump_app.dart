@@ -18,9 +18,11 @@ import 'package:companion/data/models/vaccination.dart';
 import 'package:companion/data/models/vet_visit.dart';
 import 'package:companion/data/models/weight_entry.dart';
 import 'package:companion/presentation/providers/app_providers.dart';
+import 'package:companion/presentation/providers/billing_providers.dart';
 import 'package:companion/presentation/providers/triage_providers.dart';
 import 'package:companion/presentation/widgets/date_tile.dart';
 import 'package:companion/services/app_lock_service.dart';
+import 'package:companion/services/billing.dart';
 import 'package:companion/services/reminder_scheduler.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:timezone/data/latest_all.dart' as tz_data;
@@ -242,9 +244,14 @@ Future<FakeSecureStorage> pumpApp(
   // Keystore values written before the first frame: a broken digest, a lockout
   // that outlived the process, or an enrollment the app has to open on.
   Map<String, String> secureSeed = const <String, String>{},
+  // The answer the gates get, when a test wants them closed. The shipped build
+  // has billing switched off, so without this every gate is open and the sheets
+  // they open would be code nobody ever runs.
+  ProAccess? proAccess,
 }) async {
   final storage = FakeSecureStorage()..values.addAll(secureSeed);
   late Database database;
+  final access = proAccess;
 
   // The triage table, read here instead of from inside its provider, and read
   // the way `test/core/triage_test.dart` reads it: synchronously, off disk.
@@ -350,6 +357,8 @@ Future<FakeSecureStorage> pumpApp(
         if (locale != null) initialLocaleProvider.overrideWithValue(locale),
         initialOnboardingSeenProvider.overrideWithValue(onboardingSeen),
         if (review != null) reviewServiceProvider.overrideWithValue(review),
+      if (access != null)
+        proAccessProvider.overrideWith((ref) async => access),
       ],
       child: const CompanionApp(),
     ),

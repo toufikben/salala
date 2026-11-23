@@ -1491,4 +1491,101 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get onboardingSupportBody =>
       'Companion wird von einem einzelnen Programmierer gebaut, nicht von einer Firma. Keine Werbung, keine Investoren. Wenn es seinen Platz in Ihrem Zwinger verdient, hält der Kauf die Updates am Laufen.';
+
+  @override
+  String get upgradeTitle => 'Companion Pro';
+
+  @override
+  String get upgradeIntro =>
+      'Das Zuchtbuch bleibt dauerhaft kostenlos. Pro ist der Teil, den man anderen zeigt: unbegrenzte Fotos, der Ahnentafel-Baum, der Kaufvertrag, das PDF mit eigener Kopfzeile und unbegrenzte Sicherungen.';
+
+  @override
+  String get upgradeProTitle => 'Pro';
+
+  @override
+  String get upgradeProBody => 'Ein Zwinger.';
+
+  @override
+  String get upgradeStudioTitle => 'Studio';
+
+  @override
+  String get upgradeStudioBody => 'Mehr als ein Zwinger, gleiche Funktionen.';
+
+  @override
+  String get upgradeMonthly => 'Monatlich';
+
+  @override
+  String get upgradeYearly => 'Jährlich';
+
+  @override
+  String get upgradeYearlyNote => 'Zwei Monate gratis';
+
+  @override
+  String get upgradePriceLoading => 'Preis wird beim Store abgefragt...';
+
+  @override
+  String get upgradeSubscribe => 'Abonnieren';
+
+  @override
+  String get upgradeRestore => 'Kauf wiederherstellen';
+
+  @override
+  String get upgradeRestored => 'Dein Kauf ist wieder da.';
+
+  @override
+  String get upgradeNothingToRestore => 'Kein Kauf in diesem Konto gefunden.';
+
+  @override
+  String get upgradeThankYou => 'Danke. Alles ist freigeschaltet.';
+
+  @override
+  String get upgradeFailed =>
+      'Der Store hat das nicht abgeschlossen. Es wurde nichts berechnet.';
+
+  @override
+  String get upgradeLater => 'Nicht jetzt';
+
+  @override
+  String upgradeTrialDays(int days) {
+    return 'Noch $days Tage mit allem';
+  }
+
+  @override
+  String get upgradeTrialOver => 'Die Testphase ist beendet';
+
+  @override
+  String get settingsProTitle => 'Companion Pro';
+
+  @override
+  String get settingsProOwned => 'Auf diesem Telefon aktiv';
+
+  @override
+  String get settingsProFree => 'Was Pro bringt';
+
+  @override
+  String proGateTitle(String feature) {
+    return '$feature gehört zu Pro';
+  }
+
+  @override
+  String get proGateBody =>
+      'Tiere, Würfe, Gesundheitsdaten und eine Sicherung bleiben kostenlos. Pro ergänzt, was der Käufer sieht.';
+
+  @override
+  String get proGateSee => 'Tarife ansehen';
+
+  @override
+  String get featurePhotos => 'Unbegrenzte Fotos';
+
+  @override
+  String get featurePedigree => 'Der Ahnentafel-Baum';
+
+  @override
+  String get featureReports => 'Berichte mit Kopfzeile';
+
+  @override
+  String get featureContracts => 'Kaufverträge';
+
+  @override
+  String get featureBackup => 'Unbegrenzte Sicherungen';
 }

@@ -6,7 +6,6 @@
   "navBuyers": "Acquéreurs",
   "navSettings": "Réglages",
   "languageName": "Français",
-
   "homeEmptyTitle": "Aucun animal pour l'instant",
   "homeEmptyBody": "Un troupeau commence par un seul. Donnez-lui un nom, et sa fiche commence ici.",
   "homeAddAnimal": "Ajouter un animal",
@@ -22,7 +21,6 @@
     }
   },
   "homeAnimalCount": "{count, plural, =0{Aucun animal} =1{1 animal} other{{count} animaux}}",
-
   "animalName": "Nom",
   "animalSpecies": "Espèce",
   "animalBreed": "Race",
@@ -31,7 +29,11 @@
   "animalBornOn": "Né le {day}",
   "@animalBornOn": {
     "description": "Sur la page de l'animal, la date de naissance se lit comme une phrase et non comme une ligne : c'est un des quatre faits de l'en-tête sous la photo.",
-    "placeholders": { "day": { "type": "String" } }
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
   },
   "animalStatus": "Statut",
   "animalMicrochipDate": "Date du puçage",
@@ -60,25 +62,21 @@
   "animalDeleteBody": "Ses vaccins, tests de santé, pesées, visites et symptômes sont aussi supprimés, avec toute cession enregistrée, ses photos et les fichiers qui les gardent sur ce téléphone, ainsi que le contrat joint à cette cession. Cette action est irréversible.",
   "animalNameRequired": "Le nom est obligatoire",
   "animalSpeciesRequired": "Choisissez une espèce",
-
   "sexMale": "Mâle",
   "sexFemale": "Femelle",
   "sexUnknown": "Inconnu",
-
   "statusActive": "Avec moi",
   "statusSold": "Placé",
   "statusRetired": "Reproducteur réformé",
   "statusDeceased": "Décédé",
-
   "recordsVaccinations": "Vaccins",
   "recordsHealthTests": "Tests de santé",
   "recordsWeights": "Pesées",
   "recordsVisits": "Visites vétérinaires",
   "recordsSymptoms": "Symptômes",
-"recordsPhotos": "Photos",
+  "recordsPhotos": "Photos",
   "recordsPlacements": "Placements",
   "recordsEmpty": "Rien d'enregistré.",
-
   "detailStoryLine": "Chaque ligne ici fait partie de son histoire.",
   "detailDiedLine": "Sa fiche reste telle qu'elle était.",
   "placedFarewell": "{name} est parti dans un nouveau foyer. La fiche reste avec vous.",
@@ -91,7 +89,6 @@
   "actionRetry": "Réessayer",
   "actionClear": "Effacer",
   "actionReplace": "Remplacer",
-
   "lockTitle": "Companion est verrouillé",
   "lockEnterPin": "Saisissez votre code",
   "lockUnlock": "Déverrouiller",
@@ -115,7 +112,6 @@
       }
     }
   },
-
   "settingsAppLock": "Verrouillage",
   "settingsChangePin": "Modifier le code",
   "settingsChangePinBody": "Saisissez le code actuel, puis choisissez-en un nouveau.",
@@ -137,7 +133,11 @@
   "settingsLastBackup": "Dernière sauvegarde : {day}",
   "@settingsLastBackup": {
     "description": "Sous la tuile d'export. Le but est que l'éleveur voie à quel point sa seule copie est ancienne — une application qui n'en parle jamais est une application où la dernière sauvegarde date de huit mois.",
-    "placeholders": { "day": { "type": "String" } }
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
   },
   "settingsNeverBackedUp": "Aucune sauvegarde n'a encore quitté ce téléphone",
   "settingsCsv": "Tableur (CSV)",
@@ -148,7 +148,11 @@
   "settingsCsvPlacements": "Cessions",
   "csvShared": "{file} est prêt à envoyer",
   "@csvShared": {
-    "placeholders": { "file": { "type": "String" } }
+    "placeholders": {
+      "file": {
+        "type": "String"
+      }
+    }
   },
   "csvShareFailed": "Le tableur n'a pas pu être écrit sur ce téléphone",
   "csvEmpty": "Rien à exporter sur ce téléphone pour l'instant",
@@ -170,7 +174,6 @@
   "packRestoreBody": "Du {day}. Animaux : {animals}. Enregistrements : {rows}. La restauration remplacera tout ce qui est sur ce téléphone.",
   "packRestored": "Enregistrements restaurés : {rows}",
   "packRestoreFailed": "Le pack n'a pas pu être restauré. Rien n'a changé sur ce téléphone.",
-
   "litterAdd": "Nouvelle portée",
   "litterEditTitle": "Modifier la portée",
   "litterAddPuppies": "Ajouter des chiots",
@@ -252,7 +255,6 @@
     }
   },
   "litterDeleteBody": "Les chiots restent dans vos animaux ; seul l'accouplement est supprimé. Cette action est irréversible.",
-
   "animalGone": "Cet animal a été supprimé.",
   "animalDeathDate": "Mort le",
   "animalDam": "Mère",
@@ -262,7 +264,6 @@
   "recordSaveFailed": "Enregistrement impossible. Rien n'a été écrit.",
   "recordDeleteFailed": "Suppression impossible. Cet enregistrement est toujours là.",
   "recordDateBeforeBirth": "Cette date est antérieure à la naissance de cet animal.",
-
   "vaccinationAdd": "Ajouter une vaccination",
   "vaccinationAddTitle": "Enregistrer une vaccination",
   "vaccinationEditTitle": "Modifier la vaccination",
@@ -279,7 +280,6 @@
   "vaccinationClinic": "Clinique",
   "vaccinationCertificate": "N° du certificat",
   "vaccinationDeleteBody": "La dose est retirée de l'historique de cet animal. Action irréversible.",
-
   "weightAdd": "Ajouter un poids",
   "weightKg": "Poids (kg)",
   "weightColumn": "Poids",
@@ -291,9 +291,7 @@
   "weightNote": "Note",
   "weightDeleteBody": "La pesée est supprimée. Action irréversible.",
   "weightAppendOnlyHint": "Les pesées ne se modifient pas. Mesure erronée ? Supprimez-la et pesez de nouveau.",
-
   "animalSpeciesHelper": "chien · chat",
-
   "healthTestAdd": "Ajouter un test",
   "healthTestAddTitle": "Enregistrer un test de santé",
   "healthTestEditTitle": "Modifier le test",
@@ -309,7 +307,6 @@
   "healthTestVerifiedBy": "Vérifié par",
   "healthTestExpired": "Expiré",
   "healthTestDeleteBody": "Le test est retiré de l'historique de cet animal. Action irréversible.",
-
   "visitAdd": "Ajouter une visite",
   "visitAddTitle": "Enregistrer une visite",
   "visitEditTitle": "Modifier la visite",
@@ -321,7 +318,6 @@
   "visitCostInvalid": "Saisissez un montant comme 250",
   "visitCurrency": "Devise",
   "visitDeleteBody": "La visite est retirée de l'historique de cet animal. Action irréversible.",
-
   "symptomAdd": "Ajouter un symptôme",
   "symptomAddTitle": "Enregistrer un symptôme",
   "symptomEditTitle": "Modifier le symptôme",
@@ -336,7 +332,6 @@
   "symptomOngoing": "Toujours en cours",
   "symptomResolved": "Résolu",
   "symptomDeleteBody": "Le symptôme est retiré de l'historique de cet animal. Action irréversible.",
-
   "photoFromGallery": "Choisir dans la galerie",
   "photoFromCamera": "Prendre une photo",
   "photoAdd": "Ajouter une photo",
@@ -344,7 +339,6 @@
   "photoMissing": "Absente de cet appareil",
   "photoTooLarge": "Cette photo est trop lourde",
   "photoNotAnImage": "Ce fichier n'est pas une photo",
-
   "placementAdd": "Ajouter un placement",
   "placementAddTitle": "Enregistrer un placement",
   "placementEditTitle": "Modifier le placement",
@@ -365,7 +359,6 @@
   "contractPickFailed": "Aucun document n'a pu être choisi",
   "contractTooLarge": "Ce fichier est trop lourd pour être conservé",
   "placementDeleteBody": "Le placement est retiré de l'historique de cet animal. L'acquéreur reste dans vos contacts. Action irréversible.",
-
   "buyerAdd": "Nouvel acquéreur",
   "buyerAddTitle": "Ajouter un acquéreur",
   "buyerEditTitle": "Modifier l'acquéreur",
@@ -376,21 +369,25 @@
   "buyersEmptyBody": "Un acquéreur s'ajoute avec un placement — ou ici, avant : la personne à qui vous avez vendu l'an dernier veut encore le pedigree.",
   "buyersNoAnimals": "Aucun animal enregistré pour ce contact",
   "buyerDeleteBody": "{name} est supprimé de vos contacts. Le placement reste dans l'historique de l'animal, sans acquéreur nommé. Action irréversible.",
-
   "reminderHeadsUpBody": "À noter : {what} arrive à échéance le {dueDay}",
   "@reminderHeadsUpBody": {
     "placeholders": {
-      "what": { "type": "String" },
-      "dueDay": { "type": "String" }
+      "what": {
+        "type": "String"
+      },
+      "dueDay": {
+        "type": "String"
+      }
     }
   },
   "reminderDueBody": "{what} arrive aujourd'hui. Deux minutes suffisent",
   "@reminderDueBody": {
     "placeholders": {
-      "what": { "type": "String" }
+      "what": {
+        "type": "String"
+      }
     }
   },
-
   "pdfAction": "Fiche PDF",
   "pdfFailed": "Le PDF n'a pas pu être créé",
   "pdfTitle": "Fiche sanitaire et généalogique",
@@ -408,7 +405,6 @@
   "pdfGuarantee": "Conditions de garantie",
   "pdfChartAxes": "Poids en kilogrammes, selon l'âge en mois. Le tableau ci-dessus écrit le poids d'un jeune chiot en grammes.",
   "pdfDisclaimer": "Établi hors ligne par Companion à partir des registres de l'éleveur. Ce document n'est pas un certificat vétérinaire.",
-
   "triageTitle": "Prochaine étape",
   "triageActNow": "Agir maintenant",
   "triageWatch": "Surveiller",
@@ -427,9 +423,7 @@
   "triageWhelpingOverdue": "{name} : mise bas retardée de {days}",
   "triageSevereSymptom": "{name} enregistré comme sévère et toujours en cours",
   "triageSymptomUnresolved": "{name} constaté il y a {days} et toujours en cours",
-
   "agendaTitle": "Vaccinations à prévoir",
-
   "daysSingle": "{n} jour",
   "daysDual": "{n} jours",
   "onboardingSlide1Title": "Une fiche par animal",
@@ -521,5 +515,49 @@
   "onboardingYoursTitle": "Le serveur de personne d’autre",
   "onboardingYoursBody": "Sans compte, sans publicité, sans pistage. Fonctionne dans un cabanon sans réseau, et vos données ne quittent le téléphone que si vous exportez.",
   "onboardingSupportTitle": "Fait par une personne",
-  "onboardingSupportBody": "Companion est construit par un seul programmeur, pas par une entreprise. Sans publicité et sans investisseurs. S’il trouve sa place dans votre élevage, l’acheter est ce qui fait vivre les mises à jour."
+  "onboardingSupportBody": "Companion est construit par un seul programmeur, pas par une entreprise. Sans publicité et sans investisseurs. S’il trouve sa place dans votre élevage, l’acheter est ce qui fait vivre les mises à jour.",
+  "upgradeTitle": "Companion Pro",
+  "upgradeIntro": "Le registre reste gratuit pour toujours. Pro, c'est la partie que l'on montre aux autres : photos sans limite, l'arbre généalogique, le contrat de vente, le PDF à votre en-tête et des sauvegardes sans compter.",
+  "upgradeProTitle": "Pro",
+  "upgradeProBody": "Un élevage.",
+  "upgradeStudioTitle": "Studio",
+  "upgradeStudioBody": "Plusieurs élevages, mêmes fonctions.",
+  "upgradeMonthly": "Mensuel",
+  "upgradeYearly": "Annuel",
+  "upgradeYearlyNote": "Deux mois offerts",
+  "upgradePriceLoading": "Prix demandé à la boutique...",
+  "upgradeSubscribe": "S'abonner",
+  "upgradeRestore": "Restaurer un achat",
+  "upgradeRestored": "Votre achat est revenu.",
+  "upgradeNothingToRestore": "Aucun achat trouvé sur ce compte.",
+  "upgradeThankYou": "Merci. Tout est déverrouillé.",
+  "upgradeFailed": "La boutique n'a pas terminé. Rien n'a été débité.",
+  "upgradeLater": "Pas maintenant",
+  "upgradeTrialDays": "Encore {days} jours de tout",
+  "@upgradeTrialDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "upgradeTrialOver": "L'essai est terminé",
+  "settingsProTitle": "Companion Pro",
+  "settingsProOwned": "Actif sur ce téléphone",
+  "settingsProFree": "Voir ce que Pro ajoute",
+  "proGateTitle": "{feature} fait partie de Pro",
+  "@proGateTitle": {
+    "placeholders": {
+      "feature": {
+        "type": "String"
+      }
+    }
+  },
+  "proGateBody": "Vos animaux, portées et dossiers de santé restent gratuits, ainsi qu'une sauvegarde. Pro ajoute ce que voit l'acheteur.",
+  "proGateSee": "Voir les formules",
+  "featurePhotos": "Photos sans limite",
+  "featurePedigree": "L'arbre généalogique",
+  "featureReports": "Rapports à votre en-tête",
+  "featureContracts": "Contrats de vente",
+  "featureBackup": "Sauvegardes sans limite"
 }

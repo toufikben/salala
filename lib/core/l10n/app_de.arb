@@ -6,7 +6,6 @@
   "navBuyers": "Käufer",
   "navSettings": "Einstellungen",
   "languageName": "Deutsch",
-
   "homeEmptyTitle": "Noch keine Tiere",
   "homeEmptyBody": "Eine Herde beginnt mit einem. Gib ihr einen Namen, und ihr Eintrag beginnt hier.",
   "homeAddAnimal": "Tier hinzufügen",
@@ -15,7 +14,6 @@
   "homeSearchHint": "Nach Name, Nummer, Chip, Notiz oder Käufer suchen",
   "homeNoMatches": "Kein Treffer für „{query}“",
   "homeAnimalCount": "{count, plural, =0{Keine Tiere} =1{1 Tier} other{{count} Tiere}}",
-
   "animalName": "Name",
   "animalSpecies": "Tierart",
   "animalBreed": "Rasse",
@@ -39,16 +37,13 @@
   "animalDeleteBody": "Auch seine Impfungen, Gesundheitsuntersuchungen, Gewichte, Besuche und Symptome werden gelöscht, dazu jede erfasste Vermittlung, seine Fotos und die Dateien, die diese auf diesem Gerät halten, sowie der zu dieser Vermittlung angehängte Vertrag. Das lässt sich nicht rückgängig machen.",
   "animalNameRequired": "Ein Name ist erforderlich",
   "animalSpeciesRequired": "Wählen Sie eine Tierart",
-
   "sexMale": "Rüde/Kater",
   "sexFemale": "Hündin/Kätzin",
   "sexUnknown": "Unbekannt",
-
   "statusActive": "Bei mir",
   "statusSold": "Vermittelt",
   "statusRetired": "Ausgemustert",
   "statusDeceased": "Verstorben",
-
   "recordsVaccinations": "Impfungen",
   "recordsHealthTests": "Gesundheitsuntersuchungen",
   "recordsWeights": "Gewichte",
@@ -57,7 +52,6 @@
   "recordsPhotos": "Fotos",
   "recordsPlacements": "Vermittlungen",
   "recordsEmpty": "Noch nichts erfasst.",
-
   "detailStoryLine": "Jeder Eintrag hier gehört zu seiner Geschichte.",
   "detailDiedLine": "Sein Eintrag bleibt, wie er war.",
   "placedFarewell": "{name} ist in ein neues Zuhause gegangen. Der Eintrag bleibt bei dir.",
@@ -70,7 +64,6 @@
   "actionRetry": "Erneut versuchen",
   "actionClear": "Zurücksetzen",
   "actionReplace": "Ersetzen",
-
   "lockTitle": "Companion ist gesperrt",
   "lockEnterPin": "PIN eingeben",
   "lockUnlock": "Entsperren",
@@ -86,7 +79,6 @@
   "lockChangeFailed": "Das Telefon hat die App-Sperre nicht geändert.",
   "lockChangePinDone": "PIN geändert.",
   "lockTooManyAttempts": "Zu viele falsche PINs. Erneut in {seconds} s.",
-
   "settingsAppLock": "App-Sperre",
   "settingsChangePin": "PIN ändern",
   "settingsChangePinBody": "Geben Sie die aktuelle PIN ein und wählen Sie dann eine neue.",
@@ -134,7 +126,6 @@
   "packRestoreBody": "Vom {day}. Tiere: {animals}. Einträge: {rows}. Die Wiederherstellung ersetzt alles, was jetzt auf diesem Telefon ist.",
   "packRestored": "Einträge wiederhergestellt: {rows}",
   "packRestoreFailed": "Das Paket konnte nicht wiederhergestellt werden. Auf diesem Telefon hat sich nichts geändert.",
-
   "litterAdd": "Neuer Wurf",
   "litterEditTitle": "Wurf bearbeiten",
   "litterAddPuppies": "Welpen hinzufügen",
@@ -195,7 +186,6 @@
   "litterGone": "Dieser Wurf wurde gelöscht.",
   "litterDeleteTitle": "{name} löschen?",
   "litterDeleteBody": "Die Welpen bleiben in Ihren Tieren; nur der Deckungseintrag wird entfernt. Das lässt sich nicht rückgängig machen.",
-
   "animalGone": "Dieses Tier wurde gelöscht.",
   "animalDeathDate": "Verstorben am",
   "animalDam": "Mutter",
@@ -205,7 +195,6 @@
   "recordSaveFailed": "Das ließ sich nicht speichern. Es wurde nichts geschrieben.",
   "recordDeleteFailed": "Das ließ sich nicht löschen. Der Eintrag ist noch da.",
   "recordDateBeforeBirth": "Dieses Datum liegt vor der Geburt dieses Tieres.",
-
   "vaccinationAdd": "Impfung hinzufügen",
   "vaccinationAddTitle": "Impfung erfassen",
   "vaccinationEditTitle": "Impfung bearbeiten",
@@ -222,7 +211,6 @@
   "vaccinationClinic": "Praxis",
   "vaccinationCertificate": "Zertifikatsnummer",
   "vaccinationDeleteBody": "Die Dosis wird aus der Vorgeschichte dieses Tieres entfernt. Das lässt sich nicht rückgängig machen.",
-
   "weightAdd": "Gewicht hinzufügen",
   "weightKg": "Gewicht (kg)",
   "weightColumn": "Gewicht",
@@ -234,9 +222,7 @@
   "weightNote": "Notiz",
   "weightDeleteBody": "Die Wägung wird entfernt. Das lässt sich nicht rückgängig machen.",
   "weightAppendOnlyHint": "Wägungen werden nie bearbeitet. Falsch gemessen? Löschen und erneut wiegen.",
-
   "animalSpeciesHelper": "Hund · Katze",
-
   "healthTestAdd": "Untersuchung hinzufügen",
   "healthTestAddTitle": "Gesundheitsuntersuchung erfassen",
   "healthTestEditTitle": "Untersuchung bearbeiten",
@@ -252,7 +238,6 @@
   "healthTestVerifiedBy": "Bestätigt von",
   "healthTestExpired": "Abgelaufen",
   "healthTestDeleteBody": "Das Screening wird aus der Vorgeschichte dieses Tieres entfernt. Das lässt sich nicht rückgängig machen.",
-
   "visitAdd": "Besuch hinzufügen",
   "visitAddTitle": "Tierarztbesuch erfassen",
   "visitEditTitle": "Tierarztbesuch bearbeiten",
@@ -264,7 +249,6 @@
   "visitCostInvalid": "Geben Sie einen Betrag wie 250 ein",
   "visitCurrency": "Währung",
   "visitDeleteBody": "Der Besuch wird aus der Vorgeschichte dieses Tieres entfernt. Das lässt sich nicht rückgängig machen.",
-
   "symptomAdd": "Symptom hinzufügen",
   "symptomAddTitle": "Symptom erfassen",
   "symptomEditTitle": "Symptom bearbeiten",
@@ -279,7 +263,6 @@
   "symptomOngoing": "Besteht weiter",
   "symptomResolved": "Abgeklungen",
   "symptomDeleteBody": "Das Symptom wird aus der Vorgeschichte dieses Tieres entfernt. Das lässt sich nicht rückgängig machen.",
-
   "photoAdd": "Foto hinzufügen",
   "photoFromGallery": "Aus der Galerie wählen",
   "photoFromCamera": "Foto aufnehmen",
@@ -287,7 +270,6 @@
   "photoMissing": "Nicht auf diesem Telefon",
   "photoTooLarge": "Dieses Bild ist zu groß zum Behalten",
   "photoNotAnImage": "Diese Datei ist kein Bild",
-
   "placementAdd": "Vermittlung hinzufügen",
   "placementAddTitle": "Vermittlung erfassen",
   "placementEditTitle": "Vermittlung bearbeiten",
@@ -308,7 +290,6 @@
   "contractPickFailed": "Es konnte kein Dokument gewählt werden",
   "contractTooLarge": "Diese Datei ist zu groß zum Aufbewahren",
   "placementDeleteBody": "Die Vermittlung wird aus der Vorgeschichte dieses Tieres entfernt. Der Käufer bleibt in Ihren Kontakten. Das lässt sich nicht rückgängig machen.",
-
   "buyerAdd": "Neuer Käufer",
   "buyerAddTitle": "Käufer hinzufügen",
   "buyerEditTitle": "Käufer bearbeiten",
@@ -319,10 +300,8 @@
   "buyersEmptyBody": "Ein Käufer entsteht mit einer Übergabe — oder hier, schon vorher: wer letztes Jahr bei Ihnen gekauft hat, möchte dennoch den Stammbaum.",
   "buyersNoAnimals": "Kein Tier für diesen Kontakt erfasst",
   "buyerDeleteBody": "{name} wird aus Ihren Kontakten entfernt. Die Übergabe bleibt in der Vorgeschichte des Tieres, ohne benannten Käufer. Das lässt sich nicht rückgängig machen.",
-
   "reminderHeadsUpBody": "Zur Erinnerung: {what} ist am {dueDay} fällig",
   "reminderDueBody": "{what} ist heute fällig. Zwei Minuten reichen",
-
   "pdfAction": "PDF-Dossier",
   "pdfFailed": "Das PDF konnte nicht erstellt werden",
   "pdfTitle": "Gesundheits- und Abstammungsnachweis",
@@ -340,7 +319,6 @@
   "pdfGuarantee": "Garantiebedingungen",
   "pdfChartAxes": "Gewicht in Kilogramm gegen das Alter in Monaten. Die Tabelle darüber schreibt das Gewicht eines jungen Welpen in Gramm.",
   "pdfDisclaimer": "Offline von Companion aus den eigenen Aufzeichnungen des Züchters erstellt. Dies ist kein tierärztliches Zertifikat.",
-
   "triageTitle": "Was als Nächstes zu tun ist",
   "triageActNow": "Jetzt handeln",
   "triageWatch": "Weiter beobachten",
@@ -359,9 +337,7 @@
   "triageWhelpingOverdue": "{name}: der Wurf liegt {days} über dem erwarteten Termin",
   "triageSevereSymptom": "{name} wurde als schwer erfasst und besteht weiter",
   "triageSymptomUnresolved": "{name} wurde vor {days} beobachtet und besteht weiter",
-
   "agendaTitle": "Impfungen zu terminieren",
-
   "daysSingle": "{n} Tag",
   "daysDual": "{n} Tage",
   "onboardingSlide1Title": "Ein Eintrag pro Tier",
@@ -453,5 +429,49 @@
   "onboardingYoursTitle": "Kein fremder Server",
   "onboardingYoursBody": "Kein Konto, keine Werbung, kein Tracking. Läuft im Schuppen ohne Netz, und Ihre Daten verlassen das Telefon nur beim Export.",
   "onboardingSupportTitle": "Von einer Person gebaut",
-  "onboardingSupportBody": "Companion wird von einem einzelnen Programmierer gebaut, nicht von einer Firma. Keine Werbung, keine Investoren. Wenn es seinen Platz in Ihrem Zwinger verdient, hält der Kauf die Updates am Laufen."
+  "onboardingSupportBody": "Companion wird von einem einzelnen Programmierer gebaut, nicht von einer Firma. Keine Werbung, keine Investoren. Wenn es seinen Platz in Ihrem Zwinger verdient, hält der Kauf die Updates am Laufen.",
+  "upgradeTitle": "Companion Pro",
+  "upgradeIntro": "Das Zuchtbuch bleibt dauerhaft kostenlos. Pro ist der Teil, den man anderen zeigt: unbegrenzte Fotos, der Ahnentafel-Baum, der Kaufvertrag, das PDF mit eigener Kopfzeile und unbegrenzte Sicherungen.",
+  "upgradeProTitle": "Pro",
+  "upgradeProBody": "Ein Zwinger.",
+  "upgradeStudioTitle": "Studio",
+  "upgradeStudioBody": "Mehr als ein Zwinger, gleiche Funktionen.",
+  "upgradeMonthly": "Monatlich",
+  "upgradeYearly": "Jährlich",
+  "upgradeYearlyNote": "Zwei Monate gratis",
+  "upgradePriceLoading": "Preis wird beim Store abgefragt...",
+  "upgradeSubscribe": "Abonnieren",
+  "upgradeRestore": "Kauf wiederherstellen",
+  "upgradeRestored": "Dein Kauf ist wieder da.",
+  "upgradeNothingToRestore": "Kein Kauf in diesem Konto gefunden.",
+  "upgradeThankYou": "Danke. Alles ist freigeschaltet.",
+  "upgradeFailed": "Der Store hat das nicht abgeschlossen. Es wurde nichts berechnet.",
+  "upgradeLater": "Nicht jetzt",
+  "upgradeTrialDays": "Noch {days} Tage mit allem",
+  "@upgradeTrialDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "upgradeTrialOver": "Die Testphase ist beendet",
+  "settingsProTitle": "Companion Pro",
+  "settingsProOwned": "Auf diesem Telefon aktiv",
+  "settingsProFree": "Was Pro bringt",
+  "proGateTitle": "{feature} gehört zu Pro",
+  "@proGateTitle": {
+    "placeholders": {
+      "feature": {
+        "type": "String"
+      }
+    }
+  },
+  "proGateBody": "Tiere, Würfe, Gesundheitsdaten und eine Sicherung bleiben kostenlos. Pro ergänzt, was der Käufer sieht.",
+  "proGateSee": "Tarife ansehen",
+  "featurePhotos": "Unbegrenzte Fotos",
+  "featurePedigree": "Der Ahnentafel-Baum",
+  "featureReports": "Berichte mit Kopfzeile",
+  "featureContracts": "Kaufverträge",
+  "featureBackup": "Unbegrenzte Sicherungen"
 }

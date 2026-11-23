@@ -1,0 +1,194 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:companion/data/db/settings_dao.dart';
+import 'package:companion/data/models/animal.dart';
+import 'package:companion/data/models/photo.dart';
+import 'package:companion/presentation/screens/animal_detail_screen.dart';
+import 'package:companion/presentation/screens/upgrade_screen.dart';
+import 'package:companion/services/billing.dart';
+import 'package:companion/services/trial.dart';
+
+import '../helpers/pump_app.dart';
+import '../helpers/section_finder.dart';
+
+/// The gates have to be exercised with billing closed and open, because the
+/// shipped build has it switched off: without the override every gate answers
+/// yes and the sheets they open are code no test ever runs.
+const String _nalaId = 'animal-nala';
+
+Animal _nala() => Animal(
+  id: _nalaId,
+  name: 'Nala',
+  species: 'dog',
+  breed: 'Border collie',
+  sex: Sex.female,
+  status: AnimalStatus.active,
+  isBreedingStock: true,
+  birthDate: DateTime(2024, 5, 12).millisecondsSinceEpoch,
+  createdAt: 0,
+  updatedAt: 0,
+);
+
+Photo _picture(int index) => Photo(
+  id: '',
+  animalId: _nalaId,
+  fileName: 'shot$index.jpg-1024',
+  createdAt: 0,
+);
+
+ProAccess _over() => const ProAccess(
+  billingEnabled: true,
+  owned: Entitlement.none(),
+  trial: TrialState(daysLeft: 0, expired: true),
+);
+
+ProAccess _paid() => ProAccess(
+  billingEnabled: true,
+  owned: const Entitlement(<CompanionPlan>{CompanionPlan.pro}),
+  trial: const TrialState(daysLeft: 0, expired: true),
+);
+
+Future<void> _openNala(WidgetTester tester) async {
+  await tester.tap(find.text('Nala'));
+  await settleRealIo(tester);
+}
+
+Future<void> _tap(WidgetTester tester, Finder finder) async {
+  if (finder.evaluate().isEmpty) {
+    await tester.scrollUntilVisible(
+      finder,
+      240,
+      scrollable: find.descendant(
+        of: find.byType(AnimalDetailScreen),
+        matching: find.byType(Scrollable),
+      ),
+    );
+    await settleRealIo(tester);
+  }
+  await tester.ensureVisible(finder);
+  await tester.pumpAndSettle();
+  await tester.tap(finder);
+  await settleRealIo(tester);
+}
+
+void main() {
+  group('the photo allowance', () {
+    testWidgets('a free build asks for nothing', (tester) async {
+      await pumpApp(
+        tester,
+        seed: <Animal>[_nala()],
+        seedPhotos: <Photo>[_picture(1), _picture(2), _picture(3)],
+      );
+      await _openNala(tester);
+      await _tap(tester, find.widgetWithText(TextButton, 'Add photo'));
+
+      expect(find.text('Choose from the gallery'), findsOneWidget);
+      expect(find.text('Unlimited photos is part of Pro'), findsNothing);
+    });
+
+    testWidgets('the fourth photo asks, and the plans open from there', (
+      tester,
+    ) async {
+      await pumpApp(
+        tester,
+        seed: <Animal>[_nala()],
+        seedPhotos: <Photo>[_picture(1), _picture(2), _picture(3)],
+        proAccess: _over(),
+      );
+      await _openNala(tester);
+      await _tap(tester, find.widgetWithText(TextButton, 'Add photo'));
+
+      // The sheet, not the picker: a breeder must not be sent to the gallery to
+      // choose a file the app would then refuse to keep.
+      expect(find.text('Unlimited photos is part of Pro'), findsOneWidget);
+      expect(find.text('Choose from the gallery'), findsNothing);
+
+      await tester.tap(find.text('See the plans'));
+      await settleRealIo(tester);
+
+      expect(find.byType(UpgradeScreen), findsOneWidget);
+      // The page opens on the question she asked, not on a generic pitch.
+      expect(find.text('Unlimited photos is part of Pro'), findsOneWidget);
+    });
+
+    testWidgets('a breeder who paid is never asked', (tester) async {
+      await pumpApp(
+        tester,
+        seed: <Animal>[_nala()],
+        seedPhotos: <Photo>[_picture(1), _picture(2), _picture(3)],
+        proAccess: _paid(),
+      );
+      await _openNala(tester);
+      await _tap(tester, find.widgetWithText(TextButton, 'Add photo'));
+
+      expect(find.text('Choose from the gallery'), findsOneWidget);
+    });
+
+    testWidgets('the third photo is still free', (tester) async {
+      await pumpApp(
+        tester,
+        seed: <Animal>[_nala()],
+        seedPhotos: <Photo>[_picture(1), _picture(2)],
+        proAccess: _over(),
+      );
+      await _openNala(tester);
+      await _tap(tester, find.widgetWithText(TextButton, 'Add photo'));
+
+      expect(find.text('Choose from the gallery'), findsOneWidget);
+    });
+  });
+
+  group('the buyer PDF', () {
+    testWidgets('asks before it builds, not after', (tester) async {
+      await pumpApp(tester, seed: <Animal>[_nala()], proAccess: _over());
+      await _openNala(tester);
+      await _tap(tester, find.byTooltip('PDF pack'));
+
+      expect(find.text('Branded reports is part of Pro'), findsOneWidget);
+    });
+
+    testWidgets('a paying breeder gets the share sheet instead', (tester) async {
+      await pumpApp(tester, seed: <Animal>[_nala()], proAccess: _paid());
+      await _openNala(tester);
+      await _tap(tester, find.byTooltip('PDF pack'));
+
+      expect(find.text('Branded reports is part of Pro'), findsNothing);
+    });
+  });
+
+  group('the backup allowance', () {
+    testWidgets('a second pack inside the window asks', (tester) async {
+      await pumpApp(
+        tester,
+        seed: <Animal>[_nala()],
+        proAccess: _over(),
+        beforeLaunch: (db) async {
+          await SettingsDao(db).write(
+            SettingKeys.lastPackExportedAt,
+            '${DateTime.now().millisecondsSinceEpoch}',
+          );
+        },
+      );
+      await tester.tap(find.widgetWithText(NavigationDestination, 'Settings'));
+      await settleRealIo(tester);
+      await tester.tap(sectionText('Export records'));
+      await settleRealIo(tester);
+
+      expect(find.text('Unlimited backups is part of Pro'), findsOneWidget);
+    });
+
+    testWidgets('the first pack never asks', (tester) async {
+      await pumpApp(
+        tester,
+        seed: <Animal>[_nala()],
+        proAccess: _over(),
+      );
+      await tester.tap(find.widgetWithText(NavigationDestination, 'Settings'));
+      await settleRealIo(tester);
+      await tester.tap(sectionText('Export records'));
+      await settleRealIo(tester);
+
+      expect(find.text('Unlimited backups is part of Pro'), findsNothing);
+    });
+  });
+}

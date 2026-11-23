@@ -1,7 +1,7 @@
 name: companion
 description: "Companion - an offline-first health and lineage record for small-scale dog and cat breeders, with a transferable PDF pack for puppy buyers."
 publish_to: 'none'
-version: 1.0.0+1
+version: 1.0.1+2
 
 environment:
   sdk: ^3.13.4
@@ -66,6 +66,7 @@ dependencies:
   # own to get wrong, and on a phone without Play it reports itself unavailable
   # and the row falls back to the store listing.
   in_app_review: ^2.0.12
+  in_app_purchase: ^3.2.3
 
   # Buyer pack (Stage 2). `pdf` writes the record a breeder hands to a buyer: a
   # fixed-layout document that survives a phone change, an app the buyer does

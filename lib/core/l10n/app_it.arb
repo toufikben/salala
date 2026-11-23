@@ -6,7 +6,6 @@
   "navBuyers": "Acquirenti",
   "navSettings": "Impostazioni",
   "languageName": "Italiano",
-
   "homeEmptyTitle": "Ancora nessun animale",
   "homeEmptyBody": "Un gruppo comincia da uno. Dagli un nome, e la sua scheda parte da qui.",
   "homeAddAnimal": "Aggiungi animale",
@@ -15,7 +14,6 @@
   "homeSearchHint": "Cerca per nome, numero, microchip, nota o acquirente",
   "homeNoMatches": "Nessun risultato per «{query}»",
   "homeAnimalCount": "{count, plural, =0{Nessun animale} =1{1 animale} other{{count} animali}}",
-
   "animalName": "Nome",
   "animalSpecies": "Specie",
   "animalBreed": "Razza",
@@ -39,16 +37,13 @@
   "animalDeleteBody": "Vengono eliminati anche vaccinazioni, test sanitari, pesi, visite e sintomi, insieme a ogni cessione registrata, alle sue fotografie e ai file che le conservano su questo telefono, e al contratto allegato a quella cessione. L'operazione è irreversibile.",
   "animalNameRequired": "Il nome è obbligatorio",
   "animalSpeciesRequired": "Scegli una specie",
-
   "sexMale": "Maschio",
   "sexFemale": "Femmina",
   "sexUnknown": "Sconosciuto",
-
   "statusActive": "Con me",
   "statusSold": "Ceduto",
   "statusRetired": "Riformato",
   "statusDeceased": "Deceduto",
-
   "recordsVaccinations": "Vaccinazioni",
   "recordsHealthTests": "Test sanitari",
   "recordsWeights": "Pesi",
@@ -57,7 +52,6 @@
   "recordsPhotos": "Foto",
   "recordsPlacements": "Cessioni",
   "recordsEmpty": "Ancora nulla di registrato.",
-
   "detailStoryLine": "Ogni voce qui fa parte della sua storia.",
   "detailDiedLine": "La sua scheda resta com'era.",
   "placedFarewell": "{name} è andato in una nuova casa. La scheda resta con te.",
@@ -70,7 +64,6 @@
   "actionRetry": "Riprova",
   "actionClear": "Cancella",
   "actionReplace": "Sostituisci",
-
   "lockTitle": "Companion è bloccato",
   "lockEnterPin": "Inserisci il PIN",
   "lockUnlock": "Sblocca",
@@ -86,7 +79,6 @@
   "lockChangeFailed": "Il telefono non ha modificato il blocco dell'app.",
   "lockChangePinDone": "PIN modificato.",
   "lockTooManyAttempts": "Troppi PIN errati. Riprova fra {seconds} s.",
-
   "settingsAppLock": "Blocco app",
   "settingsChangePin": "Cambia PIN",
   "settingsChangePinBody": "Inserisci il PIN attuale, poi scegline uno nuovo.",
@@ -134,7 +126,6 @@
   "packRestoreBody": "Del {day}. Animali: {animals}. Schede: {rows}. Il ripristino sostituisce tutto ciò che ora è su questo telefono.",
   "packRestored": "Schede ripristinate: {rows}",
   "packRestoreFailed": "Il pacchetto non è stato ripristinato. Su questo telefono non è cambiato nulla.",
-
   "litterAdd": "Nuova cucciolata",
   "litterEditTitle": "Modifica cucciolata",
   "litterAddPuppies": "Aggiungi cuccioli",
@@ -195,7 +186,6 @@
   "litterGone": "Questa cucciolata è stata eliminata.",
   "litterDeleteTitle": "Eliminare {name}?",
   "litterDeleteBody": "I cuccioli restano nei tuoi animali; viene rimossa solo la registrazione dell'accoppiamento. L'operazione è irreversibile.",
-
   "animalGone": "Questo animale è stato eliminato.",
   "animalDeathDate": "Morto il",
   "animalDam": "Madre",
@@ -205,7 +195,6 @@
   "recordSaveFailed": "Non è stato possibile salvare. Non è stato scritto nulla.",
   "recordDeleteFailed": "Non è stato possibile eliminare. La scheda è ancora lì.",
   "recordDateBeforeBirth": "Questa data precede la nascita di questo animale.",
-
   "vaccinationAdd": "Aggiungi vaccinazione",
   "vaccinationAddTitle": "Registra una vaccinazione",
   "vaccinationEditTitle": "Modifica vaccinazione",
@@ -222,7 +211,6 @@
   "vaccinationClinic": "Ambulatorio",
   "vaccinationCertificate": "Numero del certificato",
   "vaccinationDeleteBody": "La dose viene rimossa dalla storia di questo animale. L'operazione è irreversibile.",
-
   "weightAdd": "Aggiungi peso",
   "weightKg": "Peso (kg)",
   "weightColumn": "Peso",
@@ -234,9 +222,7 @@
   "weightNote": "Nota",
   "weightDeleteBody": "La pesata viene rimossa. L'operazione è irreversibile.",
   "weightAppendOnlyHint": "Le pesate non si modificano mai. Misura sbagliata? Eliminala e pesa di nuovo.",
-
   "animalSpeciesHelper": "cane · gatto",
-
   "healthTestAdd": "Aggiungi test",
   "healthTestAddTitle": "Registra un test sanitario",
   "healthTestEditTitle": "Modifica test sanitario",
@@ -252,7 +238,6 @@
   "healthTestVerifiedBy": "Verificato da",
   "healthTestExpired": "Scaduto",
   "healthTestDeleteBody": "Lo screening viene rimosso dalla storia di questo animale. L'operazione è irreversibile.",
-
   "visitAdd": "Aggiungi visita",
   "visitAddTitle": "Registra una visita veterinaria",
   "visitEditTitle": "Modifica visita veterinaria",
@@ -264,7 +249,6 @@
   "visitCostInvalid": "Inserisci un importo come 250",
   "visitCurrency": "Valuta",
   "visitDeleteBody": "La visita viene rimossa dalla storia di questo animale. L'operazione è irreversibile.",
-
   "symptomAdd": "Aggiungi sintomo",
   "symptomAddTitle": "Registra un sintomo",
   "symptomEditTitle": "Modifica sintomo",
@@ -279,7 +263,6 @@
   "symptomOngoing": "Ancora in corso",
   "symptomResolved": "Risolto",
   "symptomDeleteBody": "Il sintomo viene rimosso dalla storia di questo animale. L'operazione è irreversibile.",
-
   "photoAdd": "Aggiungi foto",
   "photoFromGallery": "Scegli dalla galleria",
   "photoFromCamera": "Scatta una foto",
@@ -287,7 +270,6 @@
   "photoMissing": "Non presente su questo telefono",
   "photoTooLarge": "Questa foto è troppo grande da conservare",
   "photoNotAnImage": "Questo file non è una foto",
-
   "placementAdd": "Aggiungi cessione",
   "placementAddTitle": "Registra una cessione",
   "placementEditTitle": "Modifica cessione",
@@ -308,7 +290,6 @@
   "contractPickFailed": "Non è stato possibile scegliere un documento",
   "contractTooLarge": "Quel file è troppo grande da conservare",
   "placementDeleteBody": "La cessione viene rimossa dalla storia di questo animale. L'acquirente resta nei tuoi contatti. L'operazione è irreversibile.",
-
   "buyerAdd": "Nuovo acquirente",
   "buyerAddTitle": "Aggiungi un acquirente",
   "buyerEditTitle": "Modifica acquirente",
@@ -319,10 +300,8 @@
   "buyersEmptyBody": "Un acquirente si aggiunge con una cessione, oppure qui, prima: chi ha comprato da te l'anno scorso vuole ancora il pedigree.",
   "buyersNoAnimals": "Nessun animale registrato per questo contatto",
   "buyerDeleteBody": "{name} viene rimosso dai tuoi contatti. La cessione resta nella storia dell'animale, senza acquirente indicato. L'operazione è irreversibile.",
-
   "reminderHeadsUpBody": "Promemoria: {what} scade il {dueDay}",
   "reminderDueBody": "{what} scade oggi. Due minuti bastano",
-
   "pdfAction": "Dossier PDF",
   "pdfFailed": "Non è stato possibile creare il PDF",
   "pdfTitle": "Scheda sanitaria e genealogica",
@@ -340,7 +319,6 @@
   "pdfGuarantee": "Condizioni di garanzia",
   "pdfChartAxes": "Peso in chilogrammi rispetto all'età in mesi. La tabella qui sopra scrive il peso di un cucciolo piccolo in grammi.",
   "pdfDisclaimer": "Prodotto offline da Companion a partire dai registri dell'allevatore. Non è un certificato veterinario.",
-
   "triageTitle": "Cosa fare adesso",
   "triageActNow": "Agisci subito",
   "triageWatch": "Continua a osservare",
@@ -359,9 +337,7 @@
   "triageWhelpingOverdue": "{name}: il parto è {days} oltre la data prevista",
   "triageSevereSymptom": "{name} è stato registrato come grave ed è ancora in corso",
   "triageSymptomUnresolved": "{name} è stato osservato {days} fa ed è ancora in corso",
-
   "agendaTitle": "Vaccinazioni da prenotare",
-
   "daysSingle": "{n} giorno",
   "daysDual": "{n} giorni",
   "onboardingSlide1Title": "Una scheda per animale",
@@ -453,5 +429,49 @@
   "onboardingYoursTitle": "Il server di nessun altro",
   "onboardingYoursBody": "Nessun account, nessuna pubblicità, nessun tracciamento. Funziona in un capanno senza rete, e i tuoi dati escono dal telefono solo quando esporti.",
   "onboardingSupportTitle": "Fatto da una persona",
-  "onboardingSupportBody": "Companion è costruito da un solo programmatore, non da un’azienda. Nessuna pubblicità e nessun investitore. Se si guadagna il suo posto nel tuo allevamento, comprarlo è ciò che tiene in vita gli aggiornamenti."
+  "onboardingSupportBody": "Companion è costruito da un solo programmatore, non da un’azienda. Nessuna pubblicità e nessun investitore. Se si guadagna il suo posto nel tuo allevamento, comprarlo è ciò che tiene in vita gli aggiornamenti.",
+  "upgradeTitle": "Companion Pro",
+  "upgradeIntro": "Il registro resta gratuito per sempre. Pro è la parte che mostri agli altri: foto senza limiti, l'albero genealogico, il contratto di vendita, il PDF con la tua intestazione e backup senza conteggio.",
+  "upgradeProTitle": "Pro",
+  "upgradeProBody": "Un allevamento.",
+  "upgradeStudioTitle": "Studio",
+  "upgradeStudioBody": "Più di un allevamento, stesse funzioni.",
+  "upgradeMonthly": "Mensile",
+  "upgradeYearly": "Annuale",
+  "upgradeYearlyNote": "Due mesi gratis",
+  "upgradePriceLoading": "Prezzo richiesto allo store...",
+  "upgradeSubscribe": "Abbonati",
+  "upgradeRestore": "Ripristina un acquisto",
+  "upgradeRestored": "Il tuo acquisto è tornato.",
+  "upgradeNothingToRestore": "Nessun acquisto trovato su questo account.",
+  "upgradeThankYou": "Grazie. Tutto è sbloccato.",
+  "upgradeFailed": "Lo store non ha completato. Non è stato addebitato nulla.",
+  "upgradeLater": "Non ora",
+  "upgradeTrialDays": "Restano {days} giorni di tutto",
+  "@upgradeTrialDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "upgradeTrialOver": "La prova è finita",
+  "settingsProTitle": "Companion Pro",
+  "settingsProOwned": "Attivo su questo telefono",
+  "settingsProFree": "Scopri cosa aggiunge Pro",
+  "proGateTitle": "{feature} fa parte di Pro",
+  "@proGateTitle": {
+    "placeholders": {
+      "feature": {
+        "type": "String"
+      }
+    }
+  },
+  "proGateBody": "Animali, cucciolate, cartelle sanitarie e un backup restano gratuiti. Pro aggiunge ciò che vede l'acquirente.",
+  "proGateSee": "Vedi i piani",
+  "featurePhotos": "Foto senza limiti",
+  "featurePedigree": "L'albero genealogico",
+  "featureReports": "Report con intestazione",
+  "featureContracts": "Contratti di vendita",
+  "featureBackup": "Backup senza limiti"
 }

@@ -12,7 +12,6 @@
   "@languageName": {
     "description": "This language's own name, written in this language. The Settings menu reads each locale's value straight out of its own file, which is what makes adding a language a single .arb file and no code."
   },
-
   "homeEmptyTitle": "No animals yet",
   "homeEmptyBody": "A herd begins with one. Give her a name, and her record starts here.",
   "homeAddAnimal": "Add animal",
@@ -35,7 +34,6 @@
       }
     }
   },
-
   "animalName": "Name",
   "animalSpecies": "Species",
   "animalBreed": "Breed",
@@ -44,7 +42,11 @@
   "animalBornOn": "Born {day}",
   "@animalBornOn": {
     "description": "On the animal's own page, the birth date reads as a phrase rather than as a row: it is one of the four facts in the headline under the photograph.",
-    "placeholders": { "day": { "type": "String" } }
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
   },
   "animalStatus": "Status",
   "animalMicrochip": "Microchip number",
@@ -80,25 +82,21 @@
   "animalDeleteBody": "Its vaccinations, health tests, weights, visits and symptoms are deleted too, with any handover recorded for it, its photographs and the files that hold them on this phone, and the contract attached to that handover. This cannot be undone.",
   "animalNameRequired": "A name is required",
   "animalSpeciesRequired": "Choose a species",
-
   "sexMale": "Male",
   "sexFemale": "Female",
   "sexUnknown": "Unknown",
-
   "statusActive": "With me",
   "statusSold": "Placed",
   "statusRetired": "Retired",
   "statusDeceased": "Deceased",
-
   "recordsVaccinations": "Vaccinations",
   "recordsHealthTests": "Health tests",
   "recordsWeights": "Weights",
   "recordsVisits": "Vet visits",
   "recordsSymptoms": "Symptoms",
-"recordsPhotos": "Photos",
+  "recordsPhotos": "Photos",
   "recordsPlacements": "Placements",
   "recordsEmpty": "Nothing recorded yet.",
-
   "detailStoryLine": "Every entry here is part of her story.",
   "@detailStoryLine": {
     "description": "One quiet line under the animal's facts on her own page. Said once, never on every card: a herd of forty dogs does not want forty mottoes. Deliberately not an instruction and not an exclamation."
@@ -110,24 +108,33 @@
   "placedFarewell": "{name} has gone to a new home. The record stays with you.",
   "@placedFarewell": {
     "description": "Shown once, after a handover is saved. Respects the move rather than celebrating a sale — a placed breeding dog is a loss to the kennel as much as a transaction.",
-    "placeholders": { "name": { "type": "String" } }
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
   "reminderHeadsUpBody": "Heads up: {what} is due on {dueDay}",
   "@reminderHeadsUpBody": {
     "description": "The month-ahead alarm. {what} is the dose or screening name as the breeder typed it, {dueDay} a localised date. The tone is a nudge between equals: no 'Don't forget', no exclamation mark, and the word 'heads up' rather than 'reminder' because a reminder implies the breeder would have forgotten.",
     "placeholders": {
-      "what": { "type": "String" },
-      "dueDay": { "type": "String" }
+      "what": {
+        "type": "String"
+      },
+      "dueDay": {
+        "type": "String"
+      }
     }
   },
   "reminderDueBody": "{what} is due today. Two minutes is enough",
   "@reminderDueBody": {
     "description": "The morning-of alarm. The second half is the whole point of the sentence: it says the task is small, because a breeder who reads a bare due-date at six in the morning reads it as another thing she is behind on.",
     "placeholders": {
-      "what": { "type": "String" }
+      "what": {
+        "type": "String"
+      }
     }
   },
-
   "actionSave": "Save",
   "actionCancel": "Cancel",
   "actionDelete": "Delete",
@@ -137,7 +144,6 @@
   "actionRetry": "Try again",
   "actionClear": "Clear",
   "actionReplace": "Replace",
-
   "lockTitle": "Companion is locked",
   "lockEnterPin": "Enter your PIN",
   "lockUnlock": "Unlock",
@@ -161,7 +167,6 @@
       }
     }
   },
-
   "settingsAppLock": "App lock",
   "settingsChangePin": "Change PIN",
   "settingsChangePinBody": "Enter the current PIN, then choose a new one.",
@@ -179,7 +184,9 @@
   "@settingsTrialRemaining": {
     "description": "Days left in the trial. Whole days, never a countdown, because a clock that ticks on a settings row is a pressure the breeder did not ask for.",
     "placeholders": {
-      "days": { "type": "String" }
+      "days": {
+        "type": "String"
+      }
     }
   },
   "settingsTrialOver": "The trial has ended",
@@ -195,7 +202,11 @@
   "settingsLastBackup": "Last backup: {day}",
   "@settingsLastBackup": {
     "description": "Said under the export tile. The point is that the breeder can see how stale their only copy is — an app that never mentions it is an app where the last backup was eight months ago.",
-    "placeholders": { "day": { "type": "String" } }
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
   },
   "settingsNeverBackedUp": "No backup has left this phone yet",
   "settingsCsv": "Spreadsheet (CSV)",
@@ -206,7 +217,11 @@
   "settingsCsvPlacements": "Handovers",
   "csvShared": "{file} is ready to send",
   "@csvShared": {
-    "placeholders": { "file": { "type": "String" } }
+    "placeholders": {
+      "file": {
+        "type": "String"
+      }
+    }
   },
   "csvShareFailed": "The sheet could not be written on this phone",
   "csvEmpty": "There is nothing on this phone to export yet",
@@ -233,7 +248,11 @@
   "csvColNo": "no",
   "packShared": "{file} is ready to send",
   "@packShared": {
-    "placeholders": { "file": { "type": "String" } }
+    "placeholders": {
+      "file": {
+        "type": "String"
+      }
+    }
   },
   "packShareFailed": "The pack could not be written on this phone",
   "packReadFailed": "That file could not be opened",
@@ -241,33 +260,54 @@
   "packFromTheFuture": "That pack comes from a newer Companion than this one",
   "packIncomplete": "That pack is missing part of the ledger: {table}",
   "@packIncomplete": {
-    "placeholders": { "table": { "type": "String" } }
+    "placeholders": {
+      "table": {
+        "type": "String"
+      }
+    }
   },
   "packUnknownTable": "That pack holds a table this Companion does not know: {table}",
   "@packUnknownTable": {
-    "placeholders": { "table": { "type": "String" } }
+    "placeholders": {
+      "table": {
+        "type": "String"
+      }
+    }
   },
   "packBadValue": "That pack holds a value this Companion cannot read: {detail}",
   "@packBadValue": {
     "description": "A row whose word is not one the app stores, e.g. an animal status it does not know. Refused before anything is written, so the ledger on this phone is untouched.",
-    "placeholders": { "detail": { "type": "String" } }
+    "placeholders": {
+      "detail": {
+        "type": "String"
+      }
+    }
   },
   "packRestoreTitle": "Replace everything on this phone?",
   "packRestoreBody": "From {day}. Animals: {animals}. Records: {rows}. Restoring replaces everything that is on this phone now.",
   "@packRestoreBody": {
     "description": "Labelled counts instead of a sentence: the numbers range from one animal to hundreds, and no language here agrees them all. The placeholder order below is the generated method's argument order.",
     "placeholders": {
-      "animals": { "type": "int" },
-      "rows": { "type": "int" },
-      "day": { "type": "String" }
+      "animals": {
+        "type": "int"
+      },
+      "rows": {
+        "type": "int"
+      },
+      "day": {
+        "type": "String"
+      }
     }
   },
   "packRestored": "Records restored: {rows}",
   "@packRestored": {
-    "placeholders": { "rows": { "type": "int" } }
+    "placeholders": {
+      "rows": {
+        "type": "int"
+      }
+    }
   },
   "packRestoreFailed": "The pack could not be restored. Nothing on this phone changed.",
-
   "litterAdd": "New litter",
   "litterEditTitle": "Edit litter",
   "litterAddPuppies": "Add puppies",
@@ -348,7 +388,9 @@
   "@statsPuppiesThisYear": {
     "description": "Puppies whose birth date falls in the current calendar year.",
     "placeholders": {
-      "year": { "type": "String" }
+      "year": {
+        "type": "String"
+      }
     }
   },
   "statsPlacements": "Handovers",
@@ -363,7 +405,9 @@
   "@statsHandoverCount": {
     "description": "How many of the handovers carried a price.",
     "placeholders": {
-      "count": { "type": "String" }
+      "count": {
+        "type": "String"
+      }
     }
   },
   "statsNoRevenue": "No price recorded",
@@ -386,15 +430,21 @@
   "@birthdayIn": {
     "description": "How far away a birthday is.",
     "placeholders": {
-      "days": { "type": "String" }
+      "days": {
+        "type": "String"
+      }
     }
   },
   "birthdayTurning": "{name} turns {years}",
   "@birthdayTurning": {
     "description": "An animal's name and the age she turns.",
     "placeholders": {
-      "name": { "type": "String" },
-      "years": { "type": "String" }
+      "name": {
+        "type": "String"
+      },
+      "years": {
+        "type": "String"
+      }
     }
   },
   "heatCardTitle": "Next heat",
@@ -405,15 +455,21 @@
   "@heatCardWindow": {
     "description": "The forecast, as a range. A window rather than a date because the cycle length varies by a fortnight between seasons even in one bitch.",
     "placeholders": {
-      "earliest": { "type": "String" },
-      "latest": { "type": "String" }
+      "earliest": {
+        "type": "String"
+      },
+      "latest": {
+        "type": "String"
+      }
     }
   },
   "heatCardSteady": "Based on {count} cycles in her own record.",
   "@heatCardSteady": {
     "description": "Said when the forecast rests on more than one observed gap, so the breeder knows it came from her own record rather than a breed standard.",
     "placeholders": {
-      "count": { "type": "String" }
+      "count": {
+        "type": "String"
+      }
     }
   },
   "heatCardThin": "Only one cycle on file, so the window is wide. Record another mating and it narrows.",
@@ -424,7 +480,9 @@
   "@heatCardWhelping": {
     "description": "The date a mating inside the window would be expected to whelp. The reason the card exists: a breeder planning a mating is planning a whelping.",
     "placeholders": {
-      "day": { "type": "String" }
+      "day": {
+        "type": "String"
+      }
     }
   },
   "bulkVaccineTitle": "Vaccinate together",
@@ -435,7 +493,9 @@
   "@bulkVaccineCount": {
     "description": "How many animals are about to receive the dose. Shown above the names so a wrong litter is caught before nine rows are written.",
     "placeholders": {
-      "count": { "type": "String" }
+      "count": {
+        "type": "String"
+      }
     }
   },
   "bulkVaccineAction": "Vaccinate the litter",
@@ -446,7 +506,9 @@
   "@bulkVaccineDone": {
     "description": "Said after a bulk write succeeded. States how many rows landed, because that count is what the breeder will check against the puppies in front of her.",
     "placeholders": {
-      "count": { "type": "String" }
+      "count": {
+        "type": "String"
+      }
     }
   },
   "pedigreeTitle": "Pedigree",
@@ -474,7 +536,6 @@
     }
   },
   "litterDeleteBody": "The puppies stay in your animals; only the mating record is removed. This cannot be undone.",
-
   "animalGone": "This animal was deleted.",
   "animalDeathDate": "Died",
   "animalDam": "Dam",
@@ -484,7 +545,6 @@
   "recordSaveFailed": "This could not be saved. Nothing was written.",
   "recordDeleteFailed": "This could not be deleted. The record is still there.",
   "recordDateBeforeBirth": "This date is before this animal was born.",
-
   "vaccinationAdd": "Add vaccination",
   "vaccinationAddTitle": "Log a vaccination",
   "vaccinationEditTitle": "Edit vaccination",
@@ -501,7 +561,6 @@
   "vaccinationClinic": "Clinic",
   "vaccinationCertificate": "Certificate number",
   "vaccinationDeleteBody": "The dose is removed from this animal's history. This cannot be undone.",
-
   "weightAdd": "Add weight",
   "weightKg": "Weight (kg)",
   "weightColumn": "Weight",
@@ -519,9 +578,7 @@
   "weightNote": "Note",
   "weightDeleteBody": "The weigh-in is removed. This cannot be undone.",
   "weightAppendOnlyHint": "Weigh-ins are never edited. Measured wrong? Delete it and weigh again.",
-
   "animalSpeciesHelper": "dog · cat",
-
   "healthTestAdd": "Add test",
   "healthTestAddTitle": "Log a health test",
   "healthTestEditTitle": "Edit health test",
@@ -546,7 +603,6 @@
   "healthTestVerifiedBy": "Verified by",
   "healthTestExpired": "Expired",
   "healthTestDeleteBody": "The screening is removed from this animal's history. This cannot be undone.",
-
   "visitAdd": "Add visit",
   "visitAddTitle": "Log a vet visit",
   "visitEditTitle": "Edit vet visit",
@@ -558,7 +614,6 @@
   "visitCostInvalid": "Enter an amount like 250",
   "visitCurrency": "Currency",
   "visitDeleteBody": "The visit is removed from this animal's history. This cannot be undone.",
-
   "symptomAdd": "Add symptom",
   "symptomAddTitle": "Log a symptom",
   "@symptomAddTitle": {
@@ -582,7 +637,6 @@
   "symptomOngoing": "Still happening",
   "symptomResolved": "Resolved",
   "symptomDeleteBody": "The symptom is removed from this animal's history. This cannot be undone.",
-
   "photoAdd": "Add photo",
   "photoFromGallery": "Choose from the gallery",
   "photoFromCamera": "Take a photo",
@@ -596,7 +650,6 @@
   },
   "photoTooLarge": "This picture is too big to keep",
   "photoNotAnImage": "This file is not a picture",
-
   "placementAdd": "Add placement",
   "placementAddTitle": "Log a placement",
   "@placementAddTitle": {
@@ -617,25 +670,42 @@
     "description": "What the breeder promised in writing: health guarantee, return clause, neutering condition. Free text, because the promise is theirs to word."
   },
   "contractAttach": "Attach a contract",
-  "@contractAttach": { "description": "The row that attaches a document to a handover, when none is attached yet." },
+  "@contractAttach": {
+    "description": "The row that attaches a document to a handover, when none is attached yet."
+  },
   "contractAttached": "Contract attached",
-  "@contractAttached": { "description": "Said once a document is attached to the handover." },
+  "@contractAttached": {
+    "description": "Said once a document is attached to the handover."
+  },
   "contractStoredName": "A document you attached earlier",
-  "@contractStoredName": { "description": "Shown instead of a file name for a document attached on an earlier visit, whose original name was not kept." },
+  "@contractStoredName": {
+    "description": "Shown instead of a file name for a document attached on an earlier visit, whose original name was not kept."
+  },
   "contractRemove": "Remove the contract",
-  "@contractRemove": { "description": "Tooltip of the button that detaches the contract." },
+  "@contractRemove": {
+    "description": "Tooltip of the button that detaches the contract."
+  },
   "contractOpen": "Open the contract",
-  "@contractOpen": { "description": "Tooltip of the button that hands the stored document to another app." },
+  "@contractOpen": {
+    "description": "Tooltip of the button that hands the stored document to another app."
+  },
   "contractMissing": "That document is not on this phone",
-  "@contractMissing": { "description": "The row names a document, but the file is not on this phone - the usual case after restoring a backup on a second phone." },
+  "@contractMissing": {
+    "description": "The row names a document, but the file is not on this phone - the usual case after restoring a backup on a second phone."
+  },
   "contractOpenFailed": "The document could not be opened",
-  "@contractOpenFailed": { "description": "The document exists but could not be read or handed on." },
+  "@contractOpenFailed": {
+    "description": "The document exists but could not be read or handed on."
+  },
   "contractPickFailed": "No document could be chosen",
-  "@contractPickFailed": { "description": "The phone's file picker refused or threw." },
+  "@contractPickFailed": {
+    "description": "The phone's file picker refused or threw."
+  },
   "contractTooLarge": "That file is too big to keep",
-  "@contractTooLarge": { "description": "The chosen file is larger than the app will store." },
+  "@contractTooLarge": {
+    "description": "The chosen file is larger than the app will store."
+  },
   "placementDeleteBody": "The placement is removed from this animal's history. The buyer stays in your contacts. This cannot be undone.",
-
   "buyerAdd": "New buyer",
   "buyerAddTitle": "Add a buyer",
   "buyerEditTitle": "Edit buyer",
@@ -652,17 +722,22 @@
   "@buyerDeleteBody": {
     "description": "Said before a contact is deleted, and it has to say what survives: the placement row is kept with its buyer blanked (`ON DELETE SET NULL`), because the fact that an animal went to someone is the breeder's record, while the name and phone belong to the person who can ask for them back.",
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
-
   "pdfAction": "PDF pack",
   "pdfFailed": "The PDF could not be made",
   "pdfTitle": "Health and lineage record",
   "pdfLitterTitle": "Whelping record",
   "pdfGenerated": "Generated on {day}",
   "@pdfGenerated": {
-    "placeholders": { "day": { "type": "String" } }
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
   },
   "pdfPedigree": "Pedigree",
   "pdfLitters": "Litters from this animal",
@@ -679,7 +754,6 @@
     "description": "Said under the growth curve, because the curve's own marks are drawn through the embedded font and no test can read them back. It names both units and reconciles them: the weigh-in table prints 430 g for a newborn while this axis puts the same puppy at 0.43, and a buyer holding both on one page is entitled to know which one the app made up."
   },
   "pdfDisclaimer": "Produced offline by Companion from the breeder's own records. This is not a veterinary certificate.",
-
   "triageTitle": "What to do next",
   "triageActNow": "Act now",
   "triageWatch": "Keep watching",
@@ -688,77 +762,133 @@
   "triageNotDiagnosis": "Companion reads only what you typed here. This is not a veterinary diagnosis.",
   "triageNoDoseYoung": "No vaccination recorded, at {days} old",
   "@triageNoDoseYoung": {
-    "placeholders": { "days": { "type": "String" } }
+    "placeholders": {
+      "days": {
+        "type": "String"
+      }
+    }
   },
   "triageDoseOverdue": "{name} was due {days} ago",
   "@triageDoseOverdue": {
     "placeholders": {
-      "name": { "type": "String" },
-      "days": { "type": "String" }
+      "name": {
+        "type": "String"
+      },
+      "days": {
+        "type": "String"
+      }
     }
   },
   "triageDoseDueSoon": "{name} is due in {days}",
   "@triageDoseDueSoon": {
     "placeholders": {
-      "name": { "type": "String" },
-      "days": { "type": "String" }
+      "name": {
+        "type": "String"
+      },
+      "days": {
+        "type": "String"
+      }
     }
   },
   "triageDoseToday": "{what} is due today",
   "@triageDoseToday": {
     "description": "The triage card's wording for a dose whose day is today. Deliberately the bare sentence, unlike the notification: this card sits in a column of findings, and a reassurance repeated down the column stops being one. The card already carries its urgency and its action.",
     "placeholders": {
-      "what": { "type": "String" }
+      "what": {
+        "type": "String"
+      }
     }
   },
   "triageWeightLossPuppy": "A young animal has lost {percent}% of its weight since the last weigh-in",
   "@triageWeightLossPuppy": {
-    "placeholders": { "percent": { "type": "String" } }
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
   },
   "triageWeightLoss": "Weight has fallen {percent}% since the last weigh-in",
   "@triageWeightLoss": {
-    "placeholders": { "percent": { "type": "String" } }
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
   },
   "triageNoGainPuppy": "Barely any weight gain over {days}",
   "@triageNoGainPuppy": {
-    "placeholders": { "days": { "type": "String" } }
+    "placeholders": {
+      "days": {
+        "type": "String"
+      }
+    }
   },
   "triageTestFlagged": "{name} did not come back clear",
   "@triageTestFlagged": {
-    "placeholders": { "name": { "type": "String" } }
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
   "triageTestExpired": "The {name} certificate expired {days} ago",
   "@triageTestExpired": {
     "placeholders": {
-      "name": { "type": "String" },
-      "days": { "type": "String" }
+      "name": {
+        "type": "String"
+      },
+      "days": {
+        "type": "String"
+      }
     }
   },
   "triageWhelpingOverdue": "{name}: whelping is {days} past the expected date",
   "@triageWhelpingOverdue": {
     "placeholders": {
-      "name": { "type": "String" },
-      "days": { "type": "String" }
+      "name": {
+        "type": "String"
+      },
+      "days": {
+        "type": "String"
+      }
     }
   },
   "triageSevereSymptom": "{name} was recorded as severe and is still happening",
   "@triageSevereSymptom": {
-    "placeholders": { "name": { "type": "String" } }
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
   "triageSymptomUnresolved": "{name} was seen {days} ago and is still happening",
   "@triageSymptomUnresolved": {
     "placeholders": {
-      "name": { "type": "String" },
-      "days": { "type": "String" }
+      "name": {
+        "type": "String"
+      },
+      "days": {
+        "type": "String"
+      }
     }
   },
-
   "agendaTitle": "Vaccinations to book",
-
   "daysSingle": "{n} day",
-  "@daysSingle": { "placeholders": { "n": { "type": "String" } } },
+  "@daysSingle": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
   "daysDual": "{n} days",
-  "@daysDual": { "placeholders": { "n": { "type": "String" } } },
+  "@daysDual": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
   "onboardingSlide1Title": "One record per animal",
   "onboardingSlide1Body": "A dog or a cat, its breed, its birth date and where it came from. The first one takes under a minute.",
   "onboardingSlide2Title": "Its health, in order",
@@ -781,7 +911,11 @@
   "aboutBody": "An offline ledger for a small kennel or cattery. No account, no server, no tracking — the records live on this phone and leave it only through your own hands.",
   "aboutVersion": "Version {version}",
   "@aboutVersion": {
-    "placeholders": { "version": { "type": "String" } }
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
   },
   "privacyTitle": "Privacy",
   "privacyIntro": "Companion holds one kind of data: what you typed about your animals. This page says where it sits and what can take it off this phone.",
@@ -849,7 +983,13 @@
   "timelineKindPhoto": "Photo",
   "timelineKindPlacement": "Handed over",
   "daysPlural": "{n} days",
-  "@daysPlural": { "placeholders": { "n": { "type": "String" } } },
+  "@daysPlural": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
   "onboardingLittersTitle": "Every litter, from mating to weaning",
   "onboardingLittersBody": "Date the mating and Companion gives you a whelping window, not a guess. Then every puppy, its sex, its colour and its birth weight.",
   "onboardingPedigreeTitle": "The pedigree on one page",
@@ -859,5 +999,49 @@
   "onboardingYoursTitle": "Nobody else's server",
   "onboardingYoursBody": "No account, no ads, no tracking. Works in a shed with no signal, and your records leave the phone only when you export them.",
   "onboardingSupportTitle": "Made by one person",
-  "onboardingSupportBody": "Companion is built by a single programmer, not a company. No ads and no investors. If it earns its place in your kennel, buying it is what keeps the updates coming."
+  "onboardingSupportBody": "Companion is built by a single programmer, not a company. No ads and no investors. If it earns its place in your kennel, buying it is what keeps the updates coming.",
+  "upgradeTitle": "Companion Pro",
+  "upgradeIntro": "The ledger stays free for good. Pro is the part you show other people: photos without a limit, the pedigree tree, the sale contract, the branded PDF and backups without a count.",
+  "upgradeProTitle": "Pro",
+  "upgradeProBody": "One kennel.",
+  "upgradeStudioTitle": "Studio",
+  "upgradeStudioBody": "More than one kennel, same features.",
+  "upgradeMonthly": "Monthly",
+  "upgradeYearly": "Yearly",
+  "upgradeYearlyNote": "Two months free",
+  "upgradePriceLoading": "Asking the store for the price...",
+  "upgradeSubscribe": "Subscribe",
+  "upgradeRestore": "Restore a purchase",
+  "upgradeRestored": "Your purchase is back.",
+  "upgradeNothingToRestore": "No purchase found on this account.",
+  "upgradeThankYou": "Thank you. Everything is unlocked.",
+  "upgradeFailed": "The store did not finish that. Nothing was charged.",
+  "upgradeLater": "Not now",
+  "upgradeTrialDays": "{days} days left of everything",
+  "@upgradeTrialDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "upgradeTrialOver": "The trial has ended",
+  "settingsProTitle": "Companion Pro",
+  "settingsProOwned": "Active on this phone",
+  "settingsProFree": "See what Pro adds",
+  "proGateTitle": "{feature} is part of Pro",
+  "@proGateTitle": {
+    "placeholders": {
+      "feature": {
+        "type": "String"
+      }
+    }
+  },
+  "proGateBody": "Your animals, litters, health records and one backup stay free. Pro adds the parts a buyer sees.",
+  "proGateSee": "See the plans",
+  "featurePhotos": "Unlimited photos",
+  "featurePedigree": "The pedigree tree",
+  "featureReports": "Branded reports",
+  "featureContracts": "Sale contracts",
+  "featureBackup": "Unlimited backups"
 }

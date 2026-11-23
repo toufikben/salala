@@ -18,6 +18,7 @@ import '../../presentation/screens/onboarding_screen.dart';
 import '../../presentation/screens/privacy_screen.dart';
 import '../../presentation/screens/settings_screen.dart';
 import '../../presentation/screens/terms_screen.dart';
+import '../../presentation/screens/upgrade_screen.dart';
 import '../../presentation/screens/vaccination_form_screen.dart';
 import '../../presentation/screens/vet_visit_form_screen.dart';
 import '../../presentation/screens/weight_form_screen.dart';
@@ -40,6 +41,7 @@ class AppPaths {
   static const String help = '/settings/help';
   static const String whatsNew = '/settings/whats-new';
   static const String stats = '/settings/stats';
+  static const String upgrade = '/settings/pro';
 
   static String editAnimal(String id) => '/animals/$id/edit';
 
@@ -256,6 +258,14 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: 'stats',
             builder: (context, state) => const KennelStatsScreen(),
+          ),
+          GoRoute(
+            path: 'pro',
+            builder: (context, state) => UpgradeScreen(
+              reason: proFeatureFromName(
+                state.uri.queryParameters['feature'],
+              ),
+            ),
           ),
         ],
       ),

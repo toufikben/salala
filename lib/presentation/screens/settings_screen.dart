@@ -10,6 +10,7 @@ import '../../core/router/app_router.dart';
 import '../../core/utils/date_utils.dart';
 import '../../data/db/settings_dao.dart';
 import '../../data/models/photo.dart';
+import '../../services/billing.dart';
 import '../../services/csv_export.dart';
 import '../../services/data_pack.dart';
 import '../../services/pack_archive.dart';
@@ -19,7 +20,9 @@ import '../../services/reminder_resync.dart';
 import '../../services/trial.dart';
 import '../providers/agenda_providers.dart';
 import '../providers/app_providers.dart';
+import '../providers/billing_providers.dart';
 import '../widgets/pin_dialogs.dart';
+import '../widgets/pro_gate.dart';
 import '../widgets/companion_nav_bar.dart';
 
 class SettingsScreen extends ConsumerWidget {
@@ -39,6 +42,13 @@ class SettingsScreen extends ConsumerWidget {
           const _ChangePinTile(),
           const _LanguageTile(),
           const Divider(height: 32),
+          // Only when the app actually sells something. A free build showing a
+          // "Pro" row is a row about a product that does not exist yet, and the
+          // breeder who taps it has been shown an empty shelf.
+          if (kBillingEnabled) ...<Widget>[
+            const _ProTile(),
+            const Divider(height: 32),
+          ],
           const _PackTiles(),
           // Dormant until the app sells something: a free install never sees the
           // word "trial", and the row that counts down is the one place that
@@ -386,6 +396,23 @@ Future<void> _exportCsv(
 Future<void> _exportPack(BuildContext context, WidgetRef ref) async {
   final l10n = AppLocalizations.of(context);
   final messenger = ScaffoldMessenger.of(context);
+
+  // The free tier includes one pack inside the window, because "your records are
+  // yours" is not a feature to sell. The second pack in thirty days is the
+  // convenience a breeder who works every week will want.
+  final lastMs = await ref
+      .read(settingsDaoProvider)
+      .readInt(SettingKeys.lastPackExportedAt);
+  if (!context.mounted) return;
+  if (lastMs != null) {
+    final since = DateTime.now().difference(
+      DateTime.fromMillisecondsSinceEpoch(lastMs),
+    );
+    if (since.inDays < FreeAllowance.backupWindowDays &&
+        !await ensurePro(context, ref, ProFeature.unlimitedBackup)) {
+      return;
+    }
+  }
 
   try {
     // One file, and it carries the pictures too: a restore on a new phone gets
@@ -758,6 +785,38 @@ class _RateTileState extends ConsumerState<_RateTile> {
 final trialStateProvider = FutureProvider.autoDispose<TrialState>((ref) {
   return TrialService(settings: ref.watch(settingsDaoProvider)).state();
 });
+
+/// The quiet way in.
+///
+/// A row in Settings, not a banner: the breeder who is curious finds the price,
+/// and the breeder who is not never sees a second offer. The subtitle says the
+/// truth about this phone — active, over, or still inside the trial — rather than
+/// an adjective.
+class _ProTile extends ConsumerWidget {
+  const _ProTile();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final access = ref.watch(proAccessProvider).value;
+
+    return ListTile(
+      leading: const Icon(Icons.workspace_premium_outlined),
+      title: Text(l10n.settingsProTitle),
+      subtitle: Text(
+        access == null
+            ? l10n.settingsProFree
+            : access.paid
+            ? l10n.settingsProOwned
+            : access.expired
+            ? l10n.upgradeTrialOver
+            : l10n.upgradeTrialDays(access.trial.daysLeft),
+      ),
+      trailing: const Icon(Icons.chevron_right),
+      onTap: () => context.push(AppPaths.upgrade),
+    );
+  }
+}
 
 class _TrialTile extends ConsumerWidget {
   const _TrialTile();

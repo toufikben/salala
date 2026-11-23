@@ -1475,4 +1475,100 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get onboardingSupportBody =>
       'Companion يبنيه مبرمج واحد، لا شركة. بلا إعلانات وبلا مستثمرين. وإن وجد مكانه في مربّاك، فشراؤه هو ما يُبقي التحديثات تصل.';
+
+  @override
+  String get upgradeTitle => 'Companion Pro';
+
+  @override
+  String get upgradeIntro =>
+      'السجلّ يبقى مجانيًا دائمًا. Pro هو الجزء الذي تُريه للآخرين: صور بلا حدّ، شجرة النسب، عقد البيع، ملف PDF بهويتك، ونسخ احتياطية بلا عدد.';
+
+  @override
+  String get upgradeProTitle => 'Pro';
+
+  @override
+  String get upgradeProBody => 'لِكِنِّل واحد.';
+
+  @override
+  String get upgradeStudioTitle => 'Studio';
+
+  @override
+  String get upgradeStudioBody => 'لأكثر من كِنِّل، ونفس الخصائص.';
+
+  @override
+  String get upgradeMonthly => 'شهري';
+
+  @override
+  String get upgradeYearly => 'سنوي';
+
+  @override
+  String get upgradeYearlyNote => 'شهران مجانًا';
+
+  @override
+  String get upgradePriceLoading => 'جارٍ سؤال المتجر عن السعر…';
+
+  @override
+  String get upgradeSubscribe => 'اشترك';
+
+  @override
+  String get upgradeRestore => 'استعادة عملية شراء';
+
+  @override
+  String get upgradeRestored => 'عادت مشترياتك.';
+
+  @override
+  String get upgradeNothingToRestore => 'لا توجد عملية شراء في هذا الحساب.';
+
+  @override
+  String get upgradeThankYou => 'شكرًا لك. كل شيء مفتوح.';
+
+  @override
+  String get upgradeFailed => 'لم يُكمل المتجر العملية. لم يُخصم شيء.';
+
+  @override
+  String get upgradeLater => 'ليس الآن';
+
+  @override
+  String upgradeTrialDays(int days) {
+    return 'بقي $days يومًا من كل شيء';
+  }
+
+  @override
+  String get upgradeTrialOver => 'انتهت التجربة';
+
+  @override
+  String get settingsProTitle => 'Companion Pro';
+
+  @override
+  String get settingsProOwned => 'مُفعّل على هذا الهاتف';
+
+  @override
+  String get settingsProFree => 'اعرف ما يضيفه Pro';
+
+  @override
+  String proGateTitle(String feature) {
+    return '$feature من خصائص Pro';
+  }
+
+  @override
+  String get proGateBody =>
+      'حيواناتك وبطونك وسجلّاتك الصحية ونسخة احتياطية واحدة تبقى مجانية. Pro يضيف ما يراه المشتري.';
+
+  @override
+  String get proGateSee => 'اعرض الخطط';
+
+  @override
+  String get featurePhotos => 'صور بلا حدّ';
+
+  @override
+  String get featurePedigree => 'شجرة النسب';
+
+  @override
+  String get featureReports => 'تقارير بهويتك';
+
+  @override
+  String get featureContracts => 'عقود البيع';
+
+  @override
+  String get featureBackup => 'نسخ احتياطية بلا حدّ';
 }

@@ -48,7 +48,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     super.dispose();
   }
 
-  Future<void> _finish() async {
+  Future<void> _finish({bool addFirst = false}) async {
     // Written before the screen closes: an introduction the phone would not
     // record would otherwise greet the breeder again on the next launch, and the
     // second showing reads as a bug rather than a welcome. A failure to write is
@@ -65,7 +65,14 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     // the moment the write failed for a reason the phone will not report.
     ref.read(onboardingSeenProvider.notifier).markSeen();
     if (!mounted) return;
-    context.go(widget.returnTo ?? AppPaths.animals);
+    // The last button promises the form, not the empty herd: a breeder who taps
+    // "Add my first animal" and lands on a page that asks her to tap "Add animal"
+    // has been told the button lies. `go` on the child path keeps the list
+    // underneath, so Back from the form lands on the herd rather than on the
+    // introduction she just finished.
+    context.go(
+      addFirst ? AppPaths.newAnimal : (widget.returnTo ?? AppPaths.animals),
+    );
   }
 
   @override
@@ -176,7 +183,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     width: double.infinity,
                     child: FilledButton(
                       onPressed: last
-                          ? _finish
+                          ? () => _finish(addFirst: true)
                           : () => _pages.nextPage(
                               duration: const Duration(milliseconds: 260),
                               curve: Curves.easeOutCubic,

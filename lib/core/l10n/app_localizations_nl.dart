@@ -1486,4 +1486,101 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get onboardingSupportBody =>
       'Companion wordt gebouwd door één programmeur, niet door een bedrijf. Geen advertenties en geen investeerders. Als het zijn plek in je fokkerij verdient, houdt de aankoop de updates gaande.';
+
+  @override
+  String get upgradeTitle => 'Companion Pro';
+
+  @override
+  String get upgradeIntro =>
+      'Het stamboek blijft altijd gratis. Pro is het deel dat je aan anderen laat zien: onbeperkt foto\'s, de stamboom, het verkoopcontract, de pdf met jouw kop en onbeperkte back-ups.';
+
+  @override
+  String get upgradeProTitle => 'Pro';
+
+  @override
+  String get upgradeProBody => 'Eén kennel.';
+
+  @override
+  String get upgradeStudioTitle => 'Studio';
+
+  @override
+  String get upgradeStudioBody => 'Meer dan één kennel, dezelfde functies.';
+
+  @override
+  String get upgradeMonthly => 'Maandelijks';
+
+  @override
+  String get upgradeYearly => 'Jaarlijks';
+
+  @override
+  String get upgradeYearlyNote => 'Twee maanden gratis';
+
+  @override
+  String get upgradePriceLoading => 'Prijs wordt bij de winkel opgevraagd...';
+
+  @override
+  String get upgradeSubscribe => 'Abonneren';
+
+  @override
+  String get upgradeRestore => 'Aankoop herstellen';
+
+  @override
+  String get upgradeRestored => 'Je aankoop is terug.';
+
+  @override
+  String get upgradeNothingToRestore => 'Geen aankoop gevonden op dit account.';
+
+  @override
+  String get upgradeThankYou => 'Dank je. Alles is ontgrendeld.';
+
+  @override
+  String get upgradeFailed =>
+      'De winkel heeft dat niet afgerond. Er is niets afgeschreven.';
+
+  @override
+  String get upgradeLater => 'Niet nu';
+
+  @override
+  String upgradeTrialDays(int days) {
+    return 'Nog $days dagen alles';
+  }
+
+  @override
+  String get upgradeTrialOver => 'De proefperiode is voorbij';
+
+  @override
+  String get settingsProTitle => 'Companion Pro';
+
+  @override
+  String get settingsProOwned => 'Actief op deze telefoon';
+
+  @override
+  String get settingsProFree => 'Bekijk wat Pro toevoegt';
+
+  @override
+  String proGateTitle(String feature) {
+    return '$feature hoort bij Pro';
+  }
+
+  @override
+  String get proGateBody =>
+      'Je dieren, nesten, gezondheidsdossiers en één back-up blijven gratis. Pro voegt toe wat de koper ziet.';
+
+  @override
+  String get proGateSee => 'Bekijk de plannen';
+
+  @override
+  String get featurePhotos => 'Onbeperkt foto\'s';
+
+  @override
+  String get featurePedigree => 'De stamboom';
+
+  @override
+  String get featureReports => 'Rapporten met jouw kop';
+
+  @override
+  String get featureContracts => 'Verkoopcontracten';
+
+  @override
+  String get featureBackup => 'Onbeperkte back-ups';
 }

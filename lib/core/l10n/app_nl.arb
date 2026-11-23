@@ -6,7 +6,6 @@
   "navBuyers": "Kopers",
   "navSettings": "Instellingen",
   "languageName": "Nederlands",
-
   "homeEmptyTitle": "Nog geen dieren",
   "homeEmptyBody": "Een groep begint met één. Geef hem een naam, en zijn kaart begint hier.",
   "homeAddAnimal": "Dier toevoegen",
@@ -15,7 +14,6 @@
   "homeSearchHint": "Zoek op naam, nummer, chip, notitie of koper",
   "homeNoMatches": "Niets komt overeen met ‘{query}’",
   "homeAnimalCount": "{count, plural, =0{Geen dieren} =1{1 dier} other{{count} dieren}}",
-
   "animalName": "Naam",
   "animalSpecies": "Soort",
   "animalBreed": "Ras",
@@ -39,16 +37,13 @@
   "animalDeleteBody": "Ook haar inentingen, gezondheidstests, gewichten, bezoeken en symptomen worden verwijderd, samen met elke vastgelegde plaatsing, haar foto's en de bestanden die deze op dit toestel bewaren, en het aan die plaatsing gekoppelde contract. Dit kan niet ongedaan worden gemaakt.",
   "animalNameRequired": "Een naam is verplicht",
   "animalSpeciesRequired": "Kies een soort",
-
   "sexMale": "Reu/Kater",
   "sexFemale": "Teef/Poes",
   "sexUnknown": "Onbekend",
-
   "statusActive": "Bij mij",
   "statusSold": "Geplaatst",
   "statusRetired": "Afgevoerd",
   "statusDeceased": "Overleden",
-
   "recordsVaccinations": "Inentingen",
   "recordsHealthTests": "Gezondheidstests",
   "recordsWeights": "Gewichten",
@@ -57,7 +52,6 @@
   "recordsPhotos": "Foto's",
   "recordsPlacements": "Plaatsingen",
   "recordsEmpty": "Nog niets vastgelegd.",
-
   "detailStoryLine": "Elke regel hier hoort bij zijn verhaal.",
   "detailDiedLine": "Zijn kaart blijft zoals hij was.",
   "placedFarewell": "{name} is naar een nieuw huis gegaan. De kaart blijft bij jou.",
@@ -70,7 +64,6 @@
   "actionRetry": "Opnieuw proberen",
   "actionClear": "Wissen",
   "actionReplace": "Vervangen",
-
   "lockTitle": "Companion is vergrendeld",
   "lockEnterPin": "Voer uw pincode in",
   "lockUnlock": "Ontgrendelen",
@@ -86,7 +79,6 @@
   "lockChangeFailed": "Het toestel heeft de app-vergrendeling niet gewijzigd.",
   "lockChangePinDone": "Pincode gewijzigd.",
   "lockTooManyAttempts": "Te veel onjuiste pincodes. Probeer opnieuw over {seconds} s.",
-
   "settingsAppLock": "App-vergrendeling",
   "settingsChangePin": "Pincode wijzigen",
   "settingsChangePinBody": "Voer de huidige pincode in en kies daarna een nieuwe.",
@@ -134,7 +126,6 @@
   "packRestoreBody": "Van {day}. Dieren: {animals}. Gegevens: {rows}. Herstellen vervangt alles wat nu op dit toestel staat.",
   "packRestored": "Gegevens hersteld: {rows}",
   "packRestoreFailed": "Het pakket kon niet worden hersteld. Op dit toestel is niets veranderd.",
-
   "litterAdd": "Nieuw nestje",
   "litterEditTitle": "Nestje bewerken",
   "litterAddPuppies": "Puppy's toevoegen",
@@ -195,7 +186,6 @@
   "litterGone": "Dit nestje is verwijderd.",
   "litterDeleteTitle": "{name} verwijderen?",
   "litterDeleteBody": "De puppy's blijven bij uw dieren; alleen de dekking wordt verwijderd. Dit kan niet ongedaan worden gemaakt.",
-
   "animalGone": "Dit dier is verwijderd.",
   "animalDeathDate": "Overleden op",
   "animalDam": "Moeder",
@@ -205,7 +195,6 @@
   "recordSaveFailed": "Dit kon niet worden opgeslagen. Er is niets geschreven.",
   "recordDeleteFailed": "Dit kon niet worden verwijderd. Het gegeven staat er nog.",
   "recordDateBeforeBirth": "Deze datum ligt voor de geboorte van dit dier.",
-
   "vaccinationAdd": "Inenting toevoegen",
   "vaccinationAddTitle": "Een inenting vastleggen",
   "vaccinationEditTitle": "Inenting bewerken",
@@ -222,7 +211,6 @@
   "vaccinationClinic": "Praktijk",
   "vaccinationCertificate": "Certificaatnummer",
   "vaccinationDeleteBody": "De dosis verdwijnt uit de geschiedenis van dit dier. Dit kan niet ongedaan worden gemaakt.",
-
   "weightAdd": "Gewicht toevoegen",
   "weightKg": "Gewicht (kg)",
   "weightColumn": "Gewicht",
@@ -234,9 +222,7 @@
   "weightNote": "Notitie",
   "weightDeleteBody": "De weging wordt verwijderd. Dit kan niet ongedaan worden gemaakt.",
   "weightAppendOnlyHint": "Weegingen worden nooit bewerkt. Verkeerd gemeten? Verwijder en weeg opnieuw.",
-
   "animalSpeciesHelper": "hond · kat",
-
   "healthTestAdd": "Test toevoegen",
   "healthTestAddTitle": "Een gezondheidstest vastleggen",
   "healthTestEditTitle": "Gezondheidstest bewerken",
@@ -252,7 +238,6 @@
   "healthTestVerifiedBy": "Bevestigd door",
   "healthTestExpired": "Verlopen",
   "healthTestDeleteBody": "De screening verdwijnt uit de geschiedenis van dit dier. Dit kan niet ongedaan worden gemaakt.",
-
   "visitAdd": "Bezoek toevoegen",
   "visitAddTitle": "Een dierenartsbezoek vastleggen",
   "visitEditTitle": "Dierenartsbezoek bewerken",
@@ -264,7 +249,6 @@
   "visitCostInvalid": "Voer een bedrag in zoals 250",
   "visitCurrency": "Valuta",
   "visitDeleteBody": "Het bezoek verdwijnt uit de geschiedenis van dit dier. Dit kan niet ongedaan worden gemaakt.",
-
   "symptomAdd": "Symptoom toevoegen",
   "symptomAddTitle": "Een symptoom vastleggen",
   "symptomEditTitle": "Symptoom bewerken",
@@ -279,7 +263,6 @@
   "symptomOngoing": "Nog aanwezig",
   "symptomResolved": "Verdwenen",
   "symptomDeleteBody": "Het symptoom verdwijnt uit de geschiedenis van dit dier. Dit kan niet ongedaan worden gemaakt.",
-
   "photoAdd": "Foto toevoegen",
   "photoFromGallery": "Uit de galerij kiezen",
   "photoFromCamera": "Een foto maken",
@@ -287,7 +270,6 @@
   "photoMissing": "Niet op dit toestel",
   "photoTooLarge": "Deze foto is te groot om te bewaren",
   "photoNotAnImage": "Dit bestand is geen foto",
-
   "placementAdd": "Plaatsing toevoegen",
   "placementAddTitle": "Een plaatsing vastleggen",
   "placementEditTitle": "Plaatsing bewerken",
@@ -308,7 +290,6 @@
   "contractPickFailed": "Er kon geen document worden gekozen",
   "contractTooLarge": "Dat bestand is te groot om te bewaren",
   "placementDeleteBody": "De plaatsing verdwijnt uit de geschiedenis van dit dier. De koper blijft in uw contacten. Dit kan niet ongedaan worden gemaakt.",
-
   "buyerAdd": "Nieuwe koper",
   "buyerAddTitle": "Een koper toevoegen",
   "buyerEditTitle": "Koper bewerken",
@@ -319,10 +300,8 @@
   "buyersEmptyBody": "Een koper komt erbij met een plaatsing — of hier, vooraf: wie vorig jaar bij u kocht, wil nog steeds de stamboom.",
   "buyersNoAnimals": "Geen dier vastgelegd voor dit contact",
   "buyerDeleteBody": "{name} verdwijnt uit uw contacten. De plaatsing blijft in de geschiedenis van het dier, zonder genoemde koper. Dit kan niet ongedaan worden gemaakt.",
-
   "reminderHeadsUpBody": "Herinnering: {what} verloopt op {dueDay}",
   "reminderDueBody": "{what} is vandaag aan de beurt. Twee minuten is genoeg",
-
   "pdfAction": "PDF-dossier",
   "pdfFailed": "De PDF kon niet worden gemaakt",
   "pdfTitle": "Gezondheids- en afstammingsbewijs",
@@ -340,7 +319,6 @@
   "pdfGuarantee": "Garantievoorwaarden",
   "pdfChartAxes": "Gewicht in kilogram tegen leeftijd in maanden. De tabel hierboven schrijft het gewicht van een jonge puppy in grammen.",
   "pdfDisclaimer": "Offline gemaakt door Companion uit de eigen gegevens van de fokker. Dit is geen diergeneeskundig certificaat.",
-
   "triageTitle": "Wat nu te doen",
   "triageActNow": "Nu handelen",
   "triageWatch": "Blijf opletten",
@@ -359,9 +337,7 @@
   "triageWhelpingOverdue": "{name}: de worp is {days} voorbij de verwachte datum",
   "triageSevereSymptom": "{name} is als ernstig vastgelegd en nog aanwezig",
   "triageSymptomUnresolved": "{name} is {days} geleden gezien en nog aanwezig",
-
   "agendaTitle": "Inentingen in te plannen",
-
   "daysSingle": "{n} dag",
   "daysDual": "{n} dagen",
   "onboardingSlide1Title": "Eén kaart per dier",
@@ -453,5 +429,49 @@
   "onboardingYoursTitle": "Niemand anders z’n server",
   "onboardingYoursBody": "Geen account, geen advertenties, geen tracking. Werkt in een schuur zonder bereik, en je gegevens verlaten de telefoon alleen als je exporteert.",
   "onboardingSupportTitle": "Door één persoon gemaakt",
-  "onboardingSupportBody": "Companion wordt gebouwd door één programmeur, niet door een bedrijf. Geen advertenties en geen investeerders. Als het zijn plek in je fokkerij verdient, houdt de aankoop de updates gaande."
+  "onboardingSupportBody": "Companion wordt gebouwd door één programmeur, niet door een bedrijf. Geen advertenties en geen investeerders. Als het zijn plek in je fokkerij verdient, houdt de aankoop de updates gaande.",
+  "upgradeTitle": "Companion Pro",
+  "upgradeIntro": "Het stamboek blijft altijd gratis. Pro is het deel dat je aan anderen laat zien: onbeperkt foto's, de stamboom, het verkoopcontract, de pdf met jouw kop en onbeperkte back-ups.",
+  "upgradeProTitle": "Pro",
+  "upgradeProBody": "Eén kennel.",
+  "upgradeStudioTitle": "Studio",
+  "upgradeStudioBody": "Meer dan één kennel, dezelfde functies.",
+  "upgradeMonthly": "Maandelijks",
+  "upgradeYearly": "Jaarlijks",
+  "upgradeYearlyNote": "Twee maanden gratis",
+  "upgradePriceLoading": "Prijs wordt bij de winkel opgevraagd...",
+  "upgradeSubscribe": "Abonneren",
+  "upgradeRestore": "Aankoop herstellen",
+  "upgradeRestored": "Je aankoop is terug.",
+  "upgradeNothingToRestore": "Geen aankoop gevonden op dit account.",
+  "upgradeThankYou": "Dank je. Alles is ontgrendeld.",
+  "upgradeFailed": "De winkel heeft dat niet afgerond. Er is niets afgeschreven.",
+  "upgradeLater": "Niet nu",
+  "upgradeTrialDays": "Nog {days} dagen alles",
+  "@upgradeTrialDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "upgradeTrialOver": "De proefperiode is voorbij",
+  "settingsProTitle": "Companion Pro",
+  "settingsProOwned": "Actief op deze telefoon",
+  "settingsProFree": "Bekijk wat Pro toevoegt",
+  "proGateTitle": "{feature} hoort bij Pro",
+  "@proGateTitle": {
+    "placeholders": {
+      "feature": {
+        "type": "String"
+      }
+    }
+  },
+  "proGateBody": "Je dieren, nesten, gezondheidsdossiers en één back-up blijven gratis. Pro voegt toe wat de koper ziet.",
+  "proGateSee": "Bekijk de plannen",
+  "featurePhotos": "Onbeperkt foto's",
+  "featurePedigree": "De stamboom",
+  "featureReports": "Rapporten met jouw kop",
+  "featureContracts": "Verkoopcontracten",
+  "featureBackup": "Onbeperkte back-ups"
 }

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -9,9 +11,11 @@ import 'app.dart';
 import 'data/db/app_database.dart';
 import 'data/db/settings_dao.dart';
 import 'presentation/providers/app_providers.dart';
+import 'presentation/providers/billing_providers.dart';
 import 'presentation/screens/startup_failure_screen.dart';
 import 'services/app_lock_service.dart';
 import 'services/reminder_scheduler.dart';
+import 'services/trial.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -84,6 +88,14 @@ Future<void> _launch() async {
   }
 
   container.read(hasPinProvider.notifier).set(hasPin);
+
+  // Play is asked once per launch, not once per screen: a subscription that
+  // lapsed yesterday has to stop unlocking today, and one bought on another
+  // phone has to arrive here. Not awaited — a phone in a shed must still open
+  // the ledger, and `refresh` keeps the stored row when the store cannot answer.
+  if (kBillingEnabled) {
+    unawaited(container.read(entitlementProvider.notifier).refreshFromStore());
+  }
 
   runApp(
     UncontrolledProviderScope(container: container, child: const CompanionApp()),

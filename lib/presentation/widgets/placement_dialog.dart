@@ -14,10 +14,12 @@ import '../../data/models/placement.dart';
 import '../../services/contract_files.dart';
 import '../../services/reminder_resync.dart';
 import '../../services/reminder_scheduler.dart';
+import '../../services/trial.dart';
 import '../providers/app_providers.dart';
 import '../providers/record_providers.dart';
 import 'buyer_dialog.dart';
 import 'date_tile.dart';
+import 'pro_gate.dart';
 import 'record_refusal.dart';
 
 /// Opens the same form for a new handover and for correcting an old one.
@@ -180,6 +182,9 @@ class _PlacementDialogState extends ConsumerState<PlacementDialog> {
   Future<void> _pickContract() async {
     final l10n = AppLocalizations.of(context);
     final messenger = ScaffoldMessenger.of(context);
+    // Before the file picker: a breeder who chose a contract and then met a wall
+    // has been asked to do work the app would not keep.
+    if (!await ensurePro(context, ref, ProFeature.contracts)) return;
     final PickedContract? chosen;
     try {
       chosen = await ref.read(contractFilesProvider).pick();

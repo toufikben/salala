@@ -1479,4 +1479,101 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get onboardingSupportBody =>
       'Companion is built by a single programmer, not a company. No ads and no investors. If it earns its place in your kennel, buying it is what keeps the updates coming.';
+
+  @override
+  String get upgradeTitle => 'Companion Pro';
+
+  @override
+  String get upgradeIntro =>
+      'The ledger stays free for good. Pro is the part you show other people: photos without a limit, the pedigree tree, the sale contract, the branded PDF and backups without a count.';
+
+  @override
+  String get upgradeProTitle => 'Pro';
+
+  @override
+  String get upgradeProBody => 'One kennel.';
+
+  @override
+  String get upgradeStudioTitle => 'Studio';
+
+  @override
+  String get upgradeStudioBody => 'More than one kennel, same features.';
+
+  @override
+  String get upgradeMonthly => 'Monthly';
+
+  @override
+  String get upgradeYearly => 'Yearly';
+
+  @override
+  String get upgradeYearlyNote => 'Two months free';
+
+  @override
+  String get upgradePriceLoading => 'Asking the store for the price...';
+
+  @override
+  String get upgradeSubscribe => 'Subscribe';
+
+  @override
+  String get upgradeRestore => 'Restore a purchase';
+
+  @override
+  String get upgradeRestored => 'Your purchase is back.';
+
+  @override
+  String get upgradeNothingToRestore => 'No purchase found on this account.';
+
+  @override
+  String get upgradeThankYou => 'Thank you. Everything is unlocked.';
+
+  @override
+  String get upgradeFailed =>
+      'The store did not finish that. Nothing was charged.';
+
+  @override
+  String get upgradeLater => 'Not now';
+
+  @override
+  String upgradeTrialDays(int days) {
+    return '$days days left of everything';
+  }
+
+  @override
+  String get upgradeTrialOver => 'The trial has ended';
+
+  @override
+  String get settingsProTitle => 'Companion Pro';
+
+  @override
+  String get settingsProOwned => 'Active on this phone';
+
+  @override
+  String get settingsProFree => 'See what Pro adds';
+
+  @override
+  String proGateTitle(String feature) {
+    return '$feature is part of Pro';
+  }
+
+  @override
+  String get proGateBody =>
+      'Your animals, litters, health records and one backup stay free. Pro adds the parts a buyer sees.';
+
+  @override
+  String get proGateSee => 'See the plans';
+
+  @override
+  String get featurePhotos => 'Unlimited photos';
+
+  @override
+  String get featurePedigree => 'The pedigree tree';
+
+  @override
+  String get featureReports => 'Branded reports';
+
+  @override
+  String get featureContracts => 'Sale contracts';
+
+  @override
+  String get featureBackup => 'Unlimited backups';
 }

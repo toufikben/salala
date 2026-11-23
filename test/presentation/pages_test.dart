@@ -6,6 +6,7 @@ import 'package:companion/core/build_info.dart';
 import 'package:companion/core/contact.dart';
 import 'package:companion/data/models/animal.dart';
 import 'package:companion/presentation/screens/about_screen.dart';
+import 'package:companion/presentation/screens/animal_form_screen.dart';
 import 'package:companion/presentation/screens/help_screen.dart';
 import 'package:companion/presentation/screens/onboarding_screen.dart';
 import 'package:companion/presentation/screens/privacy_screen.dart';
@@ -206,11 +207,18 @@ void main() {
       expect(find.text('Add my first animal'), findsOneWidget);
 
       await tester.tap(find.text('Add my first animal'));
+      await settleUntil(
+        tester,
+        () => find.byType(AnimalFormScreen).evaluate().isNotEmpty,
+      );
       await settleRealIo(tester);
 
-      // The row was written, so this is not just a route change: the intro is a
-      // setting now, and Settings can put it back.
-      expect(find.text('No animals yet'), findsOneWidget);
+      // The button promised the form, so the form is what it must open — not an
+      // empty herd asking her to tap "Add animal" a second time. The row was
+      // written too, so this is not just a route change: the intro is a setting
+      // now, and Settings can put it back.
+      expect(find.byType(AnimalFormScreen), findsOneWidget);
+      expect(find.byType(OnboardingScreen), findsNothing);
     });
 
     testWidgets('skipping marks it seen rather than leaving a loop', (

@@ -2689,6 +2689,186 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Companion is built by a single programmer, not a company. No ads and no investors. If it earns its place in your kennel, buying it is what keeps the updates coming.'**
   String get onboardingSupportBody;
+
+  /// No description provided for @upgradeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Companion Pro'**
+  String get upgradeTitle;
+
+  /// No description provided for @upgradeIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'The ledger stays free for good. Pro is the part you show other people: photos without a limit, the pedigree tree, the sale contract, the branded PDF and backups without a count.'**
+  String get upgradeIntro;
+
+  /// No description provided for @upgradeProTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pro'**
+  String get upgradeProTitle;
+
+  /// No description provided for @upgradeProBody.
+  ///
+  /// In en, this message translates to:
+  /// **'One kennel.'**
+  String get upgradeProBody;
+
+  /// No description provided for @upgradeStudioTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Studio'**
+  String get upgradeStudioTitle;
+
+  /// No description provided for @upgradeStudioBody.
+  ///
+  /// In en, this message translates to:
+  /// **'More than one kennel, same features.'**
+  String get upgradeStudioBody;
+
+  /// No description provided for @upgradeMonthly.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly'**
+  String get upgradeMonthly;
+
+  /// No description provided for @upgradeYearly.
+  ///
+  /// In en, this message translates to:
+  /// **'Yearly'**
+  String get upgradeYearly;
+
+  /// No description provided for @upgradeYearlyNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Two months free'**
+  String get upgradeYearlyNote;
+
+  /// No description provided for @upgradePriceLoading.
+  ///
+  /// In en, this message translates to:
+  /// **'Asking the store for the price...'**
+  String get upgradePriceLoading;
+
+  /// No description provided for @upgradeSubscribe.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscribe'**
+  String get upgradeSubscribe;
+
+  /// No description provided for @upgradeRestore.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore a purchase'**
+  String get upgradeRestore;
+
+  /// No description provided for @upgradeRestored.
+  ///
+  /// In en, this message translates to:
+  /// **'Your purchase is back.'**
+  String get upgradeRestored;
+
+  /// No description provided for @upgradeNothingToRestore.
+  ///
+  /// In en, this message translates to:
+  /// **'No purchase found on this account.'**
+  String get upgradeNothingToRestore;
+
+  /// No description provided for @upgradeThankYou.
+  ///
+  /// In en, this message translates to:
+  /// **'Thank you. Everything is unlocked.'**
+  String get upgradeThankYou;
+
+  /// No description provided for @upgradeFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'The store did not finish that. Nothing was charged.'**
+  String get upgradeFailed;
+
+  /// No description provided for @upgradeLater.
+  ///
+  /// In en, this message translates to:
+  /// **'Not now'**
+  String get upgradeLater;
+
+  /// No description provided for @upgradeTrialDays.
+  ///
+  /// In en, this message translates to:
+  /// **'{days} days left of everything'**
+  String upgradeTrialDays(int days);
+
+  /// No description provided for @upgradeTrialOver.
+  ///
+  /// In en, this message translates to:
+  /// **'The trial has ended'**
+  String get upgradeTrialOver;
+
+  /// No description provided for @settingsProTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Companion Pro'**
+  String get settingsProTitle;
+
+  /// No description provided for @settingsProOwned.
+  ///
+  /// In en, this message translates to:
+  /// **'Active on this phone'**
+  String get settingsProOwned;
+
+  /// No description provided for @settingsProFree.
+  ///
+  /// In en, this message translates to:
+  /// **'See what Pro adds'**
+  String get settingsProFree;
+
+  /// No description provided for @proGateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{feature} is part of Pro'**
+  String proGateTitle(String feature);
+
+  /// No description provided for @proGateBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your animals, litters, health records and one backup stay free. Pro adds the parts a buyer sees.'**
+  String get proGateBody;
+
+  /// No description provided for @proGateSee.
+  ///
+  /// In en, this message translates to:
+  /// **'See the plans'**
+  String get proGateSee;
+
+  /// No description provided for @featurePhotos.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlimited photos'**
+  String get featurePhotos;
+
+  /// No description provided for @featurePedigree.
+  ///
+  /// In en, this message translates to:
+  /// **'The pedigree tree'**
+  String get featurePedigree;
+
+  /// No description provided for @featureReports.
+  ///
+  /// In en, this message translates to:
+  /// **'Branded reports'**
+  String get featureReports;
+
+  /// No description provided for @featureContracts.
+  ///
+  /// In en, this message translates to:
+  /// **'Sale contracts'**
+  String get featureContracts;
+
+  /// No description provided for @featureBackup.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlimited backups'**
+  String get featureBackup;
 }
 
 class _AppLocalizationsDelegate

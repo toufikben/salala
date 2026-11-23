@@ -6,7 +6,6 @@
   "navBuyers": "Compradores",
   "navSettings": "Ajustes",
   "languageName": "Español",
-
   "homeEmptyTitle": "Aún no hay animales",
   "homeEmptyBody": "Una manada empieza por uno. Ponle nombre, y su registro empieza aquí.",
   "homeAddAnimal": "Añadir animal",
@@ -15,7 +14,6 @@
   "homeSearchHint": "Buscar por nombre, número, chip, nota o comprador",
   "homeNoMatches": "Nada coincide con «{query}»",
   "homeAnimalCount": "{count, plural, =0{Ningún animal} =1{1 animal} other{{count} animales}}",
-
   "animalName": "Nombre",
   "animalSpecies": "Especie",
   "animalBreed": "Raza",
@@ -39,16 +37,13 @@
   "animalDeleteBody": "También se eliminan sus vacunas, pruebas de salud, pesos, visitas y síntomas, junto con cualquier entrega registrada, sus fotografías y los archivos que las guardan en este teléfono, y el contrato adjunto a esa entrega. Esto no se puede deshacer.",
   "animalNameRequired": "El nombre es obligatorio",
   "animalSpeciesRequired": "Elija una especie",
-
   "sexMale": "Macho",
   "sexFemale": "Hembra",
   "sexUnknown": "Desconocido",
-
   "statusActive": "Conmigo",
   "statusSold": "Entregado",
   "statusRetired": "Retirado",
   "statusDeceased": "Fallecido",
-
   "recordsVaccinations": "Vacunas",
   "recordsHealthTests": "Pruebas de salud",
   "recordsWeights": "Pesos",
@@ -57,7 +52,6 @@
   "recordsPhotos": "Fotos",
   "recordsPlacements": "Entregas",
   "recordsEmpty": "Todavía no hay nada registrado.",
-
   "detailStoryLine": "Cada línea aquí forma parte de su historia.",
   "detailDiedLine": "Su registro queda como estaba.",
   "placedFarewell": "{name} se ha ido a un nuevo hogar. El registro se queda contigo.",
@@ -70,7 +64,6 @@
   "actionRetry": "Reintentar",
   "actionClear": "Borrar",
   "actionReplace": "Sustituir",
-
   "lockTitle": "Companion está bloqueado",
   "lockEnterPin": "Introduzca su PIN",
   "lockUnlock": "Desbloquear",
@@ -86,7 +79,6 @@
   "lockChangeFailed": "El teléfono no cambió el bloqueo de la aplicación.",
   "lockChangePinDone": "PIN cambiado.",
   "lockTooManyAttempts": "Demasiados PIN incorrectos. Inténtelo en {seconds} s.",
-
   "settingsAppLock": "Bloqueo de la aplicación",
   "settingsChangePin": "Cambiar el PIN",
   "settingsChangePinBody": "Introduzca el PIN actual y elija uno nuevo.",
@@ -134,7 +126,6 @@
   "packRestoreBody": "Del {day}. Animales: {animals}. Registros: {rows}. La restauración sustituye todo lo que hay ahora en este teléfono.",
   "packRestored": "Registros restaurados: {rows}",
   "packRestoreFailed": "El paquete no se pudo restaurar. Nada cambió en este teléfono.",
-
   "litterAdd": "Nueva camada",
   "litterEditTitle": "Editar camada",
   "litterAddPuppies": "Añadir cachorros",
@@ -195,7 +186,6 @@
   "litterGone": "Esta camada fue eliminada.",
   "litterDeleteTitle": "¿Eliminar {name}?",
   "litterDeleteBody": "Los cachorros siguen en sus animales; solo se elimina el registro del apareamiento. Esto no se puede deshacer.",
-
   "animalGone": "Este animal fue eliminado.",
   "animalDeathDate": "Falleció el",
   "animalDam": "Madre",
@@ -205,7 +195,6 @@
   "recordSaveFailed": "Esto no se pudo guardar. No se escribió nada.",
   "recordDeleteFailed": "Esto no se pudo eliminar. El registro sigue ahí.",
   "recordDateBeforeBirth": "Esta fecha es anterior al nacimiento de este animal.",
-
   "vaccinationAdd": "Añadir vacuna",
   "vaccinationAddTitle": "Registrar una vacuna",
   "vaccinationEditTitle": "Editar vacuna",
@@ -222,7 +211,6 @@
   "vaccinationClinic": "Clínica",
   "vaccinationCertificate": "Número de certificado",
   "vaccinationDeleteBody": "La dosis se elimina del historial de este animal. Esto no se puede deshacer.",
-
   "weightAdd": "Añadir peso",
   "weightKg": "Peso (kg)",
   "weightColumn": "Peso",
@@ -234,9 +222,7 @@
   "weightNote": "Nota",
   "weightDeleteBody": "La pesada se elimina. Esto no se puede deshacer.",
   "weightAppendOnlyHint": "Las pesadas nunca se editan. ¿Midió mal? Bórrela y vuelva a pesar.",
-
   "animalSpeciesHelper": "perro · gato",
-
   "healthTestAdd": "Añadir prueba",
   "healthTestAddTitle": "Registrar una prueba de salud",
   "healthTestEditTitle": "Editar prueba de salud",
@@ -252,7 +238,6 @@
   "healthTestVerifiedBy": "Verificado por",
   "healthTestExpired": "Caducado",
   "healthTestDeleteBody": "El cribado se elimina del historial de este animal. Esto no se puede deshacer.",
-
   "visitAdd": "Añadir visita",
   "visitAddTitle": "Registrar una visita al veterinario",
   "visitEditTitle": "Editar visita al veterinario",
@@ -264,7 +249,6 @@
   "visitCostInvalid": "Introduzca un importe como 250",
   "visitCurrency": "Moneda",
   "visitDeleteBody": "La visita se elimina del historial de este animal. Esto no se puede deshacer.",
-
   "symptomAdd": "Añadir síntoma",
   "symptomAddTitle": "Registrar un síntoma",
   "symptomEditTitle": "Editar síntoma",
@@ -279,7 +263,6 @@
   "symptomOngoing": "Sigue presente",
   "symptomResolved": "Resuelto",
   "symptomDeleteBody": "El síntoma se elimina del historial de este animal. Esto no se puede deshacer.",
-
   "photoAdd": "Añadir foto",
   "photoFromGallery": "Elegir de la galería",
   "photoFromCamera": "Hacer una foto",
@@ -287,7 +270,6 @@
   "photoMissing": "No está en este teléfono",
   "photoTooLarge": "Esta foto es demasiado grande para guardarla",
   "photoNotAnImage": "Este archivo no es una foto",
-
   "placementAdd": "Añadir entrega",
   "placementAddTitle": "Registrar una entrega",
   "placementEditTitle": "Editar entrega",
@@ -308,7 +290,6 @@
   "contractPickFailed": "No se pudo elegir ningún documento",
   "contractTooLarge": "Ese archivo es demasiado grande para guardarlo",
   "placementDeleteBody": "La entrega se elimina del historial de este animal. El comprador sigue en sus contactos. Esto no se puede deshacer.",
-
   "buyerAdd": "Nuevo comprador",
   "buyerAddTitle": "Añadir un comprador",
   "buyerEditTitle": "Editar comprador",
@@ -319,10 +300,8 @@
   "buyersEmptyBody": "Un comprador se añade con una entrega, o aquí antes: quien le compró el año pasado todavía quiere el pedigrí.",
   "buyersNoAnimals": "Ningún animal registrado para este contacto",
   "buyerDeleteBody": "{name} se elimina de sus contactos. La entrega sigue en el historial del animal, sin comprador nombrado. Esto no se puede deshacer.",
-
   "reminderHeadsUpBody": "Aviso: {what} vence el {dueDay}",
   "reminderDueBody": "{what} toca hoy. Dos minutos bastan",
-
   "pdfAction": "Dossier PDF",
   "pdfFailed": "El PDF no se pudo crear",
   "pdfTitle": "Historial de salud y linaje",
@@ -340,7 +319,6 @@
   "pdfGuarantee": "Condiciones de garantía",
   "pdfChartAxes": "Peso en kilogramos frente a la edad en meses. La tabla de arriba escribe el peso de un cachorro pequeño en gramos.",
   "pdfDisclaimer": "Generado sin conexión por Companion a partir de los registros del propio criador. No es un certificado veterinario.",
-
   "triageTitle": "Qué hacer ahora",
   "triageActNow": "Actúe ya",
   "triageWatch": "Siga observando",
@@ -359,9 +337,7 @@
   "triageWhelpingOverdue": "{name}: el parto va {days} por encima de la fecha prevista",
   "triageSevereSymptom": "{name} se registró como grave y sigue presente",
   "triageSymptomUnresolved": "{name} se vio hace {days} y sigue presente",
-
   "agendaTitle": "Vacunas por concertar",
-
   "daysSingle": "{n} día",
   "daysDual": "{n} días",
   "onboardingSlide1Title": "Un registro por animal",
@@ -453,5 +429,49 @@
   "onboardingYoursTitle": "El servidor de nadie más",
   "onboardingYoursBody": "Sin cuenta, sin anuncios, sin rastreo. Funciona en un cobertizo sin cobertura, y tus datos solo salen del teléfono cuando los exportas.",
   "onboardingSupportTitle": "Hecho por una persona",
-  "onboardingSupportBody": "Companion lo construye un solo programador, no una empresa. Sin anuncios y sin inversores. Si se gana su sitio en tu criadero, comprarlo es lo que mantiene las actualizaciones."
+  "onboardingSupportBody": "Companion lo construye un solo programador, no una empresa. Sin anuncios y sin inversores. Si se gana su sitio en tu criadero, comprarlo es lo que mantiene las actualizaciones.",
+  "upgradeTitle": "Companion Pro",
+  "upgradeIntro": "El libro de cría sigue siendo gratis para siempre. Pro es la parte que enseñas a los demás: fotos sin límite, el árbol genealógico, el contrato de venta, el PDF con tu cabecera y copias de seguridad sin límite.",
+  "upgradeProTitle": "Pro",
+  "upgradeProBody": "Un criadero.",
+  "upgradeStudioTitle": "Studio",
+  "upgradeStudioBody": "Más de un criadero, las mismas funciones.",
+  "upgradeMonthly": "Mensual",
+  "upgradeYearly": "Anual",
+  "upgradeYearlyNote": "Dos meses gratis",
+  "upgradePriceLoading": "Consultando el precio en la tienda...",
+  "upgradeSubscribe": "Suscribirse",
+  "upgradeRestore": "Restaurar una compra",
+  "upgradeRestored": "Tu compra ha vuelto.",
+  "upgradeNothingToRestore": "No se encontró ninguna compra en esta cuenta.",
+  "upgradeThankYou": "Gracias. Todo está desbloqueado.",
+  "upgradeFailed": "La tienda no completó la operación. No se ha cobrado nada.",
+  "upgradeLater": "Ahora no",
+  "upgradeTrialDays": "Quedan {days} días de todo",
+  "@upgradeTrialDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "upgradeTrialOver": "La prueba ha terminado",
+  "settingsProTitle": "Companion Pro",
+  "settingsProOwned": "Activo en este teléfono",
+  "settingsProFree": "Ver qué añade Pro",
+  "proGateTitle": "{feature} forma parte de Pro",
+  "@proGateTitle": {
+    "placeholders": {
+      "feature": {
+        "type": "String"
+      }
+    }
+  },
+  "proGateBody": "Tus animales, camadas, historiales y una copia de seguridad siguen gratis. Pro añade lo que ve el comprador.",
+  "proGateSee": "Ver los planes",
+  "featurePhotos": "Fotos sin límite",
+  "featurePedigree": "El árbol genealógico",
+  "featureReports": "Informes con cabecera",
+  "featureContracts": "Contratos de venta",
+  "featureBackup": "Copias sin límite"
 }
