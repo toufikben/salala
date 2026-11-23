@@ -10,7 +10,6 @@ import '../../core/router/app_router.dart';
 import '../../core/utils/date_utils.dart';
 import '../../data/db/settings_dao.dart';
 import '../../data/models/photo.dart';
-import '../../services/billing.dart';
 import '../../services/csv_export.dart';
 import '../../services/data_pack.dart';
 import '../../services/pack_archive.dart';
@@ -397,27 +396,6 @@ Future<void> _exportPack(BuildContext context, WidgetRef ref) async {
   final l10n = AppLocalizations.of(context);
   final messenger = ScaffoldMessenger.of(context);
 
-  // The free tier includes one pack inside the window, because "your records are
-  // yours" is not a feature to sell. The second pack in thirty days is the
-  // convenience a breeder who works every week will want. Read only when this
-  // build sells something.
-  if (ref.read(billingEnabledProvider)) {
-    final lastMs = await ref
-        .read(settingsDaoProvider)
-        .readInt(SettingKeys.lastPackExportedAt);
-    if (!context.mounted) return;
-    if (lastMs != null) {
-      final since = DateTime.now().difference(
-        DateTime.fromMillisecondsSinceEpoch(lastMs),
-      );
-      if (since.inDays < FreeAllowance.backupWindowDays &&
-          !await ensurePro(context, ref, ProFeature.unlimitedBackup)) {
-        return;
-      }
-    }
-    if (!context.mounted) return;
-  }
-
   try {
     // One file, and it carries the pictures too: a restore on a new phone gets
     // the ledger and the images the rows name, which the JSON-only pack could
@@ -713,7 +691,14 @@ class _HelpTiles extends ConsumerWidget {
         ListTile(
           leading: const Icon(Icons.insights_outlined),
           title: Text(l10n.settingsStats),
-          onTap: () => context.push(AppPaths.stats),
+          onTap: () async {
+            // A report over records she already has. The records themselves, the
+            // pedigree and the backup stay free: this page is the one thing on
+            // Settings that is a summary rather than her data.
+            if (await ensurePro(context, ref, ProFeature.statistics)) {
+              if (context.mounted) context.push(AppPaths.stats);
+            }
+          },
         ),
         const _RateTile(),
       ],

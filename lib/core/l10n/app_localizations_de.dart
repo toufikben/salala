@@ -1569,7 +1569,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get proGateBody =>
-      'Tiere, Würfe, Gesundheitsdaten und eine Sicherung bleiben kostenlos. Pro ergänzt, was der Käufer sieht.';
+      'Tiere, Würfe, Gesundheitsdaten, Ahnentafel und Sicherungen bleiben kostenlos. Pro ergänzt, was der Käufer sieht.';
 
   @override
   String get proGateSee => 'Tarife ansehen';
@@ -1578,14 +1578,11 @@ class AppLocalizationsDe extends AppLocalizations {
   String get featurePhotos => 'Unbegrenzte Fotos';
 
   @override
-  String get featurePedigree => 'Der Ahnentafel-Baum';
-
-  @override
   String get featureReports => 'Berichte mit Kopfzeile';
 
   @override
   String get featureContracts => 'Kaufverträge';
 
   @override
-  String get featureBackup => 'Unbegrenzte Sicherungen';
+  String get featureStats => 'Die Zwinger-Statistik';
 }

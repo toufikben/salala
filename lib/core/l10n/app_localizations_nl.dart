@@ -1564,7 +1564,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get proGateBody =>
-      'Je dieren, nesten, gezondheidsdossiers en één back-up blijven gratis. Pro voegt toe wat de koper ziet.';
+      'Je dieren, nesten, gezondheidsdossiers, stamboom en back-ups blijven gratis. Pro voegt toe wat de koper ziet.';
 
   @override
   String get proGateSee => 'Bekijk de plannen';
@@ -1573,14 +1573,11 @@ class AppLocalizationsNl extends AppLocalizations {
   String get featurePhotos => 'Onbeperkt foto\'s';
 
   @override
-  String get featurePedigree => 'De stamboom';
-
-  @override
   String get featureReports => 'Rapporten met jouw kop';
 
   @override
   String get featureContracts => 'Verkoopcontracten';
 
   @override
-  String get featureBackup => 'Onbeperkte back-ups';
+  String get featureStats => 'De kennelstatistieken';
 }

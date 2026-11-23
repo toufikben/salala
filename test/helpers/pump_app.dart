@@ -357,10 +357,10 @@ Future<FakeSecureStorage> pumpApp(
         if (locale != null) initialLocaleProvider.overrideWithValue(locale),
         initialOnboardingSeenProvider.overrideWithValue(onboardingSeen),
         if (review != null) reviewServiceProvider.overrideWithValue(review),
-      if (access != null) ...<Override>[
-        billingEnabledProvider.overrideWithValue(true),
-        proAccessProvider.overrideWith((ref) async => access),
-      ],
+        if (access != null) ...[
+          billingEnabledProvider.overrideWithValue(true),
+          proAccessProvider.overrideWith((ref) async => access),
+        ],
       ],
       child: const CompanionApp(),
     ),

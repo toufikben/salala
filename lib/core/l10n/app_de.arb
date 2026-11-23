@@ -467,11 +467,10 @@
       }
     }
   },
-  "proGateBody": "Tiere, Würfe, Gesundheitsdaten und eine Sicherung bleiben kostenlos. Pro ergänzt, was der Käufer sieht.",
+  "proGateBody": "Tiere, Würfe, Gesundheitsdaten, Ahnentafel und Sicherungen bleiben kostenlos. Pro ergänzt, was der Käufer sieht.",
   "proGateSee": "Tarife ansehen",
   "featurePhotos": "Unbegrenzte Fotos",
-  "featurePedigree": "Der Ahnentafel-Baum",
   "featureReports": "Berichte mit Kopfzeile",
   "featureContracts": "Kaufverträge",
-  "featureBackup": "Unbegrenzte Sicherungen"
+  "featureStats": "Die Zwinger-Statistik"
 }

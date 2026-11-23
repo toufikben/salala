@@ -1037,11 +1037,10 @@
       }
     }
   },
-  "proGateBody": "Your animals, litters, health records and one backup stay free. Pro adds the parts a buyer sees.",
+  "proGateBody": "Your animals, litters, health records, pedigree and backups stay free. Pro adds the parts a buyer sees.",
   "proGateSee": "See the plans",
   "featurePhotos": "Unlimited photos",
-  "featurePedigree": "The pedigree tree",
   "featureReports": "Branded reports",
   "featureContracts": "Sale contracts",
-  "featureBackup": "Unlimited backups"
+  "featureStats": "The kennel statistics"
 }

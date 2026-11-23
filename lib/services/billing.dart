@@ -66,13 +66,6 @@ class FreeAllowance {
   /// Photos per animal before Pro. Three is enough to identify a dog: a face, a
   /// side, and the paper that came with her.
   static const int photosPerAnimal = 3;
-
-  /// Backup packs in a rolling [backupWindowDays]. One is the number that keeps
-  /// the promise "your records are yours": a breeder who never pays can still
-  /// take her ledger to a new phone.
-  static const int packsPerWindow = 1;
-
-  static const int backupWindowDays = 30;
 }
 
 /// What this phone has bought.

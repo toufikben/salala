@@ -1566,7 +1566,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get proGateBody =>
-      'Tus animales, camadas, historiales y una copia de seguridad siguen gratis. Pro añade lo que ve el comprador.';
+      'Tus animales, camadas, historiales, pedigrí y copias de seguridad siguen gratis. Pro añade lo que ve el comprador.';
 
   @override
   String get proGateSee => 'Ver los planes';
@@ -1575,14 +1575,11 @@ class AppLocalizationsEs extends AppLocalizations {
   String get featurePhotos => 'Fotos sin límite';
 
   @override
-  String get featurePedigree => 'El árbol genealógico';
-
-  @override
   String get featureReports => 'Informes con cabecera';
 
   @override
   String get featureContracts => 'Contratos de venta';
 
   @override
-  String get featureBackup => 'Copias sin límite';
+  String get featureStats => 'Las estadísticas del criadero';
 }

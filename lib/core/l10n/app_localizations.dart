@@ -2831,7 +2831,7 @@ abstract class AppLocalizations {
   /// No description provided for @proGateBody.
   ///
   /// In en, this message translates to:
-  /// **'Your animals, litters, health records and one backup stay free. Pro adds the parts a buyer sees.'**
+  /// **'Your animals, litters, health records, pedigree and backups stay free. Pro adds the parts a buyer sees.'**
   String get proGateBody;
 
   /// No description provided for @proGateSee.
@@ -2846,12 +2846,6 @@ abstract class AppLocalizations {
   /// **'Unlimited photos'**
   String get featurePhotos;
 
-  /// No description provided for @featurePedigree.
-  ///
-  /// In en, this message translates to:
-  /// **'The pedigree tree'**
-  String get featurePedigree;
-
   /// No description provided for @featureReports.
   ///
   /// In en, this message translates to:
@@ -2864,11 +2858,11 @@ abstract class AppLocalizations {
   /// **'Sale contracts'**
   String get featureContracts;
 
-  /// No description provided for @featureBackup.
+  /// No description provided for @featureStats.
   ///
   /// In en, this message translates to:
-  /// **'Unlimited backups'**
-  String get featureBackup;
+  /// **'The kennel statistics'**
+  String get featureStats;
 }
 
 class _AppLocalizationsDelegate

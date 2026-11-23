@@ -467,11 +467,10 @@
       }
     }
   },
-  "proGateBody": "Je dieren, nesten, gezondheidsdossiers en één back-up blijven gratis. Pro voegt toe wat de koper ziet.",
+  "proGateBody": "Je dieren, nesten, gezondheidsdossiers, stamboom en back-ups blijven gratis. Pro voegt toe wat de koper ziet.",
   "proGateSee": "Bekijk de plannen",
   "featurePhotos": "Onbeperkt foto's",
-  "featurePedigree": "De stamboom",
   "featureReports": "Rapporten met jouw kop",
   "featureContracts": "Verkoopcontracten",
-  "featureBackup": "Onbeperkte back-ups"
+  "featureStats": "De kennelstatistieken"
 }

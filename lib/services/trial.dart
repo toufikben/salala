@@ -18,20 +18,23 @@ const bool kBillingEnabled = false;
 /// lock nobody can price, and a feature added here without a call site is a
 /// promise the app does not keep.
 enum ProFeature {
-  /// Photos beyond the free allowance, and the branded ZIP/PDF exports.
+  /// Photos beyond the free allowance.
   unlimitedPhotos,
 
-  /// The clickable pedigree tree on a litter's page.
-  pedigreeTree,
-
-  /// Reports and the charts a breeder shows a buyer.
+  /// The branded PDF pack a breeder hands to a buyer.
   reports,
 
   /// The sale contract and its printed terms.
   contracts,
 
-  /// Backups beyond the first one.
-  unlimitedBackup,
+  /// The kennel statistics page.
+  ///
+  /// A report over records she already has, not a record itself. The pedigree
+  /// and the backup are deliberately *not* here: both are the breeder's own
+  /// data, and the app promises on its seventh introduction card that her
+  /// records leave the phone whenever she says so. A paywall on the only copy
+  /// of a ledger is the one gate this app must never have.
+  statistics,
 }
 
 /// Where the trial stands today.
@@ -73,10 +76,9 @@ class ProGate {
 
   static const Set<ProFeature> _paid = <ProFeature>{
     ProFeature.unlimitedPhotos,
-    ProFeature.pedigreeTree,
     ProFeature.reports,
     ProFeature.contracts,
-    ProFeature.unlimitedBackup,
+    ProFeature.statistics,
   };
 }
 

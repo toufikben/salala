@@ -264,14 +264,12 @@ ProFeature? proFeatureFromName(String? name) {
 String featureLabel(AppLocalizations l10n, ProFeature feature) {  switch (feature) {
     case ProFeature.unlimitedPhotos:
       return l10n.featurePhotos;
-    case ProFeature.pedigreeTree:
-      return l10n.featurePedigree;
     case ProFeature.reports:
       return l10n.featureReports;
     case ProFeature.contracts:
       return l10n.featureContracts;
-    case ProFeature.unlimitedBackup:
-      return l10n.featureBackup;
+    case ProFeature.statistics:
+      return l10n.featureStats;
   }
 }
 

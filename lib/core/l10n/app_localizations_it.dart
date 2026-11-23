@@ -1570,7 +1570,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get proGateBody =>
-      'Animali, cucciolate, cartelle sanitarie e un backup restano gratuiti. Pro aggiunge ciò che vede l\'acquirente.';
+      'Animali, cucciolate, cartelle sanitarie, pedigree e backup restano gratuiti. Pro aggiunge ciò che vede l\'acquirente.';
 
   @override
   String get proGateSee => 'Vedi i piani';
@@ -1579,14 +1579,11 @@ class AppLocalizationsIt extends AppLocalizations {
   String get featurePhotos => 'Foto senza limiti';
 
   @override
-  String get featurePedigree => 'L\'albero genealogico';
-
-  @override
   String get featureReports => 'Report con intestazione';
 
   @override
   String get featureContracts => 'Contratti di vendita';
 
   @override
-  String get featureBackup => 'Backup senza limiti';
+  String get featureStats => 'Le statistiche dell\'allevamento';
 }

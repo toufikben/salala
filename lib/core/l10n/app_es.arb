@@ -467,11 +467,10 @@
       }
     }
   },
-  "proGateBody": "Tus animales, camadas, historiales y una copia de seguridad siguen gratis. Pro añade lo que ve el comprador.",
+  "proGateBody": "Tus animales, camadas, historiales, pedigrí y copias de seguridad siguen gratis. Pro añade lo que ve el comprador.",
   "proGateSee": "Ver los planes",
   "featurePhotos": "Fotos sin límite",
-  "featurePedigree": "El árbol genealógico",
   "featureReports": "Informes con cabecera",
   "featureContracts": "Contratos de venta",
-  "featureBackup": "Copias sin límite"
+  "featureStats": "Las estadísticas del criadero"
 }

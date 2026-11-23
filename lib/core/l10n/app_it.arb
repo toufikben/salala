@@ -467,11 +467,10 @@
       }
     }
   },
-  "proGateBody": "Animali, cucciolate, cartelle sanitarie e un backup restano gratuiti. Pro aggiunge ciò che vede l'acquirente.",
+  "proGateBody": "Animali, cucciolate, cartelle sanitarie, pedigree e backup restano gratuiti. Pro aggiunge ciò che vede l'acquirente.",
   "proGateSee": "Vedi i piani",
   "featurePhotos": "Foto senza limiti",
-  "featurePedigree": "L'albero genealogico",
   "featureReports": "Report con intestazione",
   "featureContracts": "Contratti di vendita",
-  "featureBackup": "Backup senza limiti"
+  "featureStats": "Le statistiche dell'allevamento"
 }

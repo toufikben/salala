@@ -195,8 +195,10 @@ void main() {
       expect(gate.expired, isTrue);
 
       // The ledger itself is not a ProFeature: no animal, litter, dose or weight
-      // can be taken away, because nothing here names one.
-      expect(ProFeature.values.length, 5);
+      // can be taken away, because nothing here names one. Neither are the
+      // backup or the pedigree: both are the breeder's own data, and the app
+      // promises her records leave the phone whenever she says so.
+      expect(ProFeature.values.length, 4);
     });
   });
 
@@ -205,9 +207,14 @@ void main() {
       expect(FreeAllowance.photosPerAnimal, 3);
     });
 
-    test('one backup inside thirty days keeps "your records are yours" true', () {
-      expect(FreeAllowance.packsPerWindow, 1);
-      expect(FreeAllowance.backupWindowDays, 30);
+    test('the backup and the pedigree are never gated', () {
+      // "Your records are yours" is the app's promise: the only copy of a
+      // ledger must leave the phone whenever the breeder says so, free. No
+      // feature may name a backup or a pedigree.
+      for (final feature in ProFeature.values) {
+        expect(feature.name.contains('ackup'), isFalse, reason: feature.name);
+        expect(feature.name.contains('edigree'), isFalse, reason: feature.name);
+      }
     });
   });
 

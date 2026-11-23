@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:companion/data/db/settings_dao.dart';
 import 'package:companion/data/models/animal.dart';
 import 'package:companion/data/models/photo.dart';
 import 'package:companion/presentation/screens/animal_detail_screen.dart';
@@ -156,39 +155,31 @@ void main() {
     });
   });
 
-  group('the backup allowance', () {
-    testWidgets('a second pack inside the window asks', (tester) async {
-      await pumpApp(
-        tester,
-        seed: <Animal>[_nala()],
-        proAccess: _over(),
-        beforeLaunch: (db) async {
-          await SettingsDao(db).write(
-            SettingKeys.lastPackExportedAt,
-            '${DateTime.now().millisecondsSinceEpoch}',
-          );
-        },
-      );
+  group('the statistics page', () {
+    testWidgets('asks before it opens, not after', (tester) async {
+      await pumpApp(tester, seed: <Animal>[_nala()], proAccess: _over());
       await tester.tap(find.widgetWithText(NavigationDestination, 'Settings'));
       await settleRealIo(tester);
-      await tester.tap(sectionText('Export records'));
+      await tester.tap(sectionText('The kennel in numbers'));
       await settleRealIo(tester);
 
-      expect(find.text('Unlimited backups is part of Pro'), findsOneWidget);
+      expect(
+        find.text('The kennel statistics is part of Pro'),
+        findsOneWidget,
+      );
     });
 
-    testWidgets('the first pack never asks', (tester) async {
-      await pumpApp(
-        tester,
-        seed: <Animal>[_nala()],
-        proAccess: _over(),
-      );
+    testWidgets('a paying breeder opens the page', (tester) async {
+      await pumpApp(tester, seed: <Animal>[_nala()], proAccess: _paid());
       await tester.tap(find.widgetWithText(NavigationDestination, 'Settings'));
       await settleRealIo(tester);
-      await tester.tap(sectionText('Export records'));
+      await tester.tap(sectionText('The kennel in numbers'));
       await settleRealIo(tester);
 
-      expect(find.text('Unlimited backups is part of Pro'), findsNothing);
+      expect(
+        find.text('The kennel statistics is part of Pro'),
+        findsNothing,
+      );
     });
   });
 }

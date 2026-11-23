@@ -467,11 +467,10 @@
       }
     }
   },
-  "proGateBody": "Os teus animais, ninhadas, registos de saúde e uma cópia continuam grátis. O Pro acrescenta o que o comprador vê.",
+  "proGateBody": "Os teus animais, ninhadas, registos de saúde, pedigree e cópias continuam grátis. O Pro acrescenta o que o comprador vê.",
   "proGateSee": "Ver os planos",
   "featurePhotos": "Fotos sem limite",
-  "featurePedigree": "A árvore genealógica",
   "featureReports": "Relatórios com cabeçalho",
   "featureContracts": "Contratos de venda",
-  "featureBackup": "Cópias sem limite"
+  "featureStats": "As estatísticas do canil"
 }

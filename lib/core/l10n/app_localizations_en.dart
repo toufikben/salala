@@ -1557,7 +1557,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get proGateBody =>
-      'Your animals, litters, health records and one backup stay free. Pro adds the parts a buyer sees.';
+      'Your animals, litters, health records, pedigree and backups stay free. Pro adds the parts a buyer sees.';
 
   @override
   String get proGateSee => 'See the plans';
@@ -1566,14 +1566,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get featurePhotos => 'Unlimited photos';
 
   @override
-  String get featurePedigree => 'The pedigree tree';
-
-  @override
   String get featureReports => 'Branded reports';
 
   @override
   String get featureContracts => 'Sale contracts';
 
   @override
-  String get featureBackup => 'Unlimited backups';
+  String get featureStats => 'The kennel statistics';
 }

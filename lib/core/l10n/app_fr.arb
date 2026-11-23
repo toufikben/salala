@@ -553,11 +553,10 @@
       }
     }
   },
-  "proGateBody": "Vos animaux, portées et dossiers de santé restent gratuits, ainsi qu'une sauvegarde. Pro ajoute ce que voit l'acheteur.",
+  "proGateBody": "Vos animaux, portées, dossiers de santé, pedigree et sauvegardes restent gratuits. Pro ajoute ce que voit l'acheteur.",
   "proGateSee": "Voir les formules",
   "featurePhotos": "Photos sans limite",
-  "featurePedigree": "L'arbre généalogique",
   "featureReports": "Rapports à votre en-tête",
   "featureContracts": "Contrats de vente",
-  "featureBackup": "Sauvegardes sans limite"
+  "featureStats": "Les statistiques de l'élevage"
 }

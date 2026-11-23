@@ -1552,7 +1552,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get proGateBody =>
-      'حيواناتك وبطونك وسجلّاتك الصحية ونسخة احتياطية واحدة تبقى مجانية. Pro يضيف ما يراه المشتري.';
+      'حيواناتك وبطونك وسجلّاتك الصحية وشجرة النسب والنسخ الاحتياطية تبقى مجانية. Pro يضيف ما يراه المشتري.';
 
   @override
   String get proGateSee => 'اعرض الخطط';
@@ -1561,14 +1561,11 @@ class AppLocalizationsAr extends AppLocalizations {
   String get featurePhotos => 'صور بلا حدّ';
 
   @override
-  String get featurePedigree => 'شجرة النسب';
-
-  @override
   String get featureReports => 'تقارير بهويتك';
 
   @override
   String get featureContracts => 'عقود البيع';
 
   @override
-  String get featureBackup => 'نسخ احتياطية بلا حدّ';
+  String get featureStats => 'إحصاءات المربّى';
 }
