@@ -50,14 +50,31 @@ class _UpgradeScreenState extends ConsumerState<UpgradeScreen> {
     final offers = ref.watch(storeOffersProvider);
     final access = ref.watch(proAccessProvider).value;
 
+    // Only plans the store actually holds are offered. A card for a plan that
+    // was never created in Play Console is a price that loads forever, and a
+    // breeder who taps it has been shown a product that does not exist.
+    final listed = offers.value ?? const <StoreOffer>[];
+    final plans = offers.isLoading
+        ? CompanionPlan.values.toList()
+        : CompanionPlan.values
+              .where(
+                (plan) => listed.any((offer) => offer.product.plan == plan),
+              )
+              .toList();
+    // Read, not written: a build method that assigns state is a frame that
+    // schedules another frame.
+    final plan = plans.contains(_plan)
+        ? _plan
+        : (plans.isEmpty ? CompanionPlan.pro : plans.first);
+
     final selected = kCompanionProducts.firstWhere(
-      (product) => product.plan == _plan && product.period == _period,
+      (product) => product.plan == plan && product.period == _period,
       orElse: () => kCompanionProducts.first,
     );
-    final offer = offers.value?.where(
+    final matching = listed.where(
       (candidate) => candidate.product.id == selected.id,
     );
-    final price = (offer == null || offer.isEmpty) ? null : offer.first.price;
+    final price = matching.isEmpty ? null : matching.first.price;
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.upgradeTitle)),
@@ -78,23 +95,21 @@ class _UpgradeScreenState extends ConsumerState<UpgradeScreen> {
           const SizedBox(height: 20),
           Row(
             children: <Widget>[
-              Expanded(
-                child: _PlanCard(
-                  title: l10n.upgradeProTitle,
-                  body: l10n.upgradeProBody,
-                  selected: _plan == CompanionPlan.pro,
-                  onTap: () => setState(() => _plan = CompanionPlan.pro),
+              for (var i = 0; i < plans.length; i++) ...<Widget>[
+                if (i > 0) const SizedBox(width: 12),
+                Expanded(
+                  child: _PlanCard(
+                    title: plans[i] == CompanionPlan.pro
+                        ? l10n.upgradeProTitle
+                        : l10n.upgradeStudioTitle,
+                    body: plans[i] == CompanionPlan.pro
+                        ? l10n.upgradeProBody
+                        : l10n.upgradeStudioBody,
+                    selected: plan == plans[i],
+                    onTap: () => setState(() => _plan = plans[i]),
+                  ),
                 ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _PlanCard(
-                  title: l10n.upgradeStudioTitle,
-                  body: l10n.upgradeStudioBody,
-                  selected: _plan == CompanionPlan.studio,
-                  onTap: () => setState(() => _plan = CompanionPlan.studio),
-                ),
-              ),
+              ],
             ],
           ),
           const SizedBox(height: 20),

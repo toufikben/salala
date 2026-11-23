@@ -399,19 +399,23 @@ Future<void> _exportPack(BuildContext context, WidgetRef ref) async {
 
   // The free tier includes one pack inside the window, because "your records are
   // yours" is not a feature to sell. The second pack in thirty days is the
-  // convenience a breeder who works every week will want.
-  final lastMs = await ref
-      .read(settingsDaoProvider)
-      .readInt(SettingKeys.lastPackExportedAt);
-  if (!context.mounted) return;
-  if (lastMs != null) {
-    final since = DateTime.now().difference(
-      DateTime.fromMillisecondsSinceEpoch(lastMs),
-    );
-    if (since.inDays < FreeAllowance.backupWindowDays &&
-        !await ensurePro(context, ref, ProFeature.unlimitedBackup)) {
-      return;
+  // convenience a breeder who works every week will want. Read only when this
+  // build sells something.
+  if (ref.read(billingEnabledProvider)) {
+    final lastMs = await ref
+        .read(settingsDaoProvider)
+        .readInt(SettingKeys.lastPackExportedAt);
+    if (!context.mounted) return;
+    if (lastMs != null) {
+      final since = DateTime.now().difference(
+        DateTime.fromMillisecondsSinceEpoch(lastMs),
+      );
+      if (since.inDays < FreeAllowance.backupWindowDays &&
+          !await ensurePro(context, ref, ProFeature.unlimitedBackup)) {
+        return;
+      }
     }
+    if (!context.mounted) return;
   }
 
   try {

@@ -71,3 +71,11 @@ final proAccessProvider = FutureProvider<ProAccess>((ref) async {
     trial: trial,
   );
 });
+
+/// Whether this build sells anything, as a value a test can bend.
+///
+/// A provider rather than the constant read directly at the call sites, because
+/// the gates have to be exercised closed: the shipped build has billing off, so
+/// without an override every gate answers yes and the sheets behind them are
+/// code no test ever runs.
+final billingEnabledProvider = Provider<bool>((ref) => kBillingEnabled);

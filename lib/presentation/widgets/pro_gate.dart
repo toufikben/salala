@@ -21,6 +21,10 @@ Future<bool> ensurePro(
   WidgetRef ref,
   ProFeature feature,
 ) async {
+  // Answered before any await: a build that sells nothing must not add a
+  // database round trip to attaching a contract or opening the gallery. The
+  // free path stays exactly as fast as it was before billing existed.
+  if (!ref.read(billingEnabledProvider)) return true;
   final access = await ref.read(proAccessProvider.future);
   if (!context.mounted) return false;
   if (access.allows(feature)) return true;

@@ -45,6 +45,13 @@ void main() {
   const homographs = <String, Set<String>>{
     'fr': <String>{
       'appTitle',
+      // The plan names are the product's own marks: "Companion Pro", "Pro" and
+      // "Studio" are what the store lists and what the receipt says, in every
+      // language. Translating them would name a product nobody can buy.
+      'upgradeTitle',
+      'upgradeProTitle',
+      'upgradeStudioTitle',
+      'settingsProTitle',
       'animalNotes',
       'recordsPhotos',
       'recordsPlacements',
@@ -65,6 +72,13 @@ void main() {
     },
     'de': <String>{
       'appTitle',
+      // The plan names are the product's own marks: "Companion Pro", "Pro" and
+      // "Studio" are what the store lists and what the receipt says, in every
+      // language. Translating them would name a product nobody can buy.
+      'upgradeTitle',
+      'upgradeProTitle',
+      'upgradeStudioTitle',
+      'settingsProTitle',
       'animalName',
       'animalStatus',
       'unitKg',
@@ -81,6 +95,13 @@ void main() {
     },
     'es': <String>{
       'appTitle',
+      // The plan names are the product's own marks: "Companion Pro", "Pro" and
+      // "Studio" are what the store lists and what the receipt says, in every
+      // language. Translating them would name a product nobody can buy.
+      'upgradeTitle',
+      'upgradeProTitle',
+      'upgradeStudioTitle',
+      'settingsProTitle',
       'csvColAnimal',
       'csvColNo',
       'unitKg',
@@ -89,6 +110,13 @@ void main() {
     },
     'it': <String>{
       'appTitle',
+      // The plan names are the product's own marks: "Companion Pro", "Pro" and
+      // "Studio" are what the store lists and what the receipt says, in every
+      // language. Translating them would name a product nobody can buy.
+      'upgradeTitle',
+      'upgradeProTitle',
+      'upgradeStudioTitle',
+      'settingsProTitle',
       'csvColNo',
       'unitKg',
       'unitGrams',
@@ -105,6 +133,13 @@ void main() {
     },
     'pt': <String>{
       'appTitle',
+      // The plan names are the product's own marks: "Companion Pro", "Pro" and
+      // "Studio" are what the store lists and what the receipt says, in every
+      // language. Translating them would name a product nobody can buy.
+      'upgradeTitle',
+      'upgradeProTitle',
+      'upgradeStudioTitle',
+      'settingsProTitle',
       'csvColAnimal',
       'unitKg',
       'unitGrams',
@@ -114,6 +149,13 @@ void main() {
     },
     'nl': <String>{
       'appTitle',
+      // The plan names are the product's own marks: "Companion Pro", "Pro" and
+      // "Studio" are what the store lists and what the receipt says, in every
+      // language. Translating them would name a product nobody can buy.
+      'upgradeTitle',
+      'upgradeProTitle',
+      'upgradeStudioTitle',
+      'settingsProTitle',
       'animalStatus',
       'unitKg',
       'unitGrams',
@@ -213,8 +255,19 @@ void main() {
 
   test('every Arabic message is written in Arabic', () {
     final arabicScript = RegExp(r'[؀-ۿ]');
+    // The product's own marks stay in the script the store prints them in. An
+    // Arabic breeder buys "Companion Pro", not a transliteration of it, and the
+    // receipt in her Play account says the same four letters. This list is where
+    // that is decided, deliberately, exactly as `homographs` decides it above.
+    const latinMarks = <String>{
+      'upgradeTitle',
+      'upgradeProTitle',
+      'upgradeStudioTitle',
+      'settingsProTitle',
+    };
     final latin = <String>[];
     for (final key in keys) {
+      if (latinMarks.contains(key)) continue;
       if (!arabicScript.hasMatch(message(arb['ar']!, key))) latin.add(key);
     }
     expect(

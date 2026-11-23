@@ -27,6 +27,7 @@ import '../../services/pdf_layout.dart';
 import '../../services/photo_files.dart';
 import '../../services/trial.dart';
 import '../providers/app_providers.dart';
+import '../providers/billing_providers.dart';
 import '../providers/record_providers.dart';
 import '../providers/triage_providers.dart';
 import '../widgets/animal_timeline_card.dart';
@@ -1227,13 +1228,17 @@ Future<void> _addPhoto(
 
   // The free allowance is per animal and the sentence is the allowance: three
   // pictures identify a dog, and the fourth is the one that sells the plan.
-  final kept = await ref.read(photosForAnimalProvider(animalId).future);
-  if (!context.mounted) return;
-  if (kept.length >= FreeAllowance.photosPerAnimal &&
-      !await ensurePro(context, ref, ProFeature.unlimitedPhotos)) {
-    return;
+  // Read only when this build sells something — a free install must not pay for
+  // a query on every tap of the camera.
+  if (ref.read(billingEnabledProvider)) {
+    final kept = await ref.read(photosForAnimalProvider(animalId).future);
+    if (!context.mounted) return;
+    if (kept.length >= FreeAllowance.photosPerAnimal &&
+        !await ensurePro(context, ref, ProFeature.unlimitedPhotos)) {
+      return;
+    }
+    if (!context.mounted) return;
   }
-  if (!context.mounted) return;
 
   // Asked before the picker opens, because the two are different trips out of
   // the app: the gallery is a document that already exists, the camera is a
