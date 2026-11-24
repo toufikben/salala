@@ -11,7 +11,8 @@ import 'app_providers.dart';
 /// plugin subscribes to a purchase stream in its constructor, and a widget test
 /// has no platform channel to answer it. Keeping the fake here is what lets the
 /// whole app — including the Settings row and every gate — be tested without a
-/// store on the machine.
+/// store on the machine, which is why the tests override the gateway rather than
+/// flipping the switch back off.
 final purchaseGatewayProvider = Provider<PurchaseGateway>((ref) {
   if (!kBillingEnabled) return const NoStoreGateway();
   final gateway = PlayPurchaseGateway();
@@ -65,11 +66,7 @@ final trialProvider = FutureProvider<TrialState>((ref) {
 final proAccessProvider = FutureProvider<ProAccess>((ref) async {
   final owned = await ref.watch(entitlementProvider.future);
   final trial = await ref.watch(trialProvider.future);
-  return ProAccess(
-    billingEnabled: kBillingEnabled,
-    owned: owned,
-    trial: trial,
-  );
+  return ProAccess(billingEnabled: kBillingEnabled, owned: owned, trial: trial);
 });
 
 /// Whether this build sells anything, as a value a test can bend.

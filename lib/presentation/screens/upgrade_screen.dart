@@ -183,9 +183,7 @@ class _UpgradeScreenState extends ConsumerState<UpgradeScreen> {
   Future<void> _buy(StoreProduct product) async {
     final l10n = AppLocalizations.of(context);
     setState(() => _working = true);
-    final bought = await ref
-        .read(entitlementProvider.notifier)
-        .buy(product);
+    final bought = await ref.read(entitlementProvider.notifier).buy(product);
     if (!mounted) return;
     setState(() => _working = false);
     _say(bought ? l10n.upgradeThankYou : l10n.upgradeFailed);
@@ -261,7 +259,8 @@ ProFeature? proFeatureFromName(String? name) {
 }
 
 /// The name of a paid feature, in the reader's language.
-String featureLabel(AppLocalizations l10n, ProFeature feature) {  switch (feature) {
+String featureLabel(AppLocalizations l10n, ProFeature feature) {
+  switch (feature) {
     case ProFeature.unlimitedPhotos:
       return l10n.featurePhotos;
     case ProFeature.reports:

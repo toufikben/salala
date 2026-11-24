@@ -11,8 +11,8 @@ import 'package:companion/services/trial.dart';
 import '../helpers/pump_app.dart';
 
 /// The gates have to be exercised with billing closed and open, because the
-/// shipped build has it switched off: without the override every gate answers
-/// yes and the sheets they open are code no test ever runs.
+/// shipped build sells: a phone inside its trial sees none of them, and the ones
+/// that open after expiry are code no test would otherwise run.
 const String _nalaId = 'animal-nala';
 
 Animal _nala() => Animal(
@@ -171,7 +171,9 @@ void main() {
       expect(find.text('Branded reports is part of Pro'), findsOneWidget);
     });
 
-    testWidgets('a paying breeder gets the share sheet instead', (tester) async {
+    testWidgets('a paying breeder gets the share sheet instead', (
+      tester,
+    ) async {
       await pumpApp(tester, seed: <Animal>[_nala()], proAccess: _paid());
       await _openNala(tester);
       await _tap(tester, find.byTooltip('PDF pack'));
@@ -185,20 +187,14 @@ void main() {
       await pumpApp(tester, seed: <Animal>[_nala()], proAccess: _over());
       await _openSetting(tester, 'The kennel in numbers');
 
-      expect(
-        find.text('The kennel statistics is part of Pro'),
-        findsOneWidget,
-      );
+      expect(find.text('The kennel statistics is part of Pro'), findsOneWidget);
     });
 
     testWidgets('a paying breeder opens the page', (tester) async {
       await pumpApp(tester, seed: <Animal>[_nala()], proAccess: _paid());
       await _openSetting(tester, 'The kennel in numbers');
 
-      expect(
-        find.text('The kennel statistics is part of Pro'),
-        findsNothing,
-      );
+      expect(find.text('The kennel statistics is part of Pro'), findsNothing);
     });
   });
 }

@@ -21,11 +21,14 @@ void main() {
     expect(state.expired, isFalse);
   });
 
-  test('the trial counts from the first launch, not from each launch', () async {
-    await service().state();
-    now = DateTime(2026, 5, 11, 9);
-    expect((await service().state()).daysLeft, kTrialDays - 10);
-  });
+  test(
+    'the trial counts from the first launch, not from each launch',
+    () async {
+      await service().state();
+      now = DateTime(2026, 5, 11, 9);
+      expect((await service().state()).daysLeft, kTrialDays - 10);
+    },
+  );
 
   test('the last day is still a day, and the next one is not', () async {
     await service().state();
@@ -63,38 +66,59 @@ void main() {
     expect((await service().state()).daysLeft, kTrialDays);
   });
 
-  test('nothing is locked in an app that sells nothing', () async {
-    await service().state();
-    now = DateTime(2027, 1, 1);
-    final expired = service();
-    expect((await expired.state()).expired, isTrue);
-    for (final feature in ProFeature.values) {
+  test(
+    'the paid features lock once the trial is over and nothing was bought',
+    () async {
+      await service().state();
+      now = DateTime(2027, 1, 1);
+      final expired = service();
+      expect((await expired.state()).expired, isTrue);
+      for (final feature in ProFeature.values) {
+        expect(
+          await expired.unlocked(feature),
+          isFalse,
+          reason: '$feature stayed open after the trial expired',
+        );
+      }
+    },
+  );
+
+  test(
+    'a bought subscription keeps the paid features open after expiry',
+    () async {
+      await service().state();
+      now = DateTime(2027, 1, 1);
+      final expired = service();
+      for (final feature in ProFeature.values) {
+        expect(
+          await expired.unlocked(feature, proOwned: true),
+          isTrue,
+          reason: '$feature stayed locked for a paying user',
+        );
+      }
+    },
+  );
+
+  test(
+    'the gate refuses what the expiry names, now that billing is on',
+    () async {
+      // The same arithmetic the app answers with today: expiry closes the paid
+      // extras, ownership reopens them, and the trial covers everything.
+      const gate = ProGate(billingEnabled: true, proOwned: false);
       expect(
-        await expired.unlocked(feature),
+        gate.allows(expired: false, feature: ProFeature.unlimitedPhotos),
         isTrue,
-        reason: '$feature came out locked with kBillingEnabled off',
       );
-    }
-  });
+      expect(
+        gate.allows(expired: true, feature: ProFeature.unlimitedPhotos),
+        isFalse,
+      );
 
-  test('the gate refuses what the expiry names, once billing is on', () async {
-    // The arithmetic without the switch: this is what the app will answer on the
-    // day billing is turned on, so it has to be right before that day rather
-    // than after it.
-    const gate = ProGate(billingEnabled: true, proOwned: false);
-    expect(
-      gate.allows(expired: false, feature: ProFeature.unlimitedPhotos),
-      isTrue,
-    );
-    expect(
-      gate.allows(expired: true, feature: ProFeature.unlimitedPhotos),
-      isFalse,
-    );
-
-    const owned = ProGate(billingEnabled: true, proOwned: true);
-    expect(
-      owned.allows(expired: true, feature: ProFeature.unlimitedPhotos),
-      isTrue,
-    );
-  });
+      const owned = ProGate(billingEnabled: true, proOwned: true);
+      expect(
+        owned.allows(expired: true, feature: ProFeature.unlimitedPhotos),
+        isTrue,
+      );
+    },
+  );
 }

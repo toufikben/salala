@@ -5,13 +5,15 @@ const int kTrialDays = 15;
 
 /// Whether this build is allowed to sell anything.
 ///
-/// `false` for now, and it is the only switch that has to be flipped on the day
-/// the app starts charging: every gate below reads it, so nothing that is free
-/// today can become locked by a mistake somewhere else.
-const bool kBillingEnabled = false;
+/// The only switch that has to be flipped for the app to start charging: every
+/// gate below reads it, so nothing that is free by default can become locked by
+/// a mistake somewhere else. Turned on once both Play subscriptions
+/// (`companion_pro_monthly`, `companion_pro_yearly`) were live on the internal
+/// testing track.
+const bool kBillingEnabled = true;
 
-/// The features that will be paid one day, named so the gate can be asked about
-/// one of them rather than about "Pro".
+/// The features that are paid once the trial ends, named so the gate can be
+/// asked about one of them rather than about "Pro".
 ///
 /// An enum rather than a list of strings because the call sites have to be told
 /// apart at compile time: a lock added to a feature that is not on this list is a
@@ -55,9 +57,8 @@ class TrialState {
 /// Whether a paid feature answers, given the trial and whether Pro was bought.
 ///
 /// Split from [TrialService] so the decision is a pure function and can be
-/// tested on the day billing is switched on rather than after it. With
-/// [billingEnabled] false everything is allowed, which is the whole of "the app
-/// is free and the structure is dormant".
+/// tested without a store. With [billingEnabled] false everything is allowed,
+/// which is what keeps a build that sells nothing from locking anything.
 class ProGate {
   const ProGate({required this.billingEnabled, required this.proOwned});
 
@@ -106,8 +107,7 @@ class TrialService {
   Future<TrialState> state() async {
     final now = _clock();
     final startedMs =
-        await settings.readInt(SettingKeys.trialStartedAt) ??
-        await _start(now);
+        await settings.readInt(SettingKeys.trialStartedAt) ?? await _start(now);
     final elapsed = _wholeDaysBetween(startedMs, now.millisecondsSinceEpoch);
     // A clock wound back before the install would make the elapsed count
     // negative, and arithmetic alone would read that as a longer trial than the
@@ -135,10 +135,7 @@ class TrialService {
   /// Every call site asks about a named feature rather than about "Pro", which is
   /// what keeps the sentence on the upgrade screen honest: it lists the features
   /// that are actually gated, not the ones someone remembered to list.
-  Future<bool> unlocked(
-    ProFeature feature, {
-    bool proOwned = false,
-  }) async {
+  Future<bool> unlocked(ProFeature feature, {bool proOwned = false}) async {
     if (!kBillingEnabled) return true;
     final trial = await state();
     return ProGate(

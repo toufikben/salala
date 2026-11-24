@@ -351,6 +351,11 @@ Future<FakeSecureStorage> pumpApp(
         contractFilesProvider.overrideWithValue(
           contractFiles ?? FakeContractFiles(),
         ),
+        // The shipped build now sells, so the real provider would construct the
+        // Play adapter, which subscribes to a platform channel no test runner
+        // answers. The store is faked here for every screen; the gates are still
+        // exercised closed through [billingEnabledProvider] below.
+        purchaseGatewayProvider.overrideWithValue(const NoStoreGateway()),
         if (!resyncOnLaunch)
           remindersResyncProvider.overrideWith(AlreadyResynced.new),
         lockGracePeriodProvider.overrideWithValue(lockGrace),
