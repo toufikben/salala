@@ -3,12 +3,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:companion/data/models/animal.dart';
 import 'package:companion/data/models/photo.dart';
 import 'package:companion/presentation/screens/animal_detail_screen.dart';
+import 'package:companion/presentation/screens/settings_screen.dart';
 import 'package:companion/presentation/screens/upgrade_screen.dart';
 import 'package:companion/services/billing.dart';
 import 'package:companion/services/trial.dart';
 
 import '../helpers/pump_app.dart';
-import '../helpers/section_finder.dart';
 
 /// The gates have to be exercised with billing closed and open, because the
 /// shipped build has it switched off: without the override every gate answers
@@ -67,6 +67,31 @@ Future<void> _tap(WidgetTester tester, Finder finder) async {
   await tester.ensureVisible(finder);
   await tester.pumpAndSettle();
   await tester.tap(finder);
+  await settleRealIo(tester);
+}
+
+/// Opens Settings and taps a row at the bottom of a lazy list.
+///
+/// The statistics row lives under the export and CSV groups, so it is not
+/// built until the list is scrolled: `find.text` finds nothing and a tap on
+/// nothing throws before the gate is ever asked.
+Future<void> _openSetting(WidgetTester tester, String label) async {
+  await tester.tap(find.widgetWithText(NavigationDestination, 'Settings'));
+  await settleRealIo(tester);
+
+  final row = find.text(label);
+  await tester.scrollUntilVisible(
+    row,
+    180,
+    scrollable: find
+        .descendant(
+          of: find.byType(SettingsScreen),
+          matching: find.byType(Scrollable),
+        )
+        .first,
+  );
+  await tester.pump();
+  await tester.tap(row);
   await settleRealIo(tester);
 }
 
@@ -158,10 +183,7 @@ void main() {
   group('the statistics page', () {
     testWidgets('asks before it opens, not after', (tester) async {
       await pumpApp(tester, seed: <Animal>[_nala()], proAccess: _over());
-      await tester.tap(find.widgetWithText(NavigationDestination, 'Settings'));
-      await settleRealIo(tester);
-      await tester.tap(sectionText('The kennel in numbers'));
-      await settleRealIo(tester);
+      await _openSetting(tester, 'The kennel in numbers');
 
       expect(
         find.text('The kennel statistics is part of Pro'),
@@ -171,10 +193,7 @@ void main() {
 
     testWidgets('a paying breeder opens the page', (tester) async {
       await pumpApp(tester, seed: <Animal>[_nala()], proAccess: _paid());
-      await tester.tap(find.widgetWithText(NavigationDestination, 'Settings'));
-      await settleRealIo(tester);
-      await tester.tap(sectionText('The kennel in numbers'));
-      await settleRealIo(tester);
+      await _openSetting(tester, 'The kennel in numbers');
 
       expect(
         find.text('The kennel statistics is part of Pro'),

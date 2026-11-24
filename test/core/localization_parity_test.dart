@@ -43,6 +43,18 @@ void main() {
   /// character-for-character like the English is either a paste or a stranger
   /// homograph — and this list is where that gets decided, deliberately.
   const homographs = <String, Set<String>>{
+    'ar': <String>{
+      // The plan names are the product's own marks: "Companion Pro", "Pro" and
+      // "Studio" are what the store lists and what the receipt says, in every
+      // language. Translating them would name a product nobody can buy. The
+      // Arabic-script test above lets the same four through deliberately; this
+      // is the same decision, so a fifth Latin mark here has to be added to
+      // both lists.
+      'upgradeTitle',
+      'upgradeProTitle',
+      'upgradeStudioTitle',
+      'settingsProTitle',
+    },
     'fr': <String>{
       'appTitle',
       // The plan names are the product's own marks: "Companion Pro", "Pro" and

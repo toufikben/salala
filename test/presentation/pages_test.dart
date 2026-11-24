@@ -1,10 +1,12 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:companion/core/build_info.dart';
 import 'package:companion/core/contact.dart';
 import 'package:companion/data/models/animal.dart';
+import 'package:companion/presentation/providers/record_providers.dart';
 import 'package:companion/presentation/screens/about_screen.dart';
 import 'package:companion/presentation/screens/animal_form_screen.dart';
 import 'package:companion/presentation/screens/help_screen.dart';
@@ -212,6 +214,32 @@ void main() {
         () => find.byType(AnimalFormScreen).evaluate().isNotEmpty,
       );
       await settleRealIo(tester);
+
+      // The herd page stays alive under the form, and this is the first frame
+      // it ever builds: the handovers query it watches starts here, not when
+      // the app opened. A query still in flight when the test ends leaves
+      // sqflite's ten-second transaction-lock timer pending and fails teardown
+      // even though every assertion passed (run 45226258616). Waiting on the
+      // query's own result is the outcome rather than another guess at a round
+      // count; the subscription is held open so the auto-dispose provider is
+      // not torn down and re-asked between pumps.
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(AnimalFormScreen)),
+        listen: false,
+      );
+      final handovers = container.listen(
+        placementsProvider,
+        (_, _) {},
+        fireImmediately: true,
+      );
+      await settleUntil(tester, () {
+        final handovers = container.read(placementsProvider);
+        // Either answer means the query is done: this wait is about the
+        // transaction lock, not about what the herd holds, and the assertion
+        // below is about the route.
+        return handovers.hasValue || handovers.hasError;
+      });
+      handovers.close();
 
       // The button promised the form, so the form is what it must open — not an
       // empty herd asking her to tap "Add animal" a second time. The row was
