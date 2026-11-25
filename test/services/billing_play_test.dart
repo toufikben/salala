@@ -129,11 +129,11 @@ void main() {
   });
 
   group('a store that cannot answer', () {
-    test('a restore on an unreachable store does not report owning nothing', () async {
+    test('a restore on an unreachable store throws instead of reporting nothing', () async {
       // The dangerous answer. `BillingService.refresh` writes whatever comes
-      // back, so returning "nothing owned" here erases the receipt of a breeder
-      // who paid, on launch, with no network — and she is locked out of what she
-      // bought until the store comes back.
+      // back, so returning "nothing owned" from an unreachable store erases the
+      // receipt of a breeder who paid, on launch, with no network — and she is
+      // locked out of what she bought until the store comes back.
       InAppPurchasePlatform.instance = _FakePlay(available: false);
       final offline = PlayPurchaseGateway();
       addTearDown(offline.dispose);
@@ -141,29 +141,37 @@ void main() {
       expect(offline.restore, throwsA(isA<StateError>()));
     });
 
-    test(
-      'a silent store does not erase the receipt it was asked about',
-      () async {
-        // The end of the chain, and the reason the throw matters: a phone that
-        // paid and then launches with a store that says nothing must still be
-        // holding Pro afterwards. This is the sequence that ran on the phone.
-        final settings = SettingsDao(await openTestDatabase());
-        await BillingService(settings: settings)
-            .write(const Entitlement(<CompanionPlan>{CompanionPlan.pro}));
+    test('so a paid breeder keeps Pro while the store is unreachable', () async {
+      // The end of the chain: the throw above is what makes this true. A phone
+      // that paid and then launches with no store must still be holding Pro.
+      final settings = SettingsDao(await openTestDatabase());
+      await BillingService(settings: settings)
+          .write(const Entitlement(<CompanionPlan>{CompanionPlan.pro}));
 
-        play.restored = <String>[];
-        final service = BillingService(settings: settings, gateway: gateway);
+      InAppPurchasePlatform.instance = _FakePlay(available: false);
+      final offline = PlayPurchaseGateway();
+      addTearDown(offline.dispose);
+      final service = BillingService(settings: settings, gateway: offline);
 
-        expect(
-          await service.refresh(),
-          const Entitlement(<CompanionPlan>{CompanionPlan.pro}),
-        );
-        expect(
-          await service.read(),
-          const Entitlement(<CompanionPlan>{CompanionPlan.pro}),
-        );
-      },
-    );
+      expect(
+        await service.refresh(),
+        const Entitlement(<CompanionPlan>{CompanionPlan.pro}),
+      );
+      expect(
+        await service.read(),
+        const Entitlement(<CompanionPlan>{CompanionPlan.pro}),
+      );
+    });
+
+    test('a reachable store that carries nothing is an answer, not a failure', () async {
+      // Measured on the phone: Play answered a restore for an account with no
+      // subscription by simply emitting nothing. That is "you own nothing", and
+      // saying "the store could not be reached" there is a second lie — it sends
+      // a breeder to check her connection for a problem that is not hers.
+      play.restored = <String>[];
+      final owned = await gateway.restore();
+      expect(owned, const Entitlement.none());
+    });
   });
 
   group('a store that answers', () {

@@ -95,12 +95,11 @@ class PlayPurchaseGateway implements PurchaseGateway {
 
   @override
   Future<Entitlement> restore() async {
-    // A store that cannot be asked is not a store that answered "nothing". The
-    // caller persists whatever comes back, and an empty set here would overwrite
-    // the receipt of a breeder who paid — on launch, in a shed, with no way back
-    // until the network returns. Throwing is what tells `BillingService.refresh`
-    // to leave the stored row alone, which is the behaviour its own comment
-    // promises.
+    // Only an unreachable store is "no answer". Play's `restorePurchases` returns
+    // normally when it has been asked and simply emits nothing for an account
+    // that owns nothing — that silence is the answer, not its absence. Throwing
+    // here as well (an earlier version did) told every breeder with nothing
+    // bought that the store was unreachable, which is a different lie.
     if (!await _iap.isAvailable()) {
       throw StateError('the store is unreachable');
     }
@@ -113,19 +112,11 @@ class PlayPurchaseGateway implements PurchaseGateway {
     // the burst is over, so "finished" is a short silence. Three seconds is
     // longer than any burst observed and short enough that the Settings row does
     // not feel stuck.
-    //
-    // A silence is not an answer, though. If nothing arrived and this account
-    // owns nothing here, the caller would write "no plans" over the receipt of
-    // somebody who did pay, on a phone that simply had a slow store. Only a
-    // non-empty result is allowed to be persisted; anything else throws, and
-    // `BillingService.refresh` keeps the stored row.
     return completer.future.timeout(
       const Duration(seconds: 3),
       onTimeout: () {
         _restoring = null;
-        final owned = Entitlement(_ownedNames());
-        if (!owned.isEmpty) return owned;
-        throw StateError('the store said nothing about what is owned');
+        return Entitlement(_ownedNames());
       },
     );
   }

@@ -1,7 +1,7 @@
 name: companion
 description: "Companion - an offline-first health and lineage record for small-scale dog and cat breeders, with a transferable PDF pack for puppy buyers."
 publish_to: 'none'
-version: 1.0.2+6
+version: 1.0.2+7
 
 environment:
   sdk: ^3.13.4
