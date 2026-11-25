@@ -1,14 +1,25 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/l10n/app_localizations.dart';
 import '../../core/utils/date_utils.dart';
+import '../../core/utils/text_input.dart';
 import '../../core/utils/money.dart';
+import '../../data/db/daos.dart';
+import '../../data/models/animal.dart';
 import '../../data/models/buyer.dart';
 import '../../data/models/placement.dart';
+import '../../services/contract_files.dart';
+import '../../services/reminder_resync.dart';
+import '../../services/reminder_scheduler.dart';
+import '../../services/trial.dart';
+import '../providers/app_providers.dart';
 import '../providers/record_providers.dart';
 import 'buyer_dialog.dart';
 import 'date_tile.dart';
+import 'pro_gate.dart';
 import 'record_refusal.dart';
 
 /// Opens the same form for a new handover and for correcting an old one.
@@ -64,6 +75,17 @@ class _PlacementDialogState extends ConsumerState<PlacementDialog> {
   late int? _placedDate;
   bool _saving = false;
 
+  /// The contract this form is holding: the file name to store, or null.
+  ///
+  /// Three states, deliberately not two. `_contractName == null` and
+  /// `_pickedContract != null` is "a new file was chosen but not yet written";
+  /// both null and no existing row is "no contract"; and a name carried from
+  /// `existing` is "the row already had one". Storing the bytes on Save rather
+  /// than on pick is what keeps a backed-out form from leaving a file on the
+  /// disk that no row names.
+  late String? _contractName;
+  PickedContract? _pickedContract;
+
   bool get _isEdit => widget.existing != null;
 
   @override
@@ -80,6 +102,7 @@ class _PlacementDialogState extends ConsumerState<PlacementDialog> {
     // Today for a new row, because a placement written at the gate is about
     // today. A row that arrived without a date keeps that absence.
     _placedDate = existing?.placedDate ?? msFromDay(DateTime.now());
+    _contractName = existing?.contractFilePath;
   }
 
   @override
@@ -146,6 +169,49 @@ class _PlacementDialogState extends ConsumerState<PlacementDialog> {
     });
   }
 
+  /// The contract the breeder chose, not yet written.
+  ///
+  /// The bytes are held in memory until Save. Writing on pick would leave a file
+  /// on this phone that no row names the moment the breeder backs out, and the
+  /// sweep that keeps the folder honest is written against pictures, not
+  /// contracts.
+  ///
+  /// The size is checked here as well as in `store`, because a breeder who
+  /// tapped a video by accident should be told at the moment of the mistake
+  /// rather than after filling in a price and a guarantee.
+  Future<void> _pickContract() async {
+    final l10n = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    // Before the file picker: a breeder who chose a contract and then met a wall
+    // has been asked to do work the app would not keep.
+    if (!await ensurePro(context, ref, ProFeature.contracts)) return;
+    final PickedContract? chosen;
+    try {
+      chosen = await ref.read(contractFilesProvider).pick();
+    } catch (error) {
+      debugPrint('Contract file could not be opened: $error');
+      messenger.showSnackBar(SnackBar(content: Text(l10n.contractPickFailed)));
+      return;
+    }
+    if (chosen == null || !mounted) return;
+    if (chosen.length > maxContractBytes) {
+      messenger.showSnackBar(SnackBar(content: Text(l10n.contractTooLarge)));
+      return;
+    }
+    setState(() => _pickedContract = chosen);
+  }
+
+  /// Removes the attached contract, on Save rather than on tap.
+  ///
+  /// A breeder who removes the wrong file and then backs out has removed
+  /// nothing: the row still points at it, and the bytes are still there.
+  void _clearContract() {
+    setState(() {
+      _pickedContract = null;
+      _contractName = null;
+    });
+  }
+
   Future<void> _save() async {
     final form = _formKey.currentState!;
     if (!form.validate()) {
@@ -163,17 +229,65 @@ class _PlacementDialogState extends ConsumerState<PlacementDialog> {
     }
     setState(() => _saving = true);
 
+    // Read before the write: the dialog pops as soon as it answers, and a
+    // disposed widget's `ref` and `context` say nothing about which language the
+    // animal's remaining alarms should be booked in.
+    final l10n = AppLocalizations.of(context);
+    final localeTag = Localizations.localeOf(context).toString();
+    final scheduler = ref.read(reminderSchedulerProvider);
+    final daos = ref.read(daosProvider);
+
     final existing = widget.existing;
     final buyers = ref.read(buyersProvider).value ?? const <Buyer>[];
+    // Read before the write for the same reason the language is: the farewell
+    // sentence needs the animal's own name and the dialog is about to be gone.
+    final animals = ref.read(animalsProvider).value ?? const <Animal>[];
+    final animalName = animalById(animals, widget.animalId)?.name;
+    final messenger = ScaffoldMessenger.of(context);
     // The loaded list, or the contact this dialog wrote a moment ago. An id
     // neither answers to is dropped rather than written, so a buyer deleted
     // while this form was open still cannot become a dangling foreign key.
     final known = _createdBuyer != null && _createdBuyer!.id == _buyerId
         ? _createdBuyer
         : buyerById(buyers, _buyerId);
-    final guarantee = _guarantee.text.trim();
-    final notes = _notes.text.trim();
-    final currency = _currency.text.trim().toUpperCase();
+    final guarantee = blankToNull(_guarantee.text);
+    final notes = blankToNull(_notes.text);
+    final currency = blankToNull(_currency.text)?.toUpperCase();
+
+    // The contract is written before the row, never after: a row that names a
+    // file nobody wrote is a handover whose document is a dead link, and the
+    // screen would promise a contract it cannot open. A refused write is a
+    // refused save, and the form stays open with everything typed in it.
+    final contractFiles = ref.read(contractFilesProvider);
+    var contractName = _contractName;
+    final picked = _pickedContract;
+    if (picked != null) {
+      try {
+        contractName = await contractFiles.store(widget.animalId, picked);
+      } on ContractRefused catch (refused) {
+        debugPrint('Contract refused: $refused');
+        if (!mounted) return;
+        setState(() => _saving = false);
+        messenger.showSnackBar(
+          SnackBar(content: Text(l10n.contractTooLarge)),
+        );
+        return;
+      } catch (error) {
+        debugPrint('Contract could not be written: $error');
+        if (!mounted) return;
+        setState(() => _saving = false);
+        messenger.showSnackBar(
+          SnackBar(content: Text(l10n.recordSaveFailed)),
+        );
+        return;
+      }
+    }
+    // The file this row used to name, removed after the new row holds. Kept
+    // until then so a save that fails leaves the old contract readable.
+    final staleContract = existing?.contractFilePath != null &&
+            existing!.contractFilePath != contractName
+        ? existing.contractFilePath!
+        : null;
 
     // Written whole instead of copied: `Placement.copyWith` can blank a price and
     // nothing else, and clearing a buyer or a date is a real edit here. The id
@@ -184,12 +298,10 @@ class _PlacementDialogState extends ConsumerState<PlacementDialog> {
       buyerId: known?.id,
       placedDate: _placedDate,
       price: _parsedPrice,
-      currency: currency.isEmpty ? null : currency,
-      guaranteeTerms: guarantee.isEmpty ? null : guarantee,
-      // No file picker in this form, so a contract path a pack brought in
-      // survives the edit rather than being blanked by it.
-      contractFilePath: existing?.contractFilePath,
-      notes: notes.isEmpty ? null : notes,
+      currency: currency,
+      guaranteeTerms: guarantee,
+      contractFilePath: contractName,
+      notes: notes,
       createdAt: existing?.createdAt ?? 0,
       updatedAt: existing?.updatedAt ?? 0,
     );
@@ -198,10 +310,82 @@ class _PlacementDialogState extends ConsumerState<PlacementDialog> {
       await savePlacement(ref, placement);
     } catch (error) {
       debugPrint('Placement save failed: $error');
+      // The file just written is now the file no row names. Put the row back the
+      // way it was, which is the state the breeder is looking at.
+      if (picked != null && contractName != null) {
+        await _discardQuietly(contractFiles, widget.animalId, contractName);
+      }
       if (mounted) _refuseSave();
       return;
     }
-    if (mounted) Navigator.of(context).pop();
+    if (staleContract != null) {
+      await _discardQuietly(contractFiles, widget.animalId, staleContract);
+    }
+    if (!mounted) return;
+    Navigator.of(context).pop();
+
+    // The one warm sentence in the app that is about a leaving, and it is said
+    // after the form is gone rather than inside it: a note pinned to the form is
+    // a note about the form, and this is about the animal. The record stays —
+    // that is the half a breeder needs to hear, because a handover reads like a
+    // deletion and is not one. Silence for a correction: the breeder who fixed a
+    // price did not send the dog anywhere.
+    if (!_isEdit && animalName != null && animalName.isNotEmpty) {
+      messenger.showSnackBar(
+        SnackBar(content: Text(l10n.placedFarewell(animalName))),
+      );
+    }
+
+    // The save may have marked the animal sold, and a sold animal's alarms are
+    // the phone's copy of a booking she no longer owns. Reconciled after the form
+    // is gone rather than in front of it: this dialog is the only path that writes
+    // a handover, so the animal form's own resync cannot know it happened, but a
+    // breeder closing a form should not wait for five reads of the ledger. Every
+    // handle below was read before the write, so nothing here touches a disposed
+    // widget.
+    unawaited(
+      _reconcileReminders(scheduler, daos, l10n, localeTag, widget.animalId),
+    );
+  }
+
+  /// A contract file whose row no longer names it, removed without a word.
+  ///
+  /// A file this app cannot delete is not a failed save: the row is written, the
+  /// breeder's handover is recorded, and what is left behind is a few hundred
+  /// kilobytes no screen reaches. Saying so would turn a housekeeping failure into
+  /// a message about her ledger.
+  static Future<void> _discardQuietly(
+    ContractFiles files,
+    String animalId,
+    String fileName,
+  ) async {
+    try {
+      await files.delete(animalId, fileName);
+    } catch (error) {
+      debugPrint('Contract $fileName not removed: $error');
+    }
+  }
+
+  static Future<void> _reconcileReminders(
+    ReminderScheduler scheduler,
+    Daos daos,
+    AppLocalizations l10n,
+    String localeTag,
+    String animalId,
+  ) async {
+    try {
+      await resyncAnimalReminders(
+        scheduler,
+        daos: daos,
+        animalId: animalId,
+        l10n: l10n,
+        dueDayText: (ms) => formatDayFor(localeTag, ms),
+      );
+    } catch (error) {
+      // The handover is saved, which is what was asked for. The next launch
+      // reads the herd again and takes another run at the alarms.
+      debugPrint('Reminder reconcile after a placement save failed: $error');
+    }
   }
 
   /// A write the database refused. The dialog stays open with the handover as
@@ -289,6 +473,55 @@ class _PlacementDialogState extends ConsumerState<PlacementDialog> {
     ],
   );
 
+  /// The attachment row: what is on file, or the two ways to add one.
+  ///
+  /// One row rather than a picker and a preview: a contract is a single document
+  /// and the form has one place for it. When something is attached the row says
+  /// what, and offers removal — a breeder who attached the wrong scan has no
+  /// other door out of the mistake.
+  Widget _contractRow(AppLocalizations l10n) {
+    final theme = Theme.of(context);
+    final picked = _pickedContract;
+    final attached = picked?.name ?? _contractName;
+
+    return ListTile(
+      contentPadding: EdgeInsets.zero,
+      leading: Icon(
+        attached == null
+            ? Icons.attach_file_outlined
+            : Icons.description_outlined,
+        color: attached == null
+            ? theme.colorScheme.onSurfaceVariant
+            : theme.colorScheme.primary,
+      ),
+      title: Text(
+        attached == null ? l10n.contractAttach : l10n.contractAttached,
+      ),
+      // The picked file's own name is shown; a name carried from an older row is
+      // shown as the file the app wrote, which is a timestamp rather than a
+      // document title. The subtitle says which of the two the breeder is
+      // looking at, because "contract.pdf" and "1770000000000-48213.pdf" mean
+      // different things about where it came from.
+      subtitle: attached == null
+          ? null
+          : Text(
+              picked?.name ?? l10n.contractStoredName,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+      trailing: attached == null
+          ? null
+          : IconButton(
+              tooltip: l10n.contractRemove,
+              icon: const Icon(Icons.close),
+              onPressed: _saving ? null : _clearContract,
+            ),
+      // Tapping the row again replaces the document. A breeder who attached the
+      // wrong scan should not have to remove it first to find that out.
+      onTap: _saving ? null : _pickContract,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -302,6 +535,9 @@ class _PlacementDialogState extends ConsumerState<PlacementDialog> {
       content: SingleChildScrollView(
         child: Form(
           key: _formKey,
+          // Re-validation on the first keystroke, not only on Save: measured
+          // on the phone as a refusal line that outlived the text that fixed it.
+          autovalidateMode: AutovalidateMode.onUserInteraction,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
@@ -366,6 +602,8 @@ class _PlacementDialogState extends ConsumerState<PlacementDialog> {
                 textCapitalization: TextCapitalization.sentences,
                 decoration: InputDecoration(labelText: l10n.animalNotes),
               ),
+              const SizedBox(height: 4),
+              _contractRow(l10n),
             ],
           ),
         ),

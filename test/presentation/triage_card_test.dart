@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_test/flutter_test.dart';
-import 'package:salala/core/utils/triage.dart';
-import 'package:salala/data/models/animal.dart';
-import 'package:salala/data/models/vaccination.dart';
-import 'package:salala/data/models/weight_entry.dart';
-import 'package:salala/presentation/screens/animal_detail_screen.dart';
-import 'package:salala/presentation/widgets/animal_card.dart';
+import 'package:companion/core/utils/triage.dart';
+import 'package:companion/data/models/animal.dart';
+import 'package:companion/data/models/vaccination.dart';
+import 'package:companion/data/models/weight_entry.dart';
+import 'package:companion/presentation/screens/animal_detail_screen.dart';
+import 'package:companion/presentation/widgets/animal_card.dart';
 
 import '../helpers/pump_app.dart';
 
@@ -61,14 +61,35 @@ Future<void> _tap(WidgetTester tester, Finder finder) async {
   await tester.pumpAndSettle();
 }
 
+/// Scrolls the ledger down to a section's own button.
+///
+/// The list is lazy and the identity card now opens with a 3:2 photograph, so
+/// the sections below it start below the fold: `ensureVisible` cannot find a
+/// widget that was never built, and a bare tap on one lands on nothing.
+Future<void> _scrollLedgerTo(WidgetTester tester, Finder finder) async {
+  await tester.scrollUntilVisible(
+    finder,
+    240,
+    scrollable: find.descendant(
+      of: find.byType(AnimalDetailScreen),
+      matching: find.byType(Scrollable),
+    ),
+  );
+  await tester.pumpAndSettle();
+}
+
 Future<void> _save(WidgetTester tester) async {
   final save = find.widgetWithText(FilledButton, 'Save');
   await tester.ensureVisible(save);
   await tester.pumpAndSettle();
   await tester.tap(save);
-  // The row is written through SQLite and the section re-reads itself
-  // afterwards, so one round of real waiting is not enough.
-  await settleRealIo(tester);
+  // The row is written through SQLite and the sections above re-read
+  // themselves afterwards. Waited for by its outcome — the form closing — since
+  // a fixed number of rounds is what made this pass alone and fail under load.
+  await settleUntil(
+    tester,
+    () => find.widgetWithText(FilledButton, 'Save').evaluate().isEmpty,
+  );
   await settleRealIo(tester);
 }
 
@@ -101,7 +122,7 @@ void main() {
     tester,
   ) async {
     _usePhoneViewport(tester);
-    await pumpSalala(tester, seed: <Animal>[_animal(ageDays: 90)]);
+    await pumpApp(tester, seed: <Animal>[_animal(ageDays: 90)]);
     await _openLedger(tester);
 
     expect(find.text('Act now'), findsOneWidget);
@@ -111,7 +132,7 @@ void main() {
     );
     expect(
       find.text(
-        'Salala reads only what you typed here. '
+        'Companion reads only what you typed here. '
         'This is not a veterinary diagnosis.',
       ),
       findsOneWidget,
@@ -122,7 +143,7 @@ void main() {
     tester,
   ) async {
     _usePhoneViewport(tester);
-    await pumpSalala(
+    await pumpApp(
       tester,
       seed: <Animal>[_animal()],
       seedVaccinations: <Vaccination>[_dose(dueInDays: 100)],
@@ -138,7 +159,7 @@ void main() {
 
   testWidgets('an overdue dose reaches the card in Arabic', (tester) async {
     _usePhoneViewport(tester);
-    await pumpSalala(
+    await pumpApp(
       tester,
       locale: const Locale('ar'),
       seed: <Animal>[_animal()],
@@ -171,7 +192,7 @@ void main() {
     // point of deriving it from the record lists instead is that this test has
     // to pass without a navigation in it.
     _usePhoneViewport(tester);
-    await pumpSalala(
+    await pumpApp(
       tester,
       seed: <Animal>[_animal()],
       seedWeights: <WeightEntry>[_weigh(1000, 25)],
@@ -183,12 +204,21 @@ void main() {
       findsOneWidget,
     );
 
-    await _tap(tester, find.widgetWithText(TextButton, 'Add weight'));
+    final addWeight = find.widgetWithText(TextButton, 'Add weight');
+    await _scrollLedgerTo(tester, addWeight);
+    await _tap(tester, addWeight);
     await tester.enterText(
       find.widgetWithText(TextFormField, 'Weight (kg)'),
       '0.8',
     );
     await _save(tester);
+
+    // The verdict is derived from the record lists, which reload after the
+    // write: waiting for the sentence itself is waiting for that reload.
+    await settleUntil(
+      tester,
+      () => find.text('Keep watching').evaluate().isNotEmpty,
+    );
 
     expect(find.text('Keep watching'), findsOneWidget);
     expect(

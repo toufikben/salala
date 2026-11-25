@@ -1,7 +1,8 @@
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:salala/services/photo_files.dart';
+import 'package:companion/services/contract_files.dart';
+import 'package:companion/services/photo_files.dart';
 
 /// D10's privacy promise is a sentence about a path, and a path in a comment is
 /// not evidence. The first version of these rules read
@@ -79,6 +80,41 @@ void main() {
 
   test('the legacy rules exclude the same folder', () {
     expectPhotosExcluded(
+      'full-backup-content',
+      File('android/app/src/main/res/xml/backup_rules.xml').readAsStringSync(),
+    );
+  });
+
+  // A contract holds a buyer's name and signature, which is the most identifying
+  // file this app ever writes. It gets the same treatment as a photograph, and
+  // the reason it is a separate assertion is that the folder name is a second
+  // constant: `contractsDirectoryName` can move without the pictures moving, and
+  // the rules would then exclude a folder nothing writes to.
+  const expectedContractDir =
+      '$documentsDirOnAndroid/$contractsDirectoryName';
+
+  void expectContractsExcluded(String label, String xml) {
+    expect(
+      homeRelativeExcludes(xml),
+      contains(expectedContractDir),
+      reason:
+          '$label does not exclude $expectedContractDir, the folder the app '
+          'keeps attached contracts in',
+    );
+  }
+
+  test('the Android 12+ rules exclude the contracts folder too', () {
+    final xml = File('android/app/src/main/res/xml/data_extraction_rules.xml')
+        .readAsStringSync();
+    expectContractsExcluded('cloud-backup', sectionOf(xml, 'cloud-backup'));
+    expectContractsExcluded(
+      'device-transfer',
+      sectionOf(xml, 'device-transfer'),
+    );
+  });
+
+  test('the legacy rules exclude the contracts folder too', () {
+    expectContractsExcluded(
       'full-backup-content',
       File('android/app/src/main/res/xml/backup_rules.xml').readAsStringSync(),
     );

@@ -14,6 +14,8 @@
 library;
 
 import '../../data/models/animal.dart';
+import '../../data/models/buyer.dart';
+import '../../data/models/placement.dart';
 
 /// The marks that change how a word is written but nobody types them from
 /// memory: tashkeel (fathatan, dammata, kasrata, sukun, shadda, madda above,
@@ -129,11 +131,32 @@ bool queryFilters(String rawQuery) => normalizeForSearch(rawQuery).isNotEmpty;
 /// different kind of answer — usually the one that settles which dog is on the
 /// table — but a partial match on a number is also how two animals come up when
 /// the query was one digit, so the exact form of it sorts above the substring.
-int _score(Animal animal, String query) {
+///
+/// Two rungs sit between the animal's own name and the numbers, because a
+/// breeder searches for a *dog* through the people and animals around it:
+/// * **a parent's name** — "which of Nala's puppies is this" is typed as the
+///   dam's name, and every puppy of hers is a right answer. It is a name hit,
+///   so it stays above the numbers, but below the animal's own name because a
+///   dog actually called Nala is the better answer to the same query.
+/// * **a buyer's name** — the ledger's other way of remembering an animal is
+///   who took her home. Below the parents because the parent is written on the
+///   animal's own card and the buyer only on a handover.
+int _score(
+  Animal animal,
+  String query, {
+  String? damName,
+  String? sireName,
+  String? buyerName,
+}) {
   final name = normalizeForSearch(animal.name);
-  if (name == query) return 6;
-  if (name.startsWith(query)) return 5;
-  if (name.contains(query)) return 4;
+  if (name == query) return 8;
+  if (name.startsWith(query)) return 7;
+  if (name.contains(query)) return 6;
+
+  for (final String? parent in <String?>[damName, sireName]) {
+    if (normalizeForSearch(parent ?? '').contains(query)) return 5;
+  }
+  if (normalizeForSearch(buyerName ?? '').contains(query)) return 4;
 
   final registration = animal.registrationNo;
   final microchip = animal.microchipId;
@@ -156,20 +179,73 @@ int _score(Animal animal, String query) {
   return 0;
 }
 
+/// Who took each animal home, by animal id, as the names a query is matched
+/// against.
+///
+/// Built once per search rather than looked up per card: a herd of two hundred
+/// against a contact list of forty is a nested scan in the middle of a keystroke
+/// otherwise. Several handovers for one animal keep the most recent buyer —
+/// [placements] is not ordered by the caller, so the newest date wins.
+Map<String, String> _buyerNamesByAnimal(
+  List<Buyer> buyers,
+  List<Placement> placements,
+) {
+  if (buyers.isEmpty || placements.isEmpty) return const <String, String>{};
+
+  final byId = <String, Buyer>{for (final buyer in buyers) buyer.id: buyer};
+  final newest = <String, (int, String)>{};
+  for (final placement in placements) {
+    final buyerId = placement.buyerId;
+    if (buyerId == null) continue;
+    final buyer = byId[buyerId];
+    if (buyer == null) continue;
+    final day = placement.placedDate ?? 0;
+    final current = newest[placement.animalId];
+    if (current == null || day >= current.$1) {
+      newest[placement.animalId] = (day, buyer.name);
+    }
+  }
+  final names = <String, String>{};
+  for (final entry in newest.entries) {
+    names[entry.key] = entry.value.$2;
+  }
+  return names;
+}
+
 /// The herd in the order a search should show it: strongest match first, and
 /// within one strength the order the list already had.
 ///
 /// An empty query returns the list untouched — the screen is the same widget
 /// before and during a search, and a search that reorders nothing is a search a
 /// breeder can read.
-List<Animal> searchHerd(List<Animal> animals, String rawQuery) {
+///
+/// [buyers] and [placements] are optional so a caller with no contact list (the
+/// litter screen, a test of the animal fields alone) keeps the older, narrower
+/// search instead of passing two empty lists to say the same thing.
+List<Animal> searchHerd(
+  List<Animal> animals,
+  String rawQuery, {
+  List<Buyer>? buyers,
+  List<Placement>? placements,
+}) {
   final query = normalizeForSearch(rawQuery);
   if (query.isEmpty) return animals;
+
+  final buyerNames = _buyerNamesByAnimal(
+    buyers ?? const <Buyer>[],
+    placements ?? const <Placement>[],
+  );
 
   final scored = <(int, int, Animal)>[];
   for (var i = 0; i < animals.length; i++) {
     final Animal animal = animals[i];
-    final int score = _score(animal, query);
+    final int score = _score(
+      animal,
+      query,
+      damName: animalById(animals, animal.damId)?.name,
+      sireName: animalById(animals, animal.sireId)?.name,
+      buyerName: buyerNames[animal.id],
+    );
     if (score > 0) scored.add((score, i, animal));
   }
   // Not `List.sort`: it is not stable, and a list that rearranges two equally good

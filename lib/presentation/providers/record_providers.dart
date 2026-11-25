@@ -2,17 +2,30 @@ import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/l10n/app_localizations.dart';
+import '../../core/utils/day_math.dart';
+import '../../core/utils/timeline.dart';
 import '../../data/models/animal.dart';
 import '../../data/models/buyer.dart';
 import '../../data/models/health_test.dart';
+import '../../data/models/litter.dart';
 import '../../data/models/photo.dart';
 import '../../data/models/placement.dart';
 import '../../data/models/symptom.dart';
 import '../../data/models/vaccination.dart';
 import '../../data/models/vet_visit.dart';
 import '../../data/models/weight_entry.dart';
+import '../../services/photo_files.dart';
 import 'agenda_providers.dart';
 import 'app_providers.dart';
+
+/// Every dose on this phone, newest first as the ledger shows them.
+///
+/// A herd-wide read, for the spreadsheet export: the CSV is one table for the
+/// accountant, not an animal's own section. The animal screens use
+/// [vaccinationsForAnimalProvider], which is a family and reads one id.
+final allVaccinationsProvider = FutureProvider.autoDispose<List<Vaccination>>(
+  (ref) => ref.read(daosProvider).vaccinations.all(),
+);
 
 /// One animal's vaccination history, newest dose first.
 ///
@@ -74,11 +87,78 @@ Future<void> deleteWeight(WidgetRef ref, WeightEntry entry) async {
   ref.invalidate(weightsForAnimalProvider(entry.animalId));
 }
 
+/// One animal's life, newest first, read from the six sections already loaded.
+///
+/// A family over the same rows rather than a table of its own: the timeline is a
+/// second *reading* of records that other screens own, so it costs the queries
+/// the page was going to make anyway and can never disagree with them.
+///
+/// The seven lists are awaited one after another rather than in parallel, which
+/// is deliberate: Riverpod hands each of them back already resolved once its own
+/// query has landed, so the cost is the slowest query and not their sum — and a
+/// `Future.wait` over families would have to cast every result back out of
+/// `Object` to pass it on. A missing animal is an empty list: the page above
+/// already says the animal is gone.
+final animalTimelineProvider = FutureProvider.autoDispose
+    .family<List<TimelineEvent>, String>((ref, animalId) async {
+      final herd = await ref.watch(animalsProvider.future);
+      Animal? animal;
+      for (final candidate in herd) {
+        if (candidate.id == animalId) {
+          animal = candidate;
+          break;
+        }
+      }
+      if (animal == null) return const <TimelineEvent>[];
+
+      final doses = await ref.watch(
+        vaccinationsForAnimalProvider(animalId).future,
+      );
+      final tests = await ref.watch(
+        healthTestsForAnimalProvider(animalId).future,
+      );
+      final visits = await ref.watch(visitsForAnimalProvider(animalId).future);
+      final weights = await ref.watch(
+        weightsForAnimalProvider(animalId).future,
+      );
+      final symptoms = await ref.watch(
+        symptomsForAnimalProvider(animalId).future,
+      );
+      final photos = await ref.watch(photosForAnimalProvider(animalId).future);
+      final placements = await ref.watch(
+        placementsForAnimalProvider(animalId).future,
+      );
+
+      return animalTimeline(
+        animal: animal,
+        vaccinations: doses,
+        healthTests: tests,
+        visits: visits,
+        weights: weights,
+        symptoms: symptoms,
+        photos: photos,
+        placements: placements,
+        // Her own whelpings come from the herd-wide list the page already
+        // watches: `litters` is one small table, and asking it per animal would
+        // be a scan per card on the herd list.
+        litters: ref.watch(littersProvider).value ?? const <Litter>[],
+      );
+    });
+
 /// One animal's pictures, oldest first — the order a growth strip reads in.
 final photosForAnimalProvider = FutureProvider.autoDispose
     .family<List<Photo>, String>(
       (ref, animalId) => ref.read(daosProvider).photos.forAnimal(animalId),
     );
+
+/// The newest picture of every animal, keyed by animal id.
+///
+/// One read for the whole herd, and the reason the herd list can be cards with
+/// faces: a per-card query would start a database call inside the frame that
+/// built that row, which is a read in the middle of a scroll.
+final herdPhotosProvider = FutureProvider.autoDispose<Map<String, Photo>>(
+  (ref) => ref.read(daosProvider).photos.newestPerAnimal(),
+);
 
 /// Where one picture's bytes actually are, or null when they are not.
 ///
@@ -101,9 +181,16 @@ final photoPathProvider = FutureProvider.autoDispose.family<String?, Photo>(
 ///
 /// Returns null when the breeder backed out of the picker — which is not a
 /// failure to report, and not a row to write.
-Future<Photo?> addPhoto(WidgetRef ref, String animalId) async {
+Future<Photo?> addPhoto(
+  WidgetRef ref,
+  String animalId, {
+  PhotoSource source = PhotoSource.gallery,
+}) async {
   final files = ref.read(photoFilesProvider);
-  final picked = await files.pick();
+  final picked = switch (source) {
+    PhotoSource.gallery => await files.pick(),
+    PhotoSource.camera => await files.capture(),
+  };
   if (picked == null) return null;
   final fileName = await files.store(animalId, picked);
   final Photo created;
@@ -125,6 +212,7 @@ Future<Photo?> addPhoto(WidgetRef ref, String animalId) async {
     rethrow;
   }
   ref.invalidate(photosForAnimalProvider(animalId));
+  ref.invalidate(herdPhotosProvider);
   return created;
 }
 
@@ -136,6 +224,7 @@ Future<Photo?> addPhoto(WidgetRef ref, String animalId) async {
 Future<void> deletePhoto(WidgetRef ref, Photo photo) async {
   await ref.read(daosProvider).photos.delete(photo.id);
   ref.invalidate(photosForAnimalProvider(photo.animalId));
+  ref.invalidate(herdPhotosProvider);
   try {
     await ref.read(photoFilesProvider).delete(photo.animalId, photo.fileName);
   } catch (error) {
@@ -228,21 +317,93 @@ final buyersProvider = FutureProvider.autoDispose<List<Buyer>>(
   (ref) => ref.read(daosProvider).buyers.alphabetical(),
 );
 
+/// Every handover on this phone, for the two screens that ask a question about
+/// all of them at once: the contact list (which animal went to whom) and the
+/// search (an animal can be remembered by its buyer's name).
+///
+/// Not a family and not derived from [placementsForAnimalProvider]: a herd-wide
+/// read is one query, and asking it per animal would be a scan per card.
+final placementsProvider = FutureProvider.autoDispose<List<Placement>>(
+  (ref) => ref.read(daosProvider).placements.all(),
+);
+
 Future<Placement> savePlacement(WidgetRef ref, Placement placement) async {
   final daos = ref.read(daosProvider);
+  final Placement saved;
   if (placement.id.isEmpty) {
-    final created = await daos.placements.create(placement);
-    ref.invalidate(placementsForAnimalProvider(created.animalId));
-    return created;
+    saved = await daos.placements.create(placement);
+  } else {
+    await daos.placements.update(placement);
+    saved = placement;
   }
-  await daos.placements.update(placement);
-  ref.invalidate(placementsForAnimalProvider(placement.animalId));
-  return placement;
+  ref.invalidate(placementsForAnimalProvider(saved.animalId));
+  ref.invalidate(placementsProvider);
+  await _syncAnimalStatusToPlacements(ref, saved.animalId);
+  return saved;
 }
 
 Future<void> deletePlacement(WidgetRef ref, Placement placement) async {
   await ref.read(daosProvider).placements.delete(placement.id);
   ref.invalidate(placementsForAnimalProvider(placement.animalId));
+  ref.invalidate(placementsProvider);
+  // A handover removed is a handover that never happened, so the animal comes
+  // back into the herd if she is still marked sold and nothing else says she
+  // left. See [_syncAnimalStatusToPlacements] for why a `deceased` animal is
+  // never touched and why a future-dated handover changes nothing.
+  await _syncAnimalStatusToPlacements(
+    ref,
+    placement.animalId,
+    reactivate: true,
+  );
+}
+
+/// Keeps `animals.status` and the handover on file saying the same thing.
+///
+/// They were two answers to one question, and only one of them was ever written:
+/// the ledger read "handed over on 3 May" while the herd list still counted the
+/// dog at home, still put her on the agenda and kept her alarm in the phone.
+/// Running this after every write to `placements` is what stops the two from
+/// drifting again.
+///
+/// A handover dated in the future does not move the status: the puppy that goes
+/// to a waiting family next month is booked, not gone, and still needs her
+/// booster while she is here. [reactivate] is set only by a delete, because that
+/// is the one path where the breeder is explicitly taking the handover back —
+/// an animal marked `retired` or `deceased` by hand keeps her own status
+/// otherwise.
+Future<void> _syncAnimalStatusToPlacements(
+  WidgetRef ref,
+  String animalId, {
+  bool reactivate = false,
+}) async {
+  final daos = ref.read(daosProvider);
+  final animal = await daos.animals.findById(animalId);
+  if (animal == null) return;
+  if (animal.status == AnimalStatus.deceased) return;
+
+  final nowMs = DateTime.now().millisecondsSinceEpoch;
+  final placements = await daos.placements.forAnimal(animalId);
+  final delivered = placements.any((p) {
+    final ms = p.placedDate;
+    return ms != null && wholeDaysBetween(ms, nowMs) >= 0;
+  });
+
+  final AnimalStatus? wanted;
+  if (delivered) {
+    wanted = AnimalStatus.sold;
+  } else if (reactivate && animal.status == AnimalStatus.sold) {
+    wanted = AnimalStatus.active;
+  } else {
+    wanted = null;
+  }
+  if (wanted == null || animal.status == wanted) return;
+
+  // Written through the dao rather than through `AnimalsController.edit`, which
+  // awaits a full re-read of the herd before it answers: the handover form is
+  // waiting behind this call, and the list is rebuilt from the invalidation
+  // below on its next read anyway.
+  await daos.animals.update(animal.copyWith(status: wanted));
+  ref.invalidate(animalsProvider);
 }
 
 /// Writes a contact and returns it as stored, because the placement form that

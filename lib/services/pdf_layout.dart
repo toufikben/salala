@@ -1,4 +1,4 @@
-/// The page furniture every Salala document shares.
+/// The page furniture every Companion document shares.
 ///
 /// These came out of `animal_pdf.dart` when the whelping record needed the same
 /// tables. A document is the one thing a buyer keeps, so two of them disagreeing

@@ -5,7 +5,9 @@ import 'package:go_router/go_router.dart';
 import '../../core/l10n/app_localizations.dart';
 import '../../core/l10n/enum_labels.dart';
 import '../../core/utils/date_utils.dart';
+import '../../core/utils/text_input.dart';
 import '../../data/models/animal.dart';
+import '../../data/models/litter.dart';
 import '../../services/reminder_resync.dart';
 import '../providers/app_providers.dart';
 import '../widgets/date_tile.dart';
@@ -39,6 +41,19 @@ class _AnimalFormScreenState extends ConsumerState<AnimalFormScreen> {
   AnimalStatus _status = AnimalStatus.active;
   bool _breedingStock = false;
   int? _birthDate;
+  int? _deathDate;
+  int? _microchipDate;
+
+  /// Who this animal came from and which whelping it belongs to.
+  ///
+  /// Four columns the schema has held since v1 that no screen could write, so a
+  /// puppy registered from a litter carried its dam and its litter only because
+  /// `createWithPuppies` stamped them, and an animal added by hand carried
+  /// neither — for ever, because `copyWith` had no way to write NULL back and
+  /// the form had no field to write a value into.
+  String? _damId;
+  String? _sireId;
+  String? _litterId;
 
   Animal? _existing;
   bool _saving = false;
@@ -71,6 +86,11 @@ class _AnimalFormScreenState extends ConsumerState<AnimalFormScreen> {
     _status = animal.status;
     _breedingStock = animal.isBreedingStock;
     _birthDate = animal.birthDate;
+    _deathDate = animal.deathDate;
+    _microchipDate = animal.microchipDate;
+    _damId = animal.damId;
+    _sireId = animal.sireId;
+    _litterId = animal.litterId;
   }
 
   @override
@@ -100,6 +120,67 @@ class _AnimalFormScreenState extends ConsumerState<AnimalFormScreen> {
     if (picked != null) setState(() => _birthDate = msFromDay(picked));
   }
 
+  Future<void> _pickDeathDate() async {
+    final now = DateTime.now();
+    // Never before the animal was born, and never in the future: a death is a
+    // day that has happened.
+    final born = dayFromMs(_birthDate);
+    final earliest = born ?? DateTime(now.year - 30);
+    final stored = dayFromMs(_deathDate);
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: stored == null || stored.isBefore(earliest) ? now : stored,
+      firstDate: earliest,
+      lastDate: now,
+    );
+    if (picked != null) setState(() => _deathDate = msFromDay(picked));
+  }
+
+  Future<void> _pickMicrochipDate() async {
+    final now = DateTime.now();
+    final born = dayFromMs(_birthDate);
+    final earliest = born ?? DateTime(now.year - 30);
+    final stored = dayFromMs(_microchipDate);
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: stored == null || stored.isBefore(earliest) ? now : stored,
+      firstDate: earliest,
+      lastDate: now,
+    );
+    if (picked != null) setState(() => _microchipDate = msFromDay(picked));
+  }
+
+  /// One parent's choices: "none", the animals of that sex, and the stored one
+  /// even if it no longer fits the filter.
+  ///
+  /// That last item matters after an edit: an animal whose sex was corrected, or
+  /// a dam who died, would otherwise leave `initialValue` naming an id the menu
+  /// does not contain — and `DropdownButton` throws on exactly that.
+  List<DropdownMenuItem<String?>> _parentItems(
+    AppLocalizations l10n,
+    List<Animal> animals,
+    Sex sex,
+    String? selected,
+  ) {
+    final pool =
+        animals.where((a) => a.id != widget.animalId && a.sex == sex).toList()
+          ..sort(
+            (a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()),
+          );
+    final missing = selected != null && !pool.any((a) => a.id == selected);
+    return <DropdownMenuItem<String?>>[
+      DropdownMenuItem<String?>(value: null, child: Text(l10n.animalNone)),
+      ...pool.map(
+        (a) => DropdownMenuItem<String?>(value: a.id, child: Text(a.name)),
+      ),
+      if (missing)
+        DropdownMenuItem<String?>(
+          value: selected,
+          child: Text(l10n.animalGone),
+        ),
+    ];
+  }
+
   Future<void> _save() async {
     final form = _formKey.currentState!;
     if (!form.validate()) {
@@ -125,17 +206,27 @@ class _AnimalFormScreenState extends ConsumerState<AnimalFormScreen> {
     final draft = base.copyWith(
       name: _name.text.trim(),
       species: _species.text.trim().toLowerCase(),
-      breed: _breed.text.trim(),
-      color: _color.text.trim(),
-      microchipId: _microchip.text.trim(),
-      registrationNo: _registrationNo.text.trim(),
-      registry: _registry.text.trim(),
-      notes: _notes.text.trim(),
+      breed: blankToNull(_breed.text),
+      color: blankToNull(_color.text),
+      microchipId: blankToNull(_microchip.text),
+      registrationNo: blankToNull(_registrationNo.text),
+      registry: blankToNull(_registry.text),
+      notes: blankToNull(_notes.text),
       sex: _sex,
       status: _status,
       isBreedingStock: _breedingStock,
       birthDate: _birthDate,
       clearBirthDate: _birthDate == null,
+      deathDate: _deathDate,
+      clearDeathDate: _deathDate == null,
+      microchipDate: _microchipDate,
+      clearMicrochipDate: _microchipDate == null,
+      damId: _damId,
+      clearDamId: _damId == null,
+      sireId: _sireId,
+      clearSireId: _sireId == null,
+      litterId: _litterId,
+      clearLitterId: _litterId == null,
     );
 
     // Read before the write rather than after it: the form is popped as soon as
@@ -201,6 +292,7 @@ class _AnimalFormScreenState extends ConsumerState<AnimalFormScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final animals = ref.watch(animalsProvider).value ?? const <Animal>[];
+    final litters = ref.watch(littersProvider).value ?? const <Litter>[];
 
     if (widget.mode == AnimalFormMode.edit) {
       final match = animals.where((a) => a.id == widget.animalId);
@@ -217,6 +309,9 @@ class _AnimalFormScreenState extends ConsumerState<AnimalFormScreen> {
       ),
       body: Form(
         key: _formKey,
+        // Re-validation on the first keystroke, not only on Save: measured
+        // on the phone as a refusal line that outlived the text that fixed it.
+        autovalidateMode: AutovalidateMode.onUserInteraction,
         // A Column inside a scroll view, deliberately not a ListView: a lazy
         // ListView drops fields outside the cache extent from the tree, and
         // Form.validate() only visits mounted fields — so an animal could be
@@ -277,9 +372,27 @@ class _AnimalFormScreenState extends ConsumerState<AnimalFormScreen> {
                       ),
                     )
                     .toList(),
-                onChanged: (value) =>
-                    setState(() => _status = value ?? _status),
+                onChanged: (value) => setState(() {
+                  _status = value ?? _status;
+                  // A death date with no death is a date the ledger would print
+                  // as fact: bringing an animal back to the herd clears it,
+                  // rather than leaving a hidden `deceased` date behind.
+                  if (_status != AnimalStatus.deceased) _deathDate = null;
+                }),
               ),
+              if (_status == AnimalStatus.deceased) ...<Widget>[
+                const SizedBox(height: 12),
+                DateTile(
+                  value: _deathDate == null
+                      ? null
+                      : formatDay(context, _deathDate),
+                  label: l10n.animalDeathDate,
+                  onPick: _pickDeathDate,
+                  onClear: _deathDate == null
+                      ? null
+                      : () => setState(() => _deathDate = null),
+                ),
+              ],
               const SizedBox(height: 12),
               DateTile(
                 value: _birthDate == null
@@ -299,6 +412,44 @@ class _AnimalFormScreenState extends ConsumerState<AnimalFormScreen> {
                 contentPadding: EdgeInsets.zero,
               ),
               const SizedBox(height: 4),
+              DropdownButtonFormField<String?>(
+                initialValue: _damId,
+                decoration: InputDecoration(labelText: l10n.litterDam),
+                items: _parentItems(l10n, animals, Sex.female, _damId),
+                onChanged: (value) => setState(() => _damId = value),
+              ),
+              const SizedBox(height: 12),
+              DropdownButtonFormField<String?>(
+                initialValue: _sireId,
+                decoration: InputDecoration(labelText: l10n.litterSire),
+                items: _parentItems(l10n, animals, Sex.male, _sireId),
+                onChanged: (value) => setState(() => _sireId = value),
+              ),
+              const SizedBox(height: 12),
+              DropdownButtonFormField<String?>(
+                initialValue: _litterId,
+                decoration: InputDecoration(labelText: l10n.animalLitter),
+                items: <DropdownMenuItem<String?>>[
+                  DropdownMenuItem<String?>(
+                    value: null,
+                    child: Text(l10n.animalNone),
+                  ),
+                  ...litters.map(
+                    (l) => DropdownMenuItem<String?>(
+                      value: l.id,
+                      child: Text(l.name),
+                    ),
+                  ),
+                  if (_litterId != null &&
+                      !litters.any((l) => l.id == _litterId))
+                    DropdownMenuItem<String?>(
+                      value: _litterId,
+                      child: Text(l10n.litterGone),
+                    ),
+                ],
+                onChanged: (value) => setState(() => _litterId = value),
+              ),
+              const SizedBox(height: 12),
               TextFormField(
                 controller: _breed,
                 textCapitalization: TextCapitalization.words,
@@ -314,6 +465,17 @@ class _AnimalFormScreenState extends ConsumerState<AnimalFormScreen> {
                 controller: _microchip,
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(labelText: l10n.animalMicrochip),
+              ),
+              const SizedBox(height: 12),
+              DateTile(
+                value: _microchipDate == null
+                    ? null
+                    : formatDay(context, _microchipDate),
+                label: l10n.animalMicrochipDate,
+                onPick: _pickMicrochipDate,
+                onClear: _microchipDate == null
+                    ? null
+                    : () => setState(() => _microchipDate = null),
               ),
               const SizedBox(height: 12),
               TextFormField(

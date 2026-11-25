@@ -1,17 +1,17 @@
 import 'package:flutter/widgets.dart' show Locale;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:salala/core/l10n/app_localizations.dart';
-import 'package:salala/core/utils/animal_rows.dart';
-import 'package:salala/data/models/animal.dart';
-import 'package:salala/data/models/buyer.dart';
-import 'package:salala/data/models/health_test.dart';
-import 'package:salala/data/models/litter.dart';
-import 'package:salala/data/models/placement.dart';
-import 'package:salala/data/models/symptom.dart';
-import 'package:salala/data/models/vaccination.dart';
-import 'package:salala/data/models/vet_visit.dart';
-import 'package:salala/data/models/weight_entry.dart';
+import 'package:companion/core/l10n/app_localizations.dart';
+import 'package:companion/core/utils/animal_rows.dart';
+import 'package:companion/data/models/animal.dart';
+import 'package:companion/data/models/buyer.dart';
+import 'package:companion/data/models/health_test.dart';
+import 'package:companion/data/models/litter.dart';
+import 'package:companion/data/models/placement.dart';
+import 'package:companion/data/models/symptom.dart';
+import 'package:companion/data/models/vaccination.dart';
+import 'package:companion/data/models/vet_visit.dart';
+import 'package:companion/data/models/weight_entry.dart';
 
 /// What the buyer's document says, before any page is drawn.
 ///
@@ -82,7 +82,7 @@ void main() {
           l10n.animalRegistry,
           l10n.animalMicrochip,
         ]);
-        expect(facts[0].$2, 'dog');
+        expect(facts[0].$2, 'Dog');
         expect(facts[1].$2, 'Canary');
         expect(facts[2].$2, l10n.sexFemale);
         expect(facts[3].$2, l10n.statusActive);

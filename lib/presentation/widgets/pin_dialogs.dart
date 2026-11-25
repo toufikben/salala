@@ -94,6 +94,10 @@ class _PinSetupDialogState extends State<_PinSetupDialog> {
 }
 
 /// Asks for the current PIN and verifies it against the stored digest.
+///
+/// Goes through `attempt` rather than `verify` because this prompt is the other
+/// door onto the same four digits: a phone passed around a market is exactly
+/// where someone tries them by hand, and only the gate used to count.
 Future<bool> askCurrentPin(BuildContext context, WidgetRef ref) async {
   final entered = await showDialog<String>(
     context: context,
@@ -101,13 +105,21 @@ Future<bool> askCurrentPin(BuildContext context, WidgetRef ref) async {
   );
   if (entered == null || entered.trim().isEmpty) return false;
 
-  final ok = await ref.read(appLockProvider).verify(entered.trim());
-  if (!ok && context.mounted) {
+  final answer = await ref.read(appLockProvider).attempt(entered.trim());
+  if (!answer.accepted && context.mounted) {
+    final wait = answer.retryAfter;
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(AppLocalizations.of(context).lockWrongPin)),
+      SnackBar(
+        content: Text(
+          wait == null
+              ? AppLocalizations.of(context).lockWrongPin
+              : AppLocalizations.of(context)
+                    .lockTooManyAttempts(wait.inSeconds),
+        ),
+      ),
     );
   }
-  return ok;
+  return answer.accepted;
 }
 
 class _PinPromptDialog extends StatefulWidget {

@@ -1,10 +1,10 @@
 import 'package:flutter/widgets.dart' show Locale;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:salala/core/l10n/app_localizations.dart';
-import 'package:salala/core/utils/date_utils.dart';
-import 'package:salala/core/utils/reminders.dart';
-import 'package:salala/services/reminder_scheduler.dart';
+import 'package:companion/core/l10n/app_localizations.dart';
+import 'package:companion/core/utils/date_utils.dart';
+import 'package:companion/core/utils/reminders.dart';
+import 'package:companion/services/reminder_scheduler.dart';
 import 'package:timezone/data/latest_all.dart' as tz_data;
 import 'package:timezone/timezone.dart' as tz;
 
@@ -39,6 +39,7 @@ void main() {
   Future<void> book({required String recordId, required int? dueMs}) {
     return scheduler.replace(
       recordId: recordId,
+      animalId: 'animal-nala',
       dueMs: dueMs,
       l10n: l10n,
       title: 'Nala',
@@ -70,7 +71,13 @@ void main() {
         writer.written.first.body,
         'Heads up: Rabies is due on 4 Dec 2026',
       );
-      expect(writer.written.last.body, 'Rabies is due today');
+      // The morning-of alarm says the task is small, because a breeder reading a
+      // bare due date at six in the morning reads it as another thing she is
+      // behind on.
+      expect(
+        writer.written.last.body,
+        'Rabies is due today. Two minutes is enough',
+      );
     });
 
     test('both alarms are inexact on purpose', () async {
@@ -88,12 +95,16 @@ void main() {
       await book(recordId: '0f1e2d3c-4b5a', dueMs: due);
 
       final day = dayFromMs(due)!;
+      // Built as a wall-clock time, not re-expressed from an instant.
+      // `TZDateTime.from(DateTime(...), tz.local)` reads the runner's local
+      // midnight-or-nine as an instant and shifts it into the pinned zone, which
+      // is the very bug `_wallClock` exists to prevent: on a runner at +01 it
+      // expected 08:00 for an alarm the phone should ring at 09:00. "Nine in the
+      // morning" is a reading of the clock, so the expectation has to be built
+      // the same way the scheduler builds it.
       expect(
         writer.written.last.at,
-        tz.TZDateTime.from(
-          DateTime(day.year, day.month, day.day, reminderHour),
-          tz.local,
-        ),
+        tz.TZDateTime(tz.local, day.year, day.month, day.day, reminderHour),
       );
       expect(writer.written.last.at.location, tz.local);
       for (final alarm in writer.written) {
@@ -146,6 +157,7 @@ void main() {
       final arabic = await AppLocalizations.delegate.load(const Locale('ar'));
       await scheduler.replace(
         recordId: '0f1e2d3c-4b5a',
+        animalId: 'animal-nala',
         dueMs: dueInSixtyDays(),
         l10n: arabic,
         title: 'نالة',
@@ -156,7 +168,19 @@ void main() {
       expect(writer.written.first.title, 'نالة');
       expect(writer.written.first.body, contains('سعار'));
       expect(writer.written.first.body, contains('٤ ديسمبر ٢٠٢٦'));
-      expect(writer.written.last.body, contains('مستحق اليوم'));
+      expect(writer.written.last.body, contains('موعدها اليوم'));
+    });
+
+    test('both mornings carry the animal the alarm is about', () async {
+      await book(recordId: '0f1e2d3c-4b5a', dueMs: dueInSixtyDays());
+
+      // The payload is the whole of the tap. A reminder says "Rabies is due" and
+      // names the dog in its title; the breeder who taps it wants that dog, not
+      // a herd to search through, so both mornings hand back her id.
+      expect(writer.written.map((alarm) => alarm.payload).toList(), <String?>[
+        'animal-nala',
+        'animal-nala',
+      ]);
     });
   });
 

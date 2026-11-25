@@ -6,8 +6,13 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart' as intl;
 
 import 'app_localizations_ar.dart';
+import 'app_localizations_de.dart';
 import 'app_localizations_en.dart';
+import 'app_localizations_es.dart';
 import 'app_localizations_fr.dart';
+import 'app_localizations_it.dart';
+import 'app_localizations_nl.dart';
+import 'app_localizations_pt.dart';
 
 // ignore_for_file: type=lint
 
@@ -96,14 +101,19 @@ abstract class AppLocalizations {
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
     Locale('ar'),
+    Locale('de'),
     Locale('en'),
+    Locale('es'),
     Locale('fr'),
+    Locale('it'),
+    Locale('nl'),
+    Locale('pt'),
   ];
 
   /// The product name; never translated.
   ///
   /// In en, this message translates to:
-  /// **'Salala'**
+  /// **'Companion'**
   String get appTitle;
 
   /// No description provided for @navAnimals.
@@ -118,11 +128,23 @@ abstract class AppLocalizations {
   /// **'Litters'**
   String get navLitters;
 
+  /// No description provided for @navBuyers.
+  ///
+  /// In en, this message translates to:
+  /// **'Buyers'**
+  String get navBuyers;
+
   /// No description provided for @navSettings.
   ///
   /// In en, this message translates to:
   /// **'Settings'**
   String get navSettings;
+
+  /// This language's own name, written in this language. The Settings menu reads each locale's value straight out of its own file, which is what makes adding a language a single .arb file and no code.
+  ///
+  /// In en, this message translates to:
+  /// **'English'**
+  String get languageName;
 
   /// No description provided for @homeEmptyTitle.
   ///
@@ -133,7 +155,7 @@ abstract class AppLocalizations {
   /// No description provided for @homeEmptyBody.
   ///
   /// In en, this message translates to:
-  /// **'Add your first dog or cat to start a health and lineage record.'**
+  /// **'A herd begins with one. Give her a name, and her record starts here.'**
   String get homeEmptyBody;
 
   /// No description provided for @homeAddAnimal.
@@ -157,7 +179,7 @@ abstract class AppLocalizations {
   /// No description provided for @homeSearchHint.
   ///
   /// In en, this message translates to:
-  /// **'Search by name, number, chip or note'**
+  /// **'Search by name, number, chip, note or buyer'**
   String get homeSearchHint;
 
   /// No description provided for @homeNoMatches.
@@ -202,6 +224,12 @@ abstract class AppLocalizations {
   /// **'Date of birth'**
   String get animalBirthDate;
 
+  /// On the animal's own page, the birth date reads as a phrase rather than as a row: it is one of the four facts in the headline under the photograph.
+  ///
+  /// In en, this message translates to:
+  /// **'Born {day}'**
+  String animalBornOn(String day);
+
   /// No description provided for @animalStatus.
   ///
   /// In en, this message translates to:
@@ -213,6 +241,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Microchip number'**
   String get animalMicrochip;
+
+  /// No description provided for @animalMicrochipDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Microchip implanted'**
+  String get animalMicrochipDate;
+
+  /// No description provided for @animalLitter.
+  ///
+  /// In en, this message translates to:
+  /// **'Litter'**
+  String get animalLitter;
+
+  /// No description provided for @animalNone.
+  ///
+  /// In en, this message translates to:
+  /// **'None'**
+  String get animalNone;
 
   /// No description provided for @animalRegistrationNo.
   ///
@@ -262,10 +308,16 @@ abstract class AppLocalizations {
   /// **'Delete {name}?'**
   String animalDeleteTitle(String name);
 
+  /// No description provided for @animalDeleteLittersNote.
+  ///
+  /// In en, this message translates to:
+  /// **'This also deletes {litters} of her whelpings, and the {puppies} puppies they registered stay in your animals without the record of their mother.'**
+  String animalDeleteLittersNote(int litters, int puppies);
+
   /// No description provided for @animalDeleteBody.
   ///
   /// In en, this message translates to:
-  /// **'Its vaccinations, health tests, weights, visits and symptoms are deleted too, with any handover recorded for it, its photographs and the files that hold them on this phone, and, if it is a dam, its whelpings. This cannot be undone.'**
+  /// **'Its vaccinations, health tests, weights, visits and symptoms are deleted too, with any handover recorded for it, its photographs and the files that hold them on this phone, and the contract attached to that handover. This cannot be undone.'**
   String get animalDeleteBody;
 
   /// No description provided for @animalNameRequired.
@@ -370,6 +422,36 @@ abstract class AppLocalizations {
   /// **'Nothing recorded yet.'**
   String get recordsEmpty;
 
+  /// One quiet line under the animal's facts on her own page. Said once, never on every card: a herd of forty dogs does not want forty mottoes. Deliberately not an instruction and not an exclamation.
+  ///
+  /// In en, this message translates to:
+  /// **'Every entry here is part of her story.'**
+  String get detailStoryLine;
+
+  /// Shown in place of the story line on an animal whose death date is recorded. Quiet, not consoling: the app is not the person to grieve with, and a longer sentence here reads as sympathy the app has not earned.
+  ///
+  /// In en, this message translates to:
+  /// **'Her record stays as it was.'**
+  String get detailDiedLine;
+
+  /// Shown once, after a handover is saved. Respects the move rather than celebrating a sale — a placed breeding dog is a loss to the kennel as much as a transaction.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} has gone to a new home. The record stays with you.'**
+  String placedFarewell(String name);
+
+  /// The month-ahead alarm. {what} is the dose or screening name as the breeder typed it, {dueDay} a localised date. The tone is a nudge between equals: no 'Don't forget', no exclamation mark, and the word 'heads up' rather than 'reminder' because a reminder implies the breeder would have forgotten.
+  ///
+  /// In en, this message translates to:
+  /// **'Heads up: {what} is due on {dueDay}'**
+  String reminderHeadsUpBody(String what, String dueDay);
+
+  /// The morning-of alarm. The second half is the whole point of the sentence: it says the task is small, because a breeder who reads a bare due-date at six in the morning reads it as another thing she is behind on.
+  ///
+  /// In en, this message translates to:
+  /// **'{what} is due today. Two minutes is enough'**
+  String reminderDueBody(String what);
+
   /// No description provided for @actionSave.
   ///
   /// In en, this message translates to:
@@ -427,7 +509,7 @@ abstract class AppLocalizations {
   /// No description provided for @lockTitle.
   ///
   /// In en, this message translates to:
-  /// **'Salala is locked'**
+  /// **'Companion is locked'**
   String get lockTitle;
 
   /// No description provided for @lockEnterPin.
@@ -502,11 +584,35 @@ abstract class AppLocalizations {
   /// **'The phone would not change the app lock.'**
   String get lockChangeFailed;
 
+  /// No description provided for @lockChangePinDone.
+  ///
+  /// In en, this message translates to:
+  /// **'PIN changed.'**
+  String get lockChangePinDone;
+
+  /// Shown while the gate refuses after repeated wrong PINs; seconds counts down to zero.
+  ///
+  /// In en, this message translates to:
+  /// **'Too many wrong PINs. Try again in {seconds}s.'**
+  String lockTooManyAttempts(int seconds);
+
   /// No description provided for @settingsAppLock.
   ///
   /// In en, this message translates to:
   /// **'App lock'**
   String get settingsAppLock;
+
+  /// No description provided for @settingsChangePin.
+  ///
+  /// In en, this message translates to:
+  /// **'Change PIN'**
+  String get settingsChangePin;
+
+  /// No description provided for @settingsChangePinBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the current PIN, then choose a new one.'**
+  String get settingsChangePinBody;
 
   /// No description provided for @settingsLanguage.
   ///
@@ -529,7 +635,7 @@ abstract class AppLocalizations {
   /// No description provided for @startupFailedTitle.
   ///
   /// In en, this message translates to:
-  /// **'Salala could not open the ledger on this phone.'**
+  /// **'Companion could not open the ledger on this phone.'**
   String get startupFailedTitle;
 
   /// No description provided for @startupFailedBody.
@@ -543,6 +649,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'About'**
   String get settingsAbout;
+
+  /// The row's title on Settings. Rendered only when kBillingEnabled is true, so a free install never sees the word trial at all.
+  ///
+  /// In en, this message translates to:
+  /// **'Free trial'**
+  String get settingsTrial;
+
+  /// Days left in the trial. Whole days, never a countdown, because a clock that ticks on a settings row is a pressure the breeder did not ask for.
+  ///
+  /// In en, this message translates to:
+  /// **'{days} days left'**
+  String settingsTrialRemaining(String days);
+
+  /// Said once the trial has run out. Deliberately not a call to buy: the export that used to work still opens, and the sentence is a fact rather than a pitch.
+  ///
+  /// In en, this message translates to:
+  /// **'The trial has ended'**
+  String get settingsTrialOver;
 
   /// No description provided for @settingsBuildTag.
   ///
@@ -565,7 +689,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsExportBody.
   ///
   /// In en, this message translates to:
-  /// **'One JSON file with every record on this phone'**
+  /// **'One ZIP file with every record and picture on this phone'**
   String get settingsExportBody;
 
   /// No description provided for @settingsImport.
@@ -579,6 +703,108 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Read a pack back onto this phone'**
   String get settingsImportBody;
+
+  /// Said under the export tile. The point is that the breeder can see how stale their only copy is — an app that never mentions it is an app where the last backup was eight months ago.
+  ///
+  /// In en, this message translates to:
+  /// **'Last backup: {day}'**
+  String settingsLastBackup(String day);
+
+  /// No description provided for @settingsNeverBackedUp.
+  ///
+  /// In en, this message translates to:
+  /// **'No backup has left this phone yet'**
+  String get settingsNeverBackedUp;
+
+  /// No description provided for @settingsCsv.
+  ///
+  /// In en, this message translates to:
+  /// **'Spreadsheet (CSV)'**
+  String get settingsCsv;
+
+  /// No description provided for @settingsCsvBody.
+  ///
+  /// In en, this message translates to:
+  /// **'For your accountant, a registry form, or a co-owner. Opens in Excel, Numbers or Google Sheets.'**
+  String get settingsCsvBody;
+
+  /// No description provided for @settingsCsvHerd.
+  ///
+  /// In en, this message translates to:
+  /// **'Animals'**
+  String get settingsCsvHerd;
+
+  /// No description provided for @settingsCsvLitters.
+  ///
+  /// In en, this message translates to:
+  /// **'Litters'**
+  String get settingsCsvLitters;
+
+  /// No description provided for @settingsCsvVaccinations.
+  ///
+  /// In en, this message translates to:
+  /// **'Vaccinations'**
+  String get settingsCsvVaccinations;
+
+  /// No description provided for @settingsCsvPlacements.
+  ///
+  /// In en, this message translates to:
+  /// **'Handovers'**
+  String get settingsCsvPlacements;
+
+  /// No description provided for @csvShared.
+  ///
+  /// In en, this message translates to:
+  /// **'{file} is ready to send'**
+  String csvShared(String file);
+
+  /// No description provided for @csvShareFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'The sheet could not be written on this phone'**
+  String get csvShareFailed;
+
+  /// No description provided for @csvEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'There is nothing on this phone to export yet'**
+  String get csvEmpty;
+
+  /// Column heading: the animal a vaccination or a handover belongs to. Reused by every sheet that is not the herd's own, where the row already is one animal.
+  ///
+  /// In en, this message translates to:
+  /// **'Animal'**
+  String get csvColAnimal;
+
+  /// Column heading for the buyer's two-letter country code.
+  ///
+  /// In en, this message translates to:
+  /// **'Country'**
+  String get csvColCountry;
+
+  /// Column heading for how many puppies a whelping registered.
+  ///
+  /// In en, this message translates to:
+  /// **'Puppies'**
+  String get csvColPuppies;
+
+  /// Column heading, answered yes or no by the two keys below. Shorter than the form's own checkbox label because it is a heading over a column of yes/no.
+  ///
+  /// In en, this message translates to:
+  /// **'Breeding stock'**
+  String get csvColBreedingStock;
+
+  /// The answer in a yes/no column. Lower case, because it read as a word in a cell rather than as a label.
+  ///
+  /// In en, this message translates to:
+  /// **'yes'**
+  String get csvColYes;
+
+  /// No description provided for @csvColNo.
+  ///
+  /// In en, this message translates to:
+  /// **'no'**
+  String get csvColNo;
 
   /// No description provided for @packShared.
   ///
@@ -601,13 +827,13 @@ abstract class AppLocalizations {
   /// No description provided for @packNotAPack.
   ///
   /// In en, this message translates to:
-  /// **'That file is not a Salala pack, or it is damaged'**
+  /// **'That file is not a Companion pack, or it is damaged'**
   String get packNotAPack;
 
   /// No description provided for @packFromTheFuture.
   ///
   /// In en, this message translates to:
-  /// **'That pack comes from a newer Salala than this one'**
+  /// **'That pack comes from a newer Companion than this one'**
   String get packFromTheFuture;
 
   /// No description provided for @packIncomplete.
@@ -619,8 +845,14 @@ abstract class AppLocalizations {
   /// No description provided for @packUnknownTable.
   ///
   /// In en, this message translates to:
-  /// **'That pack holds a table this Salala does not know: {table}'**
+  /// **'That pack holds a table this Companion does not know: {table}'**
   String packUnknownTable(String table);
+
+  /// A row whose word is not one the app stores, e.g. an animal status it does not know. Refused before anything is written, so the ledger on this phone is untouched.
+  ///
+  /// In en, this message translates to:
+  /// **'That pack holds a value this Companion cannot read: {detail}'**
+  String packBadValue(String detail);
 
   /// No description provided for @packRestoreTitle.
   ///
@@ -651,6 +883,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'New litter'**
   String get litterAdd;
+
+  /// No description provided for @litterEditTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit litter'**
+  String get litterEditTitle;
+
+  /// No description provided for @litterAddPuppies.
+  ///
+  /// In en, this message translates to:
+  /// **'Add puppies'**
+  String get litterAddPuppies;
+
+  /// No description provided for @litterHowMany.
+  ///
+  /// In en, this message translates to:
+  /// **'How many?'**
+  String get litterHowMany;
 
   /// No description provided for @litterAddTitle.
   ///
@@ -753,6 +1003,198 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Expected whelping: {date}'**
   String litterExpected(String date);
+
+  /// Title of the page that adds the whole ledger up.
+  ///
+  /// In en, this message translates to:
+  /// **'The kennel in numbers'**
+  String get statsTitle;
+
+  /// The Settings row that opens the statistics page.
+  ///
+  /// In en, this message translates to:
+  /// **'The kennel in numbers'**
+  String get settingsStats;
+
+  /// Heading over the counts of animals currently kept.
+  ///
+  /// In en, this message translates to:
+  /// **'Who is here'**
+  String get statsHerdGroup;
+
+  /// Heading over the whelping and puppy counts.
+  ///
+  /// In en, this message translates to:
+  /// **'Whelpings and puppies'**
+  String get statsBreedingGroup;
+
+  /// Heading over the handover counts and the money taken.
+  ///
+  /// In en, this message translates to:
+  /// **'Handovers'**
+  String get statsMoneyGroup;
+
+  /// How many animals are currently kept, including retired ones.
+  ///
+  /// In en, this message translates to:
+  /// **'Animals at home'**
+  String get statsAtHome;
+
+  /// How many animals are flagged as breeding stock.
+  ///
+  /// In en, this message translates to:
+  /// **'Breeding stock'**
+  String get statsBreedingStock;
+
+  /// How many females are currently kept.
+  ///
+  /// In en, this message translates to:
+  /// **'Females at home'**
+  String get statsFemales;
+
+  /// How many males are currently kept.
+  ///
+  /// In en, this message translates to:
+  /// **'Males at home'**
+  String get statsMales;
+
+  /// Every animal row the ledger holds, including sold and dead ones.
+  ///
+  /// In en, this message translates to:
+  /// **'Ever recorded'**
+  String get statsEverRecorded;
+
+  /// How many litters have a whelping date on file.
+  ///
+  /// In en, this message translates to:
+  /// **'Whelpings on file'**
+  String get statsWhelpings;
+
+  /// How many animals in the ledger were born into one of these litters.
+  ///
+  /// In en, this message translates to:
+  /// **'Puppies from your litters'**
+  String get statsPuppies;
+
+  /// Puppies whose birth date falls in the current calendar year.
+  ///
+  /// In en, this message translates to:
+  /// **'Puppies born in {year}'**
+  String statsPuppiesThisYear(String year);
+
+  /// How many handovers are on file.
+  ///
+  /// In en, this message translates to:
+  /// **'Handovers'**
+  String get statsPlacements;
+
+  /// Label for a total whose handovers had no currency typed. Never guessed.
+  ///
+  /// In en, this message translates to:
+  /// **'No currency named'**
+  String get statsUnnamedCurrency;
+
+  /// How many of the handovers carried a price.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} of them paid'**
+  String statsHandoverCount(String count);
+
+  /// Said instead of a total when no handover has a price.
+  ///
+  /// In en, this message translates to:
+  /// **'No price recorded'**
+  String get statsNoRevenue;
+
+  /// Closing line: the numbers were computed from the local ledger and never leave the phone.
+  ///
+  /// In en, this message translates to:
+  /// **'Counted from your own ledger, on this phone. Nothing here leaves it.'**
+  String get statsFooter;
+
+  /// Heading of the card listing animals whose birthday is close.
+  ///
+  /// In en, this message translates to:
+  /// **'Coming up'**
+  String get birthdayTitle;
+
+  /// A birthday that is today.
+  ///
+  /// In en, this message translates to:
+  /// **'today'**
+  String get birthdayToday;
+
+  /// How far away a birthday is.
+  ///
+  /// In en, this message translates to:
+  /// **'in {days}'**
+  String birthdayIn(String days);
+
+  /// An animal's name and the age she turns.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} turns {years}'**
+  String birthdayTurning(String name, String years);
+
+  /// Heading of the card that forecasts a dam's next season. Deliberately not the word for a medical event: a breeder is planning, not diagnosing.
+  ///
+  /// In en, this message translates to:
+  /// **'Next heat'**
+  String get heatCardTitle;
+
+  /// The forecast, as a range. A window rather than a date because the cycle length varies by a fortnight between seasons even in one bitch.
+  ///
+  /// In en, this message translates to:
+  /// **'Between {earliest} and {latest}'**
+  String heatCardWindow(String earliest, String latest);
+
+  /// Said when the forecast rests on more than one observed gap, so the breeder knows it came from her own record rather than a breed standard.
+  ///
+  /// In en, this message translates to:
+  /// **'Based on {count} cycles in her own record.'**
+  String heatCardSteady(String count);
+
+  /// Said when only one gap is on file. States the weakness of the estimate plainly instead of dressing a coincidence up as a pattern.
+  ///
+  /// In en, this message translates to:
+  /// **'Only one cycle on file, so the window is wide. Record another mating and it narrows.'**
+  String get heatCardThin;
+
+  /// The date a mating inside the window would be expected to whelp. The reason the card exists: a breeder planning a mating is planning a whelping.
+  ///
+  /// In en, this message translates to:
+  /// **'A mating in this window would whelp around {day}.'**
+  String heatCardWhelping(String day);
+
+  /// Title of the dialog that writes one dose for several animals at once. Said when the vial is open and the breeder is holding one puppy after another, so it must read as one sitting rather than several saves.
+  ///
+  /// In en, this message translates to:
+  /// **'Vaccinate together'**
+  String get bulkVaccineTitle;
+
+  /// How many animals are about to receive the dose. Shown above the names so a wrong litter is caught before nine rows are written.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} animals get the same dose'**
+  String bulkVaccineCount(String count);
+
+  /// The button that opens the bulk dialog from a litter's page.
+  ///
+  /// In en, this message translates to:
+  /// **'Vaccinate the litter'**
+  String get bulkVaccineAction;
+
+  /// Said after a bulk write succeeded. States how many rows landed, because that count is what the breeder will check against the puppies in front of her.
+  ///
+  /// In en, this message translates to:
+  /// **'Recorded for {count} animals'**
+  String bulkVaccineDone(String count);
+
+  /// Heading of the tree card on a litter's page: two parents, the litter, the puppies. Short, because it sits above a drawing rather than a table.
+  ///
+  /// In en, this message translates to:
+  /// **'Pedigree'**
+  String get pedigreeTitle;
 
   /// No description provided for @litterPuppyCount.
   ///
@@ -1264,6 +1706,18 @@ abstract class AppLocalizations {
   /// **'Add photo'**
   String get photoAdd;
 
+  /// No description provided for @photoFromGallery.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose from the gallery'**
+  String get photoFromGallery;
+
+  /// No description provided for @photoFromCamera.
+  ///
+  /// In en, this message translates to:
+  /// **'Take a photo'**
+  String get photoFromCamera;
+
   /// A photo is the only record here whose row and bytes are two different things, so the sentence says both go.
   ///
   /// In en, this message translates to:
@@ -1348,6 +1802,60 @@ abstract class AppLocalizations {
   /// **'Guarantee terms'**
   String get placementGuarantee;
 
+  /// The row that attaches a document to a handover, when none is attached yet.
+  ///
+  /// In en, this message translates to:
+  /// **'Attach a contract'**
+  String get contractAttach;
+
+  /// Said once a document is attached to the handover.
+  ///
+  /// In en, this message translates to:
+  /// **'Contract attached'**
+  String get contractAttached;
+
+  /// Shown instead of a file name for a document attached on an earlier visit, whose original name was not kept.
+  ///
+  /// In en, this message translates to:
+  /// **'A document you attached earlier'**
+  String get contractStoredName;
+
+  /// Tooltip of the button that detaches the contract.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove the contract'**
+  String get contractRemove;
+
+  /// Tooltip of the button that hands the stored document to another app.
+  ///
+  /// In en, this message translates to:
+  /// **'Open the contract'**
+  String get contractOpen;
+
+  /// The row names a document, but the file is not on this phone - the usual case after restoring a backup on a second phone.
+  ///
+  /// In en, this message translates to:
+  /// **'That document is not on this phone'**
+  String get contractMissing;
+
+  /// The document exists but could not be read or handed on.
+  ///
+  /// In en, this message translates to:
+  /// **'The document could not be opened'**
+  String get contractOpenFailed;
+
+  /// The phone's file picker refused or threw.
+  ///
+  /// In en, this message translates to:
+  /// **'No document could be chosen'**
+  String get contractPickFailed;
+
+  /// The chosen file is larger than the app will store.
+  ///
+  /// In en, this message translates to:
+  /// **'That file is too big to keep'**
+  String get contractTooLarge;
+
   /// No description provided for @placementDeleteBody.
   ///
   /// In en, this message translates to:
@@ -1390,23 +1898,29 @@ abstract class AppLocalizations {
   /// **'Country code'**
   String get buyerCountryCode;
 
+  /// No description provided for @buyersEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No buyers yet'**
+  String get buyersEmptyTitle;
+
+  /// No description provided for @buyersEmptyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'A buyer is added with a handover — or here, before one: the person you sold to last year still wants the pedigree.'**
+  String get buyersEmptyBody;
+
+  /// No description provided for @buyersNoAnimals.
+  ///
+  /// In en, this message translates to:
+  /// **'No animal on file for this contact'**
+  String get buyersNoAnimals;
+
   /// Said before a contact is deleted, and it has to say what survives: the placement row is kept with its buyer blanked (`ON DELETE SET NULL`), because the fact that an animal went to someone is the breeder's record, while the name and phone belong to the person who can ask for them back.
   ///
   /// In en, this message translates to:
   /// **'{name} is removed from your contacts. The handover stays in the animal\'s history, with no buyer named. This cannot be undone.'**
   String buyerDeleteBody(String name);
-
-  /// The month-ahead alarm. {what} is the dose or screening name as the breeder typed it, {dueDay} a localised date.
-  ///
-  /// In en, this message translates to:
-  /// **'Heads up: {what} is due on {dueDay}'**
-  String reminderHeadsUpBody(String what, String dueDay);
-
-  /// No description provided for @reminderDueBody.
-  ///
-  /// In en, this message translates to:
-  /// **'{what} is due today'**
-  String reminderDueBody(String what);
 
   /// No description provided for @pdfAction.
   ///
@@ -1507,7 +2021,7 @@ abstract class AppLocalizations {
   /// No description provided for @pdfDisclaimer.
   ///
   /// In en, this message translates to:
-  /// **'Produced offline by Salala from the breeder\'s own records. This is not a veterinary certificate.'**
+  /// **'Produced offline by Companion from the breeder\'s own records. This is not a veterinary certificate.'**
   String get pdfDisclaimer;
 
   /// No description provided for @triageTitle.
@@ -1543,7 +2057,7 @@ abstract class AppLocalizations {
   /// No description provided for @triageNotDiagnosis.
   ///
   /// In en, this message translates to:
-  /// **'Salala reads only what you typed here. This is not a veterinary diagnosis.'**
+  /// **'Companion reads only what you typed here. This is not a veterinary diagnosis.'**
   String get triageNotDiagnosis;
 
   /// No description provided for @triageNoDoseYoung.
@@ -1563,6 +2077,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{name} is due in {days}'**
   String triageDoseDueSoon(String name, String days);
+
+  /// The triage card's wording for a dose whose day is today. Deliberately the bare sentence, unlike the notification: this card sits in a column of findings, and a reassurance repeated down the column stops being one. The card already carries its urgency and its action.
+  ///
+  /// In en, this message translates to:
+  /// **'{what} is due today'**
+  String triageDoseToday(String what);
 
   /// No description provided for @triageWeightLossPuppy.
   ///
@@ -1630,11 +2150,725 @@ abstract class AppLocalizations {
   /// **'{n} days'**
   String daysDual(String n);
 
+  /// No description provided for @onboardingSlide1Title.
+  ///
+  /// In en, this message translates to:
+  /// **'One record per animal'**
+  String get onboardingSlide1Title;
+
+  /// No description provided for @onboardingSlide1Body.
+  ///
+  /// In en, this message translates to:
+  /// **'A dog or a cat, its breed, its birth date and where it came from. The first one takes under a minute.'**
+  String get onboardingSlide1Body;
+
+  /// No description provided for @onboardingSlide2Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Its health, in order'**
+  String get onboardingSlide2Title;
+
+  /// No description provided for @onboardingSlide2Body.
+  ///
+  /// In en, this message translates to:
+  /// **'Vaccinations with their next due date, weigh-ins, screenings and vet visits. Companion books the reminder for you.'**
+  String get onboardingSlide2Body;
+
+  /// No description provided for @onboardingSlide3Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Its story travels with it'**
+  String get onboardingSlide3Title;
+
+  /// No description provided for @onboardingSlide3Body.
+  ///
+  /// In en, this message translates to:
+  /// **'A PDF or a spreadsheet for the buyer, and one ZIP that carries every record and picture to a new phone.'**
+  String get onboardingSlide3Body;
+
+  /// No description provided for @onboardingSkip.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip'**
+  String get onboardingSkip;
+
+  /// No description provided for @onboardingNext.
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get onboardingNext;
+
+  /// No description provided for @onboardingStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Add my first animal'**
+  String get onboardingStart;
+
+  /// No description provided for @settingsOnboarding.
+  ///
+  /// In en, this message translates to:
+  /// **'Show the introduction again'**
+  String get settingsOnboarding;
+
+  /// No description provided for @settingsHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Help'**
+  String get settingsHelp;
+
+  /// No description provided for @settingsRate.
+  ///
+  /// In en, this message translates to:
+  /// **'Rate Companion'**
+  String get settingsRate;
+
+  /// No description provided for @settingsRateBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Opens this store\'s own review card.'**
+  String get settingsRateBody;
+
+  /// No description provided for @settingsWhatsNew.
+  ///
+  /// In en, this message translates to:
+  /// **'What\'s new'**
+  String get settingsWhatsNew;
+
+  /// No description provided for @settingsPrivacy.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy'**
+  String get settingsPrivacy;
+
+  /// No description provided for @settingsTerms.
+  ///
+  /// In en, this message translates to:
+  /// **'Terms of use'**
+  String get settingsTerms;
+
+  /// No description provided for @settingsLicenses.
+  ///
+  /// In en, this message translates to:
+  /// **'Open-source licences'**
+  String get settingsLicenses;
+
+  /// No description provided for @rateUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'This phone cannot show the review card right now.'**
+  String get rateUnavailable;
+
+  /// No description provided for @aboutTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'About Companion'**
+  String get aboutTitle;
+
+  /// No description provided for @aboutBody.
+  ///
+  /// In en, this message translates to:
+  /// **'An offline ledger for a small kennel or cattery. No account, no server, no tracking — the records live on this phone and leave it only through your own hands.'**
+  String get aboutBody;
+
+  /// No description provided for @aboutVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'Version {version}'**
+  String aboutVersion(String version);
+
+  /// No description provided for @privacyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy'**
+  String get privacyTitle;
+
+  /// No description provided for @privacyIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Companion holds one kind of data: what you typed about your animals. This page says where it sits and what can take it off this phone.'**
+  String get privacyIntro;
+
+  /// No description provided for @privacyStoredHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'What is stored'**
+  String get privacyStoredHeading;
+
+  /// No description provided for @privacyStoredBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Every animal, dose, weigh-in, screening, visit, symptom, handover and buyer contact — and the photographs you attached — in a database and a picture folder inside this app\'s private storage. Android keeps that folder out of reach of other apps, and the files are not encrypted beyond that.'**
+  String get privacyStoredBody;
+
+  /// No description provided for @privacyBackupHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'What leaves this phone'**
+  String get privacyBackupHeading;
+
+  /// No description provided for @privacyBackupBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Only what you export: a ZIP with every record and picture, a CSV of one table, or a PDF of one animal. Each goes wherever you send it, so a backup carries your buyers\' names and phone numbers — treat the file the way you would the paper it replaces. Turn on the app lock if the phone travels.'**
+  String get privacyBackupBody;
+
+  /// No description provided for @privacyCollectHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'What is collected about you'**
+  String get privacyCollectHeading;
+
+  /// No description provided for @privacyCollectBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing. There is no analytics, no crash reporting, no advertising identifier and no network call in this app.'**
+  String get privacyCollectBody;
+
+  /// No description provided for @privacyRemoveHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'How to erase it'**
+  String get privacyRemoveHeading;
+
+  /// No description provided for @privacyRemoveBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Uninstalling removes the database and the picture folder with it. There is no copy anywhere else, so export a pack first if the records matter — and remember that the app lock\'s PIN cannot be recovered either.'**
+  String get privacyRemoveBody;
+
+  /// No description provided for @termsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Terms of use'**
+  String get termsTitle;
+
+  /// No description provided for @termsUseHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'What this app is for'**
+  String get termsUseHeading;
+
+  /// No description provided for @termsUseBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Keeping your own records about the animals in your care. One licence per person; install it on the phones you use.'**
+  String get termsUseBody;
+
+  /// No description provided for @termsDataHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Your data is yours'**
+  String get termsDataHeading;
+
+  /// No description provided for @termsDataBody.
+  ///
+  /// In en, this message translates to:
+  /// **'We hold no copy of it and cannot restore it. Backups are your responsibility, and the export tile in Settings is the whole mechanism.'**
+  String get termsDataBody;
+
+  /// No description provided for @termsAdviceHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Not veterinary advice'**
+  String get termsAdviceHeading;
+
+  /// No description provided for @termsAdviceBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Companion repeats what you typed and applies arithmetic to dates and weights. It does not diagnose, and a reminder is a calendar entry, not a clinical opinion. Call a veterinarian.'**
+  String get termsAdviceBody;
+
+  /// No description provided for @termsWarrantyHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'No warranty'**
+  String get termsWarrantyHeading;
+
+  /// No description provided for @termsWarrantyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The app is provided as it is. To the extent the law allows, no liability is accepted for a lost record, a missed reminder or a decision taken on what is written here.'**
+  String get termsWarrantyBody;
+
+  /// No description provided for @helpTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Help'**
+  String get helpTitle;
+
+  /// No description provided for @helpQ1.
+  ///
+  /// In en, this message translates to:
+  /// **'How do I back up?'**
+  String get helpQ1;
+
+  /// No description provided for @helpA1.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings, then Export records. The ZIP file carries every row and every picture; send it to yourself and keep it. Restoring reads the same file back on any phone.'**
+  String get helpA1;
+
+  /// No description provided for @helpQ2.
+  ///
+  /// In en, this message translates to:
+  /// **'I forgot my PIN'**
+  String get helpQ2;
+
+  /// No description provided for @helpA2.
+  ///
+  /// In en, this message translates to:
+  /// **'It cannot be recovered, because only a hash of it is stored. Uninstalling the app clears the lock and the ledger with it, so if you have a recent pack, restore that afterwards.'**
+  String get helpA2;
+
+  /// No description provided for @helpQ3.
+  ///
+  /// In en, this message translates to:
+  /// **'I lost my phone'**
+  String get helpQ3;
+
+  /// No description provided for @helpA3.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing is on a server, so nothing can be sent back. A pack you exported earlier restores the ledger on a new phone; one you never exported is gone.'**
+  String get helpA3;
+
+  /// No description provided for @helpQ4.
+  ///
+  /// In en, this message translates to:
+  /// **'Where do the reminders come from?'**
+  String get helpQ4;
+
+  /// No description provided for @helpA4.
+  ///
+  /// In en, this message translates to:
+  /// **'From the next-due dates you typed. Companion books an alarm a month ahead and one on the morning itself; if notifications are switched off for the app, the dates still show in the herd\'s agenda.'**
+  String get helpA4;
+
+  /// No description provided for @helpQ5.
+  ///
+  /// In en, this message translates to:
+  /// **'Why does a picture say it is not on this phone?'**
+  String get helpQ5;
+
+  /// No description provided for @helpA5.
+  ///
+  /// In en, this message translates to:
+  /// **'The row survived and the file did not — usually after a restore from a pack that carried no pictures. Adding the photo again fixes it.'**
+  String get helpA5;
+
+  /// No description provided for @helpQ6.
+  ///
+  /// In en, this message translates to:
+  /// **'Can I hand over the animal\'s record?'**
+  String get helpQ6;
+
+  /// No description provided for @helpA6.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes. Open the animal and export its PDF: a fixed document the buyer can keep without this app. The handover itself is recorded on the same page.'**
+  String get helpA6;
+
+  /// No description provided for @helpQ7.
+  ///
+  /// In en, this message translates to:
+  /// **'Which languages are there?'**
+  String get helpQ7;
+
+  /// No description provided for @helpA7.
+  ///
+  /// In en, this message translates to:
+  /// **'English, Arabic, French, German, Spanish, Italian, Portuguese and Dutch. Settings, then Language — the change applies immediately.'**
+  String get helpA7;
+
+  /// No description provided for @helpQ8.
+  ///
+  /// In en, this message translates to:
+  /// **'Something is wrong with the app'**
+  String get helpQ8;
+
+  /// No description provided for @helpA8.
+  ///
+  /// In en, this message translates to:
+  /// **'Write to us and say what you were doing when it happened. The version is on the About page.'**
+  String get helpA8;
+
+  /// No description provided for @helpContactHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Write to us'**
+  String get helpContactHeading;
+
+  /// No description provided for @whatsNewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What\'s new'**
+  String get whatsNewTitle;
+
+  /// No description provided for @whatsNew1.
+  ///
+  /// In en, this message translates to:
+  /// **'Photographs on the herd cards, and a warmer, roomier layout throughout.'**
+  String get whatsNew1;
+
+  /// No description provided for @whatsNew2.
+  ///
+  /// In en, this message translates to:
+  /// **'A tapped reminder opens the animal it is about.'**
+  String get whatsNew2;
+
+  /// No description provided for @whatsNew3.
+  ///
+  /// In en, this message translates to:
+  /// **'The spreadsheet export speaks the language you are reading.'**
+  String get whatsNew3;
+
+  /// No description provided for @whatsNew4.
+  ///
+  /// In en, this message translates to:
+  /// **'Five more languages: German, Spanish, Italian, Portuguese and Dutch.'**
+  String get whatsNew4;
+
+  /// No description provided for @whatsNew5.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy, terms and help pages, and a rating row in Settings.'**
+  String get whatsNew5;
+
+  /// No description provided for @whatsNew6.
+  ///
+  /// In en, this message translates to:
+  /// **'One list per animal: every dose, weigh-in, visit and handover in date order.'**
+  String get whatsNew6;
+
+  /// No description provided for @timelineTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What happened'**
+  String get timelineTitle;
+
+  /// No description provided for @timelineEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing dated yet.'**
+  String get timelineEmpty;
+
+  /// No description provided for @timelineShowAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Show all {count}'**
+  String timelineShowAll(String count);
+
+  /// No description provided for @timelineShowLess.
+  ///
+  /// In en, this message translates to:
+  /// **'Show fewer'**
+  String get timelineShowLess;
+
+  /// No description provided for @timelineKindBorn.
+  ///
+  /// In en, this message translates to:
+  /// **'Born'**
+  String get timelineKindBorn;
+
+  /// No description provided for @timelineKindDied.
+  ///
+  /// In en, this message translates to:
+  /// **'Died'**
+  String get timelineKindDied;
+
+  /// No description provided for @timelineKindWhelped.
+  ///
+  /// In en, this message translates to:
+  /// **'Whelped'**
+  String get timelineKindWhelped;
+
+  /// No description provided for @timelineKindVaccination.
+  ///
+  /// In en, this message translates to:
+  /// **'Vaccination'**
+  String get timelineKindVaccination;
+
+  /// No description provided for @timelineKindHealthTest.
+  ///
+  /// In en, this message translates to:
+  /// **'Health test'**
+  String get timelineKindHealthTest;
+
+  /// No description provided for @timelineKindVisit.
+  ///
+  /// In en, this message translates to:
+  /// **'Vet visit'**
+  String get timelineKindVisit;
+
+  /// No description provided for @timelineKindSymptom.
+  ///
+  /// In en, this message translates to:
+  /// **'Symptom'**
+  String get timelineKindSymptom;
+
+  /// No description provided for @timelineKindWeight.
+  ///
+  /// In en, this message translates to:
+  /// **'Weigh-in'**
+  String get timelineKindWeight;
+
+  /// No description provided for @timelineKindPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo'**
+  String get timelineKindPhoto;
+
+  /// No description provided for @timelineKindPlacement.
+  ///
+  /// In en, this message translates to:
+  /// **'Handed over'**
+  String get timelineKindPlacement;
+
   /// No description provided for @daysPlural.
   ///
   /// In en, this message translates to:
   /// **'{n} days'**
   String daysPlural(String n);
+
+  /// No description provided for @onboardingLittersTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Every litter, from mating to weaning'**
+  String get onboardingLittersTitle;
+
+  /// No description provided for @onboardingLittersBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Date the mating and Companion gives you a whelping window, not a guess. Then every puppy, its sex, its colour and its birth weight.'**
+  String get onboardingLittersBody;
+
+  /// No description provided for @onboardingPedigreeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'The pedigree on one page'**
+  String get onboardingPedigreeTitle;
+
+  /// No description provided for @onboardingPedigreeBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Sire, dam and grandparents drawn as a tree, printed beside the health record. Enough for a buyer, without paying a registry.'**
+  String get onboardingPedigreeBody;
+
+  /// No description provided for @onboardingBuyersTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Who is waiting, who has paid'**
+  String get onboardingBuyersTitle;
+
+  /// No description provided for @onboardingBuyersBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Deposits, the puppy each buyer chose, the day it went home, and the signed contract filed with it.'**
+  String get onboardingBuyersBody;
+
+  /// No description provided for @onboardingYoursTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Nobody else\'s server'**
+  String get onboardingYoursTitle;
+
+  /// No description provided for @onboardingYoursBody.
+  ///
+  /// In en, this message translates to:
+  /// **'No account, no ads, no tracking. Works in a shed with no signal, and your records leave the phone only when you export them.'**
+  String get onboardingYoursBody;
+
+  /// No description provided for @onboardingSupportTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Made by one person'**
+  String get onboardingSupportTitle;
+
+  /// No description provided for @onboardingSupportBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Companion is built by a single programmer, not a company. No ads and no investors. If it earns its place in your kennel, buying it is what keeps the updates coming.'**
+  String get onboardingSupportBody;
+
+  /// No description provided for @upgradeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Companion Pro'**
+  String get upgradeTitle;
+
+  /// No description provided for @upgradeIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'The ledger stays free for good. Pro is the part you show other people: photos without a limit, the pedigree tree, the sale contract, the branded PDF and backups without a count.'**
+  String get upgradeIntro;
+
+  /// No description provided for @upgradeProTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pro'**
+  String get upgradeProTitle;
+
+  /// No description provided for @upgradeProBody.
+  ///
+  /// In en, this message translates to:
+  /// **'One kennel.'**
+  String get upgradeProBody;
+
+  /// No description provided for @upgradeStudioTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Studio'**
+  String get upgradeStudioTitle;
+
+  /// No description provided for @upgradeStudioBody.
+  ///
+  /// In en, this message translates to:
+  /// **'More than one kennel, same features.'**
+  String get upgradeStudioBody;
+
+  /// No description provided for @upgradeMonthly.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly'**
+  String get upgradeMonthly;
+
+  /// No description provided for @upgradeYearly.
+  ///
+  /// In en, this message translates to:
+  /// **'Yearly'**
+  String get upgradeYearly;
+
+  /// No description provided for @upgradeYearlyNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Two months free'**
+  String get upgradeYearlyNote;
+
+  /// No description provided for @upgradePriceLoading.
+  ///
+  /// In en, this message translates to:
+  /// **'Asking the store for the price...'**
+  String get upgradePriceLoading;
+
+  /// No description provided for @upgradeSubscribe.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscribe'**
+  String get upgradeSubscribe;
+
+  /// No description provided for @upgradeRestore.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore a purchase'**
+  String get upgradeRestore;
+
+  /// No description provided for @upgradeRestored.
+  ///
+  /// In en, this message translates to:
+  /// **'Your purchase is back.'**
+  String get upgradeRestored;
+
+  /// No description provided for @upgradeNothingToRestore.
+  ///
+  /// In en, this message translates to:
+  /// **'No purchase found on this account.'**
+  String get upgradeNothingToRestore;
+
+  /// No description provided for @upgradeStoreUnreachable.
+  ///
+  /// In en, this message translates to:
+  /// **'The store could not be reached. Try again once you are online.'**
+  String get upgradeStoreUnreachable;
+
+  /// No description provided for @upgradeThankYou.
+  ///
+  /// In en, this message translates to:
+  /// **'Thank you. Everything is unlocked.'**
+  String get upgradeThankYou;
+
+  /// No description provided for @upgradeFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'The store did not finish that. Nothing was charged.'**
+  String get upgradeFailed;
+
+  /// No description provided for @upgradeLater.
+  ///
+  /// In en, this message translates to:
+  /// **'Not now'**
+  String get upgradeLater;
+
+  /// No description provided for @upgradeTrialDays.
+  ///
+  /// In en, this message translates to:
+  /// **'{days} days left of everything'**
+  String upgradeTrialDays(int days);
+
+  /// No description provided for @upgradeTrialOver.
+  ///
+  /// In en, this message translates to:
+  /// **'The trial has ended'**
+  String get upgradeTrialOver;
+
+  /// No description provided for @settingsProTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Companion Pro'**
+  String get settingsProTitle;
+
+  /// No description provided for @settingsProOwned.
+  ///
+  /// In en, this message translates to:
+  /// **'Active on this phone'**
+  String get settingsProOwned;
+
+  /// No description provided for @settingsProFree.
+  ///
+  /// In en, this message translates to:
+  /// **'See what Pro adds'**
+  String get settingsProFree;
+
+  /// No description provided for @proGateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{feature} is part of Pro'**
+  String proGateTitle(String feature);
+
+  /// No description provided for @proGateBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your animals, litters, health records, pedigree and backups stay free. Pro adds the parts a buyer sees.'**
+  String get proGateBody;
+
+  /// No description provided for @proGateSee.
+  ///
+  /// In en, this message translates to:
+  /// **'See the plans'**
+  String get proGateSee;
+
+  /// No description provided for @featurePhotos.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlimited photos'**
+  String get featurePhotos;
+
+  /// No description provided for @featureReports.
+  ///
+  /// In en, this message translates to:
+  /// **'Branded reports'**
+  String get featureReports;
+
+  /// No description provided for @featureContracts.
+  ///
+  /// In en, this message translates to:
+  /// **'Sale contracts'**
+  String get featureContracts;
+
+  /// No description provided for @featureStats.
+  ///
+  /// In en, this message translates to:
+  /// **'The kennel statistics'**
+  String get featureStats;
 }
 
 class _AppLocalizationsDelegate
@@ -1647,8 +2881,16 @@ class _AppLocalizationsDelegate
   }
 
   @override
-  bool isSupported(Locale locale) =>
-      <String>['ar', 'en', 'fr'].contains(locale.languageCode);
+  bool isSupported(Locale locale) => <String>[
+    'ar',
+    'de',
+    'en',
+    'es',
+    'fr',
+    'it',
+    'nl',
+    'pt',
+  ].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
@@ -1659,10 +2901,20 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
   switch (locale.languageCode) {
     case 'ar':
       return AppLocalizationsAr();
+    case 'de':
+      return AppLocalizationsDe();
     case 'en':
       return AppLocalizationsEn();
+    case 'es':
+      return AppLocalizationsEs();
     case 'fr':
       return AppLocalizationsFr();
+    case 'it':
+      return AppLocalizationsIt();
+    case 'nl':
+      return AppLocalizationsNl();
+    case 'pt':
+      return AppLocalizationsPt();
   }
 
   throw FlutterError(

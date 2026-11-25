@@ -3,11 +3,14 @@ import 'package:equatable/equatable.dart';
 /// One animal transferred to one buyer. The guarantee terms are what make the
 /// export pack worth something to the person receiving the animal.
 ///
-/// [contractFilePath] has never had a value in it: no screen offers a contract
-/// to attach, so it round-trips as null and the pack carries a paper promise,
-/// not a file. It is the same kind of dormant column as `animals.photo_path`
-/// (`lib/data/db/schema.dart`), and it has to be read as one — a path a pack
-/// restores is a pointer into someone else's phone.
+/// [contractFilePath] holds a **bare file name**, never a path: the bytes live in
+/// `contracts/<folder per animal>/` beside the pictures, and a name that is not a
+/// bare name resolves to nothing rather than being opened (`contract_files.dart`).
+///
+/// A pack does not carry it. A path is a pointer into the filesystem of the phone
+/// that wrote the pack, and a restored ledger naming a file it does not hold is a
+/// screen promising a document that is not there — so the column travels as null
+/// and the handover keeps its price, its buyer and its date.
 class Placement extends Equatable {
   const Placement({
     required this.id,

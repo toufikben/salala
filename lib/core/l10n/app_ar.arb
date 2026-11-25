@@ -3,14 +3,15 @@
   "appTitle": "سلالة",
   "navAnimals": "الحيوانات",
   "navLitters": "الولادات",
+  "navBuyers": "المشترون",
   "navSettings": "الإعدادات",
-
+  "languageName": "العربية",
   "homeEmptyTitle": "لا توجد حيوانات بعد",
-  "homeEmptyBody": "أضف كلبك أو قطتك الأول لتبدأ سجل الصحة والأنساب.",
+  "homeEmptyBody": "القطيع يبدأ بواحد. سمّها، وابدأ سجلّها من هنا.",
   "homeAddAnimal": "إضافة حيوان",
   "homeBreedingStock": "حيوانات التربية",
   "homeAllAnimals": "كل الحيوانات",
-  "homeSearchHint": "ابحث بالاسم أو الرقم أو الشريحة أو الملاحظة",
+  "homeSearchHint": "ابحث بالاسم أو الرقم أو الشريحة أو الملاحظة أو المشتري",
   "homeNoMatches": "لا نتيجة تطابق « {query} »",
   "@homeNoMatches": {
     "placeholders": {
@@ -20,14 +21,25 @@
     }
   },
   "homeAnimalCount": "{count, plural, =0{لا توجد حيوانات} =1{حيوان واحد} =2{حيوانان} few{{count} حيوانات} many{{count} حيوانًا} other{{count} حيوان}}",
-
   "animalName": "الاسم",
   "animalSpecies": "الفصيلة",
   "animalBreed": "السلالة",
   "animalSex": "الجنس",
   "animalBirthDate": "تاريخ الميلاد",
+  "animalBornOn": "وُلد في {day}",
+  "@animalBornOn": {
+    "description": "في صفحة الحيوان، يُقرأ تاريخ الميلاد كعبارة لا كسطر: هو واحد من أربع حقائق في السطر الرئيسي تحت الصورة.",
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
   "animalStatus": "الحالة",
   "animalMicrochip": "رقم الشريحة",
+  "animalMicrochipDate": "تاريخ زرع الشريحة",
+  "animalLitter": "الولادة",
+  "animalNone": "لا شيء",
   "animalRegistrationNo": "رقم التسجيل",
   "animalRegistry": "جهة التسجيل",
   "animalColor": "اللون",
@@ -36,28 +48,38 @@
   "animalAddTitle": "إضافة حيوان",
   "animalEditTitle": "تعديل الحيوان",
   "animalDeleteTitle": "حذف {name}؟",
-  "animalDeleteBody": "سيُحذف معها أيضاً التطعيمات وفحوصات الصحة والأوزان والزيارات البيطرية والأعراض، وسجل التسليم إن وُجد، وصورها وما على هذا الهاتف من ملفات تلك الصور، والولادات التي هي أمّ لها. لا يمكن التراجع عن هذه الخطوة.",
+  "animalDeleteLittersNote": "سيُحذف أيضاً {litters} سجل ولادة هي أمّها، ويبقى {puppies} من جرائها في حيواناتك لكن دون سجل أمّهم.",
+  "@animalDeleteLittersNote": {
+    "placeholders": {
+      "litters": {
+        "type": "int"
+      },
+      "puppies": {
+        "type": "int"
+      }
+    }
+  },
+  "animalDeleteBody": "سيُحذف معها أيضاً التطعيمات وفحوصات الصحة والأوزان والزيارات البيطرية والأعراض، وسجل التسليم إن وُجد، وصورها وما على هذا الهاتف من ملفات تلك الصور، والعقد المرفق بذلك التسليم. لا يمكن التراجع عن هذه الخطوة.",
   "animalNameRequired": "الاسم مطلوب",
   "animalSpeciesRequired": "اختر الفصيلة",
-
   "sexMale": "ذكر",
   "sexFemale": "أنثى",
   "sexUnknown": "غير محدد",
-
   "statusActive": "لدي",
   "statusSold": "تم تسليمه",
   "statusRetired": "متقاعد",
   "statusDeceased": "متوفى",
-
   "recordsVaccinations": "التطعيمات",
   "recordsHealthTests": "فحوصات الصحة",
   "recordsWeights": "الأوزان",
   "recordsVisits": "الزيارات البيطرية",
   "recordsSymptoms": "الأعراض",
-"recordsPhotos": "الصور",
+  "recordsPhotos": "الصور",
   "recordsPlacements": "التسليم",
   "recordsEmpty": "لا يوجد سجل بعد.",
-
+  "detailStoryLine": "كل سجل هنا جزء من قصتها.",
+  "detailDiedLine": "سجلّها يبقى كما كان.",
+  "placedFarewell": "{name} انتقل إلى بيت جديد. السجل بقي معك.",
   "actionSave": "حفظ",
   "actionCancel": "إلغاء",
   "actionDelete": "حذف",
@@ -67,7 +89,6 @@
   "actionRetry": "إعادة المحاولة",
   "actionClear": "مسح",
   "actionReplace": "استبدال",
-
   "lockTitle": "سلالة مقفل",
   "lockEnterPin": "أدخل الرمز السري",
   "lockUnlock": "فتح",
@@ -81,20 +102,66 @@
   "lockDisable": "إيقاف القفل",
   "lockCurrentPin": "الرمز الحالي",
   "lockChangeFailed": "رفض الهاتف تغيير قفل التطبيق.",
-
+  "lockChangePinDone": "تم تغيير الرمز.",
+  "lockTooManyAttempts": "محاولات خاطئة كثيرة. أعد المحاولة بعد {seconds} ثانية.",
+  "@lockTooManyAttempts": {
+    "description": "Shown while the gate refuses after repeated wrong PINs; seconds counts down to zero.",
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
   "settingsAppLock": "قفل التطبيق",
+  "settingsChangePin": "تغيير الرمز",
+  "settingsChangePinBody": "أدخل الرمز الحالي ثم اختر رمزًا جديدًا.",
   "settingsLanguage": "اللغة",
   "settingsLanguageSystem": "لغة النظام",
   "languageNotStored": "رفض الهاتف حفظ هذه اللغة.",
   "startupFailedTitle": "لم تتمكن سلالة من فتح السجل على هذا الهاتف.",
   "startupFailedBody": "سجلاتك ما زالت في الملف. أغلق التطبيق وأعد فتحه.",
   "settingsAbout": "حول التطبيق",
+  "settingsTrial": "التجربة المجانية",
+  "settingsTrialRemaining": "بقيت {days} يومًا",
+  "settingsTrialOver": "انتهت التجربة",
   "settingsBuildTag": "رقم البناء",
   "settingsOfflineNote": "كل شيء محفوظ على جهازك. بلا حساب، بلا خادم، بلا تتبع.",
   "settingsExport": "تصدير السجلات",
-  "settingsExportBody": "ملف JSON واحد فيه كل سجلات هذا الهاتف",
+  "settingsExportBody": "ملف ZIP واحد يحمل كل سجل وصورة على هذا الهاتف",
   "settingsImport": "استرجاع من حزمة",
   "settingsImportBody": "قراءة حزمة وإرجاعها إلى هذا الهاتف",
+  "settingsLastBackup": "آخر نسخة احتياطية: {day}",
+  "@settingsLastBackup": {
+    "description": "تحت زر التصدير. المقصود أن يرى المربّي كم صارت نسخته الوحيدة قديمة — تطبيق لا يذكّر هو تطبيق كانت آخر نسخة فيه قبل ثمانية أشهر.",
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsNeverBackedUp": "لم تخرج نسخة احتياطية من هذا الهاتف بعد",
+  "settingsCsv": "جدول (CSV)",
+  "settingsCsvBody": "لمحاسبك أو لاستمارة السجل أو لشريك في الملكية. يُفتح في Excel أو Numbers أو Google Sheets.",
+  "settingsCsvHerd": "الحيوانات",
+  "settingsCsvLitters": "الولادات",
+  "settingsCsvVaccinations": "التحصينات",
+  "settingsCsvPlacements": "التسليمات",
+  "csvShared": "{file} جاهز للإرسال",
+  "@csvShared": {
+    "placeholders": {
+      "file": {
+        "type": "String"
+      }
+    }
+  },
+  "csvShareFailed": "لم يمكن كتابة الجدول على هذا الهاتف",
+  "csvEmpty": "لا يوجد على هذا الهاتف ما يُصدَّر بعد",
+  "csvColAnimal": "الحيوان",
+  "csvColCountry": "الدولة",
+  "csvColPuppies": "الجراء",
+  "csvColBreedingStock": "قطيع التربية",
+  "csvColYes": "نعم",
+  "csvColNo": "لا",
   "packShared": "{file} جاهز للإرسال",
   "packShareFailed": "لم يمكن كتابة الحزمة على هذا الهاتف",
   "packReadFailed": "لم يمكن فتح هذا الملف",
@@ -102,12 +169,15 @@
   "packFromTheFuture": "هذه الحزمة من نسخة سلالة أحدث من هذه النسخة",
   "packIncomplete": "تنقص هذه الحزمة جزء من السجلات: {table}",
   "packUnknownTable": "تحتوي هذه الحزمة على جدول لا تعرفه سلالة: {table}",
+  "packBadValue": "تحتوي هذه الحزمة على قيمة لا تستطيع سلالة قراءتها: {detail}",
   "packRestoreTitle": "استبدال كل شيء على هذا الهاتف؟",
   "packRestoreBody": "من {day}. الحيوانات: {animals}. السجلات: {rows}. الاسترجاع يستبدل كل ما على هذا الهاتف الآن.",
   "packRestored": "عدد السجلات المسترجعة: {rows}",
   "packRestoreFailed": "لم يمكن استرجاع الحزمة. لم يتغير شيء على هذا الهاتف.",
-
   "litterAdd": "ولادة جديدة",
+  "litterEditTitle": "تعديل الولادة",
+  "litterAddPuppies": "إضافة جراء",
+  "litterHowMany": "كم عددها؟",
   "litterAddTitle": "تسجيل ولادة",
   "litterEmptyTitle": "لا توجد ولادات بعد",
   "litterEmptyBody": "سجّل التزاوج لمتابعة الحمل وتسجيل الجراء في خطوة واحدة.",
@@ -132,6 +202,38 @@
       }
     }
   },
+  "statsTitle": "الكنل بالأرقام",
+  "settingsStats": "الكنل بالأرقام",
+  "statsHerdGroup": "من هنا",
+  "statsBreedingGroup": "البطون والجراء",
+  "statsMoneyGroup": "التسليمات",
+  "statsAtHome": "حيوانات موجودة",
+  "statsBreedingStock": "قطيع التربية",
+  "statsFemales": "إناث هنا",
+  "statsMales": "ذكور هنا",
+  "statsEverRecorded": "كل ما سُجّل",
+  "statsWhelpings": "بطون في السجل",
+  "statsPuppies": "جراء من بطونك",
+  "statsPuppiesThisYear": "جراء وُلدوا في {year}",
+  "statsPlacements": "تسليمات",
+  "statsUnnamedCurrency": "بلا عملة محددة",
+  "statsHandoverCount": "{count} منها مدفوعة",
+  "statsNoRevenue": "لا سعر مسجّل",
+  "statsFooter": "محسوبة من سجلك أنت، على هذا الهاتف. لا شيء منها يخرج عنه.",
+  "birthdayTitle": "قريبًا",
+  "birthdayToday": "اليوم",
+  "birthdayIn": "بعد {days}",
+  "birthdayTurning": "{name} يبلغ {years}",
+  "heatCardTitle": "الشياع القادم",
+  "heatCardWindow": "بين {earliest} و{latest}",
+  "heatCardSteady": "محسوب على {count} دورات في سجلّها.",
+  "heatCardThin": "دورة واحدة فقط في السجل، لذلك النافذة واسعة. سجّل تلقيحًا آخر لتضيق.",
+  "heatCardWhelping": "التلقيح في هذه النافذة يعني ولادة حول {day}.",
+  "bulkVaccineTitle": "تحصين جماعي",
+  "bulkVaccineCount": "{count} حيوانًا ستأخذ الجرعة نفسها",
+  "bulkVaccineAction": "حصّن البطن كله",
+  "bulkVaccineDone": "سُجّلت لـ {count} حيوانًا",
+  "pedigreeTitle": "شجرة النسب",
   "litterPuppyCount": "{count, plural, =0{لا توجد جراء مسجلة} =1{جرو واحد} =2{جروان} few{{count} جراء} many{{count} جروًا} other{{count} جرو}}",
   "@litterPuppyCount": {
     "placeholders": {
@@ -153,7 +255,6 @@
     }
   },
   "litterDeleteBody": "تبقى الجراء ضمن حيواناتك، ويُحذف سجل التزاوج فقط. لا يمكن التراجع عن هذه الخطوة.",
-
   "animalGone": "تم حذف هذا الحيوان.",
   "animalDeathDate": "تاريخ النفوق",
   "animalDam": "الأم",
@@ -163,7 +264,6 @@
   "recordSaveFailed": "لم يُحفظ هذا السجل. لم يُكتب شيء.",
   "recordDeleteFailed": "لم يُحذف هذا السجل. هو ما زال في مكانه.",
   "recordDateBeforeBirth": "هذا التاريخ يسبق تاريخ ميلاد هذا الحيوان.",
-
   "vaccinationAdd": "تطعيم جديد",
   "vaccinationAddTitle": "تسجيل تطعيم",
   "vaccinationEditTitle": "تعديل التطعيم",
@@ -180,7 +280,6 @@
   "vaccinationClinic": "العيادة",
   "vaccinationCertificate": "رقم الشهادة",
   "vaccinationDeleteBody": "يُحذف هذا التطعيم من سجل الحيوان. لا يمكن التراجع عن ذلك.",
-
   "weightAdd": "وزن جديد",
   "weightKg": "الوزن (كغ)",
   "weightColumn": "الوزن",
@@ -192,9 +291,7 @@
   "weightNote": "ملاحظة",
   "weightDeleteBody": "يُحذف هذا الوزن. لا يمكن التراجع عن ذلك.",
   "weightAppendOnlyHint": "الأوزان لا تُعدَّل. قياس خاطئ؟ احذفه وسجّل الوزن من جديد.",
-
   "animalSpeciesHelper": "كلب · قط",
-
   "healthTestAdd": "فحص جديد",
   "healthTestAddTitle": "تسجيل فحص صحي",
   "healthTestEditTitle": "تعديل الفحص الصحي",
@@ -210,7 +307,6 @@
   "healthTestVerifiedBy": "التحقق بواسطة",
   "healthTestExpired": "منتهي الصلاحية",
   "healthTestDeleteBody": "يُحذف هذا الفحص من سجل الحيوان. لا يمكن التراجع عن ذلك.",
-
   "visitAdd": "زيارة جديدة",
   "visitAddTitle": "تسجيل زيارة بيطرية",
   "visitEditTitle": "تعديل الزيارة البيطرية",
@@ -222,7 +318,6 @@
   "visitCostInvalid": "أدخل مبلغاً مثل 250",
   "visitCurrency": "العملة",
   "visitDeleteBody": "تُحذف هذه الزيارة من سجل الحيوان. لا يمكن التراجع عن ذلك.",
-
   "symptomAdd": "عَرَض جديد",
   "symptomAddTitle": "تسجيل عَرَض",
   "symptomEditTitle": "تعديل العَرَض",
@@ -237,13 +332,13 @@
   "symptomOngoing": "ما زال مستمرًا",
   "symptomResolved": "زائل",
   "symptomDeleteBody": "يُحذف هذا العَرَض من سجل الحيوان. لا يمكن التراجع عن ذلك.",
-
+  "photoFromGallery": "اختيار من المعرض",
+  "photoFromCamera": "التقاط صورة",
   "photoAdd": "صورة جديدة",
   "photoDeleteBody": "تُحذف هذه الصورة من سجل الحيوان ويُحذف ملفها معها. لا يمكن التراجع عن ذلك.",
   "photoMissing": "ليست على هذا الهاتف",
   "photoTooLarge": "هذه الصورة كبيرة جدًا لحفظها",
   "photoNotAnImage": "هذا الملف ليس صورة",
-
   "placementAdd": "تسليم جديد",
   "placementAddTitle": "تسجيل تسليم",
   "placementEditTitle": "تعديل التسليم",
@@ -254,30 +349,45 @@
   "placementPriceInvalid": "أدخل مبلغًا مثل 2500",
   "placementCurrency": "العملة",
   "placementGuarantee": "شروط الضمان",
+  "contractAttach": "أرفق عقدًا",
+  "contractAttached": "عقد مُرفق",
+  "contractStoredName": "مستند أرفقته سابقًا",
+  "contractRemove": "إزالة العقد",
+  "contractOpen": "فتح العقد",
+  "contractMissing": "هذا المستند ليس على هذا الهاتف",
+  "contractOpenFailed": "لم يُفتح المستند",
+  "contractPickFailed": "لم يُختر أي مستند",
+  "contractTooLarge": "هذا الملف كبير جدًا للاحتفاظ به",
   "placementDeleteBody": "يُحذف هذا التسليم من سجل الحيوان، ويبقى المشتري في جهات اتصالك. لا يمكن التراجع عن ذلك.",
-
   "buyerAdd": "مشتَرٍ جديد",
   "buyerAddTitle": "إضافة مشتَرٍ",
   "buyerEditTitle": "تعديل المشتري",
   "buyerPhone": "الهاتف",
   "buyerEmail": "البريد الإلكتروني",
   "buyerCountryCode": "رمز البلد",
+  "buyersEmptyTitle": "لا يوجد مشترون بعد",
+  "buyersEmptyBody": "يُضاف المشتري مع تسليم، أو من هنا قبل التسليم: من اشتريت منه العام الماضي ما زال يطلب شهادة النسب.",
+  "buyersNoAnimals": "لا يوجد حيوان مسجَّل لهذا الشخص",
   "buyerDeleteBody": "يُحذف {name} من جهات اتصالك. ويبقى سجل التسليم في تاريخ الحيوان دون ذكر المشتري. لا يمكن التراجع عن ذلك.",
-
   "reminderHeadsUpBody": "تنبيه: {what} مستحق في {dueDay}",
   "@reminderHeadsUpBody": {
     "placeholders": {
-      "what": { "type": "String" },
-      "dueDay": { "type": "String" }
+      "what": {
+        "type": "String"
+      },
+      "dueDay": {
+        "type": "String"
+      }
     }
   },
-  "reminderDueBody": "{what} مستحق اليوم",
+  "reminderDueBody": "{what} موعدها اليوم. دقيقتان تكفيان",
   "@reminderDueBody": {
     "placeholders": {
-      "what": { "type": "String" }
+      "what": {
+        "type": "String"
+      }
     }
   },
-
   "pdfAction": "ملف PDF",
   "pdfFailed": "تعذّر إنشاء ملف PDF",
   "pdfTitle": "السجل الصحي والنسب",
@@ -295,7 +405,6 @@
   "pdfGuarantee": "شروط الضمان",
   "pdfChartAxes": "الوزن بالكيلوغرام مقابل العمر بالأشهر. أما الجدول أعلاه فيكتب وزن الجرو الصغير بالغرام.",
   "pdfDisclaimer": "أُنشئ هذا الملف على جهاز المربّي دون اتصال بالإنترنت من سجلاته الخاصة، وهو ليس شهادة بيطرية.",
-
   "triageTitle": "ما الخطوة التالية؟",
   "triageActNow": "تصرّف الآن",
   "triageWatch": "راقب عن قرب",
@@ -304,6 +413,7 @@
   "triageNotDiagnosis": "لا تقرأ سلالة إلا ما كتبته هنا، وهذا ليس تشخيصًا بيطريًا.",
   "triageNoDoseYoung": "لم يُسجَّل أي تلقيح والعمر {days}",
   "triageDoseOverdue": "{name} كان مستحقًا منذ {days}",
+  "triageDoseToday": "{what} مستحق اليوم",
   "triageDoseDueSoon": "{name} مستحق خلال {days}",
   "triageWeightLossPuppy": "فقد الحيوان الصغير {percent}% من وزنه منذ آخر وزن",
   "triageWeightLoss": "انخفض الوزن {percent}% منذ آخر وزن",
@@ -313,10 +423,141 @@
   "triageWhelpingOverdue": "{name}: تجاوزت الولادة التاريخ المتوقع بـ {days}",
   "triageSevereSymptom": "{name} سُجِّل بدرجة شديدة وما زال مستمرًا",
   "triageSymptomUnresolved": "ما زال {name} مستمرًا بعد {days} من رصده",
-
   "agendaTitle": "تلقيحات يجب حجزها",
-
   "daysSingle": "{n} يومًا",
   "daysDual": "{n} يومين",
-  "daysPlural": "{n} أيام"
+  "onboardingSlide1Title": "سجل واحد لكل حيوان",
+  "onboardingSlide1Body": "كلب أو قطة، سلالته، تاريخ ميلاده، ومن أين جاء. الأول لا يأخذ دقيقة.",
+  "onboardingSlide2Title": "صحته، بالترتيب",
+  "onboardingSlide2Body": "التطعيمات بموعد جرعتها القادمة، الأوزان، الفحوصات، والزيارات البيطرية. رفيق يحجز التذكير عنك.",
+  "onboardingSlide3Title": "قصته تسافر معه",
+  "onboardingSlide3Body": "ملف PDF أو جدول للمشتري، وحزمة ZIP واحدة تحمل كل سجل وصورة إلى هاتف جديد.",
+  "onboardingSkip": "تخطٍّ",
+  "onboardingNext": "التالي",
+  "onboardingStart": "أضف أول حيوان",
+  "settingsOnboarding": "أعد عرض المقدمة",
+  "settingsHelp": "المساعدة",
+  "settingsRate": "قيّم رفيق",
+  "settingsRateBody": "يفتح بطاقة التقييم من المتجر.",
+  "settingsWhatsNew": "ما الجديد",
+  "settingsPrivacy": "الخصوصية",
+  "settingsTerms": "شروط الاستخدام",
+  "settingsLicenses": "رخص البرمجيات المفتوحة",
+  "rateUnavailable": "هذا الهاتف لا يستطيع عرض بطاقة التقييم الآن.",
+  "aboutTitle": "حول رفيق",
+  "aboutBody": "دفتر محلي لمربٍّ صغير. لا حساب، لا خادم، لا تتبع — السجلات تسكن هذا الهاتف ولا تخرج إلا بيدك.",
+  "aboutVersion": "الإصدار {version}",
+  "privacyTitle": "الخصوصية",
+  "privacyIntro": "رفيق تحتفظ بنوع واحد من البيانات: ما كتبته عن حيواناتك. هذه الصفحة تقول أين تسكن وماذا يمكن أن يُخرجها من هذا الهاتف.",
+  "privacyStoredHeading": "ما يُخزَّن",
+  "privacyStoredBody": "كل حيوان، جرعة، وزن، فحص، زيارة، عرض، تسليم وجهة اتصال — والصور التي أرفقتها — في قاعدة بيانات ومجلد صور داخل مساحة التطبيق الخاصة. أندرويد يمنع التطبيقات الأخرى من الوصول إلى ذلك المجلد، والملفات غير مشفّرة بعد ذلك.",
+  "privacyBackupHeading": "ما يخرج من هذا الهاتف",
+  "privacyBackupBody": "فقط ما تصدّره: حزمة ZIP فيها كل سجل وصورة، جدول CSV واحد، أو PDF لحيوان واحد. كل ملف يذهب حيث ترسله، وبالتالي الحزمة تحمل أسماء مشتريك وأرقام هواتفهم — عامل الملف كما تعامل الورق الذي يحل مكانه. شغّل قفل التطبيق إن كان الهاتف يسافر.",
+  "privacyCollectHeading": "ما يُجمع عنك",
+  "privacyCollectBody": "لا شيء. لا تحليلات، لا تقارير أعطال، لا معرّف إعلاني، ولا اتصال شبكي في هذا التطبيق.",
+  "privacyRemoveHeading": "كيف تمسحه",
+  "privacyRemoveBody": "إزالة التطبيق تزيل قاعدة البيانات ومجلد الصور معه. لا توجد نسخة في مكان آخر، فصدّر حزمة أولًا إن كانت السجلات تهمك — وتذكّر أن رقم قفل التطبيق لا يُستعاد أيضًا.",
+  "termsTitle": "شروط الاستخدام",
+  "termsUseHeading": "لماذا هذا التطبيق",
+  "termsUseBody": "للاحتفاظ بسجلاتك عن الحيوانات التي في رعايتك. رخصة واحدة لكل شخص؛ ثبّته على الهواتف التي تستخدمها.",
+  "termsDataHeading": "بياناتك لك",
+  "termsDataBody": "لا نحتفظ بنسخة منها ولا نستطيع استعادتها. النسخ الاحتياطي مسؤوليتك، وزر التصدير في الإعدادات هو الآلية كلها.",
+  "termsAdviceHeading": "ليس استشارة بيطرية",
+  "termsAdviceBody": "رفيق يعيد ما كتبته ويجري حسابًا على التواريخ والأوزان. لا يشخّص، والتذكير موعد في تقويم لا رأي سريري. اتصل بطبيب بيطري.",
+  "termsWarrantyHeading": "بلا ضمان",
+  "termsWarrantyBody": "يُقدَّم التطبيق كما هو. وفي حدود ما يسمح به القانون، لا تُقبل مسؤولية عن سجل ضائع أو تذكير فائت أو قرار اتُّخذ بناء على ما هو مكتوب هنا.",
+  "helpTitle": "المساعدة",
+  "helpQ1": "كيف أنسخ احتياطيًا؟",
+  "helpA1": "الإعدادات، ثم تصدير السجلات. ملف ZIP يحمل كل صف وكل صورة؛ أرسله لنفسك واحتفظ به. الاستعادة تقرأ الملف نفسه على أي هاتف.",
+  "helpQ2": "نسيت رقمي السري",
+  "helpA2": "لا يُستعاد، لأن المحفوظ بصمة له فقط. إزالة التطبيق تمسح القفل والدفتر معه، فإن كان لديك حزمة حديثة استعدها بعد ذلك.",
+  "helpQ3": "فقدت هاتفي",
+  "helpA3": "لا شيء على خادم، فلا شيء يمكن إعادته. حزمة صدّرتها سابقًا تعيد الدفتر على هاتف جديد؛ وحزمة لم تصدّرها ضاعت.",
+  "helpQ4": "من أين تأتي التذكيرات؟",
+  "helpA4": "من تواريخ الجرعة القادمة التي كتبتها. رفيق يحجز تنبيهًا قبل شهر وتنبيهًا في الصباح نفسه؛ وإن كانت الإشعارات موقوفة للتطبيق، تبقى التواريخ ظاهرة في أجندة القطيع.",
+  "helpQ5": "لماذا تقول صورة إنها ليست على هذا الهاتف؟",
+  "helpA5": "الصف بقي والملف لم يبقَ — غالبًا بعد استعادة من حزمة بلا صور. إضافة الصورة مرة أخرى تكفي.",
+  "helpQ6": "هل أستطيع تسليم سجل الحيوان؟",
+  "helpA6": "نعم. افتح الحيوان وصدّر ملف PDF: مستند ثابت يحتفظ به المشتري دون هذا التطبيق. والتسليم نفسه يُسجَّل في الصفحة نفسها.",
+  "helpQ7": "ما اللغات المتوفرة؟",
+  "helpA7": "الإنجليزية، العربية، الفرنسية، الألمانية، الإسبانية، الإيطالية، البرتغالية، الهولندية. الإعدادات ثم اللغة — التغيير يُطبَّق فورًا.",
+  "helpQ8": "هناك خطأ في التطبيق",
+  "helpA8": "اكتب لنا وقل ماذا كنت تفعل حين حدث. الإصدار في صفحة «حول».",
+  "helpContactHeading": "اكتب لنا",
+  "whatsNewTitle": "ما الجديد",
+  "whatsNew1": "صور على بطاقات القطيع، وتصميم أوسع وأدفأ في كل الشاشات.",
+  "whatsNew2": "نقرة التذكير تفتح الحيوان الذي يخصّه.",
+  "whatsNew3": "تصدير الجدول صار بلغة التطبيق التي تقرأها.",
+  "whatsNew4": "خمس لغات إضافية: الألمانية، الإسبانية، الإيطالية، البرتغالية، الهولندية.",
+  "whatsNew5": "صفحات الخصوصية والشروط والمساعدة، وزر تقييم في الإعدادات.",
+  "whatsNew6": "قائمة واحدة لكل حيوان: كل تطعيم ووزن وزيارة وتسليم بترتيب التاريخ.",
+  "daysPlural": "{n} أيام",
+  "timelineTitle": "ما حدث",
+  "timelineEmpty": "لا شيء مؤرّخ بعد.",
+  "timelineShowAll": "عرض الكل {count}",
+  "timelineShowLess": "عرض أقل",
+  "timelineKindBorn": "الميلاد",
+  "timelineKindDied": "الوفاة",
+  "timelineKindWhelped": "ولادة",
+  "timelineKindVaccination": "تطعيم",
+  "timelineKindHealthTest": "فحص صحي",
+  "timelineKindVisit": "زيارة بيطرية",
+  "timelineKindSymptom": "عرض",
+  "timelineKindWeight": "وزن",
+  "timelineKindPhoto": "صورة",
+  "timelineKindPlacement": "تسليم",
+  "onboardingLittersTitle": "كل بطن، من التلقيح إلى الفطام",
+  "onboardingLittersBody": "سجّل تاريخ التلقيح، ويعطيك Companion نافذة ولادة لا تخمينًا. ثم كل جرو، وجنسه ولونه ووزنه عند الميلاد.",
+  "onboardingPedigreeTitle": "النسب في صفحة واحدة",
+  "onboardingPedigreeBody": "الأب والأم والأجداد مرسومون شجرةً، مطبوعة بجانب تقرير الصحة. تكفي المشتري دون أن تدفع لنقابة.",
+  "onboardingBuyersTitle": "من ينتظر، ومن دفع",
+  "onboardingBuyersBody": "العربون، والجرو الذي اختاره كل مشترٍ، ويوم ذهابه إلى بيته، والعقد الموقّع محفوظًا معه.",
+  "onboardingYoursTitle": "لا خادم لأحد غيرك",
+  "onboardingYoursBody": "بلا حساب، بلا إعلانات، بلا تتبّع. يعمل في سقيفة بلا شبكة، وسجلاتك لا تغادر الهاتف إلا حين تصدّرها.",
+  "onboardingSupportTitle": "صنعه شخص واحد",
+  "onboardingSupportBody": "Companion يبنيه مبرمج واحد، لا شركة. بلا إعلانات وبلا مستثمرين. وإن وجد مكانه في مربّاك، فشراؤه هو ما يُبقي التحديثات تصل.",
+  "upgradeTitle": "Companion Pro",
+  "upgradeIntro": "السجلّ يبقى مجانيًا دائمًا. Pro هو الجزء الذي تُريه للآخرين: صور بلا حدّ، شجرة النسب، عقد البيع، ملف PDF بهويتك، ونسخ احتياطية بلا عدد.",
+  "upgradeProTitle": "Pro",
+  "upgradeProBody": "لِكِنِّل واحد.",
+  "upgradeStudioTitle": "Studio",
+  "upgradeStudioBody": "لأكثر من كِنِّل، ونفس الخصائص.",
+  "upgradeMonthly": "شهري",
+  "upgradeYearly": "سنوي",
+  "upgradeYearlyNote": "شهران مجانًا",
+  "upgradePriceLoading": "جارٍ سؤال المتجر عن السعر…",
+  "upgradeSubscribe": "اشترك",
+  "upgradeRestore": "استعادة عملية شراء",
+  "upgradeRestored": "عادت مشترياتك.",
+  "upgradeNothingToRestore": "لا توجد عملية شراء في هذا الحساب.",
+  "upgradeStoreUnreachable": "لم نتمكّن من الوصول إلى المتجر. أعد المحاولة عند عودة الشبكة.",
+  "upgradeThankYou": "شكرًا لك. كل شيء مفتوح.",
+  "upgradeFailed": "لم يُكمل المتجر العملية. لم يُخصم شيء.",
+  "upgradeLater": "ليس الآن",
+  "upgradeTrialDays": "بقي {days} يومًا من كل شيء",
+  "@upgradeTrialDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "upgradeTrialOver": "انتهت التجربة",
+  "settingsProTitle": "Companion Pro",
+  "settingsProOwned": "مُفعّل على هذا الهاتف",
+  "settingsProFree": "اعرف ما يضيفه Pro",
+  "proGateTitle": "{feature} من خصائص Pro",
+  "@proGateTitle": {
+    "placeholders": {
+      "feature": {
+        "type": "String"
+      }
+    }
+  },
+  "proGateBody": "حيواناتك وبطونك وسجلّاتك الصحية وشجرة النسب والنسخ الاحتياطية تبقى مجانية. Pro يضيف ما يراه المشتري.",
+  "proGateSee": "اعرض الخطط",
+  "featurePhotos": "صور بلا حدّ",
+  "featureReports": "تقارير بهويتك",
+  "featureContracts": "عقود البيع",
+  "featureStats": "إحصاءات المربّى"
 }

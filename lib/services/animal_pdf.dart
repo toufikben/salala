@@ -21,7 +21,7 @@ const double _dayMs = 86400000.0;
 ///
 /// The JSON pack is for the breeder's own phone. This document is for the other
 /// end of a sale: the person who paid for a puppy and still wants its rabies date
-/// in six years, on a device that will never run Salala. PDF is chosen because it
+/// in six years, on a device that will never run Companion. PDF is chosen because it
 /// survives an email, a print shop and a change of phone.
 ///
 /// Every line here is written from rows the breeder typed, which is why the

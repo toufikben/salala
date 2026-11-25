@@ -1,0 +1,10 @@
+# Test-runner settings for the whole package.
+#
+# The suite talks to real SQLite files through `sqflite`, so every test pays for
+# an isolate round-trip that the fake clock cannot advance. On a loaded machine a
+# single pack restore took longer than the runner's 30-second default and was
+# reported as a timeout — with the database already torn down behind it, which
+# read as a data bug rather than as the wall clock it was. Two minutes is the
+# same ceiling the rest of the suite is written against, and a genuinely hung
+# test still fails, just loudly and with its own stack.
+timeout: 120s

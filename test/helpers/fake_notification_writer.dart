@@ -1,5 +1,5 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:salala/services/reminder_scheduler.dart';
+import 'package:companion/services/reminder_scheduler.dart';
 import 'package:timezone/timezone.dart' as tz;
 
 /// One alarm the app asked the phone to hold.
@@ -10,6 +10,7 @@ class WrittenAlarm {
     required this.body,
     required this.at,
     required this.mode,
+    this.payload,
   });
 
   final int id;
@@ -17,6 +18,10 @@ class WrittenAlarm {
   final String body;
   final tz.TZDateTime at;
   final AndroidScheduleMode mode;
+
+  /// What a tap on this alarm carries: the animal it is about, so tapping opens
+  /// her ledger rather than the herd.
+  final String? payload;
 }
 
 /// The app's own notification seam, with the platform channel removed.
@@ -40,8 +45,19 @@ class FakeNotificationWriter implements NotificationWriter {
   Object? writeFailure;
   Object? clearFailure;
 
+  /// What the phone says launched the app, for the cold-start half of the tap.
+  /// Null is a normal launch by the breeder.
+  String? launchedFrom;
+
+  /// The callback the app handed the plugin, kept so a test can fire a tap on a
+  /// running app instead of only describing one.
+  void Function(String? payload)? onTap;
+
   @override
-  Future<void> initialise() async {}
+  Future<String?> initialise({void Function(String? payload)? onTap}) async {
+    this.onTap = onTap;
+    return launchedFrom;
+  }
 
   @override
   Future<void> write({
@@ -50,12 +66,20 @@ class FakeNotificationWriter implements NotificationWriter {
     required String body,
     required tz.TZDateTime at,
     required AndroidScheduleMode mode,
+    String? payload,
   }) async {
     log.add('write');
     final failure = writeFailure;
     if (failure != null) throw failure;
     written.add(
-      WrittenAlarm(id: id, title: title, body: body, at: at, mode: mode),
+      WrittenAlarm(
+        id: id,
+        title: title,
+        body: body,
+        at: at,
+        mode: mode,
+        payload: payload,
+      ),
     );
   }
 

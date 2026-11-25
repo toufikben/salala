@@ -4,10 +4,19 @@
          permissions are absent too — reminders are scheduled inexact on
          purpose, so a Play policy audit never has to be entered into. -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <!-- Billing. `in_app_purchase_android` stopped merging this in (its own
+         manifest has been empty since 0.4), so an app that sells anything must
+         declare it or the store answers "billing unavailable" on every phone —
+         and Play Console refuses to create subscription products for a bundle
+         that does not carry it. Measured 2026-11-24: nothing in this tree
+         declared it, which is the whole reason the Products page asked for a
+         new upload. -->
+    <uses-permission android:name="com.android.vending.BILLING"/>
     <application
-        android:label="سلالة"
+        android:label="Companion"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:allowBackup="false"
         android:fullBackupContent="@xml/backup_rules"

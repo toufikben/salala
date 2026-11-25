@@ -42,9 +42,51 @@ class SettingsDao {
 class SettingKeys {
   SettingKeys._();
 
-  static const String appLockEnabled = 'app_lock_enabled';
-  static const String lockTimeoutSeconds = 'lock_timeout_seconds';
-  static const String preferredCurrency = 'preferred_currency';
-  static const String defaultSpecies = 'default_species';
+  /// The four settings that are deliberately *not* keys here.
+  ///
+  /// `app_lock_enabled` and `lock_timeout_seconds` were constants in this class
+  /// and nothing ever wrote or read them: the lock is real when a digest exists
+  /// in the keystore, and the grace period is `lockGracePeriodProvider`. A
+  /// constant that says otherwise is a second source of truth that is always
+  /// wrong, and a pack restored onto a new phone would have carried it.
+  ///
+  /// `preferred_currency` went the same way once every placement carried its own
+  /// money: the currency is a property of the sale, not of the breeder, and
+  /// summing across currencies is the bug the statistics screen refuses. A
+  /// default here would have quietly offered to convert what must not be
+  /// converted.
+  ///
+  /// `default_species` never had a field to fill it. The form opens on `dog`.
   static const String languageCode = 'language_code';
+
+  /// When a pack last left this phone, in unix milliseconds.
+  ///
+  /// Kept beside the export button rather than in the pack itself: the question
+  /// it answers — "how old is the only copy of this ledger" — is about this
+  /// device's habit, and a restored pack must not claim the new phone has been
+  /// backing up. `_importPack` clears it for exactly that reason.
+  static const String lastPackExportedAt = 'last_pack_exported_at';
+
+  /// Whether the three introductory slides have been seen.
+  ///
+  /// A row rather than a `shared_preferences` first-run flag, for the same reason
+  /// `lastPackExportedAt` is one: it is a setting of this device, it can be
+  /// cleared by a restore of someone else's pack, and Settings offers a row that
+  /// shows the slides again — which is a thing no first-run flag can do.
+  static const String onboardingSeen = 'onboarding_seen';
+
+  /// The day the free trial began, in unix milliseconds, written once at the
+  /// first launch and never moved.
+  ///
+  /// In the settings table rather than the keystore on purpose: a keystore a
+  /// restore could not carry would look like a fresh install, and a breeder who
+  /// brought her ledger to a new phone would be handed a second trial for it.
+  static const String trialStartedAt = 'trial_started_at';
+
+  /// What this phone has bought, as a comma-separated list of plan names.
+  ///
+  /// Written only from what Play confirmed, never from what the app hoped: a
+  /// switch flipped in the UI is a free Pro subscription for anyone who can
+  /// reach the settings table, and Play re-checks it on every launch anyway.
+  static const String ownedPlans = 'owned_plans';
 }

@@ -13,9 +13,12 @@ import '../../services/litter_pdf.dart';
 import '../../services/pack_files.dart';
 import '../../services/pdf_layout.dart';
 import '../providers/app_providers.dart';
+import '../providers/record_providers.dart';
 import '../widgets/animal_card.dart';
+import '../widgets/bulk_vaccination_dialog.dart';
+import '../widgets/litter_pedigree.dart';
 import '../widgets/record_refusal.dart';
-import '../widgets/salala_nav_bar.dart';
+import '../widgets/companion_nav_bar.dart';
 
 class LitterListScreen extends ConsumerWidget {
   const LitterListScreen({super.key});
@@ -28,7 +31,7 @@ class LitterListScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.navLitters)),
-      bottomNavigationBar: const SalalaNavBar(index: 1),
+      bottomNavigationBar: const CompanionNavBar(index: 1),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => context.push(AppPaths.newLitter),
         icon: const Icon(Icons.add),
@@ -137,6 +140,12 @@ class LitterDetailScreen extends ConsumerWidget {
             ),
           if (litter != null)
             IconButton(
+              tooltip: l10n.actionEdit,
+              icon: const Icon(Icons.edit_outlined),
+              onPressed: () => context.push(AppPaths.editLitter(litter.id)),
+            ),
+          if (litter != null)
+            IconButton(
               tooltip: l10n.actionDelete,
               icon: const Icon(Icons.delete_outline),
               onPressed: () => _confirmDelete(context, ref, litter),
@@ -198,6 +207,43 @@ class LitterDetailScreen extends ConsumerWidget {
                   ],
                 ),
               ),
+              // The same three facts as above, drawn as their shape. The lines are
+              // kept because the tree names things and the lines date them; a
+              // breeder reading a pedigree wants both, and the tree is what makes
+              // "which line is this puppy from" answerable at a glance.
+              LitterPedigree(
+                litter: litter,
+                dam: dam,
+                sire: animalById(animals, litter.sireId),
+                puppies: puppies,
+                animals: animals,
+                coverFor: ref.watch(herdPhotosProvider).value,
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
+                child: Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: <Widget>[
+                    OutlinedButton.icon(
+                      onPressed: () => _addPuppies(context, ref, litter),
+                      icon: const Icon(Icons.pets_outlined),
+                      label: Text(l10n.litterAddPuppies),
+                    ),
+                    // Disabled rather than hidden on an empty litter: a breeder
+                    // who came here to vaccinate needs to see that the door
+                    // exists and what it is waiting for, not guess at a page
+                    // that grew a button once puppies were registered.
+                    OutlinedButton.icon(
+                      onPressed: puppies.isEmpty
+                          ? null
+                          : () => _vaccinateLitter(context, ref, puppies),
+                      icon: const Icon(Icons.vaccines_outlined),
+                      label: Text(l10n.bulkVaccineAction),
+                    ),
+                  ],
+                ),
+              ),
               if (puppies.isEmpty)
                 Padding(
                   padding: const EdgeInsets.all(16),
@@ -240,6 +286,80 @@ Future<void> _shareLitterPdf(
   } catch (error) {
     debugPrint('Litter PDF failed: $error');
     messenger.showSnackBar(SnackBar(content: Text(l10n.pdfFailed)));
+  }
+}
+
+/// Opens the bulk dose dialog for a whole litter and says how many rows landed.
+///
+/// The count in the snackbar is not decoration: the breeder is holding the
+/// puppies, and the number is what she checks against the ones in front of her.
+Future<void> _vaccinateLitter(
+  BuildContext context,
+  WidgetRef ref,
+  List<Animal> puppies,
+) async {
+  final l10n = AppLocalizations.of(context);
+  final written = await showBulkVaccinationDialog(context, animals: puppies);
+  if (written == null || !context.mounted) return;
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(content: Text(l10n.bulkVaccineDone('$written'))),
+  );
+}
+
+/// Registers more puppies for a whelping already in the ledger.
+///
+/// A breeder registers five and the sixth arrives the next morning, or enters
+/// the litter before the count is known. Before this the only way to add one was
+/// to delete the whelping — losing its dates and the puppies' lineage — and type
+/// it in again, which is exactly the kind of re-typing this ledger exists to
+/// end. The count is a list, not a field: a typed number can register the same
+/// litter twice by a slipped keypress.
+Future<void> _addPuppies(
+  BuildContext context,
+  WidgetRef ref,
+  Litter litter,
+) async {
+  final l10n = AppLocalizations.of(context);
+  var count = 1;
+  final chosen = await showDialog<int>(
+    context: context,
+    builder: (dialogContext) => StatefulBuilder(
+      builder: (dialogContext, setLocal) => AlertDialog(
+        title: Text(l10n.litterAddPuppies),
+        content: DropdownButtonFormField<int>(
+          initialValue: count,
+          decoration: InputDecoration(labelText: l10n.litterHowMany),
+          items: <DropdownMenuItem<int>>[
+            for (var index = 1; index <= maxPuppiesPerLitter; index++)
+              DropdownMenuItem(value: index, child: Text('$index')),
+          ],
+          onChanged: (value) => setLocal(() => count = value ?? count),
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: Text(l10n.actionCancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(dialogContext).pop(count),
+            child: Text(l10n.actionAdd),
+          ),
+        ],
+      ),
+    ),
+  );
+  if (chosen == null) return;
+
+  try {
+    await ref.read(littersProvider.notifier).addPuppies(litter, chosen);
+  } catch (error) {
+    // They landed or they did not, together: a refusal leaves the litter exactly
+    // as it was, so the screen stays put and says the write failed rather than
+    // showing puppies that are not in the ledger.
+    debugPrint('Adding puppies failed: $error');
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(l10n.recordSaveFailed)));
   }
 }
 

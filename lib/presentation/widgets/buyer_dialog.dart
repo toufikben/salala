@@ -196,6 +196,9 @@ class _BuyerDialogState extends ConsumerState<BuyerDialog> {
       content: SingleChildScrollView(
         child: Form(
           key: _formKey,
+          // Re-validation on the first keystroke, not only on Save: measured
+          // on the phone as a refusal line that outlived the text that fixed it.
+          autovalidateMode: AutovalidateMode.onUserInteraction,
           // A scrolled column, never a lazy list: `Form.validate()` only visits
           // mounted fields, so a name outside the cache extent would go unasked
           // and a buyer with no name would be written (D11).

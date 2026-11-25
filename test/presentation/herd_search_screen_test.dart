@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:salala/data/models/animal.dart';
-import 'package:salala/data/models/vaccination.dart';
-import 'package:salala/presentation/widgets/animal_card.dart';
+import 'package:companion/data/models/animal.dart';
+import 'package:companion/data/models/vaccination.dart';
+import 'package:companion/presentation/widgets/animal_card.dart';
 
 import '../helpers/pump_app.dart';
 
@@ -50,6 +50,15 @@ Vaccination _overdueDose() => Vaccination(
 /// below ambiguous rather than wrong, which is worth knowing on its own.
 final Finder _searchField = find.byType(TextField);
 
+/// The word `Breeding stock` inside a card rather than over the list.
+///
+/// It is both things: the heading over the breeding block, and the badge on a
+/// breeding animal's own photograph. A search removes the block and keeps the
+/// badge, so an unscoped `find.text` cannot say which one went away — the count
+/// can: two before the search, one after.
+Finder _badgeOnACard(String text) =>
+    find.descendant(of: find.byType(AnimalCard), matching: find.text(text));
+
 void _usePhoneViewport(WidgetTester tester) {
   tester.view.physicalSize = const Size(1080, 2400);
   tester.view.devicePixelRatio = 2.625;
@@ -65,7 +74,7 @@ void main() {
     tester,
   ) async {
     _usePhoneViewport(tester);
-    await pumpSalala(
+    await pumpApp(
       tester,
       seed: <Animal>[
         _animal('a-1', name: 'Bella'),
@@ -85,7 +94,12 @@ void main() {
     // different question, so the answer is one ranked list with no header over
     // it — a breeding block printed first would otherwise outrank the match
     // strength that `searchHerd` had just computed.
-    expect(find.text('Breeding stock'), findsNothing);
+    //
+    // Counted rather than looked for: `Breeding stock` is also the badge on
+    // Zeus's own photograph, and that badge is exactly what a search should
+    // still show. Two copies before the search (header + badge), one after.
+    expect(find.text('Breeding stock'), findsOneWidget);
+    expect(_badgeOnACard('Breeding stock'), findsOneWidget);
     expect(find.text('All animals'), findsNothing);
   });
 
@@ -93,7 +107,7 @@ void main() {
     tester,
   ) async {
     _usePhoneViewport(tester);
-    await pumpSalala(
+    await pumpApp(
       tester,
       seed: <Animal>[
         // The weaker match is the breeding animal on purpose: the herd view puts
@@ -117,7 +131,7 @@ void main() {
 
   testWidgets('a chip typed from a sticker finds the dog', (tester) async {
     _usePhoneViewport(tester);
-    await pumpSalala(
+    await pumpApp(
       tester,
       seed: <Animal>[
         _animal('a-1', name: 'Bella'),
@@ -132,35 +146,35 @@ void main() {
     expect(find.text('Bella'), findsNothing);
   });
 
-  testWidgets(
-    'nothing matches: the word comes back, and clearing the box brings the '
-    'herd with it',
-    (tester) async {
-      _usePhoneViewport(tester);
-      await pumpSalala(tester, seed: <Animal>[_animal(_nalaId, name: 'Nala')]);
+  testWidgets('nothing matches: the word comes back, and clearing the box brings the '
+      'herd with it', (tester) async {
+    _usePhoneViewport(tester);
+    await pumpApp(tester, seed: <Animal>[_animal(_nalaId, name: 'Nala')]);
 
-      await tester.enterText(_searchField, 'zzz');
-      await tester.pump();
+    await tester.enterText(_searchField, 'zzz');
+    await tester.pump();
 
-      expect(find.text('Nothing matches “zzz”'), findsOneWidget);
-      expect(find.text('Nala'), findsNothing);
+    expect(find.text('Nothing matches “zzz”'), findsOneWidget);
+    expect(find.text('Nala'), findsNothing);
 
-      await tester.tap(find.byIcon(Icons.close));
-      await tester.pump();
+    await tester.tap(find.byIcon(Icons.close));
+    // Real time, not one frame: bringing the herd back builds the cards again,
+    // and each card asks for its photograph. That read is a database query, and
+    // a test that ends on the frame that started it leaves the query pending.
+    await settleRealIo(tester);
 
-      expect(find.text('Nala'), findsOneWidget);
-      expect(find.text('Nothing matches “zzz”'), findsNothing);
-      // The corner button stays through a search: "nothing matches" next to
-      // "Add animal" is the app's whole answer to a dog nobody registered yet.
-      expect(find.byType(FloatingActionButton), findsOneWidget);
-    },
-  );
+    expect(find.text('Nala'), findsOneWidget);
+    expect(find.text('Nothing matches “zzz”'), findsNothing);
+    // The corner button stays through a search: "nothing matches" next to
+    // "Add animal" is the app's whole answer to a dog nobody registered yet.
+    expect(find.byType(FloatingActionButton), findsOneWidget);
+  });
 
   testWidgets('a search hides the agenda, which speaks for the whole herd', (
     tester,
   ) async {
     _usePhoneViewport(tester);
-    await pumpSalala(
+    await pumpApp(
       tester,
       seed: <Animal>[
         _animal(_nalaId, name: 'Nala'),
@@ -190,7 +204,7 @@ void main() {
     tester,
   ) async {
     _usePhoneViewport(tester);
-    await pumpSalala(
+    await pumpApp(
       tester,
       seed: <Animal>[
         _animal(_nalaId, name: 'Nala'),
@@ -217,7 +231,7 @@ void main() {
     tester,
   ) async {
     _usePhoneViewport(tester);
-    await pumpSalala(
+    await pumpApp(
       tester,
       locale: const Locale('ar'),
       seed: <Animal>[

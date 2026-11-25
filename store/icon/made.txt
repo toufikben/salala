@@ -1,0 +1,12 @@
+android\app\src\main\res\mipmap-mdpi\ic_launcher.png 48px 1883 bytes
+android\app\src\main\res\mipmap-mdpi\ic_launcher_round.png 48px 2675 bytes
+android\app\src\main\res\mipmap-hdpi\ic_launcher.png 72px 2958 bytes
+android\app\src\main\res\mipmap-hdpi\ic_launcher_round.png 72px 3892 bytes
+android\app\src\main\res\mipmap-xhdpi\ic_launcher.png 96px 4216 bytes
+android\app\src\main\res\mipmap-xhdpi\ic_launcher_round.png 96px 5787 bytes
+android\app\src\main\res\mipmap-xxhdpi\ic_launcher.png 144px 6419 bytes
+android\app\src\main\res\mipmap-xxhdpi\ic_launcher_round.png 144px 9092 bytes
+android\app\src\main\res\mipmap-xxxhdpi\ic_launcher.png 192px 8631 bytes
+android\app\src\main\res\mipmap-xxxhdpi\ic_launcher_round.png 192px 11967 bytes
+store\icon\icon-512.png 23506 bytes
+store\icon\icon-round-512.png 31246 bytes

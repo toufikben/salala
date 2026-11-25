@@ -98,25 +98,44 @@ class Animal extends Equatable {
   final int createdAt;
   final int updatedAt;
 
+  /// One flag per nullable field, because `null` already means "leave it".
+  ///
+  /// Without them there is no way to *remove* a value: un-linking a puppy from a
+  /// dam it was attached to by mistake, or clearing a microchip number typed into
+  /// the wrong animal, both need the field written as SQL NULL. `clearBirthDate`
+  /// was the only one, added for the form's date tile, and every other column
+  /// became a one-way door.
   Animal copyWith({
     String? name,
     String? species,
     String? breed,
+    bool clearBreed = false,
     Sex? sex,
     int? birthDate,
     bool clearBirthDate = false,
     int? deathDate,
+    bool clearDeathDate = false,
     String? color,
+    bool clearColor = false,
     String? registrationNo,
+    bool clearRegistrationNo = false,
     String? registry,
+    bool clearRegistry = false,
     String? microchipId,
+    bool clearMicrochipId = false,
     int? microchipDate,
+    bool clearMicrochipDate = false,
     String? damId,
+    bool clearDamId = false,
     String? sireId,
+    bool clearSireId = false,
     String? litterId,
+    bool clearLitterId = false,
     bool? isBreedingStock,
     String? photoPath,
+    bool clearPhotoPath = false,
     String? notes,
+    bool clearNotes = false,
     AnimalStatus? status,
     int? updatedAt,
   }) {
@@ -124,21 +143,25 @@ class Animal extends Equatable {
       id: id,
       name: name ?? this.name,
       species: species ?? this.species,
-      breed: breed ?? this.breed,
+      breed: clearBreed ? null : (breed ?? this.breed),
       sex: sex ?? this.sex,
       birthDate: clearBirthDate ? null : (birthDate ?? this.birthDate),
-      deathDate: deathDate ?? this.deathDate,
-      color: color ?? this.color,
-      registrationNo: registrationNo ?? this.registrationNo,
-      registry: registry ?? this.registry,
-      microchipId: microchipId ?? this.microchipId,
-      microchipDate: microchipDate ?? this.microchipDate,
-      damId: damId ?? this.damId,
-      sireId: sireId ?? this.sireId,
-      litterId: litterId ?? this.litterId,
+      deathDate: clearDeathDate ? null : (deathDate ?? this.deathDate),
+      color: clearColor ? null : (color ?? this.color),
+      registrationNo: clearRegistrationNo
+          ? null
+          : (registrationNo ?? this.registrationNo),
+      registry: clearRegistry ? null : (registry ?? this.registry),
+      microchipId: clearMicrochipId ? null : (microchipId ?? this.microchipId),
+      microchipDate: clearMicrochipDate
+          ? null
+          : (microchipDate ?? this.microchipDate),
+      damId: clearDamId ? null : (damId ?? this.damId),
+      sireId: clearSireId ? null : (sireId ?? this.sireId),
+      litterId: clearLitterId ? null : (litterId ?? this.litterId),
       isBreedingStock: isBreedingStock ?? this.isBreedingStock,
-      photoPath: photoPath ?? this.photoPath,
-      notes: notes ?? this.notes,
+      photoPath: clearPhotoPath ? null : (photoPath ?? this.photoPath),
+      notes: clearNotes ? null : (notes ?? this.notes),
       status: status ?? this.status,
       createdAt: createdAt,
       updatedAt: updatedAt ?? this.updatedAt,

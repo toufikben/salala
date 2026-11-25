@@ -1,11 +1,12 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:salala/data/db/daos.dart';
-import 'package:salala/data/models/animal.dart';
-import 'package:salala/data/models/health_test.dart';
-import 'package:salala/data/models/symptom.dart';
-import 'package:salala/data/models/vaccination.dart';
-import 'package:salala/data/models/vet_visit.dart';
-import 'package:salala/data/models/weight_entry.dart';
+import 'package:companion/core/utils/day_math.dart';
+import 'package:companion/data/db/daos.dart';
+import 'package:companion/data/models/animal.dart';
+import 'package:companion/data/models/health_test.dart';
+import 'package:companion/data/models/symptom.dart';
+import 'package:companion/data/models/vaccination.dart';
+import 'package:companion/data/models/vet_visit.dart';
+import 'package:companion/data/models/weight_entry.dart';
 
 import '../../helpers/test_db.dart';
 
@@ -104,11 +105,16 @@ void main() {
       expect(due.map((v) => v.vaccineName).toList(), <String>['Rabies']);
     });
 
-    test('isOverdue reads the clock, not the database', () {
-      final v = shot(due: 1000);
-      expect(v.isOverdue(1001), isTrue);
-      expect(v.isOverdue(999), isFalse);
-      expect(shot().isOverdue(1000), isFalse);
+    test('isOverdue counts calendar days, not milliseconds', () {
+      // A due date is a day, so a booster due today is not late at 20:00 on that
+      // same day — which is what the raw-millisecond comparison used to say.
+      final today = dayStartMs(0);
+      final v = shot(due: today);
+      expect(v.isOverdue(today), isFalse);
+      expect(v.isOverdue(today + 20 * 3600 * 1000), isFalse);
+      expect(v.isOverdue(addDays(today, -1)), isFalse);
+      expect(v.isOverdue(addDays(today, 1)), isTrue);
+      expect(shot().isOverdue(today), isFalse);
     });
   });
 
@@ -188,9 +194,12 @@ void main() {
       expect(await daos.healthTests.forAnimal('missing'), isEmpty);
     });
 
-    test('a certificate with no expiry never lapses', () {
-      expect(scan(until: 1000).isExpired(1001), isTrue);
-      expect(scan().isExpired(1000), isFalse);
+    test('a certificate is good through its last valid day', () {
+      final today = dayStartMs(0);
+      expect(scan(until: today).isExpired(today), isFalse);
+      expect(scan(until: today).isExpired(today + 20 * 3600 * 1000), isFalse);
+      expect(scan(until: today).isExpired(addDays(today, 1)), isTrue);
+      expect(scan().isExpired(today), isFalse);
     });
 
     test('an update can clear the expiry', () async {

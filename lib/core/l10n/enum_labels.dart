@@ -8,6 +8,17 @@ String sexLabel(AppLocalizations l10n, Sex sex) => switch (sex) {
   Sex.unknown => l10n.sexUnknown,
 };
 
+/// The species is free text the breeder typed, and the form stores it lowercased
+/// so "Dog" and "dog" are one species. Displaying that raw value would put a
+/// lowercase word at the top of every animal page, so the first letter is
+/// restored here — only the first, because "West Highland terrier" is already a
+/// sentence and title-casing it would fight the breeder's own spelling.
+String speciesLabel(String raw) {
+  final text = raw.trim();
+  if (text.isEmpty) return text;
+  return text[0].toUpperCase() + text.substring(1);
+}
+
 String statusLabel(AppLocalizations l10n, AnimalStatus status) =>
     switch (status) {
       AnimalStatus.active => l10n.statusActive,

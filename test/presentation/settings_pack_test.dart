@@ -2,12 +2,18 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:salala/data/db/schema.dart';
-import 'package:salala/data/models/animal.dart';
-import 'package:salala/data/models/photo.dart';
-import 'package:salala/data/models/vaccination.dart';
-import 'package:salala/presentation/widgets/animal_card.dart';
-import 'package:salala/services/data_pack.dart';
+import 'package:companion/data/db/schema.dart';
+import 'package:companion/core/utils/date_utils.dart';
+import 'package:companion/core/l10n/app_localizations.dart';
+import 'package:companion/data/models/animal.dart';
+import 'package:companion/data/models/photo.dart';
+import 'package:companion/data/models/vaccination.dart';
+import 'package:companion/presentation/screens/animal_list_screen.dart';
+import 'package:companion/presentation/screens/settings_screen.dart';
+import 'package:companion/presentation/widgets/animal_card.dart';
+import 'package:companion/services/data_pack.dart';
+import 'package:companion/services/pack_archive.dart';
+import 'package:companion/services/pack_files.dart';
 
 import '../helpers/fake_notification_writer.dart';
 import '../helpers/fake_pack_files.dart';
@@ -23,6 +29,8 @@ import '../helpers/pump_app.dart';
 String packJson({
   List<Map<String, Object?>> animals = const <Map<String, Object?>>[],
   List<Map<String, Object?>> vaccinations = const <Map<String, Object?>>[],
+  List<Map<String, Object?>>? photos,
+  List<Map<String, Object?>> settings = const <Map<String, Object?>>[],
   int formatVersion = packFormatVersion,
 }) {
   final rows = <String, Object?>{
@@ -30,6 +38,13 @@ String packJson({
   };
   rows['animals'] = animals;
   rows['vaccinations'] = vaccinations;
+  // The settings travel with the pack, language included — which is why a
+  // restore has to do something about the language rather than assume the row
+  // on screen is the row that arrived.
+  rows['user_settings'] = settings;
+  // Null is a pack from before pictures existed; a list is a pack whose rows
+  // travel with their bytes in the archive.
+  if (photos != null) rows['photos'] = photos;
   return jsonEncode(<String, Object?>{
     'format': packFormat,
     'formatVersion': formatVersion,
@@ -88,11 +103,42 @@ Future<void> goTo(WidgetTester tester, String destination) async {
   await settleRealIo(tester);
 }
 
+/// The herd tab, scrolled until the named card has been built.
+///
+/// A card is a photograph now, so two animals are taller than a phone's screen
+/// and the list is lazy: a card below the fold does not exist yet, and looking
+/// for it without scrolling finds nothing even when the row is in the ledger.
+Future<void> scrollHerdTo(WidgetTester tester, Finder finder) async {
+  await tester.scrollUntilVisible(
+    finder,
+    240,
+    scrollable: find
+        .descendant(
+          of: find.byType(AnimalListScreen),
+          matching: find.byType(Scrollable),
+        )
+        .first,
+  );
+  await settleRealIo(tester);
+}
+
 Future<void> tapTile(WidgetTester tester, String title) async {
   // A tile's label can sit under the snackbar the previous action left behind,
-  // so the scroll is asserted rather than assumed.
+  // so the scroll is asserted rather than assumed — and it is a scroll, not an
+  // `ensureVisible`: Settings is lazy and now carries the Pro row and the trial
+  // row above the pack tiles, so on a phone viewport the row has not been built
+  // at all and `ensureVisible` throws "No element" instead of scrolling to it.
   final tile = find.text(title);
-  await tester.ensureVisible(tile);
+  await tester.scrollUntilVisible(
+    tile,
+    180,
+    scrollable: find
+        .descendant(
+          of: find.byType(SettingsScreen),
+          matching: find.byType(Scrollable),
+        )
+        .first,
+  );
   await tester.pump();
   await tester.tap(tile);
   await settleRealIo(tester);
@@ -109,7 +155,7 @@ void main() {
 
   group('exporting', () {
     testWidgets('hands the sheet every record on the phone', (tester) async {
-      await pumpSalala(
+      await pumpApp(
         tester,
         packFiles: files,
         seed: <Animal>[animal('Atlas'), animal('Zida', breeding: true)],
@@ -125,17 +171,55 @@ void main() {
       expect(rows['animals'], hasLength(2));
       expect(rows['vaccinations'], hasLength(1));
       // The name is the breeder's handle on the file, so it is part of what the
-      // screen promises: a pack, stamped to the minute, that says it is JSON.
+      // screen promises: a pack, stamped to the minute, in a container that says
+      // it holds pictures as well as rows.
       expect(
         files.shared.keys.single,
-        matches(r'^salala-pack-\d{8}-\d{4}\.json$'),
+        matches(r'^companion-pack-\d{8}-\d{4}\.zip$'),
       );
       expect(find.textContaining('is ready to send'), findsOneWidget);
     });
 
+    testWidgets('the file carries the pictures as well as the rows', (
+      tester,
+    ) async {
+      final photos = FakePhotoFiles(
+        bytes: <String, List<int>>{
+          'atlas/1759000000000-4.jpg': <int>[7, 7, 7],
+        },
+      );
+      await pumpApp(
+        tester,
+        packFiles: files,
+        photoFiles: photos,
+        seed: <Animal>[animal('Atlas')],
+        seedPhotos: <Photo>[
+          Photo(
+            id: 'p-1',
+            animalId: 'atlas',
+            fileName: '1759000000000-4.jpg',
+            createdAt: 1759000000000,
+          ),
+        ],
+      );
+      await goTo(tester, 'Settings');
+
+      await tapTile(tester, 'Export records');
+
+      // The bytes travel beside the ledger: a restore on a new phone gets the
+      // images, not just their file names.
+      expect(files.sharedPhotos, <String, List<int>>{
+        'atlas/1759000000000-4.jpg': <int>[7, 7, 7],
+      });
+      final rows =
+          (jsonDecode(files.sharedJson) as Map<String, Object?>)['rows']
+              as Map<String, Object?>;
+      expect(rows['photos'], hasLength(1));
+    });
+
     testWidgets('a phone that refuses the sheet says so', (tester) async {
       files.shareFailure = StateError('no activity to share to');
-      await pumpSalala(
+      await pumpApp(
         tester,
         packFiles: files,
         seed: <Animal>[animal('Atlas')],
@@ -163,7 +247,7 @@ void main() {
         ],
         vaccinations: <Map<String, Object?>>[doseRow('v-1', 'a-1', 1)],
       );
-      await pumpSalala(
+      await pumpApp(
         tester,
         packFiles: files,
         seed: <Animal>[animal('Atlas')],
@@ -190,7 +274,7 @@ void main() {
       files.pickedText = packJson(
         animals: <Map<String, Object?>>[animalRow('a-1', 'Kenza')],
       );
-      await pumpSalala(
+      await pumpApp(
         tester,
         packFiles: files,
         seed: <Animal>[animal('Atlas')],
@@ -216,7 +300,7 @@ void main() {
         ],
         vaccinations: <Map<String, Object?>>[doseRow('v-1', 'a-1', 1)],
       );
-      await pumpSalala(
+      await pumpApp(
         tester,
         packFiles: files,
         seed: <Animal>[animal('Atlas')],
@@ -242,20 +326,17 @@ void main() {
       // Scoped to the cards: a restored dose due inside a fortnight puts its
       // animal's name in the agenda above the herd too, so the restored herd is
       // two rows per animal on this screen, not one.
-      expect(
-        find.descendant(
+      //
+      // Scrolled to, one name at a time: a card is a photograph now, so the
+      // second animal sits below the fold in a lazy list.
+      for (final name in const <String>['Kenza', 'Sultan']) {
+        final card = find.descendant(
           of: find.byType(AnimalCard),
-          matching: find.text('Kenza'),
-        ),
-        findsOneWidget,
-      );
-      expect(
-        find.descendant(
-          of: find.byType(AnimalCard),
-          matching: find.text('Sultan'),
-        ),
-        findsOneWidget,
-      );
+          matching: find.text(name),
+        );
+        await scrollHerdTo(tester, card);
+        expect(card, findsOneWidget);
+      }
       expect(find.text('Atlas'), findsNothing);
     });
 
@@ -270,7 +351,7 @@ void main() {
           doseRow('v-1', 'a-1', due.millisecondsSinceEpoch),
         ],
       );
-      await pumpSalala(
+      await pumpApp(
         tester,
         notifications: notifications,
         packFiles: files,
@@ -306,7 +387,7 @@ void main() {
       files.pickedText = packJson(
         animals: <Map<String, Object?>>[animalRow('atlas', 'Atlas')],
       );
-      await pumpSalala(
+      await pumpApp(
         tester,
         packFiles: files,
         photoFiles: photos,
@@ -328,6 +409,11 @@ void main() {
       // sentence that is: once the chain has reached the snackbar, the call below
       // it has certainly happened or certainly been refused.
       await settleRefusal(tester, waitingFor: 'Records restored: 1');
+      // And then for the sweep itself, rather than assuming it landed with the
+      // sentence: on a loaded machine the folder call is a real file-system hop
+      // after the row that announced it, and the fixed rounds above end when the
+      // snackbar appears, not when the disk answered.
+      await settleUntil(tester, () => photos.sweeps.isNotEmpty);
 
       // A pack carries no pictures, so the rows that came through are the only
       // answer to which bytes still belong on this phone. Without this call a
@@ -339,6 +425,46 @@ void main() {
       });
     });
 
+    testWidgets(
+      'a pack with pictures puts the bytes back and keeps their rows',
+      (tester) async {
+        final photos = FakePhotoFiles();
+        files.picked = PickedPackFile(
+          name: 'companion-pack.zip',
+          bytes: encodePackArchive(
+            packJson(
+              animals: <Map<String, Object?>>[animalRow('atlas', 'Atlas')],
+              photos: <Map<String, Object?>>[
+                <String, Object?>{
+                  'id': 'p-1',
+                  'animal_id': 'atlas',
+                  'file_name': '1759000000000-4.jpg',
+                  'created_at': 1759000000000,
+                },
+              ],
+            ),
+            <String, List<int>>{
+              'atlas/1759000000000-4.jpg': <int>[7, 7, 7],
+            },
+          ),
+        );
+        await pumpApp(tester, packFiles: files, photoFiles: photos);
+        await goTo(tester, 'Settings');
+
+        await tapTile(tester, 'Restore from a pack');
+        await tester.tap(find.widgetWithText(FilledButton, 'Replace'));
+        await settleRefusal(tester, waitingFor: 'Records restored: 2');
+
+        // The picture is written, its row comes from the pack, and the sweep keeps
+        // exactly that file — a restore that left the bytes behind would show the
+        // blank this app draws for a picture the phone does not have.
+        expect(photos.restored, <String>['atlas/1759000000000-4.jpg']);
+        expect(photos.sweeps.single, <String, Set<String>>{
+          'atlas': <String>{'1759000000000-4.jpg'},
+        });
+      },
+    );
+
     testWidgets('a phone that refuses the sweep still restored the ledger', (
       tester,
     ) async {
@@ -346,7 +472,7 @@ void main() {
       files.pickedText = packJson(
         animals: <Map<String, Object?>>[animalRow('a-1', 'Kenza')],
       );
-      await pumpSalala(tester, packFiles: files, photoFiles: photos);
+      await pumpApp(tester, packFiles: files, photoFiles: photos);
       await goTo(tester, 'Settings');
 
       await tapTile(tester, 'Restore from a pack');
@@ -363,7 +489,7 @@ void main() {
       tester,
     ) async {
       files.pickedText = '{"notes":"a shopping list"}';
-      await pumpSalala(
+      await pumpApp(
         tester,
         packFiles: files,
         seed: <Animal>[animal('Atlas')],
@@ -373,18 +499,18 @@ void main() {
       await tapTile(tester, 'Restore from a pack');
 
       expect(
-        find.text('That file is not a Salala pack, or it is damaged'),
+        find.text('That file is not a Companion pack, or it is damaged'),
         findsOneWidget,
       );
       expect(find.byType(AlertDialog), findsNothing);
     });
 
-    testWidgets('a pack from a newer Salala is refused', (tester) async {
+    testWidgets('a pack from a newer Companion is refused', (tester) async {
       files.pickedText = packJson(
         animals: <Map<String, Object?>>[animalRow('a-1', 'Kenza')],
         formatVersion: 99,
       );
-      await pumpSalala(
+      await pumpApp(
         tester,
         packFiles: files,
         seed: <Animal>[animal('Atlas')],
@@ -394,7 +520,7 @@ void main() {
       await tapTile(tester, 'Restore from a pack');
 
       expect(
-        find.text('That pack comes from a newer Salala than this one'),
+        find.text('That pack comes from a newer Companion than this one'),
         findsOneWidget,
       );
       expect(find.byType(AlertDialog), findsNothing);
@@ -406,7 +532,7 @@ void main() {
       ) as Map<String, Object?>;
       (broken['rows']! as Map<String, Object?>).remove('vaccinations');
       files.pickedText = jsonEncode(broken);
-      await pumpSalala(
+      await pumpApp(
         tester,
         packFiles: files,
         seed: <Animal>[animal('Atlas')],
@@ -424,7 +550,7 @@ void main() {
 
     testWidgets('backing out of the picker says nothing', (tester) async {
       files.pickedText = null;
-      await pumpSalala(
+      await pumpApp(
         tester,
         packFiles: files,
         seed: <Animal>[animal('Atlas')],
@@ -441,7 +567,7 @@ void main() {
 
     testWidgets('a file the phone will not open says so', (tester) async {
       files.pickFailure = StateError('permission denied');
-      await pumpSalala(
+      await pumpApp(
         tester,
         packFiles: files,
         seed: <Animal>[animal('Atlas')],
@@ -452,11 +578,48 @@ void main() {
 
       expect(find.text('That file could not be opened'), findsOneWidget);
     });
+
+    testWidgets('a restore does not inherit the other phone\'s backup day', (
+      tester,
+    ) async {
+      files.pickedText = packJson(
+        animals: <Map<String, Object?>>[animalRow('a-1', 'Kenza')],
+      );
+      await pumpApp(
+        tester,
+        packFiles: files,
+        seed: <Animal>[animal('Atlas')],
+        // A stamp already on this phone, so the assertion is about what the
+        // restore does to it rather than about a row that was never there.
+        beforeLaunch: (db) => db.insert('user_settings', <String, Object?>{
+          'key': 'last_pack_exported_at',
+          'value': '${DateTime(2026, 1, 1).millisecondsSinceEpoch}',
+          'updated_at': 0,
+        }),
+      );
+      await goTo(tester, 'Settings');
+
+      // The stamp from before the restore, formatted the way the row writes it.
+      final staleDay = formatDayFor(
+        'en',
+        DateTime(2026, 1, 1).millisecondsSinceEpoch,
+      );
+      expect(find.text('Last backup: $staleDay'), findsOneWidget);
+
+      await tapTile(tester, 'Restore from a pack');
+      await tester.tap(find.widgetWithText(FilledButton, 'Replace'));
+      await settleRefusal(tester, waitingFor: 'Records restored: 1');
+      await settleRealIo(tester);
+
+      // The pack came from a phone whose habit is not this phone's: a day
+      // inherited from a ledger that was never here is a claim nobody can check.
+      expect(find.text('No backup has left this phone yet'), findsOneWidget);
+    });
   });
 
   group('the app lock', () {
     testWidgets('a phone that refuses the PIN says so', (tester) async {
-      final storage = await pumpSalala(tester, seed: <Animal>[animal('Atlas')]);
+      final storage = await pumpApp(tester, seed: <Animal>[animal('Atlas')]);
       await goTo(tester, 'Settings');
 
       // Refused on the second write, which is the interesting half: the salt is
@@ -495,13 +658,16 @@ void main() {
     testWidgets('a language the phone stored changes the whole app', (
       tester,
     ) async {
-      await pumpSalala(tester, seed: <Animal>[animal('Atlas')]);
+      await pumpApp(tester, seed: <Animal>[animal('Atlas')]);
       await goTo(tester, 'Settings');
 
       await tapTile(tester, 'Language');
       await tester.tap(find.text('العربية'));
-      await settleRealIo(tester);
-      await tester.pumpAndSettle();
+      // The tap writes the row and the app only repaints in the new language
+      // once that write lands, so the sentence is the thing to wait for — a
+      // fixed pair of settles passed alone and failed inside a suite, where the
+      // write was still in another isolate when the assertion ran.
+      await settleUntil(tester, () => find.text('اللغة').evaluate().isNotEmpty);
 
       expect(find.text('اللغة'), findsOneWidget);
     });
@@ -509,7 +675,7 @@ void main() {
     testWidgets('a language the phone will not store is not shown as chosen', (
       tester,
     ) async {
-      await pumpSalala(
+      await pumpApp(
         tester,
         seed: <Animal>[animal('Atlas')],
         beforeLaunch: refuseWritesTo('user_settings'),
@@ -526,6 +692,129 @@ void main() {
       // with no sentence anywhere between the two to say the tap had failed.
       expect(find.text('Language'), findsOneWidget);
       expect(find.text('اللغة'), findsNothing);
+    });
+
+    testWidgets('every language the app ships is offered', (tester) async {
+      // The list in Settings used to be four codes typed by hand, which meant a
+      // fifth `.arb` file shipped a language nobody could choose. The menu is
+      // read off the delegate now, so this test is the guard on that promise:
+      // whatever `supportedLocales` holds has to be reachable from this row.
+      // Counted rather than named, so adding a language does not mean editing
+      // this test — which is the whole point of the menu reading the delegate.
+      await pumpApp(tester, seed: <Animal>[animal('Atlas')]);
+      await goTo(tester, 'Settings');
+      await tapTile(tester, 'Language');
+
+      expect(
+        find.byType(MenuItemButton),
+        findsNWidgets(AppLocalizations.supportedLocales.length + 1),
+        reason:
+            'the menu offers ${AppLocalizations.supportedLocales.length} '
+            'language(s) plus System default, and the row drew a different '
+            'number: a shipped .arb file that cannot be chosen, or an entry '
+            'that has no .arb file behind it',
+      );
+      expect(
+        find.descendant(
+          of: find.byType(MenuItemButton),
+          matching: find.text('System default'),
+        ),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('a language added after the first three changes the app', (
+      tester,
+    ) async {
+      // Picking German rather than Arabic on purpose: the three original
+      // languages would pass this test even if the menu were still hardcoded.
+      await pumpApp(tester, seed: <Animal>[animal('Atlas')]);
+      await goTo(tester, 'Settings');
+
+      await tapTile(tester, 'Language');
+      await tester.tap(find.text('Deutsch'));
+      await settleUntil(
+        tester,
+        () => find.text('Sprache').evaluate().isNotEmpty,
+      );
+
+      expect(find.text('Sprache'), findsOneWidget);
+    });
+
+    testWidgets('a restore adopts the language the pack was read in', (
+      tester,
+    ) async {
+      // `user_settings` travels whole, so the pack arrives with the other
+      // phone's language. The app read that setting once, in `main()`, before
+      // the first frame — so a restore that only puts the rows back leaves the
+      // ledger in one language and every label around it in another, until the
+      // next launch quietly fixes it.
+      files.pickedText = packJson(
+        animals: <Map<String, Object?>>[animalRow('a-1', 'Kenza')],
+        settings: <Map<String, Object?>>[
+          <String, Object?>{
+            'key': 'language_code',
+            'value': 'de',
+            'updated_at': 0,
+          },
+        ],
+      );
+      await pumpApp(
+        tester,
+        packFiles: files,
+        seed: <Animal>[animal('Atlas')],
+      );
+      await goTo(tester, 'Settings');
+
+      await tapTile(tester, 'Restore from a pack');
+      await tester.tap(find.widgetWithText(FilledButton, 'Replace'));
+      await settleRefusal(tester, waitingFor: 'Records restored: 2');
+      // The snackbar was built from the sentences the screen held when the tap
+      // landed, so it stays English; the app under it does not. The title is what
+      // is asserted rather than the language row: the list is scrolled down to
+      // the pack row by then, so a row above it is not built at all.
+      await settleUntil(
+        tester,
+        () => find.text('Einstellungen').evaluate().isNotEmpty,
+      );
+
+      expect(find.widgetWithText(AppBar, 'Einstellungen'), findsOneWidget);
+      expect(find.widgetWithText(AppBar, 'Settings'), findsNothing);
+    });
+
+    testWidgets('a pack that says system hands the app back to the phone', (
+      tester,
+    ) async {
+      // The other half of the same rule: `system` is a value this app stores but
+      // not a language it can show, so adopting it has to mean "no override"
+      // rather than a `Locale('system')` that resolves to nothing.
+      files.pickedText = packJson(
+        animals: <Map<String, Object?>>[animalRow('a-1', 'Kenza')],
+        settings: <Map<String, Object?>>[
+          <String, Object?>{
+            'key': 'language_code',
+            'value': 'system',
+            'updated_at': 0,
+          },
+        ],
+      );
+      await pumpApp(
+        tester,
+        packFiles: files,
+        seed: <Animal>[animal('Atlas')],
+        locale: const Locale('ar'),
+      );
+      await goTo(tester, 'الإعدادات');
+
+      await tapTile(tester, 'استرجاع من حزمة');
+      await tester.tap(find.widgetWithText(FilledButton, 'استبدال'));
+      await settleRefusal(tester, waitingFor: 'عدد السجلات المسترجعة: 2');
+      // No override means the phone decides, and a test's phone is `en_US`.
+      await settleUntil(
+        tester,
+        () => find.text('Settings').evaluate().isNotEmpty,
+      );
+      expect(find.widgetWithText(AppBar, 'Settings'), findsOneWidget);
     });
   });
 }

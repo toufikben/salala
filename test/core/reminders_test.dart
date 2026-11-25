@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:salala/core/utils/reminders.dart';
+import 'package:companion/core/utils/reminders.dart';
 
 /// A fixed noon: every case below is about which mornings are still ahead, and
 /// a `DateTime.now()` in the fixture would make that depend on when CI ran.
