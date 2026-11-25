@@ -78,6 +78,11 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+  # Only the tests use this. The platform interface is what `InAppPurchase`
+  # delegates to, so swapping its instance is the one way to drive the real
+  # `PlayPurchaseGateway` — the class that had no coverage and the defect that
+  # came with it.
+  in_app_purchase_platform_interface: ^1.4.1
   sqflite_common_ffi: ^2.3.0
 
 flutter:
