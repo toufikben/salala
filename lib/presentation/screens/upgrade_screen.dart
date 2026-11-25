@@ -49,6 +49,7 @@ class _UpgradeScreenState extends ConsumerState<UpgradeScreen> {
     final theme = Theme.of(context);
     final offers = ref.watch(storeOffersProvider);
     final access = ref.watch(proAccessProvider).value;
+    final paid = access?.paid ?? false;
 
     // Only plans the store actually holds are offered. A card for a plan that
     // was never created in Play Console is a price that loads forever, and a
@@ -152,24 +153,31 @@ class _UpgradeScreenState extends ConsumerState<UpgradeScreen> {
               ),
             ),
           const SizedBox(height: 20),
-          FilledButton(
-            onPressed: price == null || _working ? null : () => _buy(selected),
-            style: FilledButton.styleFrom(
-              minimumSize: const Size.fromHeight(52),
+          // Once the subscription is live there is nothing left to sell. Leaving
+          // the button enabled would start a second purchase of the plan she
+          // already owns, which Play would happily take.
+          if (!paid)
+            FilledButton(
+              onPressed: price == null || _working
+                  ? null
+                  : () => _buy(selected),
+              style: FilledButton.styleFrom(
+                minimumSize: const Size.fromHeight(52),
+              ),
+              child: _working
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : Text(l10n.upgradeSubscribe),
             ),
-            child: _working
-                ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : Text(l10n.upgradeSubscribe),
-          ),
-          const SizedBox(height: 8),
-          TextButton(
-            onPressed: _working ? null : _restore,
-            child: Text(l10n.upgradeRestore),
-          ),
+          if (!paid) const SizedBox(height: 8),
+          if (!paid)
+            TextButton(
+              onPressed: _working ? null : _restore,
+              child: Text(l10n.upgradeRestore),
+            ),
           const SizedBox(height: 12),
           TextButton(
             onPressed: _working ? null : () => Navigator.of(context).maybePop(),

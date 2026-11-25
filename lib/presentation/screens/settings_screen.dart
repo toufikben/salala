@@ -814,6 +814,12 @@ class _TrialTile extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final state = ref.watch(trialStateProvider).value;
+    final access = ref.watch(proAccessProvider).value;
+
+    // A countdown to the end of a trial is a countdown to a payment that will
+    // never happen once she has paid: the Pro row above already says "Active on
+    // this phone", and a second row saying 15 days left reads as a contradiction.
+    if (access != null && access.paid) return const SizedBox.shrink();
 
     return ListTile(
       leading: const Icon(Icons.hourglass_bottom),

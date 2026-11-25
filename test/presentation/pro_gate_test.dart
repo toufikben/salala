@@ -197,4 +197,36 @@ void main() {
       expect(find.text('The kennel statistics is part of Pro'), findsNothing);
     });
   });
+
+  // Both of these were found on the phone, after a real test-card purchase:
+  // the app kept selling a plan it had just sold, and kept counting down a
+  // trial that was no longer what governed the app.
+  group('after the money is taken', () {
+    testWidgets('the upgrade page stops selling what she already owns', (
+      tester,
+    ) async {
+      await pumpApp(tester, seed: <Animal>[_nala()], proAccess: _paid());
+      await _openSetting(tester, 'Companion Pro');
+
+      expect(find.byType(UpgradeScreen), findsOneWidget);
+      expect(find.widgetWithText(FilledButton, 'Subscribe'), findsNothing);
+      expect(find.text('Restore a purchase'), findsNothing);
+      // The truth is still on the page, so she knows the tap landed.
+      expect(find.text('Thank you. Everything is unlocked.'), findsOneWidget);
+    });
+
+    testWidgets('Settings stops counting down a trial she has bought out of', (
+      tester,
+    ) async {
+      await pumpApp(tester, seed: <Animal>[_nala()], proAccess: _paid());
+      await tester.tap(find.widgetWithText(NavigationDestination, 'Settings'));
+      await settleRealIo(tester);
+
+      expect(find.text('Active on this phone'), findsOneWidget);
+      // The Pro row and the trial row sat one above the other saying two
+      // different things; only the Pro row survives.
+      expect(find.text('Free trial'), findsNothing);
+      expect(find.textContaining('days left'), findsNothing);
+    });
+  });
 }
