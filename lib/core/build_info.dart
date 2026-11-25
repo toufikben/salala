@@ -15,4 +15,4 @@ const String buildTag = String.fromEnvironment('SALALA_BUILD_TAG');
 /// second copy that nobody regenerates can say `0.1.0` three releases later.
 /// `test/core/build_info_test.dart` reads the pubspec and fails when the two
 /// disagree, so the drift is caught in the suite rather than by a buyer.
-const String appVersion = '1.0.1';
+const String appVersion = '1.0.2';

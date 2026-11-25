@@ -24,6 +24,7 @@ import 'package:companion/presentation/widgets/date_tile.dart';
 import 'package:companion/services/app_lock_service.dart';
 import 'package:companion/services/billing.dart';
 import 'package:companion/services/reminder_scheduler.dart';
+import 'package:companion/services/trial.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:timezone/data/latest_all.dart' as tz_data;
 import 'package:timezone/timezone.dart' as tz;
@@ -244,14 +245,27 @@ Future<FakeSecureStorage> pumpApp(
   // Keystore values written before the first frame: a broken digest, a lockout
   // that outlived the process, or an enrollment the app has to open on.
   Map<String, String> secureSeed = const <String, String>{},
-  // The answer the gates get, when a test wants them closed. The shipped build
-  // has billing switched off, so without this every gate is open and the sheets
-  // they open would be code nobody ever runs.
+  // The answer the gates get. Defaulted to a phone inside its trial, which is
+  // what a fresh install is: every gate answers yes, so the screens behind them
+  // render fast, and a test that wants them closed passes ProAccess with an
+  // expired trial. Overridden as a provider below rather than left to the real
+  // one, because the real one awaits a database read and trial clock inside a
+  // tap.
   ProAccess? proAccess,
 }) async {
   final storage = FakeSecureStorage()..values.addAll(secureSeed);
   late Database database;
-  final access = proAccess;
+  // A phone inside its trial, which is what the shipped build answers for every
+  // fresh install. Set explicitly rather than left to the real provider: the
+  // first gate a test touches now awaits a database read, and a test body waiting
+  // on real SQLite inside a tap is a test that fails on the machine's mood.
+  final access =
+      proAccess ??
+      const ProAccess(
+        billingEnabled: true,
+        owned: Entitlement.none(),
+        trial: TrialState(daysLeft: kTrialDays, expired: false),
+      );
 
   // The triage table, read here instead of from inside its provider, and read
   // the way `test/core/triage_test.dart` reads it: synchronously, off disk.
@@ -362,10 +376,8 @@ Future<FakeSecureStorage> pumpApp(
         if (locale != null) initialLocaleProvider.overrideWithValue(locale),
         initialOnboardingSeenProvider.overrideWithValue(onboardingSeen),
         if (review != null) reviewServiceProvider.overrideWithValue(review),
-        if (access != null) ...[
-          billingEnabledProvider.overrideWithValue(true),
-          proAccessProvider.overrideWith((ref) async => access),
-        ],
+        billingEnabledProvider.overrideWithValue(access.billingEnabled),
+        proAccessProvider.overrideWith((ref) async => access),
       ],
       child: const CompanionApp(),
     ),

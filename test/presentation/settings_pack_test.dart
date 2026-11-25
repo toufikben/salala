@@ -9,6 +9,7 @@ import 'package:companion/data/models/animal.dart';
 import 'package:companion/data/models/photo.dart';
 import 'package:companion/data/models/vaccination.dart';
 import 'package:companion/presentation/screens/animal_list_screen.dart';
+import 'package:companion/presentation/screens/settings_screen.dart';
 import 'package:companion/presentation/widgets/animal_card.dart';
 import 'package:companion/services/data_pack.dart';
 import 'package:companion/services/pack_archive.dart';
@@ -123,9 +124,21 @@ Future<void> scrollHerdTo(WidgetTester tester, Finder finder) async {
 
 Future<void> tapTile(WidgetTester tester, String title) async {
   // A tile's label can sit under the snackbar the previous action left behind,
-  // so the scroll is asserted rather than assumed.
+  // so the scroll is asserted rather than assumed — and it is a scroll, not an
+  // `ensureVisible`: Settings is lazy and now carries the Pro row and the trial
+  // row above the pack tiles, so on a phone viewport the row has not been built
+  // at all and `ensureVisible` throws "No element" instead of scrolling to it.
   final tile = find.text(title);
-  await tester.ensureVisible(tile);
+  await tester.scrollUntilVisible(
+    tile,
+    180,
+    scrollable: find
+        .descendant(
+          of: find.byType(SettingsScreen),
+          matching: find.byType(Scrollable),
+        )
+        .first,
+  );
   await tester.pump();
   await tester.tap(tile);
   await settleRealIo(tester);

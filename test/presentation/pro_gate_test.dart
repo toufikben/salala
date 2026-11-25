@@ -97,7 +97,7 @@ Future<void> _openSetting(WidgetTester tester, String label) async {
 
 void main() {
   group('the photo allowance', () {
-    testWidgets('a free build asks for nothing', (tester) async {
+    testWidgets('a phone inside its trial asks for nothing', (tester) async {
       await pumpApp(
         tester,
         seed: <Animal>[_nala()],

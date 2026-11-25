@@ -8,6 +8,7 @@ import 'package:companion/data/models/buyer.dart';
 import 'package:companion/data/models/litter.dart';
 import 'package:companion/data/models/placement.dart';
 import 'package:companion/data/models/vaccination.dart';
+import 'package:companion/presentation/screens/settings_screen.dart';
 
 import '../helpers/fake_pack_files.dart';
 import '../helpers/pump_app.dart';
@@ -41,7 +42,20 @@ Future<void> _openCsvTiles(WidgetTester tester) async {
   // close the very rows the next tap is looking for.
   if (find.text('Handovers').evaluate().isNotEmpty) return;
   final header = find.text('Spreadsheet (CSV)');
-  await tester.ensureVisible(header);
+  // Scrolled, not `ensureVisible`: Settings is a lazy `ListView` that now carries
+  // the Pro row and the trial row above the spreadsheet, so on a phone viewport
+  // the header has not been built at all and `ensureVisible` throws "No element"
+  // instead of scrolling.
+  await tester.scrollUntilVisible(
+    header,
+    180,
+    scrollable: find
+        .descendant(
+          of: find.byType(SettingsScreen),
+          matching: find.byType(Scrollable),
+        )
+        .first,
+  );
   await tester.pump();
   await tester.tap(header);
   await settleRealIo(tester);
@@ -55,7 +69,18 @@ Future<void> _tapCsv(WidgetTester tester, String label) async {
     of: find.byType(ExpansionTile),
     matching: find.text(label),
   );
-  await tester.ensureVisible(tile);
+  // The four rows are taller than what is left of the screen once the header has
+  // been scrolled to, so the last one is not built until it is scrolled for.
+  await tester.scrollUntilVisible(
+    tile,
+    120,
+    scrollable: find
+        .descendant(
+          of: find.byType(SettingsScreen),
+          matching: find.byType(Scrollable),
+        )
+        .first,
+  );
   await tester.pump();
   await tester.tap(tile);
   await settleRealIo(tester);
@@ -222,7 +247,18 @@ void main() {
       await _goToSettings(tester);
 
       final export = find.text('Export records');
-      await tester.ensureVisible(export);
+      // Settings is lazy and the Pro row and the trial row now sit above the
+      // pack tiles, so the row is scrolled for rather than assumed built.
+      await tester.scrollUntilVisible(
+        export,
+        180,
+        scrollable: find
+            .descendant(
+              of: find.byType(SettingsScreen),
+              matching: find.byType(Scrollable),
+            )
+            .first,
+      );
       await tester.pump();
       await tester.tap(export);
       await settleRealIo(tester);
@@ -247,7 +283,16 @@ void main() {
       await _goToSettings(tester);
 
       final export = find.text('Export records');
-      await tester.ensureVisible(export);
+      await tester.scrollUntilVisible(
+        export,
+        180,
+        scrollable: find
+            .descendant(
+              of: find.byType(SettingsScreen),
+              matching: find.byType(Scrollable),
+            )
+            .first,
+      );
       await tester.pump();
       await tester.tap(export);
       await settleRealIo(tester);
