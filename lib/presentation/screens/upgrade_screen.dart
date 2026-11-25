@@ -200,12 +200,19 @@ class _UpgradeScreenState extends ConsumerState<UpgradeScreen> {
   Future<void> _restore() async {
     final l10n = AppLocalizations.of(context);
     setState(() => _working = true);
-    await ref.read(entitlementProvider.notifier).refreshFromStore();
+    final answered = await ref
+        .read(entitlementProvider.notifier)
+        .restoreAndReport();
     if (!mounted) return;
     setState(() => _working = false);
     final owned = ref.read(entitlementProvider).value;
+    // "No purchase found" is only the truth when the store was actually asked.
+    // In a shed, the honest answer is that the store could not be reached —
+    // telling a paying breeder she owns nothing is how a refund gets requested.
     _say(
-      owned != null && owned.unlocksEverything
+      !answered
+          ? l10n.upgradeStoreUnreachable
+          : owned != null && owned.unlocksEverything
           ? l10n.upgradeRestored
           : l10n.upgradeNothingToRestore,
     );

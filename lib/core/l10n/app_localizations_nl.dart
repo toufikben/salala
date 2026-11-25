@@ -1531,6 +1531,10 @@ class AppLocalizationsNl extends AppLocalizations {
   String get upgradeNothingToRestore => 'Geen aankoop gevonden op dit account.';
 
   @override
+  String get upgradeStoreUnreachable =>
+      'De winkel was niet bereikbaar. Probeer het opnieuw als je online bent.';
+
+  @override
   String get upgradeThankYou => 'Dank je. Alles is ontgrendeld.';
 
   @override

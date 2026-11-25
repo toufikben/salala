@@ -1536,6 +1536,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get upgradeNothingToRestore => 'Kein Kauf in diesem Konto gefunden.';
 
   @override
+  String get upgradeStoreUnreachable =>
+      'Der Store war nicht erreichbar. Versuche es erneut, sobald du online bist.';
+
+  @override
   String get upgradeThankYou => 'Danke. Alles ist freigeschaltet.';
 
   @override

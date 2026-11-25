@@ -39,6 +39,14 @@ class EntitlementController extends AsyncNotifier<Entitlement> {
     state = AsyncData(await ref.read(billingServiceProvider).refresh());
   }
 
+  /// The same, but it reports whether the store answered, so a screen can say
+  /// "the store was unreachable" instead of "you own nothing".
+  Future<bool> restoreAndReport() async {
+    final result = await ref.read(billingServiceProvider).poll();
+    state = AsyncData(result.owned);
+    return result.answered;
+  }
+
   Future<bool> buy(StoreProduct product) async {
     final owned = await ref.read(billingServiceProvider).buy(product);
     if (owned == null) return false;

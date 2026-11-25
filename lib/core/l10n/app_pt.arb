@@ -444,6 +444,7 @@
   "upgradeRestore": "Restaurar uma compra",
   "upgradeRestored": "A tua compra voltou.",
   "upgradeNothingToRestore": "Nenhuma compra encontrada nesta conta.",
+  "upgradeStoreUnreachable": "Não foi possível contactar a loja. Tenta novamente quando tiveres rede.",
   "upgradeThankYou": "Obrigado. Está tudo desbloqueado.",
   "upgradeFailed": "A loja não concluiu. Nada foi cobrado.",
   "upgradeLater": "Agora não",

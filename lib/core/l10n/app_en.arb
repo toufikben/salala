@@ -1014,6 +1014,7 @@
   "upgradeRestore": "Restore a purchase",
   "upgradeRestored": "Your purchase is back.",
   "upgradeNothingToRestore": "No purchase found on this account.",
+  "upgradeStoreUnreachable": "The store could not be reached. Try again once you are online.",
   "upgradeThankYou": "Thank you. Everything is unlocked.",
   "upgradeFailed": "The store did not finish that. Nothing was charged.",
   "upgradeLater": "Not now",

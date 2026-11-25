@@ -1520,6 +1520,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get upgradeNothingToRestore => 'لا توجد عملية شراء في هذا الحساب.';
 
   @override
+  String get upgradeStoreUnreachable =>
+      'لم نتمكّن من الوصول إلى المتجر. أعد المحاولة عند عودة الشبكة.';
+
+  @override
   String get upgradeThankYou => 'شكرًا لك. كل شيء مفتوح.';
 
   @override

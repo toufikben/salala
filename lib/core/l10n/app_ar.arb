@@ -530,6 +530,7 @@
   "upgradeRestore": "استعادة عملية شراء",
   "upgradeRestored": "عادت مشترياتك.",
   "upgradeNothingToRestore": "لا توجد عملية شراء في هذا الحساب.",
+  "upgradeStoreUnreachable": "لم نتمكّن من الوصول إلى المتجر. أعد المحاولة عند عودة الشبكة.",
   "upgradeThankYou": "شكرًا لك. كل شيء مفتوح.",
   "upgradeFailed": "لم يُكمل المتجر العملية. لم يُخصم شيء.",
   "upgradeLater": "ليس الآن",

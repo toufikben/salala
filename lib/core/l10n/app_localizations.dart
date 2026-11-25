@@ -2774,6 +2774,12 @@ abstract class AppLocalizations {
   /// **'No purchase found on this account.'**
   String get upgradeNothingToRestore;
 
+  /// No description provided for @upgradeStoreUnreachable.
+  ///
+  /// In en, this message translates to:
+  /// **'The store could not be reached. Try again once you are online.'**
+  String get upgradeStoreUnreachable;
+
   /// No description provided for @upgradeThankYou.
   ///
   /// In en, this message translates to:

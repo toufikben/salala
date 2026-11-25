@@ -1530,6 +1530,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get upgradeNothingToRestore => 'Aucun achat trouvé sur ce compte.';
 
   @override
+  String get upgradeStoreUnreachable =>
+      'La boutique est injoignable. Réessaie une fois connecté.';
+
+  @override
   String get upgradeThankYou => 'Merci. Tout est déverrouillé.';
 
   @override

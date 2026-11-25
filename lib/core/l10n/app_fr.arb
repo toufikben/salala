@@ -530,6 +530,7 @@
   "upgradeRestore": "Restaurer un achat",
   "upgradeRestored": "Votre achat est revenu.",
   "upgradeNothingToRestore": "Aucun achat trouvé sur ce compte.",
+  "upgradeStoreUnreachable": "La boutique est injoignable. Réessaie une fois connecté.",
   "upgradeThankYou": "Merci. Tout est déverrouillé.",
   "upgradeFailed": "La boutique n'a pas terminé. Rien n'a été débité.",
   "upgradeLater": "Pas maintenant",

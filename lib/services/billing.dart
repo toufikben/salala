@@ -170,15 +170,24 @@ class BillingService {
   /// lapsed must stop unlocking, and a purchase made on another phone must
   /// start. A failure leaves the stored row alone rather than locking a breeder
   /// out of what she paid for because the phone was in a shed.
-  Future<Entitlement> refresh() async {
+  Future<Entitlement> refresh() async => (await poll()).owned;
+
+  /// The same check, but it also says whether the store actually answered.
+  ///
+  /// "Nothing is owned" and "the store could not be asked" have to be told
+  /// apart wherever the answer is shown to a person: a breeder who taps Restore
+  /// in a shed must be told the store was unreachable, not that she owns
+  /// nothing. Both come back as the same entitlement, so the flag travels with
+  /// it rather than being inferred afterwards.
+  Future<({Entitlement owned, bool answered})> poll() async {
     final store = gateway;
-    if (store == null) return read();
+    if (store == null) return (owned: await read(), answered: false);
     try {
       final owned = await store.restore();
       await write(owned);
-      return owned;
+      return (owned: owned, answered: true);
     } catch (_) {
-      return read();
+      return (owned: await read(), answered: false);
     }
   }
 

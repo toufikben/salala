@@ -444,6 +444,7 @@
   "upgradeRestore": "Kauf wiederherstellen",
   "upgradeRestored": "Dein Kauf ist wieder da.",
   "upgradeNothingToRestore": "Kein Kauf in diesem Konto gefunden.",
+  "upgradeStoreUnreachable": "Der Store war nicht erreichbar. Versuche es erneut, sobald du online bist.",
   "upgradeThankYou": "Danke. Alles ist freigeschaltet.",
   "upgradeFailed": "Der Store hat das nicht abgeschlossen. Es wurde nichts berechnet.",
   "upgradeLater": "Nicht jetzt",

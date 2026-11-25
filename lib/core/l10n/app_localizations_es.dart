@@ -1533,6 +1533,10 @@ class AppLocalizationsEs extends AppLocalizations {
       'No se encontró ninguna compra en esta cuenta.';
 
   @override
+  String get upgradeStoreUnreachable =>
+      'No se pudo acceder a la tienda. Inténtalo de nuevo cuando tengas conexión.';
+
+  @override
   String get upgradeThankYou => 'Gracias. Todo está desbloqueado.';
 
   @override

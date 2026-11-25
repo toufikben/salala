@@ -1537,6 +1537,10 @@ class AppLocalizationsIt extends AppLocalizations {
       'Nessun acquisto trovato su questo account.';
 
   @override
+  String get upgradeStoreUnreachable =>
+      'Non è stato possibile raggiungere lo store. Riprova quando sei online.';
+
+  @override
   String get upgradeThankYou => 'Grazie. Tutto è sbloccato.';
 
   @override

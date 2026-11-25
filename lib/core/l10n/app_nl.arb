@@ -444,6 +444,7 @@
   "upgradeRestore": "Aankoop herstellen",
   "upgradeRestored": "Je aankoop is terug.",
   "upgradeNothingToRestore": "Geen aankoop gevonden op dit account.",
+  "upgradeStoreUnreachable": "De winkel was niet bereikbaar. Probeer het opnieuw als je online bent.",
   "upgradeThankYou": "Dank je. Alles is ontgrendeld.",
   "upgradeFailed": "De winkel heeft dat niet afgerond. Er is niets afgeschreven.",
   "upgradeLater": "Niet nu",

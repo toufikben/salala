@@ -107,20 +107,57 @@ void main() {
       expect(await billing.read(), store.owned);
     });
 
-    test('a store that cannot be reached does not lock a paying breeder out', () async {
-      final store = _FakeStore(
-        owned: const Entitlement(<CompanionPlan>{CompanionPlan.pro}),
-        failRestore: true,
-      );
-      final billing = BillingService(settings: settings, gateway: store);
-      await billing.write(
-        const Entitlement(<CompanionPlan>{CompanionPlan.pro}),
-      );
-      expect(
-        await billing.refresh(),
-        const Entitlement(<CompanionPlan>{CompanionPlan.pro}),
-      );
-      expect(store.restoreCalls, 1);
+    test(
+      'a store that cannot be reached does not lock a paying breeder out',
+      () async {
+        final store = _FakeStore(
+          owned: const Entitlement(<CompanionPlan>{CompanionPlan.pro}),
+          failRestore: true,
+        );
+        final billing = BillingService(settings: settings, gateway: store);
+        await billing.write(
+          const Entitlement(<CompanionPlan>{CompanionPlan.pro}),
+        );
+        expect(
+          await billing.refresh(),
+          const Entitlement(<CompanionPlan>{CompanionPlan.pro}),
+        );
+        expect(store.restoreCalls, 1);
+      },
+    );
+
+    // "Nothing is owned" and "the store could not be asked" are the same
+    // entitlement and different facts. The screen that offers Restore has to
+    // tell them apart: telling a paying breeder she owns nothing is how a
+    // refund gets requested, so the flag travels out of poll() with the answer.
+    test(
+      'a store that cannot be reached says so instead of saying nothing',
+      () async {
+        final store = _FakeStore(
+          owned: const Entitlement(<CompanionPlan>{CompanionPlan.pro}),
+          failRestore: true,
+        );
+        final billing = BillingService(settings: settings, gateway: store);
+        await billing.write(
+          const Entitlement(<CompanionPlan>{CompanionPlan.pro}),
+        );
+
+        final answer = await billing.poll();
+        expect(answer.answered, isFalse);
+        expect(
+          answer.owned,
+          const Entitlement(<CompanionPlan>{CompanionPlan.pro}),
+          reason: 'a failed question must not erase the stored receipt',
+        );
+      },
+    );
+
+    test('a store that answered "nothing owned" is an answer', () async {
+      final billing = BillingService(settings: settings, gateway: _FakeStore());
+
+      final answer = await billing.poll();
+      expect(answer.answered, isTrue);
+      expect(answer.owned, const Entitlement.none());
     });
 
     test('a purchase the store refused writes nothing', () async {
@@ -176,7 +213,11 @@ void main() {
           expired: true,
         );
         for (final feature in ProFeature.values) {
-          expect(gate.allows(feature), isTrue, reason: '$plan / ${feature.name}');
+          expect(
+            gate.allows(feature),
+            isTrue,
+            reason: '$plan / ${feature.name}',
+          );
         }
         expect(gate.paid, isTrue);
         expect(gate.inTrial, isFalse);
